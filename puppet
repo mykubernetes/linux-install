@@ -1,0 +1,610 @@
+
+  puppet describe -l：例如puppet支持的所有资源类型及其描述信息；
+  puppet describe -s <TYPE>：列出指定资源的简要说明；
+  puppet describe <TYPE>：显示指定资源的详细说明；
+
+常用的资源类型
+user，group，file,package，service，exec，cron，notify
+
+user：
+	常用属性:
+	commet：注释信息
+	ensure：present，absent
+	expiry：过期期限
+	gid：基本组id
+	groups：附加组
+	home：家目录
+	shell：默认家目录
+	name：用户名
+	system：true，false 是否为系统用户
+	uid：UID
+	password：密码
+
+ user { 'magedu':
+      ensure     => present,
+      uid        => '601',
+      gid        => '601',
+      shell      => '/bin/bash',
+      home       => '/home/magedu',
+      managehome => true,
+    }
+
+group：
+	常用属性:
+	name：组名
+	gid：GID
+	system：true，false 是否为系统组
+	ensure：present，absent
+	members：组成员
+group { 'magedu':
+	ensure 	=> present,
+	gid		=> 601,
+	before 	=> User['magedu'],
+}
+
+user { 'magedu':
+     ensure     => present,
+     uid        => '601',
+     gid        => '601',
+     shell      => '/bin/bash',
+     home       => '/home/magedu',
+}
+
+
+file：
+	管理文件及其内容、从属关系以及权限：内容可通过content属性直接给出，也可通过source属性根据远程服务器路径下载生成：
+	指明文件内容来源:
+	content：直接给出文件内容，支持\n \t
+	sourec:从指定位置下载文件:
+	ensure:file,directory,link,present,absent
+	常用属性:
+	force:强制运行,可用值yes,no,true,false
+	group:属组
+	owner:属主
+	mode:权限u,g,o
+	path:目标路径
+	source:源文件路径:可以本地文件路径，也可以使用puppet：///modules/modu_name/file_name
+	target:当ensure为"link"时,target标识path指向的文件是一个符号链接文件,其目标为为target属性所指向的路径:此时content及source属性自动失效
+
+file{'/tmp/mydir':
+	ensure	=> directory,
+}
+file{'/tmp/puppet.file':
+	content	=> 'puppet testing\nsecond line.',
+	ensure	=> file,
+	owner	=> 'centos',
+	group	=> 'distro',
+	mode	=> '0400',
+}
+file{'tmp/fstab.puppet':
+	source	=> '/etc/fstab',
+	ensure	=> file,
+}	
+file{'/tmp/puppet.link':
+	ensure	=> link.
+	target	=> '/tmp/puppet.file',
+}
+
+
+exec:
+	运行一个外部命令:命令应该具有"幂等性":
+	幂等性:
+		1、命令本身具有幂等性：
+		2、资源有onlyif，unless等属性以实现命令的条件试运行：
+		3、资源有refreshonly属性，以实现只有订阅的资源发生变化时才执行：
+	常用属性：
+	command：运行的命令
+	creates：此属性指定的文件不存在时才执行此命令：
+	cwd：在此属性指定的路径下执行此命令：
+	user:以指定的用户身份运行命令:
+	group：指定组:
+	onlyif:给定一个测试命令：仅在此命令执行成功（返回值状态码为0）时才运行command指定的命令：
+	unless：给定一个测试命令：仅在此命令执行成功（返回值状态码不为0）时才运行command指定的命令：
+	refresh：接受到其他资源发来的refresh通知时，默认是从新执行exec定义的comma，但是refresh属性克改变这种行为，即可指定仅在refresh时运行的命令：
+	refreshonly：仅在收到refresh通知时才运行次资源：
+	returns：期望的状态返回值，返回非此值是表示命令执行失败
+	tries：尝试执行的次数默认为1
+	timeout：超时时长
+	path:指明命令搜索路径，其功能类型PATH环境变量：其值通常为列表['path1','path2',...]:如果不定义此属性，。则必须给定命令的绝对路径:
+
+exec{‘/usr/sbin/modprobe ext4’
+	user    => root,
+	group   => root,
+	refresh => '/usr/sbin/modprobe -r ext4 && /usr/sbin/modprobe ext4',
+	timeout => 5,
+	tries	=> 2,
+}
+exec{'/bin.echo hello > /tmp/hello.txt'
+	user  => root,
+	group => root,
+	creates => '/tmp/hello.txt',
+}
+
+exec{'/bin.echo hello > /tmp/hello.txt'
+	user  => root,
+	group => root,
+	unless => '/usr.bin/test -e /tmp/hello2.txt,
+}
+
+
+
+notify:通知
+	核心属性
+	message：要发送消息的内容：Namevar
+
+notify{“hello there”：}
+
+
+cron：
+	管理cron任务：
+	常用属性
+	ensure：present，absent
+	command：要运行的job
+	hour：小时
+	minute：分钟
+	month：月
+	monthday：日
+	weekday：周
+	name：名称
+	user：运行的用户
+	environment：运行时的环境变量
+	
+cron{"sync time":
+	command	=> '/usr/sbin/ntpdate 172.16.0.1 &> /dev/null',
+	minute	=> '*/10',
+}
+
+
+package:
+	管理程序包：
+	常用属性：
+	ensure：installed，latest，VERSION（2.3.1-2.el7），present，absent
+	name：程序包名称
+	source:包来源：可以说本地文件路径或URL
+	provider:rpm
+
+package{‘zsh’：
+	ensure	=> latest,	
+}
+package{'jdk':
+	ensure	=> installed,
+	source	=> '/usr/local/src/jdk-8u25-linux-x64.rpm',
+	provider => rpm,
+}
+
+service:
+	管理服务:
+	常用属性:
+	enable:是否开机自动启动,true,false:
+	ensure:启动(running),停止(stopped):
+	hasrestart:是否支持restart参数
+	hasstatus:是否支持status参数
+	name:服务名称
+	path:脚本查找路径
+	pattern:用于搜索此服务相关的进程的模式:当脚本不支持restart/status时,用于确定服务是否处于运行状态:
+	restart:用于执行"重启"命令:
+	start:用于执行"启动"命令
+	stop:用于执行"停止"命令
+	status:用于执行"获取其状态"命令
+
+package { 'nginx':
+	ensure => latest,
+}
+
+service { 'nginx':
+      	ensure    	=> running,
+      	enable    	=> true,
+	hasrestart	=> true,
+	hasstatus	=> true,
+	restart		=> 'systemctl reload nainx.service'	
+}
+
+
+特殊属性：
+	资源引用：
+	type['title']
+	依赖关系:
+		被依赖的资源中使用:before
+		依赖其他资源的资源:require
+		->:链式依赖
+	通知关系:
+		被依赖的资源中使用:notify
+		监听其他资源的资源:subscribe
+		~>:链式通知
+
+package{‘nginx’：
+	ensure => latest,
+}
+file{'/etc/nginx/nginx.conf':
+	ensure	=> file,
+	source	=> '/root/modules/nginx/files/nginx.conf',
+	require	=> Package['nginx'],
+	notify	=> Service['nginx'],
+}
+service{'nginx':
+	ensure	=> running,
+	enable	=> true,
+	hasrestart  => true,
+	hasstatus   => true,
+	#restart    => 'systemctl reload nginx.ervice',
+	require	=> [Package['nginx'],File['/etc/nginx/nginx.conf']],
+}
+
+
+
+
+
+
+$webserver=nginx
+package{‘$webserver’：
+	ensure => latest,
+}
+file{'/etc/nginx/nginx.conf':
+	ensure	=> file,
+	source	=> '/root/modules/nginx/files/nginx.conf',
+	require	=> Package['nginx'],
+	notify	=> Service['nginx'],
+}
+service{'nginx':
+	ensure	=> running,
+	enable	=> true,
+	hasrestart  => true,
+	hasstatus   => true,
+	#restart    => 'systemctl reload nginx.ervice',
+	require	=> [Package['nginx'],File['/etc/nginx/nginx.conf']],
+}
+		puppet中变量的种类:
+			自定义变量
+			facter变量:可引用变量  
+				查看puppet支持的各facts
+					facter -p
+			内置变量:
+				客户端内置:
+					$clientcert
+					$clientversion
+				服务器端内置
+					$servername
+					$serverip
+					$serversion
+					$module_name
+
+
+
+
+
+类：class
+	用于公共目的的一组资源，是命令的代码块：创建后可在puppet全局进行调用：类可以被继承
+	语法格式：
+		class class_name {
+			...puppet code...
+		}
+	注意：类名只能包含小写字母、数字和下划线，且必须以小写字母开头：
+
+
+class nginx {
+	$webserver=nginx
+	package{‘$webserver’：
+		ensure => latest,
+	}
+	file{'/etc/nginx/nginx.conf':
+		ensure	=> file,
+		source	=> '/root/modules/nginx/files/nginx.conf',
+		require	=> Package['nginx'],
+		notify	=> Service['nginx'],
+	}
+	service{'nginx':
+		ensure	=> running,
+		enable	=> true,
+		hasrestart  => true,
+		hasstatus   => true,
+		#restart    => 'systemctl reload nginx.ervice',
+		require	=> [Package['nginx'],File['/etc/nginx/nginx.conf']],
+	}
+}
+
+include nginx
+
+
+类声明方式1：
+	include class_name,class_name,...
+
+
+
+
+
+定义能接受参数的类:
+	class class_name($arg1='value1',$arg2='value2') {
+		...puppet code...
+}
+
+
+class nginx {
+	$webserver='nginx'
+	package{‘$webserver’：
+		ensure => latest,
+	}
+	file{'/etc/nginx/nginx.conf':
+		ensure	=> file,
+		source	=> '/root/modules/nginx/files/nginx.conf',
+		require	=> Package['nginx'],
+		notify	=> Service['nginx'],
+	}
+	service{'nginx':
+		ensure	=> running,
+		enable	=> true,
+		hasrestart  => true,
+		hasstatus   => true,
+		#restart    => 'systemctl reload nginx.ervice',
+		require	=> [Package['nginx'],File['/etc/nginx/nginx.conf']],
+	}
+}
+
+include nginx
+
+类声明方式2:
+	class {'class_那么':
+	arg1 => value,
+	arg2 => value,
+}
+
+class nginx($webserver='nginx') {
+	
+	package{‘$webserver’：
+		ensure => latest,
+	}
+	file{'/etc/nginx/nginx.conf':
+		ensure	=> file,
+		source	=> '/root/modules/nginx/files/nginx.conf',
+		require	=> Package['nginx'],
+		notify	=> Service['nginx'],
+	}
+	service{'nginx':
+		ensure	=> running,
+		enable	=> true,
+		hasrestart  => true,
+		hasstatus   => true,
+		#restart    => 'systemctl reload nginx.ervice',
+		require	=> [Package['nginx'],File['/etc/nginx/nginx.conf']],
+	}
+}
+
+class {'nginx':
+	webserver => 'tengine'
+}
+
+
+
+
+
+
+类继承:
+	定义方式:
+		class base_class {
+		...puttet code...
+	}
+
+		class base_class::class_name inherits base_class{
+		...puttet code...
+	}
+
+	作用:继承一个已有的类,并实现覆盖资源属性,或向资源属性追加额外值:
+	=>,+>
+	类继承时:
+		(1)声明子类时,其基类会被自动首先声明:
+		(2)基类成为了子类的父作用域,基类中的变量和属性默认值会被子类复制一份:
+		(3)子类可以覆盖父类中同一资源的相同属性的值:
+
+class nginx {
+	package{'nginx’：
+		ensure => latest,
+} ->
+	service{'nginx':
+		enable	=> true,
+		ensure 	=> running,
+		hasrestart  => true,
+		hasstatus   => true,
+		restart	=> 'service nginx reload',
+}
+
+class nginx::webserver inherits nginx {
+	file{'/etc/nginx/nginx.conf':
+		source 	=> '/root/modules/nginx/files/nginx_web.conf',
+		ensure	=> file,
+		notify 	=> Service['nginx'],
+	}	
+}
+
+class nginx::proxy inherits nginx {
+	file{'/etc/nginx/nginx.conf':
+		source 	=> '/root/modules/nginx/files/nginx_proxy.conf',
+		ensure	=> file,
+		notify 	=> Service['nginx'],
+	}	
+}
+
+include nginx::webserver
+
+
+
+
+在子类中覆盖父类的值或增加值
+class nginx {
+	package{'nginx’：
+		ensure => latest,
+} ->
+	service{'nginx':
+		enable	=> true,
+		ensure 	=> running,
+		hasrestart  => true,
+		hasstatus   => true,
+		restart	=> 'service nginx reload',
+}
+
+class nginx::webserver inherits nginx {
+	Package['nginx'] {
+		name => tenginem
+		name +> varnish
+	}
+	file{'/etc/nginx/nginx.conf':
+		source 	=> '/root/modules/nginx/files/nginx_web.conf',
+		ensure	=> file,
+		notify 	=> Service['nginx'],
+	}	
+}
+
+include nginx::webserver
+
+
+
+
+模板:基于ERB模板语音,在静态文件中使用变量等编程元素生成适用于多种不同的环境的文本文件(配置文件):Embedded RuBy,用于实现在文本文件中嵌入ruby代码,原理的文本信息不回被改变,但ruby代码会不执行,执行结果将直接替换原来代码:
+
+	<%= Ruby Expression %>: 替换为表达式的值:
+	<% Ruby Expression %>:仅执行代码,而不替换
+	<%# comment %> 文本注释：	
+	<%%:输出为<%
+	%%>:输出为%>
+	<%- Ruby code %>:忽略空白字符:
+	<% Ruby code -%>:忽略空白行:
+
+	在模板中可以使用变量,包括puppet的任意可用变量,但变量名以@字符开头:
+
+	条件判断:
+	<% if CONDITION -%>
+		some text
+	<% end %>
+
+	<% if CONDITION -%>
+		some text
+	<% else %>
+		some other text
+	<% end %>
+
+	迭代:
+	<% @ArrayName.echo do | Variable_Name |-%>
+		some text with <%= Variable_Name %>
+	<% end %>
+
+file{'/etc/nginx/nginx.conf':
+		content => template( '/root/modules/nginx/files/nginx_web.conf'),
+		ensure	=> file,
+		notify 	=> Service['nginx'],
+	}	
+
+
+模块:
+	module_name/
+	manifests/
+		init.pp至少应该包含一个与当前模块名称同名类:
+	files:静态文件:puppet:///modules/module_name/file_name;
+	templates:模板文件目录:template('module_name/template_file_name'):
+	lib:插件目录:
+	tests:当前模块的使用帮助文件示例文件:
+	spec:类似于tests目录,存储lib目录下定义的插件的使用帮助及示例文件:
+
+
+
+
+
+
+
+
+puppet(3)
+	agent/master:
+    		agent:默认每隔30分钟向master发送node name和facts，并请求catalog;
+		master:验正客户端身份，查找与其相关的site manifest,编译生成catalog，并发送给客户端:
+	ssl xmlrpc, https
+      	8140/tcp
+	master:  puppet,puppet-server, facter
+	agent:  puppet, facter
+配置文件:
+    主配里文件:/etc/puppet/puppet.conf
+
+显示或设置配置参数:
+    	puppet config
+        	  print
+        	  set
+手动生成完成配置文件:
+	master:
+    		puppet master --genconfig > /etc/puppet/puppet_default.conf
+	agent:
+    		puppet agent --genconfig >> /etc/puppet/puppet_default.conf
+	注意:
+		(1)生成新的配置之前不能删除或移动原有的puppet.conf:
+		(2)生成的配置中，有的参数己经被废弃，与现有Puppet版本可能兼容:
+		(3)有的参数的默认值与现在版本所支持值可能不相兼容:
+	
+	获取puppet文档:
+    		puppet doc
+        	分段，称为reference
+        	列出所有的reference:
+                puppet doc--list
+	查看某一reference:
+    		puppet doc -r REFERENCE_NAME
+
+配置文件的组成部分:
+	[main]
+	[master]
+	[agen]
+
+签署正式：
+	puppet cert <action> [-h|--help] [-V|--version] [-d|--debug] [-v|--verbose] [--digest <digest>] [<host>]
+
+	Action:
+		list: 查看所等签署请求：
+配置agent/master
+	1、配置master；
+		#puppet master --no-daemonize -v
+		#systemctl start puppetmaster.service
+		#systemctl enable puppetmaster.service
+
+		8140/tcp
+	2、配置agent
+		#puppet agent --server=MASTER_HOST_NAME --no-daemonize --noop --test -v
+		#puppet agent --server=MASTER_HOST_NAME --no-daemonize -v -d
+
+
+	3、在master端为客户签署证书
+		#puppet cert list
+		#puppet cert sign NOOD_NAME
+		#puppet cert sign --all
+
+	4、在master断：
+		(1)安装所有要用到的模块：
+			puppet module install
+			自研
+		(2)定义site manifest；
+			/etc/puppet/manifests/site.pp
+				node 'NODE_NAME' {
+				 ...puppet code ...
+				}
+		列如：
+			node "node3.mageedu.com" {
+				include nginx::proxy
+				}
+
+		节点管理：
+			site.pp定义节点的方式：
+			（1）以主机名直接给出其相关定义：
+				node ‘NODE_NAME’{
+				... puppet code ...
+				}
+
+			（2）把功能相近的主机事先按统一格式命名，按统一格式调用：
+				node /^web\d+\.mageedu\.com/ {
+				... puppet code ...
+				}
+		主机命名规范：	
+		角色-运营商-机房名-IP.DOMAIN.TLD
+			web-unicom-jxq-1.1.1.1.magedu.com
+
+		对节点配置分段管理：
+		/etc/puppet/mainfests/
+			site.pp
+				import "webserver/*.pp"
+			webservers/
+				unicom.pp
+				telecom.pp
+			cacaheservers/
+				
+			appservers/
