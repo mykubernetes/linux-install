@@ -1,0 +1,278 @@
+1.安装环境
+----------
+    # uname -a
+    Linux bjrgoos056 2.6.32-431.el6.x86_64 #1 SMP Fri Nov 22 03:15:09 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
+    # cat /etc/issue
+    CentOS release 6.5 (Final)
+    Kernel \r on an \m
+
+2.源码安装
+----------
+2.1 源码下载地址 http://bird.network.cz/?download
+    在测试过程中发现最新版本1.5.0源码BFD协议有bug，修复bug后的源码已提交到svn，
+    可在svn上check out。
+    # tar xvzf bird-1.5.0.tar.gz -C /opt
+
+2.2 安装依赖包
+    # yum install -y flex bison
+    支持bird client需安装以下依赖包
+    # yum install -y ncurses-devel readline-devel
+
+2.3 编译安装
+    # cd /opt/bird-1.5.0
+    # ./configure --prefix=/opt/bird
+    # make && make install
+
+    安装后bird守护进程路径:/opt/bird/sbin/bird
+    bird client交互程序路径:/opt/bird/sbin/birdc
+
+2.4 安装bird服务
+    编写service脚本bird放到/etc/init.d目录下，执行命令:
+    # chkconfig --add bird
+    查看服务是否添加成功:
+    # chkconfig --list | grep bird
+    bird           	0:off	1:off	2:off	3:on	4:off	5:on	6:off
+    在CentOS7下需要执行命令:
+    # systemctl daemon-reload
+
+    服务脚本内容如下:
+    #!/bin/bash
+    #
+    # chkconfig: 35 85 15
+    # description: BIRD is an Internet Routing Daemon and distributed under the
+    #              GNU General Public License. It supports either IPv4 or IPv6
+    #              protocol,see more details: http://bird.network.cz/
+    # processname: BIRD
+    # config: /opt/bird-1.5.0/etc/bird.conf
+    # Script Author: yangchao
+
+    # Source function library.
+    if [ -f /etc/init.d/functions ]; then
+      . /etc/init.d/functions
+    elif [ -f /etc/rc.d/init.d/functions ] ; then
+      . /etc/rc.d/init.d/functions
+    else
+      exit 0
+    fi
+
+    # Source networking configuration.
+    . /etc/sysconfig/network
+
+    PROPATH=/opt/bird-1.5.0
+
+    # Check that networking is up.
+    [ "${NETWORKING}" = "no" ] && exit 0
+
+    start() {
+        echo -n "Starting bird daemon ...    "
+        ${PROPATH}/sbin/bird -P ${PROPATH}/var/bird.pid
+        if [ $? -ne 0 ]; then
+            echo "fail"
+            return 1
+        else
+            echo "ok"
+        fi
+    }
+
+    stop() {
+        echo -n "Shutdown bird daemon ...    "
+        echo "down" | ${PROPATH}/sbin/birdc > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo "fail"
+            return 1
+        else
+            echo "ok"
+        fi
+    }
+
+    reload() {
+        if [ "x$1" = "x" ]; then
+            echo "configure" | ${PROPATH}/sbin/birdc
+        else
+            echo "configure \"$1\"" | ${PROPATH}/sbin/birdc
+        fi
+    }
+
+    status() {
+      if [ ! -f ${PROPATH}/var/bird.pid ]; then
+         echo "`basename $0` is not running"
+         exit 1
+      else
+         pid=`cat ${PROPATH}/var/bird.pid`
+         kill -0 $pid
+         if [ $? != 0 ]; then
+             echo "`basename $0` is not running"
+             exit 1
+         else
+             echo "`basename $0` is running ($pid)"
+             exit 0
+         fi
+      fi
+    }
+
+    # See how we were called.
+    case "$1" in
+      start)
+        start
+        ;;
+      stop)
+        stop
+        ;;
+      restart)
+        stop    
+        start
+        ;;
+      reload)
+        reload $2
+        ;;
+      status)
+        status
+        ;;
+      *)
+        echo $"Usage: $BASENAME {start|stop|restart|reload|status}"
+        exit 1
+    esac
+
+    exit $?
+    # End
+
+PS: 如果安装环境与本文档一致的话，可直接下载已编译好的安装包bird-install.tar.gz，
+    直接解压至/opt即可。将解压后bird-1.5.0/etc/bird.service复制到/etc/init.d/bird。
+
+3.BIRD配置
+----------
+3.1 BIRD配置参考文档:
+    http://bird.network.cz/?get_doc&f=bird-6.html#ss6.1
+    配置文件路径:/opt/bird/etc/bird.conf
+
+    在oos生产环境中，BIRD关键配置如下:
+    router id 192.168.209.56;
+    #配置bgp发布的静态路由
+    protocol static static_bgp {
+        route 42.123.70.59/32 via "bond1";
+    }
+    #配置bgp邻居
+    protocol bgp bgp1 {
+        local as 456;
+        neighbor 10.0.132.254 as 123;
+        bfd;
+        export where proto = "static_bgp";
+        source address 10.0.132.13;
+    }
+    #使能bfd功能,路由快速收敛
+    protocol bfd {
+        interface "bond1" {
+                min rx interval 300ms;
+                min tx interval 300ms;
+                multiplier 3;
+        };
+        neighbor 10.0.132.254 dev "bond1";
+    }
+
+3.2 与交换机对端配置参考:
+    华三配置 12508
+    配置参考文档:
+    http://www.h3c.com.cn/Service/Document_Center/Switches/Catalog/S12500/S12500/Configure/Typical_Configuration_Example/H3C_S12500-R1825P01-6W100/11/201308/794683_30005_0.htm#_Toc364928553
+
+    bfd session init-mode active
+    interface Vlan-interface223
+    ip address 172.19.1.126/25
+    bfd min-transmit-interval 100
+    bfd min-receive-interval 100
+    bfd detect-multiplier 3
+
+    bgp 125
+    peer 172.19.1.48 as-number 4540
+    peer 172.19.1.48 bfd
+
+    思科配置 N7000
+    配置参考文档:
+    http://www.cisco.com/c/en/us/td/docs/switches/datacenter/sw/5_x/nx-os/interfaces/configuration/guide/if_cli/if_bfd.html#26465
+
+    switchro vdc VDC4
+    interface vlan 223
+    no shutdown
+    ip address 172.19.1.100/25
+    bfd interval 200 min_rx 200 multiplier 3
+
+    router bgp 65531
+    bgp router-id 192.168.2.1
+    network 192.168.2.1/32
+    neighbor 10.1.1.3 remote-as 58519
+    neighbor 10.1.1.3 ebgp-multihop 5
+    neighbor 10.1.1.4 remote-as 58519
+    neighbor 10.1.1.4 ebgp-multihop 5
+    address-family ipv4 unicast
+    bfd
+
+4.BIRD日常维护
+--------------
+4.1 常用命令
+    bird提供了birdc命令行与bird交互。常用命令有：
+    configure    动态加载配置文件，同service bird reload
+    down        关闭bird进程，同service bird stop
+    show protocols    查看协议状态
+    show protocols all <protocol>    查看协议详细信息
+    show bfd sessions    查看BFD会话信息
+    
+    具体例子如下:
+    bird> show protocols 
+    name     proto    table    state  since       info
+    kernel1  Kernel   master   up     2015-09-08  
+    device1  Device   master   up     2015-09-08  
+    static_bgp Static   master   up     2015-09-08  
+    bgp1     BGP      master   up     2015-11-04  Established   
+    bfd1     BFD      master   up     2015-09-08
+    查看各协议状态是否为up
+    
+    bird> show protocols all bgp1
+    name     proto    table    state  since       info
+    bgp1     BGP      master   up     2015-11-04  Established   
+      Preference:     100
+      Input filter:   ACCEPT
+      Output filter:  (unnamed)
+      Routes:         0 imported, 1 exported, 0 preferred
+      Route change stats:     received   rejected   filtered    ignored   accepted
+        Import updates:              0          0          0          0          0
+        Import withdraws:            2          0        ---          2          0
+        Export updates:              1          0          0        ---          1
+        Export withdraws:            0        ---        ---        ---          0
+      BGP state:          Established
+        Neighbor address: 10.0.132.254
+        Neighbor AS:      123
+        Neighbor ID:      10.0.132.254
+        Neighbor caps:    refresh AS4
+        Session:          external AS4
+        Source address:   10.0.132.13
+        Hold timer:       135/180
+        Keepalive timer:  44/60
+    查看bgp状态是否为Established。Routes项中的exported表示成功发布的路由条目，确
+    认是否与配置相符。
+    
+    bird> show bfd sessions 
+    bfd1:
+    IP address                Interface  State      Since       Interval  Timeout
+    10.0.132.254              bond1      Up         2015-11-04    0.300    0.900
+    查看bfd状态详细信息。
+    
+4.2 日志文件
+    BIRD日志文件存放路径:/var/log/message
+    
+4.3 思科设备命令与bird命令对比：
+    show ip route -- show route [table XXX]
+    show ip route bgp -- show route [table XXX] protocol <protocol_name> (show route proto ospf2 )
+    show ip route 1.2.0.0 longer- -- show route where net ~ 1.2.0.0/16
+    show ip bgp 1.2.0.0 -- show route where net ~ 1.2.0.0/16 all
+    show ip bgp sum -- show protocols
+    show ip bgp neighbors 1.2.3.4 -- show protocols all <protocol_name> (show protocols all ospf2)
+    show ip bgp neighbors 1.2.3.4 advertised-routes -- show route export <protocol_name>
+    clear ip bgp 1.2.3.4 -- reload <protocol_name> [in/out]
+    show ip route summary -- show route [table XXX] count
+
+5.修复BFD协议bug说明
+-------------------
+    RFC5881规定BFD控制报文UDP源端口范围为49152-65535，但BIRD中的BFD协议没有限制
+    此范围，源端口范围由配置文件/etc/sysctl.conf中net.ipv4.ip_local_port_range
+    的取值决定。临时修改取值办法：sysctl -w net.ipv4.ip_local_port_range="49152 
+    65535"。通过修改源码文件bird-1.5.0\proto\bfd\packets.c修复，详见svn。
+
