@@ -29,7 +29,7 @@ http.port: 9200
 discovery.zen.minimum_master_nodes: 1
 探测其他节点超时时间
 discovery.zen.ping.timeout: 3s
-```
-启动elasticsearch进程
-systemctl daemon-reload
-systemctl start elasticsearch
+```  
+启动elasticsearch进程  
+systemctl daemon-reload  
+systemctl start elasticsearch  
