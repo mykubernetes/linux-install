@@ -1,10 +1,31 @@
 ELK
 ====
 一、安装jdk  
-``` yum install -y java-1.7.0-openjdk-devel.x86_64 ```
+```
+$ tar -zxf /opt/softwares/jdk-8u121-linux-x64.gz -C /opt/modules/
+# vi /etc/profile
+#JAVA_HOME
+export JAVA_HOME=/opt/modules/jdk1.8.0_121
+export PATH=$PATH:$JAVA_HOME/bin
+# source /etc/profile
+```
 
-二、安装elasticsearch
-``` yum install -y elasticsearch-1.7.2.noarch.rpm ```  
+二、安装elasticsearch  
+yum源
+```
+vim /etc/yum.repos.d/elk.repo
+[elasticsearch]
+name=Elasticsearch Repository for 6.x Package
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+enabled=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+```  
+rpm下载地址：https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0.rpm  
+```
+curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0.rpm 
+# rpm -ivh elasticsearch-6.4.0.rpm 
+```  
 修改配置文件
 ```
 cd /etc/elasticsearch/
