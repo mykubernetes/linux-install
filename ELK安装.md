@@ -28,29 +28,16 @@ curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0
 ```  
 修改配置文件
 ```
-cd /etc/elasticsearch/
-vim elasticsearch.yml
-集群名称
-cluster.name: elasticsearch
-节点名称
-node.name: "node001"
-选举后是否可以成为主节点
-node.master: true
-是否可以存储数据
-node.master: true
-每个索引shard的数量
-index.number_of_shards: 3
-每个所以shard的副本数
-index.number_of_replicas: 2
-参与集群选举的端口端口
-transport.tcp.port: 9300
-工作端口
-http.port: 9200
-最少主节点数量
-discovery.zen.minimum_master_nodes: 1
-探测其他节点超时时间
-discovery.zen.ping.timeout: 3s
+# cp /etc/elasticsearch/elasticsearch.yml{,.bak}
+# vim /etc/elasticsearch/elasticsearch.yml
+cluster.name: my-elk        #集群的名称
+node.name: my-test01        #节点的名称
+node.master: true           #是否为master（主节点），true：是，false：不是
+node.data: false            #是否是数据节点，false：不是，true：是
+network.host: node001       #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
+discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
+
 启动elasticsearch进程  
 systemctl daemon-reload  
 systemctl start elasticsearch  
