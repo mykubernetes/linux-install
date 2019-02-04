@@ -11,7 +11,7 @@ export PATH=$PATH:$JAVA_HOME/bin
 ```
 
 二、安装elasticsearch  
-yum源
+1、yum源
 ```
 vim /etc/yum.repos.d/elk.repo
 [elasticsearch]
@@ -26,7 +26,7 @@ rpm下载地址：https://artifacts.elastic.co/downloads/elasticsearch/elasticse
 curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0.rpm 
 # rpm -ivh elasticsearch-6.4.0.rpm 
 ```  
-修改配置文件
+2、修改配置文件
 ```
 # cp /etc/elasticsearch/elasticsearch.yml{,.bak}
 # vim /etc/elasticsearch/elasticsearch.yml
@@ -38,6 +38,10 @@ network.host: node001       #监听的ip地址，如果是0.0.0.0，则表示监
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
 
-启动elasticsearch进程  
-systemctl daemon-reload  
-systemctl start elasticsearch  
+3、所有的机子/etc/sysconfig/elasticsearch文件添加java环境  
+```
+vim /etc/sysconfig/elasticsearch
+JAVA_HOME=/usr/local/jdk1.8
+```  
+4、启动elasticsearch
+``` systemctl start elasticsearch.service ```
