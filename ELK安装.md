@@ -50,10 +50,10 @@ JAVA_HOME=/opt/modules/jdk1.8.0_121
 
 5、curl访问方法  
 1)查看单记得点的工作状态  
-``` curl -X GET 'http://node001:9200/?preey' ``` 
+``` curl -X GET 'http://node001:9200/?preey' ```  
 2)查看cat支持的操作  
 ``` curl -X GET 'http://node001:9200/_cat' ```  
-3)查看集群有几个节点
+3)查看集群有几个节点  
 ``` curl -X GET 'http://node001:9200/_cat/nodes' ```  
 ``` curl -X GET 'http://node001:9200/_cat/nodes?v' ```  
 
