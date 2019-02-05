@@ -44,5 +44,5 @@ discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 vim /etc/sysconfig/elasticsearch
 JAVA_HOME=/usr/local/jdk1.8
 ```  
-4、启动elasticsearch
+4、启动elasticsearch  
 ``` systemctl start elasticsearch.service ```
