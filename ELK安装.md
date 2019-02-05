@@ -42,8 +42,18 @@ discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 3、所有的机子/etc/sysconfig/elasticsearch文件添加java环境  
 ```
 vim /etc/sysconfig/elasticsearch
-JAVA_HOME=/usr/local/jdk1.8
+JAVA_HOME=/opt/modules/jdk1.8.0_121
 ```  
 4、启动elasticsearch  
 ``` systemctl daemon-reload ```  
 ``` systemctl start elasticsearch.service ```
+
+5、curl访问方法  
+1)查看单记得点的工作状态  
+``` curl -X GET 'http://node001:9200/?preey' ``` 
+2)查看cat支持的操作  
+``` curl -X GET 'http://node001:9200/_cat' ```  
+3)查看集群有几个节点
+``` curl -X GET 'http://node001:9200/_cat/nodes' ```  
+``` curl -X GET 'http://node001:9200/_cat/nodes?v' ```  
+
