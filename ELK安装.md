@@ -114,3 +114,9 @@ output {
      }
 }     
 ```  
+4、启动logstash  
+```
+$ pwd 
+/opt/module/logstash-6.6.0/
+bin/logstash -f config/logstash.conf
+```
