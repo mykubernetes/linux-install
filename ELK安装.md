@@ -1,7 +1,7 @@
 ELK
 ====
 官网：https://www.elastic.co/cn/  
-一、安装jdk  
+一、安装jdk  最低要求jdk 8版本
 ```
 $ tar -zxf /opt/softwares/jdk-8u121-linux-x64.gz -C /opt/modules/
 # vi /etc/profile
@@ -28,14 +28,9 @@ network.host: node001       #监听的ip地址，如果是0.0.0.0，则表示监
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
 
-3、所有的机子/etc/sysconfig/elasticsearch文件添加java环境  
-```
-vim /etc/sysconfig/elasticsearch
-JAVA_HOME=/opt/modules/jdk1.8.0_121
-```  
-4、启动elasticsearch  
-``` systemctl daemon-reload ```  
-``` systemctl start elasticsearch.service ```
+3、启动elasticsearch  
+``` ./elasticsearch -d ```  
+
 
 5、curl访问方法  
 1)查看单记得点的工作状态  
