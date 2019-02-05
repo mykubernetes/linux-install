@@ -71,7 +71,7 @@ rpm -ivh kibana-6.4.0-x86_64.rpm
 ```
 # vim /etc/kibana/kibana.yml
   server.port: 5601
-  server.host: "node001"
+  server.host: "192.168.0.1"
   elasticsearch.url: "http://node001:9200"
   logging.dest: /var/log/kibana.log
 ```  
