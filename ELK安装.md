@@ -29,7 +29,7 @@ discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
 3、优化内核限制文件数和打开的进程数  
 ```
-    cat  /etc/security/limits.conf  |grep "^*"
+cat  /etc/security/limits.conf  |grep "^*"
     * soft    nofile    924511
     * sift    nproc     924511
     * hard    nproc     924511
@@ -37,8 +37,9 @@ discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
 4、修改内核参数
 ```  
- vim /etc/sysctl.conf
- vm.max_map_count=262144
+$ vim /etc/sysctl.conf
+  vm.max_map_count=262144
+sysctl -p
 ```  
 5、启动elasticsearch  
 ``` ./elasticsearch -d ```  
