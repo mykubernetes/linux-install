@@ -61,7 +61,7 @@ tar -xvf kibana-6.6.0-linux-x86_64.tar.gz -C /opt/module/
 ```  
 
 4、启动kibana  
-``` systemctl start kibana ```  
+``` nohup ./kibana & ```  
 ``` http://node001:5601 ```  
 
 
