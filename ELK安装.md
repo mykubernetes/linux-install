@@ -92,7 +92,7 @@ rpm -ivh logstash-6.4.0.rpm
 vim /usr/share/logstash/bin/logstash.lib.sh
 JAVA_HOME=/usr/local/jdk1.8
 ```  
-2、配置logstash收集syslog日志  
+3、配置logstash收集syslog日志  
 ```
 vim /etc/logstash/conf.d/syslog.conf
 input {
