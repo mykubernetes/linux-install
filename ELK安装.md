@@ -41,7 +41,7 @@ discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ``` curl -X GET 'http://node001:9200/_cat/nodes' ```  
 ``` curl -X GET 'http://node001:9200/_cat/nodes?v' ```  
 4)查看集群健康状态  
-``` curl -X GET 'https://node:9200/_cluster/health?pretty' ```  
+``` curl -X GET 'https://node001:9200/_cluster/health?pretty' ```  
 5）查看集群详细信息  
 ``` curl 'node001:9200/_cluster/state?pretty' ```
 
