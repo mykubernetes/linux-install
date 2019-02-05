@@ -60,3 +60,18 @@ JAVA_HOME=/opt/modules/jdk1.8.0_121
 ``` curl -X GET 'https://node:9200/_cluster/health?pretty' ```  
 5）查看集群详细信息  
 ``` curl 'node001:9200/_cluster/state?pretty' ```
+
+三、安装kibana  
+1、下载安装包  
+```
+curl -O https://artifacts.elastic.co/downloads/kibana/kibana-6.4.0-x86_64.rpm
+rpm -ivh kibana-6.4.0-x86_64.rpm
+```  
+2、修改配置文件  
+```
+# vim /etc/kibana/kibana.yml
+  server.port: 5601
+  server.host: "node001"
+  elasticsearch.url: "http://node001:9200"
+  logging.dest: /var/log/kibana.log
+```  
