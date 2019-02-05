@@ -12,25 +12,14 @@ export PATH=$PATH:$JAVA_HOME/bin
 ```
 
 二、安装elasticsearch  
-1、yum源
+1下载eelasticsearch  
 ```
-vim /etc/yum.repos.d/elk.repo
-[elasticsearch]
-name=Elasticsearch Repository for 6.x Package
-baseurl=https://artifacts.elastic.co/packages/6.x/yum
-gpgcheck=1
-enabled=1
-gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
-```  
-rpm下载地址：https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0.rpm  
-```
-curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0.rpm 
-# rpm -ivh elasticsearch-6.4.0.rpm 
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.0.tar.gz
+tar -xvf elasticsearch-6.6.0.tar.gz -C /opt/module/
 ```  
 2、修改配置文件
 ```
-# cp /etc/elasticsearch/elasticsearch.yml{,.bak}
-# vim /etc/elasticsearch/elasticsearch.yml
+# vim /opt/module/elasticsearch-6.6.0/config/elasticsearch.yml
 cluster.name: my-elk        #集群的名称
 node.name: my-test01        #节点的名称
 node.master: true           #是否为master（主节点），true：是，false：不是
