@@ -37,9 +37,9 @@ cat  /etc/security/limits.conf  |grep "^*"
 ```  
 4、修改内核参数
 ```  
-$ vim /etc/sysctl.conf
+# vim /etc/sysctl.conf
   vm.max_map_count=262144
-sysctl -p
+# sysctl -p
 ```  
 5、启动elasticsearch  
 ``` ./elasticsearch -d ```  
