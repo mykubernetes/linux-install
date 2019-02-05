@@ -1,6 +1,6 @@
 使用curl命令操作elasticsearch
 =============================
-1、第一：_cat系列  
+一、使用_cat系列  
 _cat系列提供了一系列查询elasticsearch集群状态的接口。  
 ```
 curl -XGET localhost:9200/_cat
@@ -52,7 +52,7 @@ Onyxx      analysis-pinyin  NA      j
 Onyxx      head             NA      s    /_plugin/head/
 Onyxx      bigdesk          NA      s    /_plugin/bigdesk/
 ```  
-2、第二：_cluster系列  
+二、使用_cluster系列  
 1、查询设置集群状态  
 ```
 curl -XGET localhost:9200/_cluster/health?pretty=true
@@ -97,7 +97,7 @@ $ curl -XPOST ‘http://localhost:9200/_cluster/nodes/_shutdown’
 $ curl -XPOST ‘http://localhost:9200/_cluster/nodes/_all/_shutdown’
 delay=10s表示延迟10秒关闭
 ```  
-第三：_nodes系列  
+三、使用_nodes系列  
 1、查询节点的状态  
 ```
 curl -XGET ‘http://localhost:9200/_nodes/stats?pretty=true’
@@ -109,7 +109,7 @@ curl -XGET ‘http://localhost:9200/_nodes/192.168.1.2,192.168.1.3/info/jvm,proc
 curl -XGET ‘http://localhost:9200/_nodes/192.168.1.2,192.168.1.3/_all
 curl -XGET ‘http://localhost:9200/_nodes/hot_threads
 ```  
-第四：索引操作  
+四、使用索引操作  
 1、获取索引  
 ``` curl -XGET ‘http://localhost:9200/{index}/{type}/{id}’ ```  
 2、索引数据  
