@@ -1,5 +1,6 @@
 ELK
 ====
+官网：https://www.elastic.co/cn/  
 一、安装jdk  
 ```
 $ tar -zxf /opt/softwares/jdk-8u121-linux-x64.gz -C /opt/modules/
