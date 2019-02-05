@@ -140,4 +140,6 @@ output.elasticsearch:
 #修改paths:
  paths:
     - /var/log/messages
-```
+```  
+3、启动filebeat  
+``` bin/filebeat -c /etc/filebeat/filebeat.yml ```
