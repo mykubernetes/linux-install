@@ -118,5 +118,5 @@ output {
 ```
 $ pwd 
 /opt/module/logstash-6.6.0/
-bin/logstash -f config/logstash.conf
+nohup bin/logstash -f config/logstash.conf &
 ```
