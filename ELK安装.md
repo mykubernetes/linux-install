@@ -30,9 +30,9 @@ discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 
 3、启动elasticsearch  
 ``` ./elasticsearch -d ```  
+不能使用root身份运行
 
-
-5、curl访问方法  
+4、curl访问方法  
 1)查看单记得点的工作状态  
 ``` curl -X GET 'http://node001:9200/?preey' ```  
 2)查看cat支持的操作  
