@@ -75,3 +75,5 @@ rpm -ivh kibana-6.4.0-x86_64.rpm
   elasticsearch.url: "http://node001:9200"
   logging.dest: /var/log/kibana.log
 ```  
+3、创建日志目录  
+``` touch /var/log/kibana.log && chmod 777 /var/log/kibana.log ```  
