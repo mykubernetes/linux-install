@@ -56,4 +56,7 @@ JAVA_HOME=/opt/modules/jdk1.8.0_121
 3)查看集群有几个节点  
 ``` curl -X GET 'http://node001:9200/_cat/nodes' ```  
 ``` curl -X GET 'http://node001:9200/_cat/nodes?v' ```  
-
+4)查看集群健康状态  
+``` curl -X GET 'https://node:9200/_cluster/health?pretty' ```  
+5）查看集群详细信息  
+``` curl 'node001:9200/_cluster/state?pretty' ```
