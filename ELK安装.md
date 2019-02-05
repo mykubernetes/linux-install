@@ -80,8 +80,9 @@ tar -xvf kibana-6.6.0-linux-x86_64.tar.gz -C /opt/module/
 
 四、logstash安装  
 1、下载安装包  
-``` curl -O https://artifacts.elastic.co/downloads/logstash/logstash-6.4.0.rpm
-rpm -ivh logstash-6.4.0.rpm
+``` 
+https://artifacts.elastic.co/downloads/logstash/logstash-6.6.0.tar.gz
+tar -xvf logstash-6.6.0.tar.gz -C module/
 ```  
 2、配置环境变量
 ```
@@ -90,16 +91,26 @@ JAVA_HOME=/usr/local/jdk1.8
 ```  
 3、配置logstash收集syslog日志  
 ```
-vim /etc/logstash/conf.d/syslog.conf
+vim /opt/module/logstash/config/logstash.conf
 input {
-   syslog { 
-      type => "system-syslog"
-      port => 10514
+   beats {
+      port => 5044
    }
 }
+
 output {
-   stdout {
-      codec => rubydebug
-   }
-｝
+   if "nginx" in [tags] {
+      elasticsearch {
+         hosts => "localhost:9200"
+         index => "nginx-access-%{+YYYY.MM.dd}"
+      }
+    }
+    
+    if tomcat in [tats] {
+      elasticsearch {
+         hosts => "localhost:9200"
+         index => "tomcat-catalina-%{+YYYY.MM.dd}"
+       }
+     }
+}     
 ```  
