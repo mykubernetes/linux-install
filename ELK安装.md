@@ -27,12 +27,24 @@ node.data: false            #是否是数据节点，false：不是，true：是
 network.host: node001       #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
-
-3、启动elasticsearch  
+3、优化内核限制文件数和打开的进程数  
+```
+    cat  /etc/security/limits.conf  |grep "^*"
+    * soft    nofile    924511
+    * sift    nproc     924511
+    * hard    nproc     924511
+    * hard nofile 924511
+```  
+4、修改内核参数
+```  
+ vim /etc/sysctl.conf
+ vm.max_map_count=262144
+```  
+5、启动elasticsearch  
 ``` ./elasticsearch -d ```  
 不能使用root身份运行
 
-4、curl访问方法  
+6、curl访问方法  
 1)查看单记得点的工作状态  
 ``` curl -X GET 'http://node001:9200/?pretty' ```  
 2)查看cat支持的操作  
