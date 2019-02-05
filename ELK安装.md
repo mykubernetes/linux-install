@@ -58,7 +58,7 @@ cat  /etc/security/limits.conf  |grep "^*"
 5）查看集群详细信息  
 ``` curl 'node001:9200/_cluster/state?pretty' ```
 
-三、安装kibana  
+三、安装Kibana  
 1、下载安装包  
 ```
 wget https://artifacts.elastic.co/downloads/kibana/kibana-6.6.0-linux-x86_64.tar.gz
@@ -78,7 +78,7 @@ tar -xvf kibana-6.6.0-linux-x86_64.tar.gz -C /opt/module/
 ``` http://node001:5601 ```  
 
 
-四、logstash安装  
+四、安装Logstash  
 1、下载安装包  
 ``` 
 https://artifacts.elastic.co/downloads/logstash/logstash-6.6.0.tar.gz
@@ -119,4 +119,25 @@ output {
 $ pwd 
 /opt/module/logstash-6.6.0/
 nohup bin/logstash -f config/logstash.conf &
+```
+
+五、安装Filebeat  
+1、下载安装包  
+``` 
+https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.6.0-linux-x86_64.tar.gz
+tar -xvf filebeat-6.6.0-linux-x86_64.tar.gz
+```  
+2、修改配置文件
+```
+vim /opt/module/filebeat-6.6.0-linux-x86_64/filebeat.yml
+#注释以下内容：
+#enabled: false
+
+输出位置配置：
+output.elasticsearch:
+ hosts: ["localhost:9200"]
+
+#修改paths:
+ paths:
+    - /var/log/messages
 ```
