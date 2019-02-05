@@ -34,7 +34,7 @@ discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 
 4、curl访问方法  
 1)查看单记得点的工作状态  
-``` curl -X GET 'http://node001:9200/?preey' ```  
+``` curl -X GET 'http://node001:9200/?pretty' ```  
 2)查看cat支持的操作  
 ``` curl -X GET 'http://node001:9200/_cat' ```  
 3)查看集群有几个节点  
