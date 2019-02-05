@@ -45,4 +45,5 @@ vim /etc/sysconfig/elasticsearch
 JAVA_HOME=/usr/local/jdk1.8
 ```  
 4、启动elasticsearch  
+``` systemctl daemon-reload ```  
 ``` systemctl start elasticsearch.service ```
