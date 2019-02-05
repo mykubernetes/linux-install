@@ -66,10 +66,10 @@ level=shards 表示显示分片信息
 3、集群的详细信息。包括节点、分片等。  
 ``` curl -XGET localhost:9200/_cluster/state?pretty=true ```  
 
-3、获取集群堆积的任务  
+4、获取集群堆积的任务  
 ``` curl -XGET localhost:9200/_cluster/pending_tasks?pretty=true ```  
 
-3、修改集群配置
+5、修改集群配置
 举例：
 ```
 curl -XPUT localhost:9200/_cluster/settings -d '{
@@ -78,18 +78,18 @@ curl -XPUT localhost:9200/_cluster/settings -d '{
     }
 }'
 ```  
-transient 表示临时的，persistent表示永久的
-4、对shard的手动控制  
+transient 表示临时的，persistent表示永久的  
+6、对shard的手动控制  
 ``` curl -XPOST ‘localhost:9200/_cluster/reroute’ -d ‘xxxxxx’ ```
 
-5、关闭节点  
+7、关闭节点  
 关闭指定192.168.1.1节点  
 ```
 curl -XPOST ‘http://192.168.1.1:9200/_cluster/nodes/_local/_shutdown’
 curl -XPOST ‘http://localhost:9200/_cluster/nodes/192.168.1.1/_shutdown’
 ```  
 关闭主节点  
-```  curl -XPOST ‘http://localhost:9200/_cluster/nodes/_master/_shutdown’ ```
+```  curl -XPOST ‘http://localhost:9200/_cluster/nodes/_master/_shutdown’ ```  
 关闭整个集群  
 ```
 $ curl -XPOST ‘http://localhost:9200/_shutdown?delay=10s’
@@ -111,11 +111,11 @@ curl -XGET ‘http://localhost:9200/_nodes/hot_threads
 ```  
 第四：索引操作  
 1、获取索引  
-``` curl -XGET ‘http://localhost:9200/{index}/{type}/{id}’ ```
+``` curl -XGET ‘http://localhost:9200/{index}/{type}/{id}’ ```  
 2、索引数据  
-``` curl -XPOST ‘http://localhost:9200/{index}/{type}/{id}’ -d'{“a”:”avalue”,”b”:”bvalue”}’ ```
+``` curl -XPOST ‘http://localhost:9200/{index}/{type}/{id}’ -d'{“a”:”avalue”,”b”:”bvalue”}’ ```  
 3、删除索引  
-``` curl -XDELETE ‘http://localhost:9200/{index}/{type}/{id}’ ```
+``` curl -XDELETE ‘http://localhost:9200/{index}/{type}/{id}’ ```  
 4、设置mapping  
 ```
 curl -XPUT http://localhost:9200/{index}/{type}/_mapping -d '{
@@ -139,7 +139,7 @@ curl -XPUT http://localhost:9200/{index}/{type}/_mapping -d '{
 }'
 ```  
 5、获取mapping  
-``` curl -XGET http://localhost:9200/{index}/{type}/_mapping ```
+``` curl -XGET http://localhost:9200/{index}/{type}/_mapping ```  
 6、搜索  
 ```
 curl -XGET 'http://localhost:9200/{index}/{type}/_search' -d '{
