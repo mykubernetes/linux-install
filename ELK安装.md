@@ -77,6 +77,33 @@ rpm -ivh kibana-6.4.0-x86_64.rpm
 ```  
 3、创建日志目录  
 ``` touch /var/log/kibana.log && chmod 777 /var/log/kibana.log ```  
-4、启动kibana
-``` systemctl start kibana ```
-``` http://node001:5601 ```
+4、启动kibana  
+``` systemctl start kibana ```  
+``` http://node001:5601 ```  
+
+
+四、logstash安装  
+1、下载安装包  
+``` curl -O https://artifacts.elastic.co/downloads/logstash/logstash-6.4.0.rpm
+rpm -ivh logstash-6.4.0.rpm
+```  
+2、配置环境变量
+```
+vim /usr/share/logstash/bin/logstash.lib.sh
+JAVA_HOME=/usr/local/jdk1.8
+```  
+2、配置logstash收集syslog日志  
+```
+vim /etc/logstash/conf.d/syslog.conf
+input {
+   syslog { 
+      type => "system-syslog"
+      port => 10514
+   }
+}
+output {
+   stdout {
+      codec => rubydebug
+   }
+｝
+```  
