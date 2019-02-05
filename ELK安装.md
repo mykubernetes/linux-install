@@ -77,3 +77,6 @@ rpm -ivh kibana-6.4.0-x86_64.rpm
 ```  
 3、创建日志目录  
 ``` touch /var/log/kibana.log && chmod 777 /var/log/kibana.log ```  
+4、启动kibana
+``` systemctl start kibana ```
+``` http://node001:5601 ```
