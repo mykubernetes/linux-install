@@ -27,6 +27,8 @@ node.data: false            #是否是数据节点，false：不是，true：是
 index.number_of_shards:5    #每个索引的shard数量（分片数量）
 index.number_of_replicas:   #每个shard的复本数量
 transport.tcp.port: 9300    #集群选举通信端口
+path.data: /opt/module/elk/data  #数据路径
+path.logs: /opt/module/elasticsearch-6.6.0/logs  #日志路径
 network.host: node001       #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
