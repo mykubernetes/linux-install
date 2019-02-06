@@ -113,7 +113,41 @@ output {
 }     
 ```  
 参考https://www.elastic.co/guide/en/logstash/current/index.html  
-3、启动logstash  
+3、性能监控程序  
+```
+# yum install collectd -y 
+vim /etc/collectd.conf
+   Hostname "node001"
+   LoadPlugin syslog
+   LoadPlugin cpu
+   LoadPlugin df
+   LoadPlugin interface
+   LoadPlugin load
+   LoadPlugin memory
+   LoadPlugin network
+   <Plugin network>
+      <Server "192.168.1.1" "25826">  #192.168.1.1是logstash主机监听地址，25826是其监听的UTP端口
+      </Server>
+   </Plugin>
+   Include "/etc/collectd.d"
+# systemctl start collectd.service   
+```  
+```
+input {
+   udp {
+      port  => 25826
+      codec => collectd {}
+      type  => "collectd"
+   }
+}
+
+output {
+   stdout {
+      codec => rubydebug
+   }
+}
+```  
+4、启动logstash  
 ```
 $ pwd 
 /opt/module/logstash-6.6.0/
