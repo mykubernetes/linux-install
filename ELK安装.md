@@ -142,4 +142,4 @@ output.elasticsearch:
     - /var/log/messages
 ```  
 3、启动filebeat  
-``` bin/filebeat -c /etc/filebeat/filebeat.yml ```
+``` ./filebeat -c /etc/filebeat/filebeat.yml ```
