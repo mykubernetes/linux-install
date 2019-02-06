@@ -1,7 +1,7 @@
 一、日志服务端配置：  
 rsyslog的软件包查看  
-``` rpm -qa | grep rsyslog ```
-``` rsyslog-5.8.10-6.el6.x86_64  ##默认系统已经安装 ```
+``` rpm -qa | grep rsyslog ```  
+``` rsyslog-5.8.10-6.el6.x86_64  ##默认系统已经安装 ```  
 修改rsyslog配置文件以下内容，去掉#  
 ```
 # vim /etc/rsyslog.conf
@@ -32,7 +32,6 @@ $InputTCPServerRun 514
 ```
 mysql> GRANT ALL ON Syslog.* to  admin@'192.168.146.%' IDENTIFIED BY 'admin';
 mysql> GRANT ALL ON Syslog.* TO admin@'localhost' IDENTIFIED BY 'ctyun.cn';
-
 mysql> FLUSH PRIVILEGES;
 ```  
 编辑日志服务器配置文件添加ommysql模块，日志信息指向数据库服务器，重启服务：  
