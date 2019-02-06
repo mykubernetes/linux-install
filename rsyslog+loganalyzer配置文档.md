@@ -79,19 +79,19 @@ NameVirtualHost *:8008
 *.info;mail.none;authpriv.none;cron.none    @server_ip  ###此处可定义日志类型
 ```  
 配置loganalyzer web界面  
-1、
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer1.png)
-2、
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer2.png)
-3、
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer3.png)
-4、
+1、  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer1.png)  
+2、  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer2.png)  
+3、  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer3.png)  
+4、  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer4.png)  
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer5.png)
-5、一直下一步，直到配置日志分析系统管理账户（后期使用）
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer6.png)
-6、
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer7.png)
-7、
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer8.png)
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer5.png)  
+5、一直下一步，直到配置日志分析系统管理账户（后期使用）  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer6.png)  
+6、  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer7.png)  
+7、  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/loganalyzer8.png)  
 
