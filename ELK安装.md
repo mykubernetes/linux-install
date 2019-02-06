@@ -24,6 +24,9 @@ cluster.name: my-elk        #集群的名称
 node.name: my-test01        #节点的名称
 node.master: true           #是否为master（主节点），true：是，false：不是
 node.data: false            #是否是数据节点，false：不是，true：是
+index.number_of_shards:5    #每个索引的shard数量（分片数量）
+index.number_of_replicas:   #每个shard的复本数量
+transport.tcp.port: 9300    #集群选举通信端口
 network.host: node001       #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
