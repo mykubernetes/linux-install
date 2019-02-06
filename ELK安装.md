@@ -87,12 +87,7 @@ tar -xvf kibana-6.6.0-linux-x86_64.tar.gz -C /opt/module/
 https://artifacts.elastic.co/downloads/logstash/logstash-6.6.0.tar.gz
 tar -xvf logstash-6.6.0.tar.gz -C module/
 ```  
-2、配置环境变量
-```
-vim /usr/share/logstash/bin/logstash.lib.sh
-JAVA_HOME=/usr/local/jdk1.8
-```  
-3、配置logstash收集syslog日志  
+2、配置logstash收集syslog日志  
 ```
 vim /opt/module/logstash/config/logstash.conf
 input {
@@ -117,7 +112,7 @@ output {
      }
 }     
 ```  
-4、启动logstash  
+3、启动logstash  
 ```
 $ pwd 
 /opt/module/logstash-6.6.0/
