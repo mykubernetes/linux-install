@@ -112,6 +112,7 @@ output {
      }
 }     
 ```  
+参考https://www.elastic.co/guide/en/logstash/current/index.html  
 3、启动logstash  
 ```
 $ pwd 
