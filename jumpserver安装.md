@@ -226,12 +226,12 @@ server {
 到此安装成功。  
 
 
-34.4  jumpserver平台系统初始化  
-34.4.1  系统基本设置  
+八、jumpserver平台系统初始化  
+1、系统基本设置  
 这里要写成自己真实的URL地址，不然后期用户访问不了。http://192.168.1.63  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver8.png)  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver9.png)  
-34.4.2  配置邮件发送服务器  
+2、配置邮件发送服务器  
 点击页面上边的"邮件设置" TAB ，进入邮件设置页面： 
 SMTP服务器：smtp.163.com
  ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver10.png)
@@ -255,8 +255,8 @@ SMTP服务器：smtp.163.com
 1）后端服务器需要有python、sudo环境才能使用推送用户，批量命令等功能   
 2）后端服务器如果开启了selinux，请安装libselinux-python。一般情况服务器上都关闭了selinux  
 
-34.5  使用jumpserver 管理王者荣耀数万台游戏服务器  
-34.5.1  用户管理  
+九、使用jumpserver 管理王者荣耀数万台游戏服务器  
+1 ）用户管理  
 1、添加用户组。  
 用户名即 Jumpserver 登录账号。用户组是用于资产授权，当某个资产对一个用户组授权后，这个用户组下面的所有用户就都可以使用这个资产了。角色用于区分一个用户是管理员还是普通用户。  
 点击用户管理 —> 查看用户组 —> 添加用户组  
@@ -275,7 +275,7 @@ ________________________________________
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver19.png)  
 然后点提交。   
 
-查看添加的用户  
+3、查看添加的用户  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver20.png)  
 
 成功提交用户信息后，Jumpserver 会发送一条设置"用户密码"的邮件到您填写的用户邮箱。  
@@ -285,22 +285,25 @@ ________________________________________
 用户首次登录 Jumpserver，会被要求完善用户信息。  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver23.png)  
 这个需要用户自己生成SSH 密钥，方便后期登录：我在自己的另一台linux上，使用mk用户生成自己的ssh密钥。  
-(py3) [root@xuegod63 luna]# useradd mk123  
-(py3) [root@xuegod63 luna]# echo 123456 | passwd --stdin mk123  
-[root@xuegod63 opt]# su - mk123  
-[mk@xuegod63 ~]$ ssh-keygen   #一路回车  
-[mk@xuegod63 ~]$ cat ~/.ssh/id_rsa.pub   
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDE/7Yt3MKTvavCZSV2F9GCRX0snRDyAu2GzvmGaMj1Y1Evv0+bdNYuEVbax/CyakBcaYyBuD427trkQytfbfovc97As4fFV3yhKKKis6D66TR28zH5gGkhuToFhmil9BGFzJqy1M7fne+A18bKvezlFpZn4clwgg3kIqPCbOtQQnA9h1TH5j8lnvMwwcRxenKRMla987TfJ3482aTAoScxNmv2FNNSQmZEKHGPT5MmUIzrm3dwvCotAEmDegxJ0dB5u29tZaHgxMWFf1GRoj3pW8CzMOhug42F9FDF+K9wve5aph0mmc5pe7OKJthWrbv8CEV3T2mRYK4+M5q5sRed mk123@xuegod63.cn  
+```
+(py3) [root@node001 luna]# useradd mk123
+(py3) [root@node001 luna]# echo 123456 | passwd --stdin mk123
+[root@node001 opt]# su - mk123
+[mk@node001 ~]$ ssh-keygen   #一路回车
+[mk@node001 ~]$ cat ~/.ssh/id_rsa.pub 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDE/7Yt3MKTvavCZSV2F9GCRX0snRDyAu2GzvmGaMj1Y1Evv0+bdNYuEVbax/CyakBcaYyBuD427trkQytfbfovc97As4fFV3yhKKKis6D66TR28zH5gGkhuToFhmil9BGFzJqy1M7fne+A18bKvezlFpZn4clwgg3kIqPCbOtQQnA9h1TH5j8lnvMwwcRxenKRMla987TfJ3482aTAoScxNmv2FNNSQmZEKHGPT5MmUIzrm3dwvCotAEmDegxJ0dB5u29tZaHgxMWFf1GRoj3pW8CzMOhug42F9FDF+K9wve5aph0mmc5pe7OKJthWrbv8CEV3T2mRYK4+M5q5sRed mk123@xuegod63.cn
+```  
 把上面生成的公钥粘到这里：  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver24.png)  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver25.png)  
-34.5.2  编辑资产树添加节点  
+
+4、编辑资产树添加节点  
 节点不能重名，右击节点可以添加、删除和重命名节点，以及进行资产相关的操作。
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver26.png) 
  改成节点名字为：王者荣耀-华北区-服务器  
 
 
-34.5.3   创建管理用户  
+5、创建管理用户  
 Jumpserver里各个用户的说明：  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver27.png)   
 管理用户是服务器的 root，或拥有 NOPASSWD: ALL sudo 权限的用户，Jumpserver 使用该用户来推送系统用户、获取资产硬件信息等。  
@@ -310,7 +313,7 @@ Jumpserver里各个用户的说明：
 前提，你的王者荣耀-华北区-服务器节点中所有的服务器root用户密码都是：123456  
 这样就可以使用此root用户管理服务器。  
 
-34.5.4   创建系统用户  
+6、创建系统用户  
 系统用户是 Jumpserver 跳转登录资产时使用的用户，可以理解为登录资产用户， Jumpserver使用系统用户登录资产。  
 系统用户的 Sudo 栏填写允许当前系统用户免sudo密码执行的程序路径，如默认的/sbin/ifconfig，意思是当前系统用户可以直接执行 ifconfig 命令或 sudo ifconfig 而不需要输入当前系统用户的密码，执行其他的命令任然需要密码，以此来达到权限控制的目的。  
 # 此处的权限应该根据使用用户的需求汇总后定制，原则上给予最小权限即可。  
@@ -323,7 +326,7 @@ Linux 系统协议项务必选择 ssh 。如果用户在系统中已存在，请
 再加一个： 系统管理员用户：manager   
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver32.png)  
 
-34.5.5   创建资产  
+7、创建资产  
 点击页面左侧的“资产管理”菜单下的“资产列表”按钮，查看当前所有的资产列表。  
 点击页面左上角的“创建资产”按钮，进入资产创建页面，填写资产信息。  
 IP 地址和管理用户要确保正确，确保所选的管理用户的用户名和密码能"牢靠"地登录指定的 IP 主机上。资产的系统平台也务必正确填写。公网 IP 信息只用于展示，可不填，Jumpserver 连接资产使用的是 IP 信息。  
@@ -336,11 +339,11 @@ game64.xuegod.cn-王者荣耀-华北区  192.168.1.64
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver36.png)
 如果资产不能正常连接，请检查管理用户的用户名和密钥是否正确以及该管理用户是否能使用 SSH 从 Jumpserver 主机正确登录到资产主机上。  
 
-34.5.6   网域列表  
+8、网域列表  
 网域功能是为了解决部分环境无法直接连接而新增的功能，原理是通过网关服务器进行跳转登录。  
 这个功能，一般情况不用到。  
 
-34.5.7  创建授权规则  
+9、创建授权规则  
 节点，对应的是资产，代表该节点下的所有资产。  
 用户组，对应的是用户，代表该用户组下所有的用户。  
 系统用户，及所选的用户组下的用户能通过该系统用户使用所选节点下的资产。  
@@ -351,17 +354,18 @@ game64.xuegod.cn-王者荣耀-华北区  192.168.1.64
  
 
 授权成功后，你自己手动到xuegod64上查看：  
-[root@xuegod64 ~]# tail /etc/passwd -n 5  
-postfix:x:89:89::/var/spool/postfix:/sbin/nologin  
-ntp:x:38:38::/etc/ntp:/sbin/nologin  
-tcpdump:x:72:72::/:/sbin/nologin  
-mk:x:1000:1000:mk:/home/mk:/bin/bash  
-manager:x:1001:1001::/home/manager:/bin/bash  #自动推送一个帐号，自动在资产服务器上创建系统用户  
+```
+[root@node001 ~]# tail /etc/passwd -n 5
+postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+ntp:x:38:38::/etc/ntp:/sbin/nologin
+tcpdump:x:72:72::/:/sbin/nologin
+mk:x:1000:1000:mk:/home/mk:/bin/bash
+manager:x:1001:1001::/home/manager:/bin/bash  #自动推送一个帐号，自动在资产服务器上创建系统用户
+```  
+[root@node001 ~]# visudo  #sudo相关的规则也会被自动推送过来  
+``` manager ALL=(ALL) NOPASSWD: /sbin/,/bin/ ```  
 
-[root@xuegod64 ~]# visudo  #sudo相关的规则也会被自动推送过来  
-manager ALL=(ALL) NOPASSWD: /sbin/,/bin/  
-
-34.5.8  用户使用资产  
+9、用户使用资产  
 登录 Jumpserver  
 创建授权规则的时候，选择了用户组，所以这里需要登录所选用户组下面的用户才能看见相应的资产。  
 使用无痕浏览器，再打开一个窗口，进行登录：  
@@ -376,7 +380,7 @@ manager ALL=(ALL) NOPASSWD: /sbin/,/bin/
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver42.png)  
 接下来，就可以对资产进行操作了。  
 
-34.5.9  在xshell字符终端下连接jumpserver管理服务器  
+10、在xshell字符终端下连接jumpserver管理服务器  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver43.png)  
 输入jumpserver用户mk123 和密码123456  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver44.png)  
@@ -385,9 +389,9 @@ manager ALL=(ALL) NOPASSWD: /sbin/,/bin/
 Opt> 64   #输入一个64，就可以直接登录：192.168.1.64  
 Connecting to manager@game64.xuegod.cn-王者荣耀-华北区 0.3  
 Last login: Thu Jun  7 23:15:13 2018 from xuegod63.cn  
-[manager@xuegod64 ~]$ whoami  #发现登录使用的是系统用户manager  
+[manager@node001 ~]$ whoami  #发现登录使用的是系统用户manager  
 manager  
-[manager@xuegod64 ~]$ exit  
+[manager@node001 ~]$ exit  
 登出  
 Opt> p  #显示你有权限的主机  
  ID  Hostname                          IP              LoginAs       Comment  
@@ -397,15 +401,15 @@ Opt> g  #显示你有权限的主机组
   ID Name            Assets     Comment  
   1   王者荣耀-华北区-服务器                         1  
 
-34.5.10  查看历史命令记录  
+11、查看历史命令记录  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver46.png)  
-34.5.10  查看历史会话并回放视频  
+12、查看历史会话并回放视频  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver47.png)  
 更多内容，可以参数官方手册：http://docs.jumpserver.org/zh/docs/step_by_step.html  
 
 总结：  
-34.1  Jumpserver堡垒机概述-部署Jumpserver运行环境  
-34.2  安装Coco组件  
-34.3  安装Web-Terminal前端-Luna组件-配置Nginx整合各组件  
-34.4  jumpserver平台系统初始化  
-34.5  使用jumpserver 管理王者荣耀数万台游戏服务器  
+Jumpserver堡垒机概述-部署Jumpserver运行环境  
+安装Coco组件  
+安装Web-Terminal前端-Luna组件-配置Nginx整合各组件  
+jumpserver平台系统初始化  
+使用jumpserver 管理王者荣耀数万台游戏服务器  
