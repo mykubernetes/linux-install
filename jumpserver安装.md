@@ -87,7 +87,7 @@ MariaDB [(none)]> exit;
 7、改 Jumpserver 配置文件  
 ```
 # cd /opt/jumpserver
-# cp config_example.yml config.py
+# cp config_example.py config.py
 # vim config.py
 ```  
 我们计划修改 DevelopmentConfig 中的配置，因为默认 Jumpserver 使用该配置，它继承自 Config  
