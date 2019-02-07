@@ -3,7 +3,9 @@
 实验环境：  
 node001 jumpserver服务端  
 node002  资源，被管理的服务器  
- 
+安装包下载  
+``` 链接：https://pan.baidu.com/s/1gVu4SotVOv2LnScgJ7RlPg 提取码：v4kb ```  
+
  一、准备工作
 关闭 selinux 和防火墙  
 ```
