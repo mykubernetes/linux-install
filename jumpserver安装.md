@@ -123,11 +123,11 @@ class DevelopmentConfig(Config):
 附上重启的方法  
 
 (py3) [root@node001 jumpserver]# ./jms restart -d  
-34.2  安装 Coco组件  
-34.2.1  安装coco组件  
+
+四、安装 Coco组件  
 1、默认点击web终端，弹出：  
  
- 
+
 所以接下来，我们安装luna和coco：  
 coco概述：coco实现了 SSH Server 和 Web Terminal Server 的组件，提供 SSH 和 WebSocket 接口, 使用 Paramiko 和 Flask 开发。  
 ```
@@ -150,25 +150,25 @@ coco概述：coco实现了 SSH Server 和 Web Terminal Server 的组件，提供
 (py3) [root@node001 jumpserver]# ./cocod start -d   #后台运行使用 -d 参数
 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 ```  
-34.3 安装Web-Terminal前端-Luna组件-配置Nginx整合各组件  
-34.3.1  安装luna组件  
+五、安装Web-Terminal前端-Luna组件-配置Nginx整合各组件  
+1、安装luna组件  
 Luna概述：Luna现在是 Web Terminal 前端，计划前端页面都由该项目提供，Jumpserver 只提供 API，不再负责后台渲染html等。  
 访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译  
  解压 Luna  
  ```
-(py3) [root@xuegod63 jumpserver]# cd /opt
-(py3) [root@xuegod63 jumpserver]# tar xvf luna.tar.gz
-(py3) [root@xuegod63 jumpserver]# ls /opt/luna
+(py3) [root@node001 jumpserver]# cd /opt
+(py3) [root@node001 jumpserver]# tar xvf luna.tar.gz
+(py3) [root@node001 jumpserver]# ls /opt/luna
 注：在线下载
 #wget https://github.com/jumpserver/luna/releases/download/v1.0.0/luna.tar.gz
 ```  
-34.3.2  配置 Nginx 整合各组件  
+2、配置 Nginx 整合各组件  
 安装 Nginx 根据喜好选择安装方式和版本  
 ``` (py3) [root@node001 jumpserver]# yum -y install nginx ```  
-5.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf  
+3、准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf  
 内容如下：  
 ```
-(py3) [root@xuegod63 opt]#  vim /etc/nginx/nginx.conf
+(py3) [root@node001 opt]#  vim /etc/nginx/nginx.conf
 删除第38行到 57行中server {。。。}相关的内容，在vim命令模式，输入38gg，快速跳到38行，然后输入20dd，就可以删除。
 删除后，在38行插入以一下内容:
 ```  
