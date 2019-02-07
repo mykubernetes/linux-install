@@ -93,7 +93,7 @@ MariaDB [(none)]> exit;
 # cp config_example.py config.py
 # vim config.py
 ```  
-# 我们计划修改 DevelopmentConfig 中的配置，因为默认 Jumpserver 使用该配置，它继承自 Config  
+我们计划修改 DevelopmentConfig 中的配置，因为默认 Jumpserver 使用该配置，它继承自 Config  
 注意: 配置文件是 Python 格式，不要用 TAB，而要用空格  
 ```
 class DevelopmentConfig(Config):
@@ -147,7 +147,7 @@ coco概述：coco实现了 SSH Server 和 Web Terminal Server 的组件，提供
 (py3) [root@xuegod63 jumpserver]# cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
 (py3) [root@xuegod63 coco]# chmod +x cocod 
 (py3) [root@xuegod63 jumpserver]# ./cocod start -d   #后台运行使用 -d 参数
-# 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
+新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
 34.3 安装Web-Terminal前端-Luna组件-配置Nginx整合各组件
 34.3.1  安装luna组件
