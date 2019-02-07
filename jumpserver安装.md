@@ -234,11 +234,11 @@ server {
 2、配置邮件发送服务器  
 点击页面上边的"邮件设置" TAB ，进入邮件设置页面： 
 SMTP服务器：smtp.163.com
- ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver10.png)
+ ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver10.png)  
 注：自己邮箱要开启smtp和pop3服务。  
 开启POP3/SMTP/IMAP服务方法：  
 请登录163邮箱，点击页面右上角的“设置”—在“高级”下，点“POP3/SMTP/IMAP”，勾选图中两个选项，点击确定。即可开启成功。开通后即可用闪电邮、Outlook等软件收发邮件了。  
- ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver11.png)
+ ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver11.png)  
 服务器地址：POP3服务器：pop.163.com   |  SMTP服务器：smtp.163.com   | IMAP服务器：imap.163.com  
 注：配置完后，需要重启一下服务。不然后期创建用户，收不到邮件。  
 ```
@@ -246,9 +246,9 @@ SMTP服务器：smtp.163.com
 (py3) [root@node001 jumpserver]# /opt/jumpserver/jms start all -d  
 ```  
 配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面：  
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver12.png)
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver12.png)  
 查看邮箱：  
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver13.png)
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver13.png)  
 收到邮件后，点提交：  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver14.png)  
 注意： 在使用jumpserver过程中，有一步是系统用户推送，要推送成功，client（后端服务器）要满足以下条件：   
