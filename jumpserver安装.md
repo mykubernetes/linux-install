@@ -132,7 +132,7 @@ coco概述：coco实现了 SSH Server 和 Web Terminal Server 的组件，提供
 (py3) [root@node001 jumpserver]# cd /opt/coco  #直接使用离线代码
 (py3) [root@node001 jumpserver]# source /opt/py3/bin/activate
 ```
-附：在线下载代码：#``` git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master ```
+附：在线下载代码：#``` git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master ```  
 2、 安装coco的依赖包，主要有rpm和python包  
 ```
 (py3) [root@node001 jumpserver]# cd /opt/coco/requirements
