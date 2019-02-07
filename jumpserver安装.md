@@ -121,13 +121,11 @@ class DevelopmentConfig(Config):
  
 这里需要使用8080端口来访问页面。后期搭建 nginx 代理，就可以直接使用80端口正常访问了  
 附上重启的方法  
-
-(py3) [root@node001 jumpserver]# ./jms restart -d  
+``` (py3) [root@node001 jumpserver]# ./jms restart -d ```  
 
 四、安装 Coco组件  
 1、默认点击web终端，弹出：  
  
-
 所以接下来，我们安装luna和coco：  
 coco概述：coco实现了 SSH Server 和 Web Terminal Server 的组件，提供 SSH 和 WebSocket 接口, 使用 Paramiko 和 Flask 开发。  
 ```
