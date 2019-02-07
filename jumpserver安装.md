@@ -137,7 +137,7 @@ coco概述：coco实现了 SSH Server 和 Web Terminal Server 的组件，提供
 ```
 (py3) [root@node001 jumpserver]# cd /opt/coco/requirements
 (py3) [root@node001 jumpserver]# yum -y  install $(cat rpm_requirements.txt)  
-(py3) [root@node001 jumpserver]# pip install -r requirements.txt   #前面已经离线安装过python的包，这里就很快安装成功了，或提示已经安装成功。
+(py3) [root@node001 jumpserver]# pip install -r requirements.txt 
 注：扩展： pip download -r requirements.txt  #使用download可以下载python包到本地
 ```  
 3、查看配置文件并运行  
