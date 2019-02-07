@@ -298,8 +298,8 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDE/7Yt3MKTvavCZSV2F9GCRX0snRDyAu2GzvmGaMj1
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver25.png)  
 
 4、编辑资产树添加节点  
-节点不能重名，右击节点可以添加、删除和重命名节点，以及进行资产相关的操作。
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver26.png) 
+节点不能重名，右击节点可以添加、删除和重命名节点，以及进行资产相关的操作。  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver26.png)  
  改成节点名字为：王者荣耀-华北区-服务器  
 
 
@@ -333,10 +333,10 @@ IP 地址和管理用户要确保正确，确保所选的管理用户的用户�
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver33.png)  
 开启虚拟机xuegod64.cn。 一会把这台机器当成资源添加平台中。  
 game64.xuegod.cn-王者荣耀-华北区  192.168.1.64  
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver34.png)
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver35.png) 
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver34.png)  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver35.png)  
 资产创建信息填写好保存之后，可以看到已经可以连接资产，说明正常：
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver36.png)
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver36.png)  
 如果资产不能正常连接，请检查管理用户的用户名和密钥是否正确以及该管理用户是否能使用 SSH 从 Jumpserver 主机正确登录到资产主机上。  
 
 8、网域列表  
