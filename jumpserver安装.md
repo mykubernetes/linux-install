@@ -113,59 +113,66 @@ class DevelopmentConfig(Config):
 (py3) [root@node001 jumpserver]# chmod +x jms
 (py3) [root@node001 jumpserver]# ./jms start all -d # 后台运行使用 -d 参数 
 注： ./jms start all #前台运行
-如果运行失败了，重新启动一下。
-```  
+如果运行失败了，重新启动一下。 
 #启动服务的脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数  
+```  
 测试：  
-访问 http://192.168.1.63:8080/   用户 ： admin 密码： admin  
+访问 http://192.168.1.1:8080/   用户 ： admin 密码： admin  
  
 这里需要使用8080端口来访问页面。后期搭建 nginx 代理，就可以直接使用80端口正常访问了  
 附上重启的方法  
 
-(py3) [root@xuegod63 jumpserver]# ./jms restart -d 
-34.2  安装 Coco组件
-34.2.1  安装coco组件
-1、默认点击web终端，弹出：
+(py3) [root@node001 jumpserver]# ./jms restart -d  
+34.2  安装 Coco组件  
+34.2.1  安装coco组件  
+1、默认点击web终端，弹出：  
  
  
-所以接下来，我们安装luna和coco：
-coco概述：coco实现了 SSH Server 和 Web Terminal Server 的组件，提供 SSH 和 WebSocket 接口, 使用 Paramiko 和 Flask 开发。
-(py3) [root@xuegod63 jumpserver]# cd /opt/coco  #直接使用离线代码
-(py3) [root@xuegod63 jumpserver]# source /opt/py3/bin/activate  
-附：在线下载代码：# git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
-2、 安装coco的依赖包，主要有rpm和python包
-(py3) [root@xuegod63 jumpserver]# cd /opt/coco/requirements
-(py3) [root@xuegod63 jumpserver]# yum -y  install $(cat rpm_requirements.txt)  
-(py3) [root@xuegod63 jumpserver]# pip install -r requirements.txt   #前面已经离线安装过python的包，这里就很快安装成功了，或提示已经安装成功。
+所以接下来，我们安装luna和coco：  
+coco概述：coco实现了 SSH Server 和 Web Terminal Server 的组件，提供 SSH 和 WebSocket 接口, 使用 Paramiko 和 Flask 开发。  
+```
+(py3) [root@node001 jumpserver]# cd /opt/coco  #直接使用离线代码
+(py3) [root@node001 jumpserver]# source /opt/py3/bin/activate
+```
+附：在线下载代码：#``` git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master ```
+2、 安装coco的依赖包，主要有rpm和python包  
+```
+(py3) [root@node001 jumpserver]# cd /opt/coco/requirements
+(py3) [root@node001 jumpserver]# yum -y  install $(cat rpm_requirements.txt)  
+(py3) [root@node001 jumpserver]# pip install -r requirements.txt   #前面已经离线安装过python的包，这里就很快安装成功了，或提示已经安装成功。
 注：扩展： pip download -r requirements.txt  #使用download可以下载python包到本地
-
-3、查看配置文件并运行
-(py3) [root@xuegod63 jumpserver]# cd /opt/coco
-(py3) [root@xuegod63 jumpserver]# cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
-(py3) [root@xuegod63 coco]# chmod +x cocod 
-(py3) [root@xuegod63 jumpserver]# ./cocod start -d   #后台运行使用 -d 参数
+```  
+3、查看配置文件并运行  
+```
+(py3) [root@node001 jumpserver]# cd /opt/coco
+(py3) [root@node001 jumpserver]# cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
+(py3) [root@node001 coco]# chmod +x cocod 
+(py3) [root@node001 jumpserver]# ./cocod start -d   #后台运行使用 -d 参数
 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
-
-34.3 安装Web-Terminal前端-Luna组件-配置Nginx整合各组件
-34.3.1  安装luna组件
-Luna概述：Luna现在是 Web Terminal 前端，计划前端页面都由该项目提供，Jumpserver 只提供 API，不再负责后台渲染html等。
-访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
- 解压 Luna
+```  
+34.3 安装Web-Terminal前端-Luna组件-配置Nginx整合各组件  
+34.3.1  安装luna组件  
+Luna概述：Luna现在是 Web Terminal 前端，计划前端页面都由该项目提供，Jumpserver 只提供 API，不再负责后台渲染html等。  
+访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译  
+ 解压 Luna  
+ ```
 (py3) [root@xuegod63 jumpserver]# cd /opt
 (py3) [root@xuegod63 jumpserver]# tar xvf luna.tar.gz
 (py3) [root@xuegod63 jumpserver]# ls /opt/luna
 注：在线下载
 #wget https://github.com/jumpserver/luna/releases/download/v1.0.0/luna.tar.gz
-
-34.3.2  配置 Nginx 整合各组件
-安装 Nginx 根据喜好选择安装方式和版本
-(py3) [root@xuegod63 jumpserver]# yum -y install nginx
-5.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf
-内容如下：
+```  
+34.3.2  配置 Nginx 整合各组件  
+安装 Nginx 根据喜好选择安装方式和版本  
+``` (py3) [root@node001 jumpserver]# yum -y install nginx ```  
+5.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf  
+内容如下：  
+```
 (py3) [root@xuegod63 opt]#  vim /etc/nginx/nginx.conf
 删除第38行到 57行中server {。。。}相关的内容，在vim命令模式，输入38gg，快速跳到38行，然后输入20dd，就可以删除。
 删除后，在38行插入以一下内容:
-
+```  
+```
 server {
     listen 80;
 
@@ -199,7 +206,9 @@ server {
         proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器，请填写它的ip
     }
 }
-
-34.3.3  运行 Nginx
+```  
+ 运行 Nginx  
+ ```
 (py3) [root@xuegod63 opt]# nginx -t   # 检测配置文件
 (py3) [root@xuegod63 jumpserver]# systemctl start nginx  ;  systemctl enable nginx
+```
