@@ -50,6 +50,7 @@ gitlab 主配置文件：
 1)下载汉化包  
 ```
 # git clone https://gitlab.com/xhang/gitlab.git #下载汉化补丁
+# git clone https://gitlab.com/xhang/gitlab.git -b v10.2.3-zh
 # tar xvf gitlab-patch-zh.tat.gz -C /opt/module/
 # \cp -rvf /opt/module/gitlab/* /opt/gitlab/embedded/service/gitlab-rails/
 ```
