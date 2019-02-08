@@ -372,7 +372,7 @@ manager:x:1001:1001::/home/manager:/bin/bash  #自动推送一个帐号，自动
 [root@node002 ~]# visudo  #sudo相关的规则也会被自动推送过来  
 ``` manager ALL=(ALL) NOPASSWD: /sbin/,/bin/ ```  
 
-9、用户使用资产  
+10、用户使用资产  
 登录 Jumpserver  
 创建授权规则的时候，选择了用户组，所以这里需要登录所选用户组下面的用户才能看见相应的资产。  
 使用无痕浏览器，再打开一个窗口，进行登录：  
@@ -387,15 +387,15 @@ manager:x:1001:1001::/home/manager:/bin/bash  #自动推送一个帐号，自动
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver42.png)  
 接下来，就可以对资产进行操作了。  
 
-10、在xshell字符终端下连接jumpserver管理服务器  
+11、在xshell字符终端下连接jumpserver管理服务器  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver43.png)  
 输入jumpserver用户mk123 和密码123456  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver44.png)  
 点击确定开始连接  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver45.png)  
 Opt> 2   #输入一个2，就可以直接登录：192.168.1.2  
-Connecting to manager@game64.xuegod.cn-王者荣耀-华北区 0.3  
-Last login: Thu Jun  7 23:15:13 2018 from xuegod63.cn  
+Connecting to manager@node02-王者荣耀-华北区   
+Last login: Thu Jun  7 23:15:13 2018 from node01
 [manager@node002 ~]$ whoami  #发现登录使用的是系统用户manager  
 manager  
 [manager@node002 ~]$ exit  
@@ -408,9 +408,9 @@ Opt> g  #显示你有权限的主机组
   ID Name            Assets     Comment  
   1   王者荣耀-华北区-服务器                         1  
 
-11、查看历史命令记录  
+12、查看历史命令记录  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver46.png)  
-12、查看历史会话并回放视频  
+13、查看历史会话并回放视频  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver47.png)  
 更多内容，可以参数官方手册：http://docs.jumpserver.org/zh/docs/step_by_step.html  
 
