@@ -264,8 +264,7 @@ SMTP服务器：smtp.163.com
 2）后端服务器如果开启了selinux，请安装libselinux-python。一般情况服务器上都关闭了selinux  
 
 九、使用jumpserver 管理王者荣耀数万台游戏服务器  
-1 ）用户管理  
-1、添加用户组。  
+1、添加用户组  
 用户名即 Jumpserver 登录账号。用户组是用于资产授权，当某个资产对一个用户组授权后，这个用户组下面的所有用户就都可以使用这个资产了。角色用于区分一个用户是管理员还是普通用户。  
 点击用户管理 —> 查看用户组 —> 添加用户组  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver15.png)  
