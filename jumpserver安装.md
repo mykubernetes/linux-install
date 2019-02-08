@@ -65,7 +65,11 @@ git clone --depth=1 https://github.com/jumpserver/jumpserver.git && cd jumpserve
 # source /opt/py3/bin/activate
 (py3) [root@node001 ~]# pip -V
 pip 9.0.1 from /opt/py3/lib/python3.6/site-packages (python 3.6) 
-在线安装：(py3) [root@node001 ~]#  pip install -r requirements.txt  
+方法1：离线安装：
+(py3) [root@node001 python-package]# cd /opt/python-package 
+(py3) [root@node001 ~]# pip install  ./* 
+
+方法2:在线安装：(py3) [root@node001 ~]#  pip install -r requirements.txt  
 pip 是一个安装和管理 Python 包的工具，相当于yum命令
 ```  
 4、安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke  
