@@ -51,9 +51,7 @@ gitlab 主配置文件：
 ```
 # git clone https://gitlab.com/xhang/gitlab.git #下载汉化补丁
 # tar xvf gitlab-patch-zh.tat.gz -C /opt/module/
-# cd /opt/module/gitlab/
-# git diff v10.2.3 v10.2.3-zh > ../10.2.3-zh.diff
-# patch -d /opt/gitlab/embedded/service/gitlab-rails/ -p1 < ../10.2.3-zh.diff
+# \cp -rvf /opt/module/gitlab/* /opt/gitlab/embedded/service/gitlab-rails/
 ```
 2)启动gitlab  
-注：如果返回502需要稍等一会在刷新就好了。
+注：如果返回502需要稍等一分钟左右再刷新就好了。
