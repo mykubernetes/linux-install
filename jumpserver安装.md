@@ -11,7 +11,9 @@ node002  资源，被管理的服务器
 ```
 # setenforce 0  # 可以设置配置文件永久关闭
 # systemctl stop firewalld.service ; systemctl disable firewalld.service
-
+#查看字符集
+# cat /etc/locale.conf
+  LANG=zh_CN.UTF-8
 # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
 # localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
 # export LC_ALL=zh_CN.UTF-8
@@ -113,7 +115,7 @@ class DevelopmentConfig(Config):
 8、成数据库表结构和初始化数据  
 ```
 (py3) [root@node001 jumpserver]# cd /opt/jumpserver/utils
-(py3) [root@node001 jumpserver]# bash make_migrations.sh  #注，在执行这一条命令之前，必续保障之前的pip install ./* 命令已经执行完了，不然后导入不了Django等软件包。
+(py3) [root@node001 jumpserver]# bash make_migrations.sh  
 ```
 9、运行 Jumpserver
 ```
