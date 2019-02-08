@@ -114,7 +114,9 @@ class DevelopmentConfig(Config):
 ```
 (py3) [root@node001 jumpserver]# cd /opt/jumpserver/utils
 (py3) [root@node001 jumpserver]# bash make_migrations.sh  #注，在执行这一条命令之前，必续保障之前的pip install ./* 命令已经执行完了，不然后导入不了Django等软件包。
-9、行 Jumpserver
+```
+9、运行 Jumpserver
+```
 (py3) [root@node001 jumpserver]# cd /opt/jumpserver
 (py3) [root@node001 jumpserver]# chmod +x jms
 (py3) [root@node001 jumpserver]# ./jms start all -d # 后台运行使用 -d 参数 
