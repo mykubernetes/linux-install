@@ -322,7 +322,7 @@ Jumpserver里各个用户的说明：
 6、创建系统用户  
 系统用户是 Jumpserver 跳转登录资产时使用的用户，可以理解为登录资产用户， Jumpserver使用系统用户登录资产。  
 系统用户的 Sudo 栏填写允许当前系统用户免sudo密码执行的程序路径，如默认的/sbin/ifconfig，意思是当前系统用户可以直接执行 ifconfig 命令或 sudo ifconfig 而不需要输入当前系统用户的密码，执行其他的命令任然需要密码，以此来达到权限控制的目的。  
-# 此处的权限应该根据使用用户的需求汇总后定制，原则上给予最小权限即可。  
+此处的权限应该根据使用用户的需求汇总后定制，原则上给予最小权限即可。  
 系统用户创建时，如果选择了自动推送 Jumpserver 会使用 Ansible 自动推送系统用户到资产中，如果资产(交换机、Windows )不支持 Ansible, 请手动填写账号密码。  
 Linux 系统协议项务必选择 ssh 。如果用户在系统中已存在，请去掉自动生成密钥、自动推送勾选。  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver30.png)  
