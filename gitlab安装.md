@@ -55,3 +55,5 @@ gitlab 主配置文件：
 # git diff v10.2.3 v10.2.3-zh > ../10.2.3-zh.diff
 # patch -d /opt/gitlab/embedded/service/gitlab-rails/ -p1 < ../10.2.3-zh.diff
 ```
+2)启动gitlab  
+注：如果返回502需要稍等一会在刷新就好了。
