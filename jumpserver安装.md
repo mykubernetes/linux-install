@@ -338,7 +338,7 @@ Linux 系统协议项务必选择 ssh 。如果用户在系统中已存在，请
 IP 地址和管理用户要确保正确，确保所选的管理用户的用户名和密码能"牢靠"地登录指定的 IP 主机上。资产的系统平台也务必正确填写。公网 IP 信息只用于展示，可不填，Jumpserver 连接资产使用的是 IP 信息。  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver33.png)  
 开启虚拟机xuegod64.cn。 一会把这台机器当成资源添加平台中。  
-game64.xuegod.cn-王者荣耀-华北区  192.168.1.64  
+node02-王者荣耀-华北区  192.168.1.2  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver34.png)  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver35.png)  
 资产创建信息填写好保存之后，可以看到已经可以连接资产，说明正常：
@@ -359,7 +359,7 @@ game64.xuegod.cn-王者荣耀-华北区  192.168.1.64
 
  
 
-授权成功后，你自己手动到xuegod64上查看：  
+授权成功后，你自己手动到node02上查看：  
 ```
 [root@node001 ~]# tail /etc/passwd -n 5
 postfix:x:89:89::/var/spool/postfix:/sbin/nologin
@@ -368,7 +368,7 @@ tcpdump:x:72:72::/:/sbin/nologin
 mk:x:1000:1000:mk:/home/mk:/bin/bash
 manager:x:1001:1001::/home/manager:/bin/bash  #自动推送一个帐号，自动在资产服务器上创建系统用户
 ```  
-[root@node001 ~]# visudo  #sudo相关的规则也会被自动推送过来  
+[root@node002 ~]# visudo  #sudo相关的规则也会被自动推送过来  
 ``` manager ALL=(ALL) NOPASSWD: /sbin/,/bin/ ```  
 
 9、用户使用资产  
@@ -392,16 +392,16 @@ manager:x:1001:1001::/home/manager:/bin/bash  #自动推送一个帐号，自动
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver44.png)  
 点击确定开始连接  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver45.png)  
-Opt> 64   #输入一个64，就可以直接登录：192.168.1.64  
+Opt> 2   #输入一个2，就可以直接登录：192.168.1.2  
 Connecting to manager@game64.xuegod.cn-王者荣耀-华北区 0.3  
 Last login: Thu Jun  7 23:15:13 2018 from xuegod63.cn  
-[manager@node001 ~]$ whoami  #发现登录使用的是系统用户manager  
+[manager@node002 ~]$ whoami  #发现登录使用的是系统用户manager  
 manager  
-[manager@node001 ~]$ exit  
+[manager@node002 ~]$ exit  
 登出  
 Opt> p  #显示你有权限的主机  
  ID  Hostname                          IP              LoginAs       Comment  
-  1  game64.xuegod.cn-王者荣耀-华北区 192.168.1.64    [系统管理员用户]  
+  1  node02 -王者荣耀-华北区 192.168.1.2    [系统管理员用户]  
 
 Opt> g  #显示你有权限的主机组  
   ID Name            Assets     Comment  
