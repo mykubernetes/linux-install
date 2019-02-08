@@ -298,7 +298,7 @@ ________________________________________
 [root@node001 opt]# su - mk123
 [mk@node001 ~]$ ssh-keygen   #一路回车
 [mk@node001 ~]$ cat ~/.ssh/id_rsa.pub 
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDE/7Yt3MKTvavCZSV2F9GCRX0snRDyAu2GzvmGaMj1Y1Evv0+bdNYuEVbax/CyakBcaYyBuD427trkQytfbfovc97As4fFV3yhKKKis6D66TR28zH5gGkhuToFhmil9BGFzJqy1M7fne+A18bKvezlFpZn4clwgg3kIqPCbOtQQnA9h1TH5j8lnvMwwcRxenKRMla987TfJ3482aTAoScxNmv2FNNSQmZEKHGPT5MmUIzrm3dwvCotAEmDegxJ0dB5u29tZaHgxMWFf1GRoj3pW8CzMOhug42F9FDF+K9wve5aph0mmc5pe7OKJthWrbv8CEV3T2mRYK4+M5q5sRed mk123@xuegod63.cn
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDE/7Yt3MKTvavCZSV2F9GCRX0snRDyAu2GzvmGaMj1Y1Evv0+bdNYuEVbax/CyakBcaYyBuD427trkQytfbfovc97As4fFV3yhKKKis6D66TR28zH5gGkhuToFhmil9BGFzJqy1M7fne+A18bKvezlFpZn4clwgg3kIqPCbOtQQnA9h1TH5j8lnvMwwcRxenKRMla987TfJ3482aTAoScxNmv2FNNSQmZEKHGPT5MmUIzrm3dwvCotAEmDegxJ0dB5u29tZaHgxMWFf1GRoj3pW8CzMOhug42F9FDF+K9wve5aph0mmc5pe7OKJthWrbv8CEV3T2mRYK4+M5q5sRed mk123@node02
 ```  
 把上面生成的公钥粘到这里：  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver24.png)  
@@ -338,7 +338,7 @@ Linux 系统协议项务必选择 ssh 。如果用户在系统中已存在，请
 点击页面左上角的“创建资产”按钮，进入资产创建页面，填写资产信息。  
 IP 地址和管理用户要确保正确，确保所选的管理用户的用户名和密码能"牢靠"地登录指定的 IP 主机上。资产的系统平台也务必正确填写。公网 IP 信息只用于展示，可不填，Jumpserver 连接资产使用的是 IP 信息。  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver33.png)  
-开启虚拟机xuegod64.cn。 一会把这台机器当成资源添加平台中。  
+开启虚拟机node02。 一会把这台机器当成资源添加平台中。  
 node02-王者荣耀-华北区  192.168.1.2  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver34.png)  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/jumpserver35.png)  
