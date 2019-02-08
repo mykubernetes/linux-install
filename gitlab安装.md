@@ -15,8 +15,7 @@ gitlab安装
 # vim /etc/gitlab/gitlab.rb    #修改 gitlab 外部访问地址
  external_url 'http://192.168.1.63'
 ```
-注：这里必须修改，不然后后期访问时，用户到地址是：http://gitlab.example.com/xxxx ，根本
-不能访问。 修改后获得是： http://192.168.1.63/xxxx
+注：这里必须修改，不然后后期访问时，用户到地址是：http://gitlab.example.com/xxxx ，根本不能访问。 修改后获得是： http://192.168.1.63/xxxx  
 ``` gitlab-ctl reconfigure ```  
 5、查看gitlab运行状态  
 ```
