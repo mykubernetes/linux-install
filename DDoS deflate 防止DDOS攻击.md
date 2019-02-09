@@ -34,7 +34,7 @@ Chain INPUT (policy ACCEPT)
 target     prot opt source               destination         
 DROP       all  --  192.168.1.64         0.0.0.0/0 
 ```  
-测试需要等待一分钟才能生效，因为crontab一分钟执行一次  
+测试需要等待一分钟才能生效  
 6、卸载  
 ```
 # wget http://www.inetbase.com/scripts/ddos/uninstall.ddos
