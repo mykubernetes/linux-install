@@ -39,7 +39,7 @@ SHELL=/bin/sh
 1）压力测试
 # ab -n 1000 -c 10 http://192.168.1.1/index.html
 2）查看连接数
-# netstat -ntu | awk '{print $5}' |grep -v :: | cut -d: -f1 | sort | uniq -c | sort -n
+# netstat -ntu | awk '{print $5}' | cut -d: -f1 | sed -n '/[0-9]/p' | sort | uniq -c | sort -nr
 3）查看防火墙规则
 # iptables -L -n
 Chain INPUT (policy ACCEPT)
