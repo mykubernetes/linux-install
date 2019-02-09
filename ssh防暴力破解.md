@@ -52,7 +52,7 @@ http://www.fail2ban.org/wiki/index.php/Downloads
 
 五、查看状态  
 ```
-# fail2ban-client status。
+# fail2ban-client status
 # fail2ban-client status ssh-iptables
 Status for the jail: ssh-iptables
 |- filter
