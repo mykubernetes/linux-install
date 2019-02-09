@@ -1,6 +1,7 @@
 DDoS deflate 防止DDOS攻击
 =========================
 1、下载软件  
+链接：https://pan.baidu.com/s/1MwcstT1gQA_ZwT_a-wH9hg 提取码：95nf  
 ```
 wget http://www.inetbase.com/scripts/ddos/install.sh
 # chmod 700 install.sh
