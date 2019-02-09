@@ -16,7 +16,7 @@ CRON="/etc/cron.d/ddos.cron"                     #定时执行程序
 FREQ=1                                           #检查区间间隔
 NO_OF_CONNECTIONS=150                            #限制IP个数
 APF_BAN=0                                        #1为屏蔽IP,0为使用iptables
-BAN_PERIOD=600                                   #禁止时间
+BAN_PERIOD=600                                   #禁止时间以秒为单位默认10分钟
 ```  
 3、周期性任务计划  
 ```
