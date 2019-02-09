@@ -24,4 +24,23 @@ cat  /etc/cron.d/ddos.cron
 SHELL=/bin/sh
 0-59/1 * * * * root /usr/local/ddos/ddos.sh >/dev/null 2>&1
 ```  
-4、无需重启进程
+4、无需重启进程  
+
+5、测试  
+```
+# ab -n 1000 -c 10 http://192.168.1.1/index.html
+# iptables -L -n
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+DROP       all  --  192.168.1.64         0.0.0.0/0 
+```  
+测试需要等待一分钟才能生效，因为crontab一分钟执行一次  
+6、卸载  
+```
+# wget http://www.inetbase.com/scripts/ddos/uninstall.ddos
+# chmod +x uninstall.ddos 
+# ./uninstall.ddos
+```  
+注意：在卸载之前所被该程序拒绝访问的iptables的规则，不会自动清除  
+
+ 
