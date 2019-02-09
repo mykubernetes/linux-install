@@ -32,5 +32,5 @@ RUN_AS_USER=root
 5、启动nexus  
 ``` /opt/module/nexus-2.11.4-01/bin/nexus start ```  
 6、web页面展示  
-``` http://192.168.101.68:8081/nexus ```
+``` http://192.168.101.68:8081/nexus ```  
 默认用户名：admin 密码：admin123  
