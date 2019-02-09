@@ -24,3 +24,4 @@ cat  /etc/cron.d/ddos.cron
 SHELL=/bin/sh
 0-59/1 * * * * root /usr/local/ddos/ddos.sh >/dev/null 2>&1
 ```  
+4、无需重启进程
