@@ -8,10 +8,10 @@
 说明：尝试登陆失败超过3次，普通用户600秒解锁，root用户1200秒解锁  
 2、手动解除锁定  
 1）查看某一用户错误登陆次数  
-``` pam_tally2 –-user ```  
+``` pam_tally2 --user ```  
 2）查看work用户的错误登陆次数  
-``` pam_tally2 –-user work ```  
+``` pam_tally2 --user work ```  
 3）清空某一用户错误登陆次数  
-``` pam_tally2 –-user –-reset ```  
+``` pam_tally2 --user –-reset ```  
 4）清空 work 用户的错误登陆次数  
-``` pam_tally2 –-user work –-reset ```  
+``` pam_tally2 --user work –-reset ```  
