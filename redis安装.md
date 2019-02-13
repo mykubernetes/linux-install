@@ -46,7 +46,33 @@ appendonly no                  		#定义是否开启此功能，no表示关闭�
   OK
 或者 redis-cli -a 123456  启动直接输入密码
 ```  
+5、RDB和AOF相关配置 默认值即可
+配置文件中的与RDB相关的参数：
+```
+stop-writes-on-bgsave-error yes		#在进行快照备份时，一旦发生错误的话是否停止写操作
+rdbcompression yes			#RDB文件是否使用压缩，压缩会消耗CPU
+rdbchecksum yes				#是否对RDB文件做校验码检测
+dbfilename dump.rdb 			#定义RDB文件的名称
+dir /var/lib/redis 			#定义RDB文件存放的目录路径
+```  
+配置文件中的与AOF相关的参数：  
+```
+appendonly no 				#定义是否开启AOF功能，默认为关闭
+appendfilename "appendonly.aof" 	#定义AOF文件
+appendfsync always 			#表示每次收到写命令时，立即写到磁盘上的AOF文件，虽然是最好的持久化功能，但是每次有写命令时都会有磁盘的I/O操作，容易影响redis的性能
+appendfsync everysec 			#表示每秒钟写一次，不管每秒钟收到多少个写请求都往磁盘中的AOF文件中写一次
+appendfsync no 				#表示append功能不会触发写操作，所有的写操作都是提交给OS，由OS自行决定是如何写的
+no-appendfsync-on-rewrite no 		//当此项为yes时，表示在重写时，对于新的写操作不做同步，而暂存在内存中
+auto-aof-rewrite-percentage 100		//表示当前AOF文件的大小是上次重写AOF文件的二倍时，则自动日志重写过程
+auto-aof-rewrite-min-size 64mb		//定义AOF文件重写过程的条件，最少为定义大小则触发重写过程
 
+注意：持久本身不能取代备份；还应该制定备份策略，对redis数据库定期进行备份；
+
+RDB与AOF同时启用：
+	(1) BGSAVE和BGREWRITEAOF不会同时执行，为了避免对磁盘的I/O影响过大，在某一时刻只允许一者执行；
+		如果BGSAVE在执行当中，而用户手动执行BGREWRITEAOF时，redis会立即返回OK，但是redis不会同时执行，会等BGSAVE执行完成，再执行BGREWRITEAOF
+	(2) 在Redis服务器启动用于恢复数据时，会优先使用AOF
+```  
 命令行工具
 ```
 切换库（名称空间）：
