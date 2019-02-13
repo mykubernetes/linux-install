@@ -49,6 +49,15 @@ vim /etc/redis-sentinel.conf
   sentinel failover-timeout <master-name> <milliseconds>          #故障转移超时时间，在指定时间没能完成则判定为失败，单位为毫秒（默认为180秒）
 
 # systemctl start redis-sentinel 启动
+# redis-cli -p 26379
+127.0.0.1:26379> info sentinel
+  # Sentinel
+  sentinel_masters:1
+  sentinel_tilt:0
+  sentinel_running_scripts:0
+  sentinel_scripts_queue_length:0
+  sentinel_simulate_failure_flags:0
+  master0:name=mymaster,status=sdown,address=127.0.0.1:6379,slaves=0,sentinels=1
 ```  
 4、密码配置  
 ```
