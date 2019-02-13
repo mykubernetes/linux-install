@@ -58,6 +58,15 @@ vim /etc/redis-sentinel.conf
   sentinel_scripts_queue_length:0
   sentinel_simulate_failure_flags:0
   master0:name=mymaster,status=sdown,address=127.0.0.1:6379,slaves=0,sentinels=1
+  
+# 127.0.0.1:26379> sentinel masters
+1)  1) "name"
+    2) "mymaster"
+    3) "ip"
+    4) "127.0.0.1"
+
+127.0.0.1:26379> sentinel slaves mymaster
+(empty list or set)
 ```  
 4、密码配置  
 ```
