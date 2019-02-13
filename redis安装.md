@@ -38,7 +38,7 @@ appendonly no                  		#定义是否开启此功能，no表示关闭�
 ```  
 4、sentinel管理多个redis服务实现HA  
 ```
-/etc/redis-sentinel.conf
+vim /etc/redis-sentinel.conf
 # sentinel monitor <master-name> <ip> <redis-port> <quorum> #此项可以出现多次，可以监控多组redis主从架构，此项用于监控主节点
 	<master-name> 自定义的主节点名称
 	<ip> 主节点的IP地址
