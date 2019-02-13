@@ -62,9 +62,9 @@ appendfilename "appendonly.aof" 	#定义AOF文件
 appendfsync always 			#表示每次收到写命令时，立即写到磁盘上的AOF文件，虽然是最好的持久化功能，但是每次有写命令时都会有磁盘的I/O操作，容易影响redis的性能
 appendfsync everysec 			#表示每秒钟写一次，不管每秒钟收到多少个写请求都往磁盘中的AOF文件中写一次
 appendfsync no 				#表示append功能不会触发写操作，所有的写操作都是提交给OS，由OS自行决定是如何写的
-no-appendfsync-on-rewrite no 		//当此项为yes时，表示在重写时，对于新的写操作不做同步，而暂存在内存中
-auto-aof-rewrite-percentage 100		//表示当前AOF文件的大小是上次重写AOF文件的二倍时，则自动日志重写过程
-auto-aof-rewrite-min-size 64mb		//定义AOF文件重写过程的条件，最少为定义大小则触发重写过程
+no-appendfsync-on-rewrite no 		#当此项为yes时，表示在重写时，对于新的写操作不做同步，而暂存在内存中
+auto-aof-rewrite-percentage 100		#表示当前AOF文件的大小是上次重写AOF文件的二倍时，则自动日志重写过程
+auto-aof-rewrite-min-size 64mb		#定义AOF文件重写过程的条件，最少为定义大小则触发重写过程
 ```  
 注意：持久本身不能取代备份；还应该制定备份策略，对redis数据库定期进行备份；  
 
@@ -72,6 +72,13 @@ RDB与AOF同时启用：
 	(1) BGSAVE和BGREWRITEAOF不会同时执行，为了避免对磁盘的I/O影响过大，在某一时刻只允许一者执行；  
 	如果BGSAVE在执行当中，而用户手动执行BGREWRITEAOF时，redis会立即返回OK，但是redis不会同时执行，会等BGSAVE执行完成，再执行BGREWRITEAOF  
 	(2) 在Redis服务器启动用于恢复数据时，会优先使用AOF  
+
+6、redis主从架构  
+主库会基于pingcheck方式检查从库是否在线，如果在线则直接同步数据文件至从服务端，从服务端也可以主动发送同步请求到主服务端，主库如果是启动了持久化功能时，会不断的同步数据到磁盘上，主库一旦收到从库的同步请求时，主库会将内存中的数据做快照，然后把数据文件同步给从库，从库得到以后是保存在本地文件中（磁盘），而后则把该文件装载到内存中完成数据重建，链式复制也同步如此，因为主是不区分是真正的主，还是另外一个的从  
+
+1、启动一slave  
+2、slave会向master发送同步命令，请求主库上的数据，不论从是第一次连接，还是非第一次连接，master此时都会启动一个后台的子进程将数据快照保存在数据文件中，然后把数据文件发送给slave  
+3、slave收到数据文件 以后会保存到本地，而后把文件重载装入内存  
 
 命令行工具  
 ```
