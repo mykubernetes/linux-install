@@ -44,8 +44,6 @@ appendonly no                  		#定义是否开启此功能，no表示关闭�
 	<ip> 主节点的IP地址
 	<redis-port>主节点的端口号
 	<quorum>主节点对应的quorum法定数量，用于定义sentinel的数量，是一个大于值尽量使用奇数，如果sentinel有3个，则指定为2即可
-	<master-name>为集群名称，可以自定义，如果同时监控有多组redis集群时
-	<master-name>不能同样
 sentinel down-after-milliseconds <master-name> <milliseconds>   #sentinel连接其他节点超时时间，单位为毫秒（默认为30秒）
 sentinel parallel-syncs <master-name> <numslaves>               #提升主服务器时，允许多少个从服务向新的主服务器发起同步请求
 sentinel failover-timeout <master-name> <milliseconds>          #故障转移超时时间，在指定时间没能完成则判定为失败，单位为毫秒（默认为180秒）
