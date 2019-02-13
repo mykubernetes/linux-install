@@ -1,10 +1,10 @@
 redis安装  
 =========
 1、配置yum源  
-``` yum install -y http://rpms.famillecollet.com/enterprise/remi-release-7.rpm ```
+``` yum install -y http://rpms.famillecollet.com/enterprise/remi-release-7.rpm ```  
 2、安装  
 ``` yum --enablerepo=remi install redis ```  
-3、配置文件
+3、配置文件  
 ```
 vim /etc/redis.conf
 daemonize no  
@@ -35,4 +35,14 @@ slave-read-only yes          		#定义从服务对主服务是否为只读（仅
 ###### APPEND ONLY MODE #######  	#定义AOF的持久化功能相关配置，一旦有某一个键发生变化，将修改键的命令附加到命令列表的文件中
 appendonly no                  		#定义是否开启此功能，no表示关闭，yes表示开启
                                     	说明：RDB和AOF两种持久功能可以同时启用，两者不影响
+```  
+4、密码配置  
 ```
+# vim /etc/redis.conf
+  requirepass 123456    
+# systemctl restart redis
+# redis-cli
+  127.0.0.1:6379> auth  123456
+  OK
+或者 redis-cli -a 123456  启动直接输入密码
+```  
