@@ -39,14 +39,16 @@ appendonly no                  		#定义是否开启此功能，no表示关闭�
 4、sentinel管理多个redis服务实现HA  
 ```
 vim /etc/redis-sentinel.conf
-# sentinel monitor <master-name> <ip> <redis-port> <quorum> #此项可以出现多次，可以监控多组redis主从架构，此项用于监控主节点
+  # sentinel monitor <master-name> <ip> <redis-port> <quorum> #此项可以出现多次，可以监控多组redis主从架构，此项用于监控主节点
 	<master-name> 自定义的主节点名称
 	<ip> 主节点的IP地址
 	<redis-port>主节点的端口号
 	<quorum>主节点对应的quorum法定数量，用于定义sentinel的数量，是一个大于值尽量使用奇数，如果sentinel有3个，则指定为2即可
-sentinel down-after-milliseconds <master-name> <milliseconds>   #sentinel连接其他节点超时时间，单位为毫秒（默认为30秒）
-sentinel parallel-syncs <master-name> <numslaves>               #提升主服务器时，允许多少个从服务向新的主服务器发起同步请求
-sentinel failover-timeout <master-name> <milliseconds>          #故障转移超时时间，在指定时间没能完成则判定为失败，单位为毫秒（默认为180秒）
+  sentinel down-after-milliseconds <master-name> <milliseconds>   #sentinel连接其他节点超时时间，单位为毫秒（默认为30秒）
+  sentinel parallel-syncs <master-name> <numslaves>               #提升主服务器时，允许多少个从服务向新的主服务器发起同步请求
+  sentinel failover-timeout <master-name> <milliseconds>          #故障转移超时时间，在指定时间没能完成则判定为失败，单位为毫秒（默认为180秒）
+
+# systemctl start redis-sentinel 启动
 ```  
 4、密码配置  
 ```
