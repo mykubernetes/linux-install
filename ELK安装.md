@@ -141,7 +141,7 @@ output {
       }
     }
     
-    if "tomcat" in [tats] {
+    if "tomcat" in [tags] {
       elasticsearch {
          hosts => "localhost:9200"
          index => "tomcat-catalina-%{+YYYY.MM.dd}"
