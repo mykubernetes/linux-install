@@ -191,7 +191,7 @@ output {
   if [type] == "nginx-accesslog" {
     elasticsearch {
       hosts => ["192.168.56.11:9200"]
-      index => "logstash-nginx-accesslog-5616-%{+YYYY.MM.dd}"
+      index => "logstash-nginx-accesslog-node01-%{+YYYY.MM.dd}"
   }}
 }
 ```  
@@ -217,7 +217,7 @@ output {
   if [type] == "tomct-access-log" {
     elasticsearch {
       hosts => ["192.168.56.11:9200"]
-      index => "logstash-tomcat-5616-access-%{+YYYY.MM.dd}"
+      index => "logstash-tomcat-node01-access-%{+YYYY.MM.dd}"
       codec => "json"
     }
   }
