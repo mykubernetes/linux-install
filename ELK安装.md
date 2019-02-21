@@ -230,8 +230,8 @@ http://www.kjson.com/
 五、安装Filebeat  
 1、下载安装包  
 ``` 
-https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.6.0-linux-x86_64.tar.gz
-tar -xvf filebeat-6.6.0-linux-x86_64.tar.gz
+wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.6.1-x86_64.rpm
+yum install -y filebeat-6.6.1-x86_64.rpm
 ```  
 2、修改配置文件
 ```
@@ -257,4 +257,4 @@ output.logstash:
   #loadbalance: true                        #多个输出的时候开启负载
 ```  
 3、启动filebeat  
-``` ./filebeat -c /etc/filebeat/filebeat.yml ```
+``` systemctl  restart filebeat ```
