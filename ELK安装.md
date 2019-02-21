@@ -106,7 +106,7 @@ yum install -y logstash-6.6.1.rpm
 
 3、基本配置说明
 ```
-# cat logstash.txt
+# cat /etc/logstash/conf.d/system-log.conf 
 input {
   file {
     path => "var/log/messages"                    #收集日志文件
@@ -124,7 +124,7 @@ output {
 }
 ```  
 
-3、配置logstash收集syslog日志  
+4、配置logstash收集syslog日志  
 ```
 vim /opt/module/logstash/config/logstash.conf
 input {
@@ -151,10 +151,81 @@ output {
 ```  
 参考https://www.elastic.co/guide/en/logstash/current/index.html  
 
-4、启动logstash  
+5、启动logstash  
 ```
 systemctl start logstash
 ```
+
+6、nginx日志转换成json格式  
+```
+# vim  conf/nginx.conf
+log_format access_json '{"@timestamp":"$time_iso8601",'
+        '"host":"$server_addr",'
+        '"clientip":"$remote_addr",'
+        '"size":$body_bytes_sent,'
+        '"responsetime":$request_time,'
+        '"upstreamtime":"$upstream_response_time",'
+        '"upstreamhost":"$upstream_addr",'
+        '"http_host":"$host",'
+        '"url":"$uri",'
+        '"domain":"$host",'
+        '"xff":"$http_x_forwarded_for",'
+        '"referer":"$http_referer",'
+        '"status":"$status"}';
+    access_log  /var/log/nginx/access.log  access_json;
+```  
+配置logstash收集nginx日志
+```
+# vim nginx.conf 
+input {
+  file {
+    path => "/var/log/nginx/access.log"
+    start_position => "end"
+    type => "nginx-accesslog"
+    codec => json
+  }
+}
+
+
+output {
+  if [type] == "nginx-accesslog" {
+    elasticsearch {
+      hosts => ["192.168.56.11:9200"]
+      index => "logstash-nginx-accesslog-5616-%{+YYYY.MM.dd}"
+  }}
+}
+```  
+7、tomcat日志转换成json格式  
+```
+vim conf/server.xml
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="tomcat_access_log" suffix=".log"
+               pattern="{&quot;clientip&quot;:&quot;%h&quot;,&quot;ClientUser&quot;:&quot;%l&quot;,&quot;authenticated&quot;:&quot;%u&quot;,&quot;AccessTime&quot;:&quot;%t&quot;,&quot;method&quot;:&quot;%r&quot;,&quot;status&quot;:&quot;%s&quot;,&quot;SendBytes&quot;:&quot;%b&quot;,&quot;Query?string&quot;:&quot;%q&quot;,&quot;partner&quot;:&quot;%{Referer}i&quot;,&quot;AgentVersion&quot;:&quot;%{User-Agent}i&quot;}"/> 
+```  
+配置logstash收集tomcat日志  
+```
+# cat /etc/logstash/conf.d/tomcat.conf 
+input {
+  file {
+    path => "/usr/local/tomcat/logs/localhost_access_log.*.txt"
+    start_position => "end"
+    type => "tomct-access-log"
+  }
+}
+
+output {
+  if [type] == "tomct-access-log" {
+    elasticsearch {
+      hosts => ["192.168.56.11:9200"]
+      index => "logstash-tomcat-5616-access-%{+YYYY.MM.dd}"
+      codec => "json"
+    }
+  }
+}
+```  
+
+8、验证日志是否json格式：
+http://www.kjson.com/
 
 五、安装Filebeat  
 1、下载安装包  
