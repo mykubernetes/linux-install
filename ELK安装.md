@@ -82,14 +82,49 @@ tar -xvf kibana-6.6.0-linux-x86_64.tar.gz -C /opt/module/
 ``` nohup ./kibana & ```  
 ``` http://node001:5601 ```  
 
+5、配置nginx反向代理kibana认证  
+```
+# htpasswd -bc /usr/local/nginx/htpass.txt kibana 123456
+#chown nginx.nginx /usr/local/nginx/ -R
+
+server字段添加
+auth_basic "Restricted Access";
+auth_basic_user_file /usr/local/nginx/htpass.txt;
+```  
 
 四、安装Logstash  
 1、下载安装包  
 ``` 
-https://artifacts.elastic.co/downloads/logstash/logstash-6.6.0.tar.gz
-tar -xvf logstash-6.6.0.tar.gz -C module/
+wget https://artifacts.elastic.co/downloads/logstash/logstash-6.6.1.rpm
+yum install -y logstash-6.6.1.rpm
 ```  
-2、配置logstash收集syslog日志  
+
+2、测试logstash是否可用
+```
+/usr/share/logstash/bin/logstash -e 'input { stdin{} } output { stdout { codec => rubydebug}}'
+```
+
+3、基本配置说明
+```
+# cat logstash.txt
+input {
+  file {
+    path => "var/log/messages"                    #收集日志文件
+    start_position => "beginning"                 #第一次启动是否读取以前文件内容"beginning"为读取以前内容
+    type => "systemlog-node01"                  #打一个标签
+    stat_interval => "2"                                  #读取文件时间间隔
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["192.168.1.70:9200"]                  #日志发送的主机
+    index => "logstash-system-log-node01-%{+YYYY.MM.dd}"     #定义日志格式
+  }
+}
+```  
+
+3、配置logstash收集syslog日志  
 ```
 vim /opt/module/logstash/config/logstash.conf
 input {
@@ -106,7 +141,7 @@ output {
       }
     }
     
-    if tomcat in [tats] {
+    if "tomcat" in [tats] {
       elasticsearch {
          hosts => "localhost:9200"
          index => "tomcat-catalina-%{+YYYY.MM.dd}"
@@ -115,45 +150,10 @@ output {
 }     
 ```  
 参考https://www.elastic.co/guide/en/logstash/current/index.html  
-3、性能监控程序  
-```
-# yum install collectd -y 
-vim /etc/collectd.conf
-   Hostname "node001"
-   LoadPlugin syslog
-   LoadPlugin cpu
-   LoadPlugin df
-   LoadPlugin interface
-   LoadPlugin load
-   LoadPlugin memory
-   LoadPlugin network
-   <Plugin network>
-      <Server "192.168.1.1" "25826">  #192.168.1.1是logstash主机监听地址，25826是其监听的UTP端口
-      </Server>
-   </Plugin>
-   Include "/etc/collectd.d"
-# systemctl start collectd.service   
-```  
-```
-input {
-   udp {
-      port  => 25826
-      codec => collectd {}
-      type  => "collectd"
-   }
-}
 
-output {
-   stdout {
-      codec => rubydebug
-   }
-}
-```  
 4、启动logstash  
 ```
-$ pwd 
-/opt/module/logstash-6.6.0/
-nohup bin/logstash -f config/logstash.conf &
+systemctl start logstash
 ```
 
 五、安装Filebeat  
