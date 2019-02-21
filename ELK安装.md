@@ -242,7 +242,7 @@ filebeat.prospectors:
     - /var/log/messages
     - /var/log/*.log
   exclude_lines: ["^DBG","^$"]              #不收集的行                       
-  document_type: system-log-node01
+  document_type: system-log-node01          #和elasticsearch一样打标签
 output.redis:
   hosts: ["192.168.56.12:6379"]
   key: "system-log-5612"  
