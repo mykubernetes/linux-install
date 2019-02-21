@@ -235,17 +235,26 @@ tar -xvf filebeat-6.6.0-linux-x86_64.tar.gz
 ```  
 2、修改配置文件
 ```
-vim /opt/module/filebeat-6.6.0-linux-x86_64/filebeat.yml
-#注释以下内容：
-#enabled: false
-
-输出位置配置：
-output.elasticsearch:
- hosts: ["localhost:9200"]
-
-#修改paths:
- paths:
+# grep -v "#"  /etc/filebeat/filebeat.yml | grep -v "^$"
+filebeat.prospectors:
+- input_type: log
+  paths:
     - /var/log/messages
+    - /var/log/*.log
+  exclude_lines: ["^DBG","^$"]              #不收集的行                       
+  document_type: system-log-node01
+output.redis:
+  hosts: ["192.168.56.12:6379"]
+  key: "system-log-5612"  
+  db: 1
+  timeout: 5
+  password: 123456
+output.logstash:
+  hosts: ["192.168.56.11:5044"]             #logstash 服务器地址，可以是多个
+  enabled: true                             #是否开启输出至logstash，默认即为true
+  worker: 1                                 #工作线程数
+  compression_level: 3                      #压缩级别
+  #loadbalance: true                        #多个输出的时候开启负载
 ```  
 3、启动filebeat  
 ``` ./filebeat -c /etc/filebeat/filebeat.yml ```
