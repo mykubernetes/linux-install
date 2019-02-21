@@ -256,5 +256,42 @@ output.logstash:
   compression_level: 3                      #压缩级别
   #loadbalance: true                        #多个输出的时候开启负载
 ```  
-3、启动filebeat  
+3、收集tomcat日志  
+```
+#  grep -v "#"  /etc/filebeat/filebeat.yml | grep -v "^$"
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/messages
+    - /var/log/*.log
+  exclude_lines: ["^DBG","^$"]
+  document_type: system-log-5612
+- input_type: log
+  paths:
+    - /usr/local/tomcat/logs/tomcat_access_log.*.log
+  document_type: tomcat-accesslog-5612
+output.logstash:
+  hosts: ["192.168.56.11:5044","192.168.56.11:5045"] #多个logstash服务器
+  enabled: true
+  worker: 1
+  compression_level: 3
+  loadbalance: true
+```  
+4、配置logstash服务并收集beats日志  
+```
+# cat beats-node01.conf 
+input {
+        beats {
+        port => 5045          #重新开启一个端口
+        codec => "json"
+        }
+}
+
+output {
+  file {
+    path => "/tmp/filebeat.txt"
+  }
+}
+```
+4、启动filebeat  
 ``` systemctl  restart filebeat ```
