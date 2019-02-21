@@ -150,7 +150,7 @@ echo "$label  $count_netstat_wait_connections" | curl --data-binary @- http://19
 删除某个组下的某实例的所有数据：  
 ``` curl -X DELETE http://192.168.1.70:9091/metrics/job/JOB_NAME/instance/HOME_NAME ```  
 
-删除某个组下的所有数据：
+删除某个组下的所有数据：  
 ``` curl -X DELETE http://pushgateway.example.org:9091/metrics/job/JOB_NAME ```  
 
 
