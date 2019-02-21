@@ -111,14 +111,14 @@ input {
   file {
     path => "var/log/messages"                    #收集日志文件
     start_position => "beginning"                 #第一次启动是否读取以前文件内容"beginning"为读取以前内容
-    type => "systemlog-node01"                  #打一个标签
-    stat_interval => "2"                                  #读取文件时间间隔
+    type => "systemlog-node01"                    #打一个标签
+    stat_interval => "2"                          #读取文件时间间隔
   }
 }
 
 output {
-  elasticsearch {
-    hosts => ["192.168.1.70:9200"]                  #日志发送的主机
+  elasticsearch {                                            #发生给elasticsearch
+    hosts => ["192.168.1.70:9200"]                           #日志发送的主机
     index => "logstash-system-log-node01-%{+YYYY.MM.dd}"     #定义日志格式
   }
 }
