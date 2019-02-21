@@ -265,11 +265,11 @@ filebeat.prospectors:
     - /var/log/messages
     - /var/log/*.log
   exclude_lines: ["^DBG","^$"]
-  document_type: system-log-5612
+  document_type: system-log-node01
 - input_type: log
   paths:
     - /usr/local/tomcat/logs/tomcat_access_log.*.log
-  document_type: tomcat-accesslog-5612
+  document_type: tomcat-accesslog-node01
 output.logstash:
   hosts: ["192.168.56.11:5044","192.168.56.11:5045"] #多个logstash服务器
   enabled: true
@@ -282,16 +282,32 @@ output.logstash:
 # cat beats-node01.conf 
 input {
         beats {
-        port => 5045          #重新开启一个端口
+        port => 5044          #重新开启一个端口
         codec => "json"
         }
 }
 
 output {
-  file {
-    path => "/tmp/filebeat.txt"
-  }
+  if [type] == "system-log-node01" {
+  redis {
+    host => "192.168.56.12"
+    port => "6379"
+    db => "1"
+    key => "system-log-5612"
+    data_type => "list"
+    password => "123456"
+ }}
+  if [type] == "tomcat-accesslog-node01" {
+  redis {
+    host => "192.168.56.12"
+    port => "6379"
+    db => "0"
+    key => "tomcat-accesslog-node01"
+    data_type => "list"
+    password => "123456"
+ }} 
 }
+
 ```
 4、启动filebeat  
 ``` systemctl  restart filebeat ```
