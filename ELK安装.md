@@ -256,7 +256,9 @@ output.logstash:
   compression_level: 3                      #压缩级别
   #loadbalance: true                        #多个输出的时候开启负载
 ```  
-3、收集tomcat日志  
+3、启动filebeat  
+``` systemctl  restart filebeat ```
+4、收集tomcat日志  
 ```
 #  grep -v "#"  /etc/filebeat/filebeat.yml | grep -v "^$"
 filebeat.prospectors:
@@ -277,7 +279,7 @@ output.logstash:
   compression_level: 3
   loadbalance: true
 ```  
-4、配置logstash服务并收集beats日志  
+5、配置logstash服务并收集beats日志  
 ```
 # cat beats-node01.conf 
 input {
@@ -308,6 +310,40 @@ output {
  }} 
 }
 
+```  
+6、配置logstash收集redis并发生到elasticsearch
 ```
-4、启动filebeat  
-``` systemctl  restart filebeat ```
+# cat  redis-es.conf
+input {
+  redis {
+    host => "192.168.56.12"
+    port => "6379"
+    db => "1"
+    key => "system-log-node01"
+    data_type => "list"
+    password => "123456"
+ }
+  redis {
+    host => "192.168.56.12"
+    port => "6379"
+    db => "0"
+    key => "tomcat-accesslog-node01"
+    data_type => "list"
+password => "123456"
+codec  => "json" #对于json格式的日志定义编码格式
+ } 
+}
+
+output {
+  if [type] == "system-log-node01" {
+    elasticsearch {
+      hosts => ["192.168.56.12:9200"]
+      index => "logstash-system-log-node01-%{+YYYY.MM.dd}"
+}}
+  if [type] == "tomcat-accesslog-node01" {
+    elasticsearch {
+      hosts => ["192.168.56.12:9200"]
+      index => "logstash-tomcat-accesslog-node01-%{+YYYY.MM.dd}"
+}}
+}
+```
