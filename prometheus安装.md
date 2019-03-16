@@ -97,7 +97,55 @@ cd /opt/prometheus/node_exporter-0.17.0.linux-amd64
    root      3279  0.0  0.1 113180  1212 ?        Ss   09:06   0:00 /bin/sh /opt/prometheus/node_exporter-0.17.0.linux-amd64/up.sh
    root      3280  0.1  1.5 113808 16056 ?        Sl   09:06   0:02 /opt/prometheus/node_exporter-0.17.0.linux-amd64/node_exporter
 ```  
-3、web展示  
+3、配置文本文件收集器  
+```
+# mkdir -p /var/lib/node_exporter/textfile_collector
+# echo 'metadata{role="docker_server",datacenter="BJ"} 1' | sudo tee /var/lib/node_exporter/textfile_collector/metadata.prom
+注：文本文件收集器，默认事加载的，我们只需要指定目录 --collector.textfile.directory=""
+```  
+--collector.textfile.directory=/var/lib/node_exporter/textfile_collector  #指定文本文件收集器
+--collector.systemd                                                       #开启系统收集器
+--collector.systemd.unit-whitelist="(docker|sshd|rsyslog).service"        #白名单，收集的服务
+--web.listen-address=“0.0.0.0:9100"                                       #监听地址
+--web.telemetry-path="/node_metrics"                                      #网页地址路径
+
+4、配置过滤规则,因为node_export收集的数据非常多，可以通过过滤规则匹配出想收集的数据  
+https://raw.githubusercontent.com/aishangwei/prometheus-demo/master/prometheus/prometheus.yml  
+```
+global:
+  scrape_interval:     15s 
+  evaluation_interval: 15s 
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      # - alertmanager:9093
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+  - job_name: 'node'
+    static_configs:
+    - targets: ['192.168.20.172:9100', '192.168.20.173:9100', '192.168.20.174:9100']
+    params:
+      collect[]:
+        - cpu
+        - meminfo
+        - diskstats
+        - netdev
+        - netstat
+        - filefd
+        - filesystem
+        - xfs
+        - systemd
+```  
+5、web展示  
 http://192.168.1.70:9100  
 
 三、pushgageway安装部署  
