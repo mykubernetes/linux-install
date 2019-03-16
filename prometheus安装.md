@@ -68,13 +68,13 @@ scrape_configs:
 # ps aux |grep prometheus
    root      3479  0.1  3.7 148388 37892 ?        Sl   08:49   0:04 /opt/prometheus/prometheus-2.7.1.linux-amd64/prometheus --web.listen-address=0.0.0.0:9090 --   web.read-timeout=5m --web.max-connections=10 --storage.tsdb.retention=15d --storage.tsdb.path=/opt/prometheus/prometheus-2.7.1.linux-amd64/data --   query.max-concurrency=20 --query.timeout=2m
 ```  
---web.listen-address="0.0.0.0:9090"                    #监听地址  
---web.read-timeout=5m                                      #请求链接的最?等待时间   
---web.max-connections=10                                #最大链接数  
---storage.tsdb.retention=15d                             #数据保存期限  
---storage.tsdb.path="/opt/prometheus/prometheus-2.7.1.linux-amd64/data"     #数据保存目录  
---query.max-concurrency=20                             #客户端并发执行的查询的最大数量   后边两条属于优化设置  
---query.timeout=2m                                           #客户端查询语句超时时间  
+- --web.listen-address="0.0.0.0:9090"                    #监听地址  
+- --web.read-timeout=5m                                      #请求链接的最?等待时间   
+- --web.max-connections=10                                #最大链接数  
+- --storage.tsdb.retention=15d                             #数据保存期限  
+- --storage.tsdb.path="/opt/prometheus/prometheus-2.7.1.linux-amd64/data"     #数据保存目录  
+- --query.max-concurrency=20                             #客户端并发执行的查询的最大数量   后边两条属于优化设置  
+- --query.timeout=2m                                           #客户端查询语句超时时间  
 
 5、web展示  
 http://192.168.1.70:9090  
@@ -103,11 +103,11 @@ cd /opt/prometheus/node_exporter-0.17.0.linux-amd64
 # echo 'metadata{role="docker_server",datacenter="BJ"} 1' | sudo tee /var/lib/node_exporter/textfile_collector/metadata.prom
 注：文本文件收集器，默认事加载的，我们只需要指定目录 --collector.textfile.directory=""
 ```  
---collector.textfile.directory=/var/lib/node_exporter/textfile_collector  #指定文本文件收集器  
---collector.systemd                                                       #开启系统收集器  
---collector.systemd.unit-whitelist="(docker|sshd|rsyslog).service"        #白名单，收集的服务  
---web.listen-address=“0.0.0.0:9100"                                       #监听地址  
---web.telemetry-path="/node_metrics"                                      #网页地址路径  
+- --collector.textfile.directory=/var/lib/node_exporter/textfile_collector  #指定文本文件收集器  
+- --collector.systemd                                                       #开启系统收集器  
+- --collector.systemd.unit-whitelist="(docker|sshd|rsyslog).service"        #白名单，收集的服务  
+- --web.listen-address=“0.0.0.0:9100"                                       #监听地址  
+- --web.telemetry-path="/node_metrics"                                      #网页地址路径  
 
 4、配置过滤规则,因为node_export收集的数据非常多，可以通过过滤规则匹配出想收集的数据  
 https://raw.githubusercontent.com/aishangwei/prometheus-demo/master/prometheus/prometheus.yml  
@@ -133,7 +133,7 @@ scrape_configs:
   - job_name: 'node'
     static_configs:
     - targets: ['192.168.20.172:9100', '192.168.20.173:9100', '192.168.20.174:9100']
-    params:
+    params:            #过滤参数
       collect[]:
         - cpu
         - meminfo
