@@ -106,7 +106,7 @@ cd /opt/prometheus/node_exporter-0.17.0.linux-amd64
 - --collector.textfile.directory=/var/lib/node_exporter/textfile_collector  #指定文本文件收集器  
 - --collector.systemd                                                       #开启系统收集器  
 - --collector.systemd.unit-whitelist="(docker|sshd|rsyslog).service"        #白名单，收集的服务  
-- --web.listen-address=“0.0.0.0:9100"                                       #监听地址  
+- --web.listen-address="0.0.0.0:9100"                                       #监听地址  
 - --web.telemetry-path="/node_metrics"                                      #网页地址路径  
 
 4、配置过滤规则,因为node_export收集的数据非常多，可以通过过滤规则匹配出想收集的数据  
