@@ -103,6 +103,6 @@ Export list for 192.168.2.203:
 /opt/data/nfs1 192.168.2.0/24
 ```  
 
-4、挂载
+4、挂载  
 ``` # mount -t nfs 192.168.2.203:/opt/data/nfs1 /l/opt/data/mount/nfs1 -o proto=tcp -o nolock ```  
 
