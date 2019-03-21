@@ -18,7 +18,7 @@ chmod 666 /opt/data/nfs1
 4、编辑export文件  
 ```
 # vim /etc/exports 
-/opt/data/nfs1 192.168.2.0/24(rw,no_root_squash,no_all_squash,sync)
+/opt/data/nfs1 192.168.101.0/24(rw,async,insecure,anonuid=1000,anongid=1000,no_root_squash)
 ```  
 常用参数  
 rw 读写  
@@ -28,8 +28,8 @@ async 数据会先暂存于内存当中，而非直接写入硬盘
 no_root_squash  登入 NFS 主机，登入 NFS 主机，他就具有 root 的权限
 root_squash  客户端 root 的身份会由 root_squash 的设定压缩成 nfsnobody  
 all_squash  不论登入 NFS 的使用者身份为何， 他的身份都会被压缩成为匿名用户  
-anonuid  
-anongid  
+anonuid  匿名用户的UID值
+anongid  匿名用户的GID值,备注：其中anonuid=1000,anongid=1000,为此目录用户web的ID号,达到连接NFS用户权限一致。
 anon  
 
 5、配置生效  
