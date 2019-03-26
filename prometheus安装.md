@@ -301,7 +301,7 @@ scrape_configs:
 [{
   "targets": [
     "http://node02"
-]
+  ]
 }]
 ```  
 
