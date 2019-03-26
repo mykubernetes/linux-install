@@ -2,3 +2,6 @@
 http://ceph.org.cn/
 官方yum源
 https://download.ceph.com/rpm-hammer/
+
+官方提供ansible部署
+http://docs.ceph.com/ceph-ansible/master/
