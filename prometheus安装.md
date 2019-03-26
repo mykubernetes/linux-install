@@ -168,7 +168,25 @@ root      4081  0.0  0.7 111312  7976 ?        Sl   10:10   0:00 /opt/prometheus
 ```  
 --persistence.file="/tmp/pushgateway.data"    #数据持久保存文件内，不指定则保存在内存中，重启丢失  
 
-3、脚本编写  
+3、prometheus添加pushgageway主机，使用文件发现方式
+```
+# cat /etc/prometheus.yml
+……
+- job_name: pushgateway
+  honor_labels: true
+  file_sd_configs:
+    - files:
+      - targets/pushgateway/*.json
+    refresh_interval: 5m
+
+发现主机
+# cat targets/pushgateway/push.json
+[{
+ "targets": ["192.168.101.67:9091"]
+}]
+```
+
+4、脚本编写  
 ```
 # cat node_exporter_shell.sh
 #/bin/bash
@@ -186,7 +204,7 @@ echo "$label : $count_netstat_wait_connections"
 
 echo "$label  $count_netstat_wait_connections" | curl --data-binary @- http://192.168.1.70:9091/metrics/job/pushgateway/instance/$instance_name
 ```  
-4、配置脚本每15秒检查一次  由于计划任务是每分钟执行一次所以定义多个  
+5、配置脚本每15秒检查一次  由于计划任务是每分钟执行一次所以定义多个  
 ```
 #chmod +x node_exporter_shell.sh
 # crontab -l
@@ -196,7 +214,7 @@ echo "$label  $count_netstat_wait_connections" | curl --data-binary @- http://19
 * * * * * /usr/bin/sleep 60 ; /opt/node_exporter_shell.sh
 ```  
 
-5、删除数据大写字母为监控数据值  
+6、删除数据大写字母为监控数据值  
 删除某个组下的某实例的所有数据：  
 ``` curl -X DELETE http://192.168.1.70:9091/metrics/job/JOB_NAME/instance/HOME_NAME ```  
 
