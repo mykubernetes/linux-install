@@ -305,7 +305,7 @@ scrape_configs:
 }]
 ```  
 
-注：
-• 我们的第一个relabel通过将__address__标签(当前目标地址)写入__param_target标签来创建一个参数。
-• 第二个relabel将__param_target标签写为实例标签。
-• 最后，我们使用我们的出口商的主机名(和端口)重新标记__address__标签，在我们的例子中是node02
+注：  
+• 我们的第一个relabel通过将__address__标签(当前目标地址)写入__param_target标签来创建一个参数。  
+• 第二个relabel将__param_target标签写为实例标签。  
+• 最后，我们使用我们的出口商的主机名(和端口)重新标记__address__标签，在我们的例子中是node02  
