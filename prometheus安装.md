@@ -166,7 +166,7 @@ cd /opt/prometheus/pushgateway-0.7.0.linux-amd64/
 root      4080  0.0  0.1 113180  1212 ?        Ss   10:10   0:00 /bin/sh /opt/prometheus/pushgateway-0.7.0.linux-amd64/up.sh
 root      4081  0.0  0.7 111312  7976 ?        Sl   10:10   0:00 /opt/prometheus/pushgateway-0.7.0.linux-amd64/pushgateway --web.listen-address=0.0.0.0:9092
 ```  
---persistence.file="/tmp/pushgateway.data"    #数据持久保存文件内，不指定则保存在内存中，重启丢失
+--persistence.file="/tmp/pushgateway.data"    #数据持久保存文件内，不指定则保存在内存中，重启丢失  
 
 3、脚本编写  
 ```
@@ -203,6 +203,7 @@ echo "$label  $count_netstat_wait_connections" | curl --data-binary @- http://19
 删除某个组下的所有数据：  
 ``` curl -X DELETE http://pushgateway.example.org:9091/metrics/job/JOB_NAME ```  
 
+格式如下： /metrics/job/<jobname>{/<label>/<label>}  
 
 四、grafana安装  
 官网  
