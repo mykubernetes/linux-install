@@ -236,3 +236,76 @@ https://grafana.com/grafana/download
 2、web展示  
 192.168.1.70:3000  
 admin/admin  
+
+
+五、安装配置 black exporter  
+Prometheus探测工作是通过运行一个blackbox exporter——来探测远程目标，并公开在本地端点上收集的任何时间序列。  
+
+1、安装black exporter  
+``` 
+# wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz
+# tar xf blackbox_exporter-0.12.0.linux-amd64.tar.gz
+# cp blackbox_exporter-0.12.0.linux-amd64/blackbox_exporter /usr/local/bin/
+# blackbox_exporter --version
+```  
+
+2、配置black exporter  
+```
+# mkdir -pv /etc/prober
+# cat /etc/prober/prober.yml
+modules:
+  http_2xx_check:
+  prober: http
+  timeout: 5s
+  http:
+    valid_status_codes: []
+    method: GET
+icmp_check:
+  prober: icmp
+  timeout: 5s
+  icmp:
+    preferred_ip_protocol: "ip4"
+dns_examplecom_check:
+  prober: dns
+  dns:
+  preferred_ip_protocol: "ip4"
+  query_name: "www.huy.cn"
+```  
+
+3、启动  
+``` # blackbox_exporter --config.file="/etc/prober/prober.yml" ```  
+
+4、prometheus添加配置文件  
+```
+# cat /etc/prometheus/prometheus.yml
+……
+scrape_configs:
+  - job_name: 'http_probe'
+    metrics_path: /probe
+    params:
+      module: [http_2xx_check]
+    file_sd_configs:
+      - files:
+        - 'targets/probes/http_probes.json'
+        refresh_interval: 5m
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+         replacement: 192.168.101.67:9115
+
+自动发现主机
+# cat /etc/prometheus/targets/probes/http_probes.json
+[{
+  "targets": [
+    "http://node02"
+]
+}]
+```  
+
+注：
+• 我们的第一个relabel通过将__address__标签(当前目标地址)写入__param_target标签来创建一个参数。
+• 第二个relabel将__param_target标签写为实例标签。
+• 最后，我们使用我们的出口商的主机名(和端口)重新标记__address__标签，在我们的例子中是node02
