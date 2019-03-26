@@ -89,7 +89,7 @@ cd /opt/prometheus/node_exporter-0.17.0.linux-amd64
 2、配置node_exporter后台启动  
 ```
 # cat up.sh
-/opt/prometheus/node_exporter-0.17.0.linux-amd64/node_exporter
+/opt/prometheus/node_exporter-0.17.0.linux-amd64/node_exporter --collector.systemd --collector.systemd.unit-whitelist=(docker|sshd|nginx).service
 
 # daemonize -c /opt/prometheus/node_exporter-0.17.0.linux-amd64/ /opt/prometheus/node_exporter-0.17.0.linux-amd64/up.sh
 
