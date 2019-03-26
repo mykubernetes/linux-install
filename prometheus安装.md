@@ -158,7 +158,7 @@ cd /opt/prometheus/pushgateway-0.7.0.linux-amd64/
 2、pushgageway后台启动
 ```
 # cat up.sh
-/opt/prometheus/pushgateway-0.7.0.linux-amd64/pushgateway  --web.listen-address="0.0.0.0:9091"
+/opt/prometheus/pushgateway-0.7.0.linux-amd64/pushgateway  --web.listen-address="0.0.0.0:9091" --persistence.file="/tmp/pushgateway.data"
 
 # daemonize -c /opt/prometheus/pushgateway-0.7.0.linux-amd64 /opt/prometheus/pushgateway-0.7.0.linux-amd64/up.sh
 
@@ -166,6 +166,8 @@ cd /opt/prometheus/pushgateway-0.7.0.linux-amd64/
 root      4080  0.0  0.1 113180  1212 ?        Ss   10:10   0:00 /bin/sh /opt/prometheus/pushgateway-0.7.0.linux-amd64/up.sh
 root      4081  0.0  0.7 111312  7976 ?        Sl   10:10   0:00 /opt/prometheus/pushgateway-0.7.0.linux-amd64/pushgateway --web.listen-address=0.0.0.0:9092
 ```  
+--persistence.file="/tmp/pushgateway.data"    #数据持久保存文件内，不指定则保存在内存中，重启丢失
+
 3、脚本编写  
 ```
 # cat node_exporter_shell.sh
