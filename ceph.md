@@ -7,7 +7,7 @@ https://download.ceph.com/rpm-hammer/
 http://docs.ceph.com/ceph-ansible/master/  
 
 
-安装前准备
+一、安装前准备
 =========
 ```
 export username="ceph-admin"
@@ -65,7 +65,7 @@ EOF
 ``` # sed -i 's/Default requiretty/#Default requiretty/' /etc/sudoers ```  
 
 
-使用 ceph-deploy 部署集群
+二、使用 ceph-deploy 部署集群
 ======================
 # 配置免密钥登录  
 ```
