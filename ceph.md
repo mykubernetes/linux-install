@@ -126,3 +126,5 @@ done
 ``` # ceph-deploy mgr create node01 node02 node03 ```  
 # 开启 dashboard 模块，用于UI查看  
 ``` # ceph mgr module enable dashboard ```  
+
+curl http://192.168.101.66:7000
