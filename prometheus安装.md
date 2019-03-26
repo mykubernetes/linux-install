@@ -203,7 +203,7 @@ echo "$label  $count_netstat_wait_connections" | curl --data-binary @- http://19
 删除某个组下的所有数据：  
 ``` curl -X DELETE http://pushgateway.example.org:9091/metrics/job/JOB_NAME ```  
 
-格式如下： /metrics/job/<jobname>{/<label>/<label>}  
+``` 格式如下： /metrics/job/<jobname>{/<label>/<label>} ```  
 
 四、grafana安装  
 官网  
