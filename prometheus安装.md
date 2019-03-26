@@ -255,21 +255,21 @@ Prometheus探测工作是通过运行一个blackbox exporter——来探测远�
 # cat /etc/prober/prober.yml
 modules:
   http_2xx_check:
-  prober: http
-  timeout: 5s
-  http:
-    valid_status_codes: []
-    method: GET
-icmp_check:
-  prober: icmp
-  timeout: 5s
-  icmp:
-    preferred_ip_protocol: "ip4"
-dns_examplecom_check:
-  prober: dns
-  dns:
-  preferred_ip_protocol: "ip4"
-  query_name: "www.huy.cn"
+    prober: http
+    timeout: 5s
+    http:
+      valid_status_codes: []
+      method: GET
+  icmp_check:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: "ip4"
+  dns_examplecom_check:
+    prober: dns
+    dns:
+      preferred_ip_protocol: "ip4"
+      query_name: "www.huy.cn"
 ```  
 
 3、启动  
