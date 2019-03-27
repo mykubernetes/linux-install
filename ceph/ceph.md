@@ -88,13 +88,13 @@ ssh-copy-id ${username}@node03
 ``` # ceph-deploy new node01 node02 node03  ```  
 
 ls  
-# 编辑 ceph.conf 配置文件  
+# 编辑 ceph.conf 配置文件最后添加两行  
 ```
 cat ceph.conf
 [global]
 .....
-public network = 192.168.20.0/24
-cluster network = 192.168.20.0/24
+public network = 192.168.101.0/24
+cluster network = 192.168.101.0/24
 ```  
 
 # 安装 ceph包，替代 ceph-deploy install node1 node2 ,不过下面的命令需要在每台node上安装
