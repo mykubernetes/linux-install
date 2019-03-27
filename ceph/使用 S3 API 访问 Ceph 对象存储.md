@@ -12,8 +12,8 @@
 ```
 vi .s3cfg
 ……
-host_base = c720183.xiodi.cn:7480
-host_bucket = %(bucket).c720183.xiodi.cn:7480
+host_base = node01:7480
+host_bucket = %(bucket).node01:7480
 ……
 ```  
 5、创建桶并放入文件  
