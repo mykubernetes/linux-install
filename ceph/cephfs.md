@@ -13,7 +13,7 @@ cephfs
 ```  
 2、创建用户(可选，因为部署时，已经生成)
 ```
-ceph auth get-or-create client.cephfs mon ‘allow r’ mds ‘allow r, allow rw path=/’ osd ‘allow rw pool=cephfs_data’ -o ceph.client.cephfs.keyring
+ceph auth get-or-create client.cephfs mon 'allow r' mds 'allow r, allow rw path=/' osd 'allow rw pool=cephfs_data' -o ceph.client.cephfs.keyring
 拷贝到客户端
 scp ceph.client.cephfs.keyring node04:/etc/ceph/
 ```  
