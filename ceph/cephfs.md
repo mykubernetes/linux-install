@@ -17,3 +17,26 @@ ceph auth get-or-create client.cephfs mon 'allow r' mds 'allow r, allow rw path=
 拷贝到客户端
 scp ceph.client.cephfs.keyring node04:/etc/ceph/
 ```  
+
+3、通过内核驱动和FUSE客户端挂载Ceph FS  
+1)创建挂载目录  
+``` # mkdir /mnt/cephfs ```  
+2)挂载  
+```
+手动挂载
+ceph auth get-key client.cephfs // 在 ceph fs服务器上执行，获取key
+mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secret=……
+
+通过key文件挂载
+echo …secret…> /etc/ceph/cephfskey // 把 key保存起来
+mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secretfile= /etc/ceph/cephfskey // name为用户名
+
+启动挂载
+echo "node02:6789:/ /mnt/cephfs ceph name=cephfs,secretfile=/etc/ceph/cephfskey,_netdev,noatime 0 0" >> /etc/fstab
+```  
+4、校验  
+```
+umount /mnt/cephfs
+mount /mnt/cephfs
+dd if=/dev/zero of=/mnt/cephfs/file1 bs=1M count=1024
+```  
