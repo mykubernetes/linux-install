@@ -85,11 +85,60 @@ rbd --image rbd1 info --name client.rbd
 ``` # dd if=/dev/zero of=/mnt/ceph-disk1/file1 count=100 bs=1M ```  
 5、做成服务，开机自动挂载  
 ```
-# wget -O /usr/local/bin/rbd-mount https://raw.githubusercontent.com/aishangwei/ceph-demo/master/client/rbd-mount
+# cat /usr/local/bin/rbd-mount
+
+#!/bin/bash
+
+# Pool name where block device image is stored
+export poolname=rbd
+ 
+# Disk image name
+export rbdimage=rbd1
+ 
+# Mounted Directory
+export mountpoint=/mnt/ceph-disk1
+ 
+# Image mount/unmount and pool are passed from the systemd service as arguments
+# Are we are mounting or unmounting
+if [ "$1" == "m" ]; then
+   modprobe rbd
+   rbd feature disable $rbdimage object-map fast-diff deep-flatten
+   rbd map $rbdimage --id rbd --keyring /etc/ceph/ceph.client.rbd.keyring
+   mkdir -p $mountpoint
+   mount /dev/rbd/$poolname/$rbdimage $mountpoint
+fi
+if [ "$1" == "u" ]; then
+   umount $mountpoint
+   rbd unmap /dev/rbd/$poolname/$rbdimage
+fi
+
+添加执行权限
 # chmod +x /usr/local/bin/rbd-mount
-# wget -O /etc/systemd/system/rbd-mount.service https://raw.githubusercontent.com/aishangwei/ceph-demo/master/client/rbd-mount.service
+```  
+
+```
+# cat /etc/systemd/system/rbd-mount.service 
+[Unit]
+Description=RADOS block device mapping for $rbdimage in pool $poolname"
+Conflicts=shutdown.target
+Wants=network-online.target
+After=NetworkManager-wait-online.service
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/rbd-mount m
+ExecStop=/usr/local/bin/rbd-mount u
+[Install]
+WantedBy=multi-user.target
+
+
 # systemctl daemon-reload
 # systemctl enable rbd-mount.service
+```  
+
+重启测试  
+```
 # reboot -f
 # df -h
 ```  
+
