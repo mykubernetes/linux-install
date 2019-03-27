@@ -34,10 +34,10 @@ ceph osd lspools              # 查看集群存储池
 ceph osd pool create rbd 512  # 50 为place group数量(pg)
 ```  
 确定 pg_num 取值是强制性的，因为不能自动计算。下面是几个常用的值：  
-• 少于 5 个 OSD 时可把 pg_num 设置为 128
-• OSD 数量在 5 到 10 个时，可把pg_num 设置为 512
-• OSD 数量在 10 到 50 个时，可把 pg_num 设置为 4096
-• OSD 数量大于 50 时，你得理解权衡方法、以及如何自己计算pg_num 取值
+• 少于 5 个 OSD 时可把 pg_num 设置为 128  
+• OSD 数量在 5 到 10 个时，可把pg_num 设置为 512  
+• OSD 数量在 10 到 50 个时，可把 pg_num 设置为 4096  
+• OSD 数量大于 50 时，你得理解权衡方法、以及如何自己计算pg_num 取值  
 2、客户端创建 块设备  
 ```
 rbd create rbd1 --size 10240 --name client.rbd
@@ -54,16 +54,16 @@ rbd --image rbd1 info --name client.rbd
 
 1、映射到客户端，应该会报错  
 ``` # rbd map --image rbd1 --name client.rbd ``` 
-• layering: 分层支持
-• exclusive-lock: 排它锁定支持对
-• object-map: 对象映射支持(需要排它锁定(exclusive-lock))
-• deep-flatten: 快照平支持(snapshot flatten support)
-• fast-diff: 在client-node1上使用krbd(内核rbd)客户机进行快速diff计算(需要对象映射)，我们将无法在CentOS内核3.10上映射块设备映像，因为该内核不支持对象映射(object-map)、深平(deep-flatten)和快速diff(fast-diff)(在内核4.9中引入了支持)。为了解决这个问题，我们将禁用不支持的特性，有几个选项可以做到这一点:
+• layering: 分层支持  
+• exclusive-lock: 排它锁定支持对  
+• object-map: 对象映射支持(需要排它锁定(exclusive-lock))  
+• deep-flatten: 快照平支持(snapshot flatten support)  
+• fast-diff: 在client-node1上使用krbd(内核rbd)客户机进行快速diff计算(需要对象映射)，我们将无法在CentOS内核3.10上映射块设备映像，因为该内核不支持对象映射(object-map)、深平(deep-flatten)和快速diff(fast-diff)(在内核4.9中引入了支持)。为了解决这个问题，我们将禁用不支持的特性，有几个选项可以做到这一点:  
 
 1）动态禁用  
 ``` # rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd ```  
 2） 创建RBD镜像时，只启用 分层特性。  
-``` # rbd create rbd2 --size 10240 --image-feature layering --name client.rbd ``` 
+``` # rbd create rbd2 --size 10240 --image-feature layering --name client.rbd ```  
 3）ceph 配置文件中禁用  
 ``` rbd_default_features = 1 ```  
 
