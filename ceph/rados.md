@@ -60,6 +60,6 @@ for i in `cat ./pool`
 ```  
 6、测试是否能够访问ceph 集群  
 ```
-sudo cp
-ceph -s -k /var/lib/ceph/radosgw/ceph-rgw.node03/keyring --name client.rgw.node03
+sudo cp /var/lib/ceph/radosgw/ceph-rgw.node01/keyring ./
+ceph -s -k /var/lib/ceph/radosgw/ceph-rgw.node01/keyring --name client.rgw.node01
 ```
