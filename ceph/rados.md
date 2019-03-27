@@ -15,10 +15,48 @@ sudo systemctl restart ceph-radosgw@rgw.node01.service
 ```
 5、创建池  
 ```
-wget https://raw.githubusercontent.com/aishangwei/ceph-demo/master/ceph-deploy/rgw/pool
-wget https://raw.githubusercontent.com/aishangwei/ceph-demo/master/ceph-deploy/rgw/create_pool.sh
-chmod +x create_pool.sh
-./create_pool.sh
+# cat ./pool
+.rgw
+.rgw.root
+.rgw.control
+.rgw.gc
+.rgw.buckets
+.rgw.buckets.index
+.rgw.buckets.extra
+.log
+.intent-log
+.usage
+.users
+.users.email
+.users.swift
+.users.uid
+
+
+
+# cat ./create_pool.sh
+#!/bin/bash
+
+PG_NUM=30
+PGP_NUM=30
+SIZE=3
+
+for i in `cat ./pool`
+        do
+        ceph osd pool create $i $PG_NUM
+        ceph osd pool set $i size $SIZE
+        done
+
+for i in `cat ./pool`
+        do
+        ceph osd pool set $i pgp_num $PGP_NUM
+        done
+
+
+
+
+
+# chmod +x create_pool.sh
+# ./create_pool.sh
 ```  
 6、测试是否能够访问ceph 集群  
 ```
