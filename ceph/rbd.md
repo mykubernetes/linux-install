@@ -69,7 +69,7 @@ rbd --image rbd1 info --name client.rbd
 
 2动态禁用  
 ```
-# rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff
+# rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd
 # rbd map --image rbd1 --name client.rbd
 # rbd showmapped --name client.rbd
 ```  
