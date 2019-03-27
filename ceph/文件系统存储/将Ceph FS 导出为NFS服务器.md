@@ -12,6 +12,7 @@
 
 3、修改配置文件  
 ``` # vim /etc/ganesha/ganesha.conf ```  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/ceph.png)  
 
 4、通过提供Ganesha.conf 启动NFS Ganesha守护进程  
 ```
