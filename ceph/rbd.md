@@ -84,6 +84,7 @@ rbd --image rbd1 info --name client.rbd
 4、写入数据测试  
 ``` # dd if=/dev/zero of=/mnt/ceph-disk1/file1 count=100 bs=1M ```  
 5、做成服务，开机自动挂载  
+1)做成服务  
 ```
 # cat /usr/local/bin/rbd-mount
 
@@ -116,6 +117,7 @@ fi
 # chmod +x /usr/local/bin/rbd-mount
 ```  
 
+2)开机自动挂载
 ```
 # cat /etc/systemd/system/rbd-mount.service 
 [Unit]
