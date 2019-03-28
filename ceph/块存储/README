@@ -61,14 +61,14 @@ rbd snap ls rbd/rbd1
 rbd --pool rbd snap protect --image my-image --snap my-snapshot
 rbd snap protect rbd/rbd1@rbd1_snap
 
-清除快照
+清除快照（删除所有快照）
 方法一：rbd --pool {pool-name} snap purge {image-name}
 方法二：rbd snap purge {pool-name}/{image-name}
 列
 rbd --pool rbd snap purge rbd1
 rbd snap purge rbd/rbd1
 
-删除快照
+删除快照(删除指定的)
 方法一：rbd --pool {pool-name} snap rm {image-name}
 方法二：rbd snap rm {pool-name}/{image-name}
 列
