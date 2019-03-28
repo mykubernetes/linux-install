@@ -7,13 +7,13 @@
 2、将认证秘钥和配置文件拷贝到客户端  
 ```
 # scp ceph.client.rbd.keyring node04:/etc/ceph/
-#scp /etc/ceph/ceph.conf node04:/etc/ceph/
+# scp /etc/ceph/ceph.conf node04:/etc/ceph/
 ```  
 3、客户端检查是否符合块设备环境要求
 ```
-uname -r
-modprobe rbd
-echo $?
+# uname -r
+# modprobe rbd
+# echo $?
 ```  
 4、安装ceph客户端
 ```
@@ -53,8 +53,8 @@ priority=1
 默认创建块设备，会直接创建在rbd 池中，但使用 deploy 安装后，该rbd池并没有创建。  
 1、在服务器端创建池和块  
 ```
-ceph osd lspools              # 查看集群存储池
-ceph osd pool create rbd 512  # 50 为place group数量(pg)
+# ceph osd lspools              # 查看集群存储池
+# ceph osd pool create rbd 512  # 50 为place group数量(pg)
 ```  
 确定 pg_num 取值是强制性的，因为不能自动计算。下面是几个常用的值：  
 • 少于 5 个 OSD 时可把 pg_num 设置为 128  
@@ -63,11 +63,11 @@ ceph osd pool create rbd 512  # 50 为place group数量(pg)
 • OSD 数量大于 50 时，你得理解权衡方法、以及如何自己计算pg_num 取值  
 2、客户端创建 块设备  
 ```
-rbd create rbd1 --size 10240 --name client.rbd
-rbd ls --name client.rbd
-rbd ls -p rbd --name client.rbd
-rbd list --name client.rbd
-rbd --image rbd1 info --name client.rbd
+# rbd create rbd1 --size 10240 --name client.rbd
+# rbd ls --name client.rbd
+# rbd ls -p rbd --name client.rbd
+# rbd list --name client.rbd
+# rbd --image rbd1 info --name client.rbd
 ```  
 
 
