@@ -46,7 +46,7 @@ priority=1
 ```  
 
 ``` 
-# wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+# wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
 # sed -i 's/http/https/g' /etc/yum.repos.d/CentOS-Base.repo
 # yum -y install epel-release
 ```  
