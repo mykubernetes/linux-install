@@ -96,13 +96,16 @@ priority=1
 3）ceph 配置文件中禁用  
 ``` rbd_default_features = 1 ```  
 
-2动态禁用  
-```
-# rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd
-# rbd map --image rbd1 --name client.rbd
-# rbd showmapped --name client.rbd
-```  
-3、创建文件系统，并挂载  
+2、动态禁用  
+``` # rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd ```  
+3、映射到本地  
+``` # rbd map --image rbd1 --name client.rbd ```  
+或者  
+``` # rbd map rbd1 --pool rbd --id admin ```  
+4、查看映射到本地的块  
+``` # rbd showmapped --name client.rbd ```
+
+5、创建文件系统，并挂载  
 ```
 # fdisk -l /dev/rbd0
 # mkfs.xfs /dev/rbd0
@@ -110,9 +113,9 @@ priority=1
 # mount /dev/rbd0 /mnt/ceph-disk1
 # df -h /mnt/ceph-disk1
 ```  
-4、写入数据测试  
+6、写入数据测试  
 ``` # dd if=/dev/zero of=/mnt/ceph-disk1/file1 count=100 bs=1M ```  
-5、做成服务，开机自动挂载  
+7、做成服务，开机自动挂载  
 1)做成服务  
 ```
 # cat /usr/local/bin/rbd-mount
