@@ -137,6 +137,13 @@ ls -l *.keyring
 ``` # ceph-deploy admin node01 node02 node03  ```  
 
 # 配置 osd  
+1、单台添加
+```
+# ceph-deploy disk list node01                          #查看主机可以使用的硬盘       
+# ceph-deploy disk zap --fs-type xfs node01:/dev/sdb    #初始化
+# ceph-deploy osd create node01:/dev/sdb                #创建并激活
+```
+2、这里使用脚本批量执行
 ```
 for dev in /dev/vda /dev/vdc /dev/vdd
 do
@@ -149,8 +156,12 @@ ceph-deploy osd create node03 --data $dev
 done
 ```  
 
+# 查看集群硬盘  
+``` # ceph osd tree ```  
+
 # 部署 mgr ， L版以后才需要部署  
 ``` # ceph-deploy mgr create node01 node02 node03 ```  
+
 # 开启 dashboard 模块，用于UI查看  
 ``` # ceph mgr module enable dashboard ```  
 
