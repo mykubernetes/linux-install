@@ -103,3 +103,7 @@ Osd down 情况
 2、需要重新启动下osd.0  
 ``` # ceph-deploy osd activate ceph01:/dev/sdb1 ```  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/ceph2.png)  
+
+
+查看权限  
+``` # ceph auth list ```  
