@@ -76,7 +76,7 @@ rbd --image rbd1 info --name client.rbd
 ==========
 
 1、映射到客户端，应该会报错  
-``` # rbd map --image rbd1 --name client.rbd ``` 
+``` # rbd map --image rbd1 --name client.rbd ```  
 • layering: 分层支持  
 • exclusive-lock: 排它锁定支持对  
 • object-map: 对象映射支持(需要排它锁定(exclusive-lock))  
