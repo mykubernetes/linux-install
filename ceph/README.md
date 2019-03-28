@@ -52,14 +52,47 @@
 
 
 
+三、Cephfs
+=======
+1、查看服务  
+``` # systemctl status ceph-mds@node01 ```  
+
+2、创建mds   
+需要切换到建立的集群目录下执行  
+``` # ceph-deploy --overwrite-conf mds create node01 node02 ```  
+
+3、创建cephfs的pool  
+```
+# ceph osd pool create cephfs_metadata 128
+# ceph osd pool create cephfs_data 256
+```
+
+4、使用 cephfs 的 pool 创建新的文件系统  
+``` # ceph fs new cephfs cephfs_metadata cephfs_data ```  
+
+5、在其他主机上建立目录，测试挂载ceph的文件系统  
+```
+# mkdir /mnt/nas
+# cat /etc/ceph/ceph.client.admin.keyring
+  [client.admin]
+           key = AQCTuRNa40dBIBAAtJWoHqF1R2pw73ERBfs++w==
+# mount -t ceph zjs05:6789,zjs06:6789,zjs07:6789:/ /mnt/nas -o name=admin,secret=AQCTuRNa40dBIBAAtJWoHqF1R2pw73ERBfs++w==
+```  
 
 
 
+四、Rgw
+======
+1、查看服务  
+``` # systemctl status ceph-radosgw@node01 ```  
 
+如果不是清楚的话  
+```
+# ls /lib/systemd/system -l | grep radosgw
+# ls /lib/systemd/system -l | grep ceph-mds
+```  
 
-
-
-
-
+2、开启服务  
+``` systemctl restart ceph-radosgw@node01 ```  
 
 
