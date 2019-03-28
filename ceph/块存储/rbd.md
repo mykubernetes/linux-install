@@ -181,3 +181,15 @@ WantedBy=multi-user.target
 # df -h
 ```  
 
+9、或者不做成服务写到配置里实现自动挂载  
+1、编辑映射文件  
+```
+# cat /etc/ceph/rbdmap 
+  rbd/rbd1 -id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
+```  
+2、添加开机挂载  
+```
+# cat /etc/fstab
+  /dev/rdb0 /mnt/ceph ext4 defaults,noatime,_netdev
+```  
+
