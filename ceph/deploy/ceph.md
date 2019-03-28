@@ -114,8 +114,7 @@ ssh-copy-id ${username}@node03
 
 # 部署节点
 ``` # ceph-deploy new node01 node02 node03  ```  
-
-ls  
+  
 # 编辑 ceph.conf 配置文件最后添加两行  
 ```
 cat ceph.conf
