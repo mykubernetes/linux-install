@@ -73,10 +73,10 @@ priority=1
 ```  
 
 3、更改块大小  
-``` # rbd resize rbd1 --size 2040 ```  
+``` # rbd resize rbd1 --size 2040 --name client.rbd ```  
 
 4、删除块  
-``` # rbd rm rbd1 ```  
+``` # rbd rm rbd1 --name client.rbd ```  
 
 映射块设备
 ==========
