@@ -1,3 +1,5 @@
+块设备添加和删除
+
 一、创建块设备
 rbd create rbd1 --size 1024
 rbd map rbd1
@@ -28,3 +30,19 @@ vim /etc/ceph/rbdmap
 vim /etc/fstab
 注释 /dev/rbd/rbd/rbd1 /mnt/ceph ext4 defaults,noatime,_netdev
 rbd rm rbd1
+
+________________________________________________________________
+
+快照和克隆
+方法一：rbd --pool {pool-name} snap create --snap {snap-name} {image-name}
+方法二：rbd snap create {pool-name}/{image-name}@{snap-name}
+列
+rbd --pool rbd snap create --snap rbd1_snap rbd1
+rbd snap create rbd/rbd1@rbd1_snap
+
+快照回滚
+方法一：rbd --pool {pool-name} snap rollback --snap {snap-name} {image-name}
+方法二：rbd snap rollback {pool-name}/{image-name}@{snap-name}
+列
+rbd --pool rbd snap rollback --snap rbd1_snap rbd1
+rbd snap rollback rbd/rbd1@rbd1_snap
