@@ -75,3 +75,15 @@ rbd snap purge rbd/rbd1
 列
 rbd --pool rbd snap rm rbd1
 rbd snap rm rbd/rbd1
+
+取消保护快照
+方法一：rbd--pool {pool-name} snap unprotect --image {image-name} --snap {snapshot-name}
+方法二：rbd snap unprotect {pool-name}/{image-name}@{snapshot-name}
+列
+rbd --pool rbd snap unprotect --image my-image --snap my-snapshot
+rbd snap unprotect rbd/rbd1@rbd_snap
+
+快照克隆（需要先进行快照保护）
+rbd clone {pool-name}/{parent-image}@{snap-name} {pool-name}/{child-image-name}
+列
+rbd clone rbd/rbd1@rbd1_snap rbd/rbd1-snap-clone
