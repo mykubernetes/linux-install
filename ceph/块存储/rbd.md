@@ -110,7 +110,7 @@ priority=1
 5、取消映射  
 ``` # rbd unmap /dev/rbd0 ```  
 
-5、创建文件系统，并挂载  
+6、创建文件系统，并挂载  
 ```
 # fdisk -l /dev/rbd0
 # mkfs.xfs /dev/rbd0
@@ -118,9 +118,9 @@ priority=1
 # mount /dev/rbd0 /mnt/ceph-disk1
 # df -h /mnt/ceph-disk1
 ```  
-6、写入数据测试  
+7、写入数据测试  
 ``` # dd if=/dev/zero of=/mnt/ceph-disk1/file1 count=100 bs=1M ```  
-7、做成服务，开机自动挂载  
+8、做成服务，开机自动挂载  
 1)做成服务  
 ```
 # cat /usr/local/bin/rbd-mount
