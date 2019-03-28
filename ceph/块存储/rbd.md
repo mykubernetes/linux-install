@@ -73,7 +73,11 @@ priority=1
 ```  
 
 3、更改块大小  
-``` # rbd resize rbd1 --size 2040 --name client.rbd ```  
+```
+# rbd resize rbd1 --size 2040 --name client.rbd
+动态在线扩容
+# resize2fs /dev/rbd0
+```  
 
 4、删除块  
 ``` # rbd rm rbd1 --name client.rbd ```  
