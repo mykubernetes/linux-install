@@ -139,9 +139,9 @@ ls -l *.keyring
 # 配置 osd  
 1、单台添加
 ```
-# ceph-deploy disk list node01                          #查看主机可以使用的硬盘       
-# ceph-deploy disk zap --fs-type xfs node01:/dev/sdb    #初始化
-# ceph-deploy osd create node01:/dev/sdb                #创建并激活
+# ceph-deploy disk list node01                #查看主机可以使用的硬盘       
+# ceph-deploy disk zap node01:/dev/sdb        #初始化
+# ceph-deploy osd create node01:/dev/sdb      #创建并激活
 ```
 2、这里使用脚本批量执行
 ```
