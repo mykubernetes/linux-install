@@ -46,3 +46,17 @@ rbd snap create rbd/rbd1@rbd1_snap
 列
 rbd --pool rbd snap rollback --snap rbd1_snap rbd1
 rbd snap rollback rbd/rbd1@rbd1_snap
+
+列出快照
+方法一：rbd --pool {pool-name} snap ls {image-name}
+方法二：rbd snap ls {pool-name}/{image-name}
+列
+rbd --pool rbd snap ls rbd1
+rbd snap ls rbd/rbd1
+
+保护快照
+方法一：rbd --pool {pool-name} snap protect --image {image-name} --snap {snapshot-name}
+方法二：rbd snap protect {pool-name}/{image-name}@{snapshot-name}
+列
+rbd --pool rbd snap protect --image my-image --snap my-snapshot
+rbd snap protect rbd/rbd1@rbd1_snap
