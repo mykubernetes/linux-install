@@ -55,7 +55,7 @@ rbd --pool rbd snap ls rbd1
 rbd snap ls rbd/rbd1
 
 保护快照
-rbd create rbd1 --size 1024 --format 2   # format等于2才可以使用
+rbd create rbd1 --size 1024 --image-format 2   # format等于2才可以使用
 方法一：rbd --pool {pool-name} snap protect --image {image-name} --snap {snapshot-name}
 方法二：rbd snap protect {pool-name}/{image-name}@{snapshot-name}
 列
