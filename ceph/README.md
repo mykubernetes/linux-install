@@ -1,4 +1,4 @@
-Pool配置
+一、Pool配置
 =========
 1、创建  pool 
 --------------
@@ -32,5 +32,34 @@ Pool配置
 
 5、删除 pool  
 -----------  
-删除一个 pool 会同时清空 pool 的所有数据，因此非常危险。(和 rm -rf /类似)。因此删除 pool 时 ceph 要求必须输入两次 pool 名称，同时加上--yes-i-really-really-mean-it 选项。
+删除一个 pool 会同时清空 pool 的所有数据，因此非常危险。(和 rm -rf /类似)。因此删除 pool 时 ceph 要求必须输入两次 pool 名称，同时加上--yes-i-really-really-mean-it 选项。  
 ``` # ceph osd pool delete rbd-pool rbd-pool --yes-i-really-really-mean-it ```  
+
+
+二、获取参数
+===========
+1、通过 get 操作能够获取 pool 的配置值,比如获取当前 pg_num  
+``` # ceph osd pool get rbd-pool pg_num ```  
+
+2、获取当前副本数量  
+``` # ceph osd pool get rbd-pool size ```  
+
+3、查看pool详细信息  
+``` # ceph osd dump | grep pool ```  
+
+4、查询参数的命令  
+``` # ceph --show-config | grep mon_pg_warn_max_per_osd ```  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
