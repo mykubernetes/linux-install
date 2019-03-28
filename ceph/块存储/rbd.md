@@ -61,6 +61,7 @@ priority=1
 • OSD 数量在 5 到 10 个时，可把pg_num 设置为 512  
 • OSD 数量在 10 到 50 个时，可把 pg_num 设置为 4096  
 • OSD 数量大于 50 时，你得理解权衡方法、以及如何自己计算pg_num 取值  
+
 2、客户端创建 块设备  
 ```
 创建块设备rbd1为块名 --size默认以M为单位 --pool 池名
@@ -71,7 +72,11 @@ priority=1
 # rbd --image rbd1 info --name client.rbd
 ```  
 
+3、更改块大小  
+``` # rbd resize rbd1 --size 2040 ```  
 
+4、删除块  
+``` # rbd rm rbd1 ```  
 
 映射块设备
 ==========
