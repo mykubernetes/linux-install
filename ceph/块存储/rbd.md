@@ -98,12 +98,17 @@ priority=1
 
 2、动态禁用  
 ``` # rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd ```  
+
 3、映射到本地  
 ``` # rbd map --image rbd1 --name client.rbd ```  
 或者  
 ``` # rbd map rbd1 --pool rbd --id admin ```  
+
 4、查看映射到本地的块  
 ``` # rbd showmapped --name client.rbd ```
+
+5、取消映射  
+``` # rbd unmap /dev/rbd0 ```  
 
 5、创建文件系统，并挂载  
 ```
