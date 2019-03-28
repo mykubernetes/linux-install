@@ -69,8 +69,8 @@ rbd --pool rbd snap purge rbd1
 rbd snap purge rbd/rbd1
 
 删除快照
-方法一：rbd --pool {pool-name} snap ls {image-name}
-方法二：rbd snap ls {pool-name}/{image-name}
+方法一：rbd --pool {pool-name} snap rm {image-name}
+方法二：rbd snap rm {pool-name}/{image-name}
 列
-rbd --pool rbd snap ls rbd1
-rbd snap ls rbd/rbd1
+rbd --pool rbd snap rm rbd1
+rbd snap rm rbd/rbd1
