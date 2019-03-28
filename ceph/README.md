@@ -95,4 +95,11 @@
 2、开启服务  
 ``` systemctl restart ceph-radosgw@node01 ```  
 
-
+五、错误参考
+==========
+Osd down 情况  
+1、使用命令 ceph osd tree 查看发现问题  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/ceph1.png)  
+2、需要重新启动下osd.0  
+``` # ceph-deploy osd activate ceph01:/dev/sdb1 ```  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/ceph2.png)  
