@@ -159,6 +159,13 @@ done
 # 查看集群硬盘  
 ``` # ceph osd tree ```  
 
+# 查看集群状态  
+```
+# ceph -s
+# ceph health
+# ceph health detail
+```  
+
 # 部署 mgr ， L版以后才需要部署  
 ``` # ceph-deploy mgr create node01 node02 node03 ```  
 
