@@ -17,10 +17,33 @@ echo $?
 ```  
 4、安装ceph客户端
 ```
-wget -O /etc/yum.repos.d/ceph.repo https://raw.githubusercontent.com/aishangwei/ceph-demo/master/ceph-deploy/ceph.repo
-yum -y install ceph
-cat /etc/ceph/ceph.client.rbd.keyring
-ceph -s --name client.rbd
+配置yum源
+# cat /etc/yum.repos.d/ceph.repo 
+[ceph]
+name=ceph
+baseurl=http://mirrors.aliyun.com/ceph/rpm-luminous/el7/x86_64/
+gpgcheck=0
+priority=1
+
+[ceph-noarch]
+name=cephnoarch
+baseurl=http://mirrors.aliyun.com/ceph/rpm-luminous/el7/noarch/
+gpgcheck=0
+priority=1
+
+[ceph-source]
+name=Ceph source packages
+baseurl=http://mirrors.aliyun.com/ceph/rpm-luminous/el7/SRPMS
+enabled=0
+gpgcheck=1
+type=rpm-md
+gpgkey=http://mirrors.aliyun.com/ceph/keys/release.asc
+priority=1
+
+安装
+# yum -y install ceph
+# cat /etc/ceph/ceph.client.rbd.keyring
+# ceph -s --name client.rbd
 ```  
 
 
