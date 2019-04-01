@@ -9,16 +9,6 @@ http://docs.ceph.com/ceph-ansible/master/
 
 一、安装前准备
 =========
-```
-export username="ceph-admin"
-export passwd="ceph-admin"
-export node1="node01"
-export node2="node02"
-export node3="node03"
-export node1_ip="192.168.101.66"
-export node2_ip="192.168.101.67"
-export node3_ip="192.168.101.68"
-```  
 
 # 配置 yum源  
 ``` 
@@ -60,10 +50,10 @@ systemctl restart ntpd ntpdate && systemctl enable ntpd ntpdate
 
 # 创建部署用户和ssh免密码登录  
 ```
-useradd ${username}
-echo "${passwd}" | passwd --stdin ${username}
-echo "${username} ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/${username}
-chmod 0440 /etc/sudoers.d/${username}
+useradd ceph
+echo 123456 | passwd --stdin ceph
+echo ceph ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph
+chmod 0440 /etc/sudoers.d/ceph
 ```  
 
 # 配置防火墙，或者关闭  
@@ -83,9 +73,9 @@ setenforce 0
 # 配置主机名解析，使用  /etc/hosts,或者dns  
 ```
 cat >>/etc/hosts<<EOF
-$node1_ip     $node1
-$node2_ip     $node2
-$node3_ip     $node3
+192.168.101.66   node01
+192.168.101.67   node02
+192.168.101.68   node03
 EOF
 ```  
 
@@ -97,12 +87,11 @@ EOF
 ======================
 # 配置免密钥登录  
 ```
-su - ceph-admin
-export username=ceph-admin
+su - ceph
 ssh-keygen
-ssh-copy-id ${username}@node01
-ssh-copy-id ${username}@node02
-ssh-copy-id ${username}@node03
+ssh-copy-id ceph@node01
+ssh-copy-id ceph@node02
+ssh-copy-id ceph@node03
 ```  
 
 # 安装 ceph-deploy  
