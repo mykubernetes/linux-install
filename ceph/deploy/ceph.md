@@ -156,6 +156,7 @@ done
 # ceph -s
 # ceph health
 # ceph health detail
+# ceph quorum_status --format json-pretty
 ```  
 
 # 部署 mgr ， L版以后才需要部署  
