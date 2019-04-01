@@ -80,7 +80,7 @@ EOF
 ```  
 
 # 配置sudo不需要tty  
-``` # sed -i 's/Default requiretty/#Default requiretty/' /etc/sudoers ```  
+``` # sed -i 's/Defaults    requiretty/#Defaults    requiretty/' /etc/sudoers ```  
 
 
 二、使用 ceph-deploy 部署集群
