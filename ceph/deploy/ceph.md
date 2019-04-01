@@ -44,7 +44,7 @@ priority=1
 # 配置NTP  
 ```
 yum -y install ntpdate ntp
-ntpdate  cn.ntp.org.cn
+ntpdate  ntp.aliyun.com
 systemctl restart ntpd ntpdate && systemctl enable ntpd ntpdate
 ```  
 
