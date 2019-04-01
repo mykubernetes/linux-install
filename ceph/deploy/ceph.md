@@ -159,6 +159,15 @@ done
 # ceph quorum_status --format json-pretty
 ```  
 
+#查看osd是否启动
+```
+# netstat -utpln |grep osd
+tcp        0      0 192.168.101.67:6800     0.0.0.0:*               LISTEN      19079/ceph-osd      
+tcp        0      0 192.168.101.67:6801     0.0.0.0:*               LISTEN      19079/ceph-osd      
+tcp        0      0 192.168.101.67:6802     0.0.0.0:*               LISTEN      19079/ceph-osd      
+tcp        0      0 192.168.101.67:6803     0.0.0.0:*               LISTEN      19079/ceph-osd
+```  
+
 # 部署 mgr ， L版以后才需要部署  
 ``` # ceph-deploy mgr create node01 node02 node03 ```  
 
