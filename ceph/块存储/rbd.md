@@ -65,7 +65,7 @@ priority=1
 2、客户端创建 块设备  
 ```
 创建块设备rbd1为块名 --size默认以M为单位 --pool 池名
-# rbd create rbd1 --size 10240 --pool rbd--name client.rbd
+# rbd create rbd1 --size 10240 --pool rbd --name client.rbd
 # rbd ls --name client.rbd
 # rbd ls -p rbd --name client.rbd
 # rbd list --name client.rbd
