@@ -52,7 +52,7 @@ systemctl restart ntpd  && systemctl enable ntpd
 ```
 useradd ceph
 echo 123456 | passwd --stdin ceph
-echo ceph ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph
+echo "ceph ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph
 chmod 0440 /etc/sudoers.d/ceph
 ```  
 
