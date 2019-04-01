@@ -45,7 +45,7 @@ priority=1
 ```
 yum -y install ntpdate ntp
 ntpdate  ntp.aliyun.com
-systemctl restart ntpd ntpdate && systemctl enable ntpd ntpdate
+systemctl restart ntpd  && systemctl enable ntpd
 ```  
 
 # 创建部署用户和ssh免密码登录  
