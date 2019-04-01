@@ -106,7 +106,7 @@ priority=1
 3、映射到本地  
 ``` # rbd map --image rbd1 --name client.rbd ```  
 或者  
-``` # rbd map rbd1 --pool rbd --id admin ```  
+``` # rbd map rbd1 --pool rbd --name client.rbd ```  
 
 4、查看映射到本地的块  
 ``` # rbd showmapped --name client.rbd ```
