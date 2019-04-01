@@ -1,4 +1,4 @@
-一、Pool配置
+官方中文文档http://docs.ceph.org.cn/architecture/
 =========
 1、创建  pool 
 --------------
