@@ -122,6 +122,7 @@ cluster network = 192.168.101.0/24
 ```
 # ceph-deploy mon create-initial
 ls -l *.keyring
+netstat -tlunp |grep 6789
 ```  
 
 # 把配置信息拷贝到各节点  
