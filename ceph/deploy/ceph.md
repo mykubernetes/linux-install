@@ -80,6 +80,8 @@ EOF
 ```  
 
 # 配置sudo不需要tty  
+手动修改配置文件  
+注释Defaults requiretty  
 ``` # sed -i 's/Defaults    requiretty/#Defaults    requiretty/' /etc/sudoers ```  
 
 
