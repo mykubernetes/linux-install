@@ -1,5 +1,8 @@
 官方中文文档http://docs.ceph.org.cn/architecture/
+=====================================
+书https://frank6866.gitbooks.io/ceph/content/  
 =========
+
 1、创建  pool 
 --------------
 ```
