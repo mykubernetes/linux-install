@@ -5,9 +5,9 @@
 
 2、启动 NFS所需的rpc服务  
 ```
-# systemctl start rpcbind;
-# systemctl enable rpcbind
-# systemctl status rpcbind.service
+systemctl start rpcbind
+systemctl enable rpcbind
+systemctl status rpcbind.service
 ```  
 
 3、修改配置文件  
