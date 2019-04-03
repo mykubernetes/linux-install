@@ -13,6 +13,31 @@ systemctl status rpcbind.service
 3、修改配置文件  
 ``` # vim /etc/ganesha/ganesha.conf ```  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/ceph.png)  
+```
+EXPORT
+{
+	# Export Id (mandatory, each EXPORT must have a unique Export_Id)
+	Export_Id = 77;
+
+	# Exported path (mandatory)
+	Path = "/";
+
+	# Pseudo Path (required for NFS v4)
+	Pseudo = "/";
+
+	# Required for access (default is None)
+	# Could use CLIENT blocks instead
+	Access_Type = RW;
+        SecType = "none";
+        NFS_Protocols = "3";
+        Squash = No_ROOT_Squash;
+
+	# Exporting FSAL
+	FSAL {
+		Name = CEPH;
+	}
+}
+```  
 
 4、通过提供Ganesha.conf 启动NFS Ganesha守护进程，并输出日志到/var/log/ganesha.log下，为deubg模式 
 ```
