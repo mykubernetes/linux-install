@@ -205,7 +205,7 @@ WantedBy=multi-user.target
 1、编辑映射文件  
 ```
 # cat /etc/ceph/rbdmap 
-  rbd/rbd1 -id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
+  rbd/rbd1 -id=client.rbd,keyring=/etc/ceph/ceph.client.rbd.keyring
 ```  
 2、添加开机挂载  
 ```
