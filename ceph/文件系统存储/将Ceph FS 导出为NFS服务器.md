@@ -14,10 +14,13 @@ systemctl status rpcbind.service
 ``` # vim /etc/ganesha/ganesha.conf ```  
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/ceph.png)  
 
-4、通过提供Ganesha.conf 启动NFS Ganesha守护进程  
+4、通过提供Ganesha.conf 启动NFS Ganesha守护进程，并输出日志到/var/log/ganesha.log下，为deubg模式 
 ```
-ganesha.nfsd -f /etc/ganesha.conf -L /var/log/ganesha.log -N NIV_DEBUG
-showmount -e
+# ganesha.nfsd -f /etc/ganesha/ganesha.conf -L /var/log/ganesha.log -N NIV_DEBUG
+
+# showmount -e
+Export list for node02:
+
 ```  
 5、客户端挂载  
 ```
