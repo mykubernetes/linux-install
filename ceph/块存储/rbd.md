@@ -210,6 +210,6 @@ WantedBy=multi-user.target
 2、添加开机挂载  
 ```
 # cat /etc/fstab
-  /dev/rbd/rbd/rbd1 /mnt/ceph ext4 defaults,noatime,_netdev
+  /dev/rbd/rbd/rbd1 /mnt/ceph-disk1 ext4 defaults,noatime,_netdev
 ```  
 
