@@ -33,7 +33,7 @@ mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secret=……
 
 通过key文件挂载
 echo …secret…> /etc/ceph/cephfskey        #把 key保存起来
-mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secretfile= /etc/ceph/cephfskey   #name为认证用户名
+mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secretfile=/etc/ceph/cephfskey   #name为认证用户名
 
 启动挂载
 echo "node02:6789:/ /mnt/cephfs ceph name=cephfs,secretfile=/etc/ceph/cephfskey,_netdev,noatime 0 0" >> /etc/fstab
