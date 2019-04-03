@@ -205,11 +205,11 @@ WantedBy=multi-user.target
 1、编辑映射文件  
 ```
 # cat /etc/ceph/rbdmap 
-  rbd/rbd0 -id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
+  rbd/rbd1 -id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
 ```  
 2、添加开机挂载  
 ```
 # cat /etc/fstab
-  /dev/rbd/rbd/rbd0 /mnt/ceph ext4 defaults,noatime,_netdev
+  /dev/rbd/rbd/rbd1 /mnt/ceph ext4 defaults,noatime,_netdev
 ```  
 
