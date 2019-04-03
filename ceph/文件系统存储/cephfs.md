@@ -50,7 +50,7 @@ dd if=/dev/zero of=/mnt/cephfs/file1 bs=1M count=1024
 1)安装软件包  
 ```
 # rpm -qa |grep -i ceph-fuse 
-# yum -y intall ceph-fuse
+# yum -y install ceph-fuse
 ``` 
 2)挂载  
 ```
