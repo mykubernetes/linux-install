@@ -1,6 +1,8 @@
 安装rbd客户端工具
 ===============
 
+服务器端配置认证
+-----------
 1、在服务器端创建 ceph 块客户端用户名和认证密钥  
 ``` # ceph auth get-or-create client.rbd mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=rbd' |tee ./ceph.client.rbd.keyring ```  
 
@@ -9,13 +11,19 @@
 # scp ceph.client.rbd.keyring node04:/etc/ceph/
 # scp /etc/ceph/ceph.conf node04:/etc/ceph/
 ```  
-3、客户端检查是否符合块设备环境要求
+
+
+
+
+客户端安装客户端工具
+-----------
+1、客户端检查是否符合块设备环境要求
 ```
 # uname -r
 # modprobe rbd
 # echo $?
 ```  
-4、安装ceph客户端
+2、安装ceph客户端
 ```
 配置yum源
 # cat /etc/yum.repos.d/ceph.repo 
@@ -47,9 +55,8 @@ priority=1
 ```  
 
 
-客户端创建块设备
-===============
-
+服务器端配置存储池
+------------------
 默认创建块设备，会直接创建在rbd 池中，但使用 deploy 安装后，该rbd池并没有创建。  
 1、在服务器端创建池和块  
 ```
@@ -62,7 +69,9 @@ priority=1
 • OSD 数量在 10 到 50 个时，可把 pg_num 设置为 4096  
 • OSD 数量大于 50 时，你得理解权衡方法、以及如何自己计算pg_num 取值  
 
-2、客户端创建 块设备  
+客户端申请image
+-------------
+1、客户端创建 块设备  
 ```
 创建块设备rbd1为块名 --size默认以M为单位 --pool 池名
 # rbd create rbd1 --size 10240 --pool rbd --name client.rbd
@@ -72,18 +81,18 @@ priority=1
 # rbd --image rbd1 info --name client.rbd
 ```  
 
-3、更改块大小  
+2、更改块大小  
 ```
 # rbd resize rbd1 --size 2040 --name client.rbd
 动态在线扩容
 # resize2fs /dev/rbd0
 ```  
 
-4、删除块  
+3、删除块  
 ``` # rbd rm rbd1 --name client.rbd ```  
 
-映射块设备
-==========
+客户端映射块设备
+------------
 
 1、映射到客户端，应该会报错  
 ``` # rbd map --image rbd1 --name client.rbd ```  
