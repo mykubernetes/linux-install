@@ -54,7 +54,18 @@ dd if=/dev/zero of=/mnt/cephfs/file1 bs=1M count=1024
 ``` 
 2)挂载  
 ```
+命令挂载
 # ceph-fuse --keyring /etc/ceph/ceph.client.cephfs.keyring --name client.cephfs -m node02:6789 /mnt/cephfs
+# df -h /mnt/cephfs/
+Filesystem      Size  Used Avail Use% Mounted on
+ceph-fuse       6.5G     0  6.5G   0% /mnt/cephfs
+
+使用配置文件命令挂载挂载
 # echo "id=cephfs,keyring=/etc/ceph/ceph.client.cephfs.keyring /mnt/cephfs fuse.ceph defaults 0 0 _netdev" >> /etc/fstab
+# mount /mnt/cephfs/
+# df -h /mnt/cephfs/
+Filesystem      Size  Used Avail Use% Mounted on
+ceph-fuse       6.5G     0  6.5G   0% /mnt/cephfs
+
 ```  
 注：因为 keyring文件包含了用户名，所以fstab不需要指定用了  
