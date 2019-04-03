@@ -24,7 +24,12 @@ Export list for node02:
 ```  
 5、客户端挂载  
 ```
-yum install -y nfs-utils
-mkdir /mnt/cephnfs
-mount -o rw,noatime node02:/ /mnt/cephnfs
+# yum install -y nfs-utils
+# mkdir /mnt/cephnfs
+# mount -o rw,noatime node02:/ /mnt/cephnfs
+验证
+# df -h /mnt/cephnfs
+Filesystem      Size  Used Avail Use% Mounted on
+node02:/           0     0     0    - /mnt/cephnfs
+
 ```  
