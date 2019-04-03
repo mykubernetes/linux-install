@@ -1,5 +1,7 @@
 cephfs
 ======
+服务器端部署
+----------
 1、部署 cephfs  
 ``` # ceph-deploy mds create node02 ```  
 注意：查看输出，应该能看到执行了哪些命令，以及生成的keyring  
@@ -11,30 +13,32 @@ cephfs
 # ceph osd pool ls
 # ceph fs ls
 ```  
-2、创建用户(可选，因为部署时，已经生成)
+2、创建用户并赋予权限  
 ```
 ceph auth get-or-create client.cephfs mon 'allow r' mds 'allow r, allow rw path=/' osd 'allow rw pool=cephfs_data' -o ceph.client.cephfs.keyring
 拷贝到客户端
 scp ceph.client.cephfs.keyring node04:/etc/ceph/
 ```  
 
-3、通过内核驱动和FUSE客户端挂载Ceph FS  
+客户端挂载
+--------
+1、通过内核驱动挂载Ceph FS  
 1)创建挂载目录  
 ``` # mkdir /mnt/cephfs ```  
 2)挂载  
 ```
 手动挂载
-ceph auth get-key client.cephfs // 在 ceph fs服务器上执行，获取key
+ceph auth get-key client.cephfs        #在 ceph fs服务器上执行，获取key
 mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secret=……
 
 通过key文件挂载
-echo …secret…> /etc/ceph/cephfskey // 把 key保存起来
-mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secretfile= /etc/ceph/cephfskey // name为用户名
+echo …secret…> /etc/ceph/cephfskey        #把 key保存起来
+mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secretfile= /etc/ceph/cephfskey   #name为认证用户名
 
 启动挂载
 echo "node02:6789:/ /mnt/cephfs ceph name=cephfs,secretfile=/etc/ceph/cephfskey,_netdev,noatime 0 0" >> /etc/fstab
 ```  
-4、校验  
+3)、校验  
 ```
 umount /mnt/cephfs
 mount /mnt/cephfs
@@ -42,7 +46,7 @@ dd if=/dev/zero of=/mnt/cephfs/file1 bs=1M count=1024
 ```  
 
 
-5、FUSE客户端挂载  
+5、通过FUSE客户端挂载  
 1)安装软件包  
 ```
 # rpm -qa |grep -i ceph-fuse 
