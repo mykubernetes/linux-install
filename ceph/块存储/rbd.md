@@ -113,12 +113,19 @@ priority=1
 ``` # rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd ```  
 
 3、映射到本地  
-``` # rbd map --image rbd1 --name client.rbd ```  
+``` 
+# rbd map --image rbd1 --name client.rbd 
+/dev/rbd0
+```  
 或者  
 ``` # rbd map rbd1 --pool rbd --name client.rbd ```  
 
 4、查看映射到本地的块  
-``` # rbd showmapped --name client.rbd ```
+``` 
+# rbd showmapped --name client.rbd
+id pool image snap device    
+0  rbd  rbd1  -    /dev/rbd0
+```  
 
 5、取消映射  
 ``` # rbd unmap /dev/rbd0 ```  
@@ -198,11 +205,11 @@ WantedBy=multi-user.target
 1、编辑映射文件  
 ```
 # cat /etc/ceph/rbdmap 
-  rbd/rbd1 -id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
+  rbd/rbd0 -id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
 ```  
 2、添加开机挂载  
 ```
 # cat /etc/fstab
-  /dev/rbd/rbd/rbd1 /mnt/ceph ext4 defaults,noatime,_netdev
+  /dev/rbd/rbd/rbd0 /mnt/ceph ext4 defaults,noatime,_netdev
 ```  
 
