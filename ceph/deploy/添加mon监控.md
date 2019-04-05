@@ -24,3 +24,9 @@ ceph-deploy --overwrite-conf config push node02
 ```
 ceph-deploy mon create node02 
 ```  
+
+4、查看  
+```
+# ceph -s
+# ceph mon_status -f json-pretty
+```  
