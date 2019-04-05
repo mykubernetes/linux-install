@@ -2,7 +2,6 @@
 =====================================
 书https://frank6866.gitbooks.io/ceph/content/  
 =========
-https://www.cnblogs.com/luxiaodai/p/10006036.html
 
 1、创建  pool 
 --------------
