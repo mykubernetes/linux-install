@@ -125,6 +125,11 @@ ls -l *.keyring
 netstat -tlunp |grep 6789
 ```  
 
+# 查看mon状态  
+```
+ceph mon_status -f json-pretty
+```  
+
 # 把配置信息拷贝到各节点  
 ``` # ceph-deploy admin node01 node02 node03  ```  
 
