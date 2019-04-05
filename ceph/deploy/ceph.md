@@ -156,6 +156,17 @@ done
 # 查看集群硬盘  
 ``` # ceph osd tree ```  
 
+# 查看使用容量
+```
+# ceph osd df
+ID CLASS WEIGHT  REWEIGHT SIZE    USE     AVAIL   %USE  VAR  PGS 
+ 0   hdd 0.00780  1.00000 8.00GiB 1.12GiB 6.88GiB 14.00 1.00 242 
+ 1   hdd 0.00780  1.00000 8.00GiB 1.12GiB 6.88GiB 13.95 1.00 242 
+ 2   hdd 0.00780  1.00000 8.00GiB 1.12GiB 6.88GiB 13.95 1.00 242 
+                    TOTAL 24.0GiB 3.35GiB 20.6GiB 13.97          
+MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
+```  
+
 # 查看集群状态  
 ```
 # ceph -s
