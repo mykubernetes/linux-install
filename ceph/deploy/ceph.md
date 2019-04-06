@@ -222,7 +222,7 @@ MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
 ```  
 - ID: osd id
 - WEIGHT: 权重，和osd容量有关系
-- REWEIGHT: 自动以的权重
+- REWEIGHT: 自定义的权重
 - SIZE: osd大小
 - USE: 已用空间大小
 - AVAIL: 可用空间大小
