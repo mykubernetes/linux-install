@@ -188,6 +188,14 @@ tcp        0      0 192.168.101.67:6802     0.0.0.0:*               LISTEN      
 tcp        0      0 192.168.101.67:6803     0.0.0.0:*               LISTEN      19079/ceph-osd
 ```  
 
+# 查看节点信息  
+```
+ceph node ls
+ceph node ls mon
+ceph node ls osd
+ceph node ls mds
+```  
+
 # 部署 mgr ， L版以后才需要部署  
 ``` # ceph-deploy mgr create node01 node02 node03 ```  
 
