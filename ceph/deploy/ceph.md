@@ -159,13 +159,28 @@ done
 ```  
 
 # 查看集群硬盘  
-``` # ceph osd tree ```  
+```
+# ceph osd tree
+ID CLASS WEIGHT  TYPE NAME       STATUS REWEIGHT PRI-AFF 
+-1       0.02339 root default                            
+-3       0.00780     host node01                         
+ 0   hdd 0.00780         osd.0       up  1.00000 1.00000 
+-5       0.00780     host node02                         
+ 1   hdd 0.00780         osd.1       up  1.00000 1.00000 
+-7       0.00780     host node03                         
+ 2   hdd 0.00780         osd.2       up  1.00000 1.00000
+```  
+- ID: 如果为负数，表示的是主机或者root；如果是正数，表示的是osd的id  
+- WEIGHT: osd的weight，root的weight是所有host的weight的和。某个host的weight是它上面所有osd的weight的和  
+- NAME: 主机名或者osd的名称  
+- UP/DOWN: osd的状态信息  
+- REWEIGHT: osd的reweight值，如果osd状态为down，reweight值为0  
+
+
 
 # 查看使用容量
 ```
 # ceph df
-2019-04-06 10:34:37.415152 7f50fe086700  0 -- 192.168.101.69:0/1645338759 >> 192.168.101.70:6805/1046 conn(0x7f50e80096f0 :-1 s=STATE_CONNECTING_WAIT_CONNECT_REPLY_AUTH pgs=0 cs=0 l=1).handle_connect_reply connect got BADAUTHORIZER
-2019-04-06 10:34:37.415570 7f50fe086700  0 -- 192.168.101.69:0/1645338759 >> 192.168.101.70:6805/1046 conn(0x7f50e80096f0 :-1 s=STATE_CONNECTING_WAIT_CONNECT_REPLY_AUTH pgs=0 cs=0 l=1).handle_connect_reply connect got BADAUTHORIZER
 GLOBAL:
     SIZE        AVAIL       RAW USED     %RAW USED 
     24.0GiB     20.6GiB      3.35GiB         13.98 
