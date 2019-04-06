@@ -103,8 +103,13 @@ ssh-copy-id ceph@node03
 # cd my-cluster
 ```  
 
-# 部署节点
-``` # ceph-deploy new node01 node02 node03  ```  
+# 部署节点,参数为monitor结点的主机名列表   
+```
+# ceph-deploy new node01 node02 node03
+该命令会在当前目录下创建如下文件:
+# ls
+ceph.conf  ceph-deploy-ceph.log  ceph.mon.keyring
+```  
   
 # 编辑 ceph.conf 配置文件最后添加两行  
 ```
@@ -115,9 +120,11 @@ public network = 192.168.101.0/24
 cluster network = 192.168.101.0/24
 ```  
 
-# 安装ceph包，使用替代 ceph-deploy install node1 node2 
+# 安装ceph相关包
 ``` 
 # ceph-deploy install node01 node02 node03
+如果速度慢可以知道阿里源
+# ceph-deploy install node01 node02 node03  --repo-url http://mirrors.aliyun.com/ceph/rpm-jewel/el7/
 可以使用下面命令代替ceph-deploy命令，因为ceph-deploy命令会下载官方yum源并覆盖本地yum源速度慢
 每天ceph节点执行
 # yum install -y ceph ceph-radosgw 
