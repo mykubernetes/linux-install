@@ -162,6 +162,19 @@ done
 
 # 查看使用容量
 ```
+# ceph df
+2019-04-06 10:34:37.415152 7f50fe086700  0 -- 192.168.101.69:0/1645338759 >> 192.168.101.70:6805/1046 conn(0x7f50e80096f0 :-1 s=STATE_CONNECTING_WAIT_CONNECT_REPLY_AUTH pgs=0 cs=0 l=1).handle_connect_reply connect got BADAUTHORIZER
+2019-04-06 10:34:37.415570 7f50fe086700  0 -- 192.168.101.69:0/1645338759 >> 192.168.101.70:6805/1046 conn(0x7f50e80096f0 :-1 s=STATE_CONNECTING_WAIT_CONNECT_REPLY_AUTH pgs=0 cs=0 l=1).handle_connect_reply connect got BADAUTHORIZER
+GLOBAL:
+    SIZE        AVAIL       RAW USED     %RAW USED 
+    24.0GiB     20.6GiB      3.35GiB         13.98 
+POOLS:
+    NAME                ID     USED        %USED     MAX AVAIL     OBJECTS 
+    rbd                 1       114MiB      1.69       6.48GiB          42 
+    cephfs_data         2           0B         0       6.48GiB           0 
+    cephfs_metadata     3      6.24KiB         0       6.48GiB          21
+```  
+```
 # ceph osd df
 ID CLASS WEIGHT  REWEIGHT SIZE    USE     AVAIL   %USE  VAR  PGS 
  0   hdd 0.00780  1.00000 8.00GiB 1.12GiB 6.88GiB 14.00 1.00 242 
