@@ -115,9 +115,13 @@ public network = 192.168.101.0/24
 cluster network = 192.168.101.0/24
 ```  
 
-# 安装 ceph包，替代 ceph-deploy install node1 node2 ,不过下面的命令需要在每台node上安装
-``` # yum install -y ceph ceph-radosgw ```  
-
+# 安装ceph包，使用替代 ceph-deploy install node1 node2 
+``` 
+# ceph-deploy install node01 node02 node03
+可以使用下面命令代替ceph-deploy命令，因为ceph-deploy命令会下载官方yum源并覆盖本地yum源速度慢
+每天ceph节点执行
+# yum install -y ceph ceph-radosgw 
+```  
 # 配置初始 monitor(s)、并收集所有密钥：  
 ```
 # ceph-deploy mon create-initial
