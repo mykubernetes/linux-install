@@ -131,7 +131,8 @@ netstat -tlunp |grep 6789
 
 # 查看mon状态  
 ```
-ceph mon_status -f json-pretty
+# ceph mon_status -f json-pretty
+# ceph mon_status | python -mjson.tool
 ```  
 
 # 把配置信息拷贝到各节点  
@@ -174,6 +175,20 @@ POOLS:
     cephfs_data         2           0B         0       6.48GiB           0 
     cephfs_metadata     3      6.24KiB         0       6.48GiB          21
 ```  
+GLOBAL区域表示整体的空间使用情况:  
+- SIZE: 表示集群中所有OSD总空间大小  
+- AVAIL: 表示可以使用的空间大小  
+- RAW USED: 表示已用空间大小  
+- %RAW USED: 表示已用空间百分比  
+
+POOLS区域表示某个pool的空间使用情况  
+- NAME: pool名称  
+- ID: pool id  
+- USED: 已用空间大小  
+- %USED: 已用空间百分比  
+- MAX AVAIL: 最大可用空间大小  
+- OBJECTS: 这个pool中对象的个数  
+注意: pool里面的已有空间是业务上的空间,也就是一个副本的空间;将业务上空间乘以副本数,和RAW USED是相等的。RAW USED是集群物理上已近使用的空间。  
 ```
 # ceph osd df
 ID CLASS WEIGHT  REWEIGHT SIZE    USE     AVAIL   %USE  VAR  PGS 
