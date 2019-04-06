@@ -39,16 +39,7 @@
 # ceph-deploy osd create ceph-1:/dev/sdb
 ```  
 
-
-
-
-
-
-
-
 # 移除OSD
-
-本文参考同事的文档  
 
 1.在crush中设置OSD weight为0，等待迁移完成。  
 ```
