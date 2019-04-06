@@ -81,15 +81,38 @@ priority=1
 # rbd --image rbd1 info --name client.rbd
 ```  
 
-2、更改块大小  
+2、查看块设备的详细信息  
 ```
+# rbd info rbd/rbd1
+rbd image 'rbd1':
+    size 512 MB in 128 objects
+    order 22 (4096 kB objects)
+    block_name_prefix: rbd_data.1ad6e2ae8944a
+    format: 2
+    features: layering, exclusive-lock, object-map, fast-diff, deep-flatten
+    flags:
+```  
+- size: 512 MB in 128 objects，表示该块设备的大小是512MBytes，分布在128个objects中，RBD默认的块大小是4MBytes
+- order: order 22 (4096 kB objects)，指定RBD在OSD中存储时的block size，block size的计算公式是1<<order(单位是bytes)，在本例中order=22，所有block         size是1<<22bytes，也就是4096KBytes。order的默认值是22，RBD在OSD中默认的对象大小是4MBytes
+- format: rbd image的格式，format1已经过期了。现在默认都是format2，被librbd和kernel3.11后面的版本支持
+- block_name_prefix: 表示这个image在pool中的名称前缀，可以通过rados -p pool-frank6866 ls | grep rbd_data.1ad6e2ae8944a命令查看这个rbd image在rados中的所有object。但是要注意的是，刚创建的image，如果里面没有数据，不会在rados中创建object，只有写入数据时才会有。size字段中的objects数量表示的是最大的objects数量
+
+3、更改块大小  
+```
+调大块设备的大小:
 # rbd resize rbd1 --size 2040 --name client.rbd
+# rbd resize --size 1024 rbd/rbd1 --name client.rbd
 动态在线扩容
 # resize2fs /dev/rbd0
+
+减小块设备的大小: 
+# rbd resize --size 256 rbd/rbd1 --allow-shrink
+
+删除块设备:
+# rbd rm rbd/rbd1 --name client.rbd
+# rbd rm rbd1 --name client.rbd
 ```  
 
-3、删除块  
-``` # rbd rm rbd1 --name client.rbd ```  
 
 客户端映射块设备
 ------------
