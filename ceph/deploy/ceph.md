@@ -222,6 +222,20 @@ MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
 - %USE: 已用空间百分比
 - PGS: pg数量
 
+# 查询osd在哪个主机上  
+```
+# ceph osd find 0
+{
+    "osd": 0,
+    "ip": "192.168.101.69:6800/1092",
+    "osd_fsid": "04fc90fc-8cda-4b60-ab60-43a42cd2fac3",
+    "crush_location": {
+        "host": "node01",
+        "root": "default"
+    }
+}
+```  
+
 # 查看集群状态  
 ```
 # ceph -s
