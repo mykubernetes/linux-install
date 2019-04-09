@@ -298,7 +298,7 @@ scrape_configs:
       - target_label: __address__
          replacement: 192.168.101.67:9115
 
-自动发现主机
+自动发现主机（远端探测地址）
 # cat /etc/prometheus/targets/probes/http_probes.json
 [{
   "targets": [
