@@ -347,3 +347,76 @@ output {
 }}
 }
 ```
+
+将日志写入kafka，并取出写入elasticsearch
+
+```
+input {
+  file {
+    path => "/var/log/nginx/access.log"
+    type => "nginx-access-log-node01"
+    start_position => "beginning"
+    stat_interval => "2"
+    codec => "json"
+  }
+  file {
+    path => "/var/log/messages"
+    type => "systme-log-node01"
+    start_position => "beginning"
+    stat_interval => "2"
+  }
+}
+
+output {
+  if [type] == "nginx-access-log-node01" {
+    kafka {
+      bootstrap_servers => "192.168.101.66:9092"
+      topic_id => "nginx-accesslog-node01"
+      codec => "json"
+        }
+  }
+  if [type] == "system-log-node01" {
+    kafka {
+      otstrap_servers => "192.168.101.66:9092"
+      topic_id => "system-log-node01"
+      codec => "json"
+    }
+  }
+}
+```  
+
+```
+input {
+  kafka {
+    bootstrap_servers => "192.168.101.66:9092"
+    topics => "nginx-accesslog-node01"
+    group_id => "nginx-access-log"
+    codec => "json"
+    consumer_threads => 1
+    decorate_events => true
+  }
+   kafka {
+    bootstrap_servers => "192.168.101.66:9092"
+    topics => "system-log-node01"
+    group_id => "systemlog-log"
+    codec => "json"
+    consumer_threads => 1
+    decorate_events => true
+  }
+}
+
+output {
+  if [type] == "nginx-access-log-node01" {
+  elasticsearch {
+    hosts => ["192.168.101.66:9200"]
+    index => "logstash-nginx-access-log-node01-%{+YYYY.MM.dd}"
+    }
+  }
+  if [type] == "system-log-node01" {
+  elasticsearch {
+    hosts => ["192.168.101.66:9200"]
+    index => "systemlog-log-node01-%{+YYYY.MM}"
+    }
+  }
+}
+```  
