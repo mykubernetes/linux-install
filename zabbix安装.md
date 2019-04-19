@@ -88,6 +88,8 @@ Hostname=
 Include=/etc/zabbix/zabbix_agentd.d/*.conf
 # UserParameter= =
 ```  
+测试  
+/usr/local/zabbix/bin/zabbix_get -s <被监控主机IP> -p 10050 -k "system.hostname"  
 
 3. 源码编译方式部署Zabbix服务器  
 ```
