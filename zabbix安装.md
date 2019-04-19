@@ -72,6 +72,23 @@ php_value date.timezone Asia/Shanghai
 # systemctl start httpd
 ```  
 
+2.1 YUM方式部署Zabbix_Agent服务器
+```
+# rpm -ivh http://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-1.el7.noarch.rpm
+# yum install zabbix-agent
+# vi /etc/zabbix/zabbix_agentd.conf
+PidFile=/var/run/zabbix/zabbix_agentd.pid
+LogFile=/var/log/zabbix/zabbix_agentd.log
+DebugLevel=3
+Server=
+ListenPort=10050
+ListenIP=0.0.0.0
+ServerActive=
+Hostname=
+Include=/etc/zabbix/zabbix_agentd.d/*.conf
+# UserParameter= =
+```  
+
 3. 源码编译方式部署Zabbix服务器  
 ```
 3.1 部署Nginx
