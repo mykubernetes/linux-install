@@ -103,6 +103,7 @@ PrivateTmp=true
 [Install]
 WantedBy=multi-user.target
 ```  
+
 3.2 部署PHP  
 ```
 安装依赖包:
@@ -144,8 +145,8 @@ WantedBy=multi-user.target
 [root@web-01 ~]# systemctl start php-fpm
 [root@web-01 ~]# systemctl enable php-fpm
 ```  
-3.3 部署Zabbix Server
-https://www.zabbix.com/download_sources
+3.3 部署Zabbix Server  
+https://www.zabbix.com/download_sources  
 ```
 导入表结构：
 # cd database/mysql
@@ -191,8 +192,9 @@ WantedBy=multi-user.target
 启动Agent：
 # /usr/local/zabbix/sbin/zabbix_agentd
 ```  
-3.4 部署Zabbix Web界面
-Zabbix前端使用PHP写的，所以必须运行在PHP支持的Web服务器上。
+
+3.4 部署Zabbix Web界面  
+Zabbix前端使用PHP写的，所以必须运行在PHP支持的Web服务器上。  
 ```
 # cp zabbix-4.0.0/frontends/php/* /usr/local/nginx/html/ -rf
 # vi /usr/local/php/etc/php.ini
