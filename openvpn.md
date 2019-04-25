@@ -270,8 +270,8 @@ Windows
 # sz /opt/easy-rsa/pki/private/client.key
 ```  
 3.在C:\Program Files\OpenVPN\config  创建一个客户端配置文件，名称叫client.ovpn  
+内容如下  
 ```
-	内容如下
 client                  #指定当前VPN是客户端
 dev tun                 #使用tun隧道传输协议
 proto udp               #使用udp协议传输数据
