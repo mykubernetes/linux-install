@@ -357,16 +357,18 @@ OpenVPN访问内网网段
 [root@m01 ~]# firewall-cmd --reload
 
 
-双重认证
+双重认证  
 
 1.修改Server端配置文件，添加以下三行代码
-[root@web01 ~]# vim /etc/openvpn/server.conf
+```
+# vim /etc/openvpn/server.conf
 script-security 3   #允许使用自定义脚本
 auth-user-pass-verify /etc/openvpn/check.sh via-env
 username-as-common-name #用户密码登陆方式验证
+```  
 #注：如果加上client-cert-not-required则代表只使用用户名密码方式验证登录，如果不加，则代表需要证书和用户名密码双重验证登录！
-
-[root@openvpn ~]# cat /etc/openvpn/check.sh
+```
+# cat /etc/openvpn/check.sh
 #!/bin/sh
 ###########################################################
 PASSFILE="/etc/openvpn/openvpnfile"
@@ -390,25 +392,28 @@ TIME_STAMP=`date "+%Y-%m-%d %T"`
     fi
     echo "${TIME_STAMP}: Incorrect password: username=\"${username}\", password=\"${password}\"." >> ${LOG_FILE}
 exit 1
-
-#记得添加执行权限，否则会无法重启openvpn服务
-[root@openvpn ~]# chmod +x /etc/openvpn/check.sh
-
-准备用户名密码文件
-[root@openvpn ~]# cat /etc/openvpn/openvpnfile
-oldboy 123456
-
-重载openvpn服务
-[root@openvpn ~]# systemctl restart openvpn@server
-
+```
+#记得添加执行权限，否则会无法重启openvpn服务  
+```
+# chmod +x /etc/openvpn/check.sh
+```  
+准备用户名密码文件  
+```
+# cat /etc/openvpn/openvpnfile
+huy 123456
+```  
+重载openvpn服务  
+```
+# systemctl restart openvpn@server
+```  
 
 
 
 
 [root@openvpn openvpn]# tail -f /var/log/openvpn-password.log 
-2019-01-19 18:24:30: Successful authentication: username="oldboy".
-2019-01-19 18:26:14: Successful authentication: username="xiaowang".
-2019-01-19 18:26:58: User does not exist: username="oldboy", password="123456".		#尝试使用不存在的用户的连接
+2019-01-19 18:24:30: Successful authentication: username="huy".
+2019-01-19 18:26:14: Successful authentication: username="jingjing".
+2019-01-19 18:26:58: User does not exist: username="yy", password="123456".		#尝试使用不存在的用户的连接
 
 
 
