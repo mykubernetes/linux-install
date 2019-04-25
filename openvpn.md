@@ -262,6 +262,7 @@ ca.crt  client  dh.pem  server  server.conf  server.crt  server.key
 Windows  
 ---
 1.下载windows的openvpn软件  
+https://www.techspot.com/downloads/5182-openvpn.html  
 2.下载服务端生成的客户端密钥文件和ca文件至windows指定C:\Program Files\OpenVPN\config 目录中  
 ```
 # cd /etc/openvpn/
