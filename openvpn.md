@@ -1,12 +1,15 @@
 1.安装epel扩展源  
+-------
 ``` # yum -y install epel-release ```  
 
 2.为了保证OpenVPN的安装，需要使用easy-rsa秘钥生成工具生成证书  
+-----------
 ``` # yum -y install easy-rsa -y ```   
 注：centos7安装的是三的版本easy-rsa.noarch 0:3.0.3-1.el7  
     centos6安装的是二的版本  
 
 3.生成秘钥证书前，需要准备vars文件  
+------------
 ```
 # mkdir /opt/easy-rsa
 # cd /opt/easy-rsa/
@@ -29,6 +32,7 @@ set_var EASYRSA_NS_SUPPORT "yes"
 ```  
 
 4.初始化生成证书
+---------------
 
 #1.初始化，在当前目录创建PKI目录，用于存储证书 
 ``` 
@@ -46,23 +50,154 @@ pki/
 
 2 directories, 0 files
 ```  
-#2.创建根证书，会提示设置密码，用于ca对之后生成的server和client证书签名时使用，其他可默认
-[root@m01 easy-rsa]# ./easyrsa build-ca
 
-#3.创建server端证书和私钥文件，nopass表示不加密私钥文件，其他可默认
-[root@m01 easy-rsa]# ./easyrsa gen-req server nopass
+#2.创建根证书，会提示设置密码，用于ca对之后生成的server和client证书签名时使用，其他可默认  
+```
+# ./easyrsa build-ca
 
-#4.给server端证书签名，首先是对一些信息的确认，可以输入yes，然后创建ca根证书时设置的密码 
-[root@m01 easy-rsa]# ./easyrsa sign server server
+Note: using Easy-RSA configuration from: ./vars
+Generating a 2048 bit RSA private key
+.........................................................................+++
+.............................................................+++
+writing new private key to '/opt/easy-rsa/pki/private/ca.key.aAXtpvJrtQ'
+Enter PEM pass phrase:               #输入密码
+Verifying - Enter PEM pass phrase:        #确认密码
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Common Name (eg: your user, host, or server name) [Easy-RSA CA]:       #回车确认，不用输入
 
-#5.创建Diffie-Hellman文件，秘钥交换时的Diffie-Hellman算法
-[root@m01 easy-rsa]# ./easyrsa gen-dh
+CA creation complete and you may now import and sign cert requests.
+Your new CA certificate file for publishing is at:
+/opt/easy-rsa/pki/ca.crt        #会创建ca文件
+```  
 
-#6.创建client端证书和私钥文件，nopass表示不加密私钥文件，其他可默认
-[root@m01 easy-rsa]# ./easyrsa gen-req client nopass
+#3.创建server端证书和私钥文件，nopass表示不加密私钥文件，其他可默认  
+```
+# ./easyrsa gen-req server nopass              #server为文件名，可更改
 
-#7.给client端证书签名，首先是对一些信息的确认，可以输入yes，然后创建ca根证书时设置的密码 
-[root@m01 easy-rsa]# ./easyrsa sign client client
+Note: using Easy-RSA configuration from: ./vars
+Generating a 2048 bit RSA private key
+..........................................................+++
+.......................................+++
+writing new private key to '/opt/easy-rsa/pki/private/server.key.pzw2afEph2'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Common Name (eg: your user, host, or server name) [server]:           #回车
+
+Keypair and certificate request completed. Your files are:
+req: /opt/easy-rsa/pki/reqs/server.req                   #生成请求文件，下一步为server.req设置签名成为公钥
+key: /opt/easy-rsa/pki/private/server.key                #生成私钥文件
+```  
+
+#4.给server端证书签名，首先是对一些信息的确认，可以输入yes，然后创建ca根证书时设置的密码  
+```
+# ./easyrsa sign server server
+
+Note: using Easy-RSA configuration from: ./vars
+
+
+You are about to sign the following certificate.
+Please check over the details shown below for accuracy. Note that this request
+has not been cryptographically verified. Please be sure it came from a trusted
+source or that you have verified the request checksum with the sender.
+
+Request subject, to be signed as a server certificate for 3650 days:      #证书时间10年
+
+subject=
+    commonName                = server
+
+
+Type the word 'yes' to continue, or any other input to abort.
+  Confirm request details: yes                #输入yes
+Using configuration from ./openssl-1.0.cnf
+Enter pass phrase for /opt/easy-rsa/pki/private/ca.key:         #输入之前设置的密码
+Check that the request matches the signature
+Signature ok
+The Subject's Distinguished Name is as follows
+commonName            :ASN.1 12:'server'
+Certificate is to be certified until Apr 22 02:50:42 2029 GMT (3650 days)
+
+Write out database with 1 new entries
+Data Base Updated
+
+Certificate created at: /opt/easy-rsa/pki/issued/server.crt    #生成为公钥文件
+```  
+
+#5.创建Diffie-Hellman文件，秘钥交换时的Diffie-Hellman算法  
+```
+# ./easyrsa gen-dh        #速度有点慢
+DH parameters of size 2048 created at /opt/easy-rsa/pki/dh.pem  #生产dh.pem交换文件
+```  
+
+#6.创建client端证书和私钥文件，nopass表示不加密私钥文件，其他可默认  
+```
+# ./easyrsa gen-req client nopass
+
+Note: using Easy-RSA configuration from: ./vars
+Generating a 2048 bit RSA private key
+...........................+++
+................................+++
+writing new private key to '/opt/easy-rsa/pki/private/client.key.iKlNgvT9YZ'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Common Name (eg: your user, host, or server name) [client]:          #回车
+
+Keypair and certificate request completed. Your files are:
+req: /opt/easy-rsa/pki/reqs/client.req        #客户端请求文件
+key: /opt/easy-rsa/pki/private/client.key     #客户端私钥文件
+```  
+
+#7.给client端证书签名，首先是对一些信息的确认，可以输入yes，然后创建ca根证书时设置的密码  
+```
+# ./easyrsa sign client client
+
+Note: using Easy-RSA configuration from: ./vars
+
+
+You are about to sign the following certificate.
+Please check over the details shown below for accuracy. Note that this request
+has not been cryptographically verified. Please be sure it came from a trusted
+source or that you have verified the request checksum with the sender.
+
+Request subject, to be signed as a client certificate for 3650 days:
+
+subject=
+    commonName                = client
+
+
+Type the word 'yes' to continue, or any other input to abort.
+  Confirm request details: yes              #输入yes
+Using configuration from ./openssl-1.0.cnf
+Enter pass phrase for /opt/easy-rsa/pki/private/ca.key:     #输入密码
+Check that the request matches the signature
+Signature ok
+The Subject's Distinguished Name is as follows
+commonName            :ASN.1 12:'client'
+Certificate is to be certified until Apr 22 03:03:53 2029 GMT (3650 days)
+
+Write out database with 1 new entries
+Data Base Updated
+
+Certificate created at: /opt/easy-rsa/pki/issued/client.crt          #生成公钥证书
+```  
 
 
 1.安装openvpn
