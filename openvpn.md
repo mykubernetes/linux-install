@@ -342,6 +342,7 @@ https://www.cnblogs.com/airoot/p/7252987.html
 
 
 OpenVPN访问内网网段  
+----
 ```
 # route add  -net 10.8.0.0/24 gw 172.16.1.102
 ```
