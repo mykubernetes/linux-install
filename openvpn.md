@@ -343,6 +343,7 @@ https://www.cnblogs.com/airoot/p/7252987.html
 
 OpenVPN访问内网网段  
 ----
+#解决方式一，添加路由规则
 ```
 # route add  -net 10.8.0.0/24 gw 172.16.1.102
 ```
@@ -361,7 +362,7 @@ OpenVPN访问内网网段
 ```  
 
 双重认证  
-
+------
 1.修改Server端配置文件，添加以下三行代码
 ```
 # vim /etc/openvpn/server.conf
