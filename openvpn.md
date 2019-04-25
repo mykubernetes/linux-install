@@ -26,8 +26,8 @@ set_var EASYRSA_DN  "cn_only"
 set_var EASYRSA_REQ_COUNTRY "CN"                    #所在的国家
 set_var EASYRSA_REQ_PROVINCE "Shanghai"             #所在的省份
 set_var EASYRSA_REQ_CITY "Shanghai"                 #所在的城市
-set_var EASYRSA_REQ_ORG "Oldboy"                    #所在的组织
-set_var EASYRSA_REQ_EMAIL "xuliangwei@foxmail.com"  #邮箱的地址
+set_var EASYRSA_REQ_ORG "YY"                    #所在的组织
+set_var EASYRSA_REQ_EMAIL "123456@qq.com"  #邮箱的地址
 set_var EASYRSA_NS_SUPPORT "yes"
 ```  
 
