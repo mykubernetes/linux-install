@@ -257,47 +257,21 @@ ca.crt  client  dh.pem  server  server.conf  server.crt  server.key
 # systemctl status openvpn@server.service       #查看是否启动
 ```  
 
-客户端连接
-Windows
-	1.下载windows的openvpn软件
-	2.下载服务端生成的客户端密钥文件和ca文件至windows指定C:\Program Files\OpenVPN\config 目录中
-	[root@openvpn-client ~]# cd /etc/openvpn/
-	[root@openvpn-client openvpn]# sz /opt/easy-rsa/pki/ca.crt
-	[root@openvpn-client openvpn]# sz /opt/easy-rsa/pki/issued/client.crt
-	[root@openvpn-client openvpn]# sz /opt/easy-rsa/pki/private/client.key
-	
-	3.在C:\Program Files\OpenVPN\config  创建一个客户端配置文件，名称叫client.ovpn
+客户端连接  
+-------
+Windows  
+---
+1.下载windows的openvpn软件  
+2.下载服务端生成的客户端密钥文件和ca文件至windows指定C:\Program Files\OpenVPN\config 目录中  
+```
+# cd /etc/openvpn/
+# sz /opt/easy-rsa/pki/ca.crt
+# sz /opt/easy-rsa/pki/issued/client.crt
+# sz /opt/easy-rsa/pki/private/client.key
+```  
+3.在C:\Program Files\OpenVPN\config  创建一个客户端配置文件，名称叫client.ovpn  
+```
 	内容如下
-	client                  #指定当前VPN是客户端
-	dev tun                 #使用tun隧道传输协议
-	proto udp               #使用udp协议传输数据
-	remote 10.0.0.102 1194   #openvpn服务器IP地址端口号
-	resolv-retry infinite   #断线自动重新连接，在网络不稳定的情况下非常有用
-	nobind                  #不绑定本地特定的端口号
-	ca ca.crt               #指定CA证书的文件路径
-	cert client.crt         #指定当前客户端的证书文件路径
-	key client.key          #指定当前客户端的私钥文件路径
-	verb 3                  #指定日志文件的记录详细级别，可选0-9，等级越高日志内容越详细
-	persist-key     #通过keepalive检测超时后，重新启动VPN，不重新读取keys，保留第一次使用的keys
-	persist-tun     #检测超时后，重新启动VPN，一直保持tun是linkup的。否则网络会先linkdown然后再linkup
-	
-	4.最终windows的目录中配置文件如下
-	
-	5.双击运行openvpn，然后连接即可。
-
-Linux
-1.安装openvpn
-[root@openvpn-client ~]# yum install openvpn -y
-
-
-2.下载证书文件
-[root@openvpn-client ~]# cd /etc/openvpn/
-[root@openvpn-client openvpn]# scp root@172.16.1.102:/opt/easy-rsa/pki/ca.crt ./
-[root@openvpn-client openvpn]# scp root@172.16.1.102:/opt/easy-rsa/pki/issued/client.crt ./
-[root@openvpn-client openvpn]# scp root@172.16.1.102:/opt/easy-rsa/pki/private/client.key ./
-
-3.配置客户端
-[root@zabbix-agent-sh-103 openvpn]# cat client.ovpn
 client                  #指定当前VPN是客户端
 dev tun                 #使用tun隧道传输协议
 proto udp               #使用udp协议传输数据
@@ -310,28 +284,71 @@ key client.key          #指定当前客户端的私钥文件路径
 verb 3                  #指定日志文件的记录详细级别，可选0-9，等级越高日志内容越详细
 persist-key     #通过keepalive检测超时后，重新启动VPN，不重新读取keys，保留第一次使用的keys
 persist-tun     #检测超时后，重新启动VPN，一直保持tun是linkup的。否则网络会先linkdown然后再linkup
+```  
+	
+4.双击运行openvpn，然后连接即可。  
+查看windows下route  
+```
+route print -4
+```  
 
-4.启动Linux客户端的openvpn
-[root@openvpn-client ~]# openvpn --daemon --cd /etc/openvpn --config client.ovpn --log-append /var/log/openvpn.log
+Linux  
+---
+1.安装openvpn  
+```
+# yum install openvpn -y
+```  
 
-# --daemon：openvpn以daemon方式启动。
-# --cd dir：配置文件的目录，openvpn初始化前，先切换到此目录。
-# --config file：客户端配置文件的路径。
-# --log-append file：日志文件路径，如果文件不存在会自动创建。
+2.下载证书文件  
+```
+# cd /etc/openvpn/
+# scp root@172.16.1.102:/opt/easy-rsa/pki/ca.crt ./
+# scp root@172.16.1.102:/opt/easy-rsa/pki/issued/client.crt ./
+# scp root@172.16.1.102:/opt/easy-rsa/pki/private/client.key ./
+```  
+
+3.配置客户端  
+```
+# cat client.ovpn
+client                  #指定当前VPN是客户端
+dev tun                 #使用tun隧道传输协议
+proto udp               #使用udp协议传输数据
+remote 10.0.0.102 1194   #openvpn服务器IP地址端口号
+resolv-retry infinite   #断线自动重新连接，在网络不稳定的情况下非常有用
+nobind                  #不绑定本地特定的端口号
+ca ca.crt               #指定CA证书的文件路径
+cert client.crt         #指定当前客户端的证书文件路径
+key client.key          #指定当前客户端的私钥文件路径
+verb 3                  #指定日志文件的记录详细级别，可选0-9，等级越高日志内容越详细
+persist-key     #通过keepalive检测超时后，重新启动VPN，不重新读取keys，保留第一次使用的keys
+persist-tun     #检测超时后，重新启动VPN，一直保持tun是linkup的。否则网络会先linkdown然后再linkup
+```  
+
+4.启动Linux客户端的openvpn  
+```
+# openvpn --daemon --cd /etc/openvpn --config client.ovpn --log-append /var/log/openvpn.log
+```  
+- --daemon：openvpn以daemon方式启动。  
+- --cd dir：配置文件的目录，openvpn初始化前，先切换到此目录。  
+- --config file：客户端配置文件的路径。  
+- --log-append file：日志文件路径，如果文件不存在会自动创建。  
 
 
-mac安装openvpn
-https://www.jianshu.com/p/a5fd8dc95ad4
-https://www.cnblogs.com/airoot/p/7252987.html
+mac安装openvpn  
+https://www.jianshu.com/p/a5fd8dc95ad4  
+https://www.cnblogs.com/airoot/p/7252987.html  
 
 
 
-OpenVPN访问内网网段
-[root@zabbix-agent-sh-103 ~]# route add  -net 10.8.0.0/24 gw 172.16.1.102
-抓包发现数据包已经是一来一回
+OpenVPN访问内网网段  
+```
+# route add  -net 10.8.0.0/24 gw 172.16.1.102
+```
+抓包发现数据包已经是一来一回  
+```
 17:51:36.053959 IP zabbix-agent-sh-103 > 10.8.0.10: ICMP echo reply, id 1, seq 420, length 40
 17:51:37.057545 IP 10.8.0.10 > zabbix-agent-sh-103: ICMP echo request, id 1, seq 421, length 40
-
+```  
 
 #解决方式二，在vpn服务器上配置防火墙转发规则
 [root@m01 ~]# systemctl start firewalld
