@@ -286,8 +286,10 @@ verb 3                  #指定日志文件的记录详细级别，可选0-9，�
 persist-key     #通过keepalive检测超时后，重新启动VPN，不重新读取keys，保留第一次使用的keys
 persist-tun     #检测超时后，重新启动VPN，一直保持tun是linkup的。否则网络会先linkdown然后再linkup
 ```  
-	
-4.双击运行openvpn，然后连接即可。  
+
+4.最终windows的目录中配置文件如下
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/openvpn.png)
+5.双击运行openvpn，然后连接即可。  
 查看windows下route  
 ```
 route print -4
