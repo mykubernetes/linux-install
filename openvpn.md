@@ -334,7 +334,8 @@ persist-tun     #检测超时后，重新启动VPN，一直保持tun是linkup的
 - --log-append file：日志文件路径，如果文件不存在会自动创建。  
 
 
-mac安装openvpn  
+mac安装openvpn
+----
 https://www.jianshu.com/p/a5fd8dc95ad4  
 https://www.cnblogs.com/airoot/p/7252987.html  
 
@@ -350,12 +351,13 @@ OpenVPN访问内网网段
 17:51:37.057545 IP 10.8.0.10 > zabbix-agent-sh-103: ICMP echo request, id 1, seq 421, length 40
 ```  
 
-#解决方式二，在vpn服务器上配置防火墙转发规则
-[root@m01 ~]# systemctl start firewalld
-[root@m01 ~]# firewall-cmd --add-service=openvpn --permanent
-[root@m01 ~]# firewall-cmd --add-masquerade --permanent
-[root@m01 ~]# firewall-cmd --reload
-
+#解决方式二，在vpn服务器上配置防火墙转发规则  
+```
+# systemctl start firewalld
+# firewall-cmd --add-service=openvpn --permanent
+# firewall-cmd --add-masquerade --permanent
+# firewall-cmd --reload
+```  
 
 双重认证  
 
