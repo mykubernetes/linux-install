@@ -397,23 +397,24 @@ exit 1
 ```
 # chmod +x /etc/openvpn/check.sh
 ```  
+
 准备用户名密码文件  
 ```
 # cat /etc/openvpn/openvpnfile
 huy 123456
 ```  
+
 重载openvpn服务  
 ```
 # systemctl restart openvpn@server
 ```  
 
-
-
-
-[root@openvpn openvpn]# tail -f /var/log/openvpn-password.log 
+查看日志  
+```
+# tail -f /var/log/openvpn-password.log 
 2019-01-19 18:24:30: Successful authentication: username="huy".
 2019-01-19 18:26:14: Successful authentication: username="jingjing".
 2019-01-19 18:26:58: User does not exist: username="yy", password="123456".		#尝试使用不存在的用户的连接
-
+```  
 
 
