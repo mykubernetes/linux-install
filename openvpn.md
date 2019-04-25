@@ -199,13 +199,18 @@ Data Base Updated
 Certificate created at: /opt/easy-rsa/pki/issued/client.crt          #生成公钥证书
 ```  
 
-
-1.安装openvpn
-[root@openvpn easy-rsa]# yum install openvpn -y
+5、安装openvpn
+------------
+1.安装openvpn  
+```
+# yum install openvpn -y
+```  
 
 2.配置openvpn
-[root@openvpn easy-rsa]# cd /etc/openvpn/
-[root@web01 openvpn]# cat server.conf
+```
+# cd /etc/openvpn/
+# cp /usr/share/doc/openvpn-2.4.7/sample/sample-config-files/server.conf /etc/openvpn/   #此处不拷贝使用精简版
+# cat server.conf
 port 1194                               #端口
 proto udp                               #协议
 dev tun                                 #采用路由隧道模式tun
@@ -225,22 +230,32 @@ log /var/log/openvpn.log                #openvpn日志记录位置
 persist-key     #通过keepalive检测超时后，重新启动VPN，不重新读取keys，保留第一次使用的keys。
 persist-tun     #检测超时后，重新启动VPN，一直保持tun是linkup的。否则网络会先linkdown然后再linkup
 duplicate-cn
+```  
 
-3.根据配置需要文件中定义，需要拷贝openvpnServer端用到的证书至/etc/openvpn目录中
-[root@m01 ~]# cd /etc/openvpn/
-[root@m01 openvpn]# cp /opt/easy-rsa/pki/ca.crt ./
-[root@m01 openvpn]# cp /opt/easy-rsa/pki/issued/server.crt ./
-[root@m01 openvpn]# cp /opt/easy-rsa/pki/private/server.key ./
-[root@m01 openvpn]# cp /opt/easy-rsa/pki/dh.pem ./
+3.根据配置需要文件中定义，需要拷贝openvpnServer端用到的证书至/etc/openvpn目录中  
+```
+# cd /etc/openvpn/
+# cp /opt/easy-rsa/pki/ca.crt ./
+# cp /opt/easy-rsa/pki/issued/server.crt ./
+# cp /opt/easy-rsa/pki/private/server.key ./
+# cp /opt/easy-rsa/pki/dh.pem ./
 
-4.配置openvpn，首先需要开启内核转发功能
-[root@m01 ~]# echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
-[root@m01 ~]# systemctl restart network
+# ls
+ca.crt  client  dh.pem  server  server.conf  server.crt  server.key
+```  
 
-8.启动openvpn服务并加入开机自启
-[root@m01 ~]# systemctl -f enable openvpn@server.service    #设置启动文件
-[root@m01 ~]# systemctl start openvpn@server.service        #启动openvpn服务
+4.配置openvpn，首先需要开启内核转发功能  
+```
+# echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+# systemctl restart network
+```
 
+5.启动openvpn服务并加入开机自启  
+```
+# systemctl -f enable openvpn@server.service    #设置启动文件
+# systemctl start openvpn@server.service        #启动openvpn服务
+# systemctl status openvpn@server.service       #查看是否启动
+```  
 
 客户端连接
 Windows
