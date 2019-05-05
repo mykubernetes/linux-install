@@ -313,7 +313,31 @@ output.logstash:
   compression_level: 3
   loadbalance: true
 ```  
-5、配置logstash服务并收集beats日志  
+5、发送到kafka  
+```
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+   - /var/log/messages
+   - /var/log/secure
+  fields:
+    log_topic: osmessages
+name: "172.16.213.157"
+output.kafka:
+  enabled: true
+  hosts: ["172.16.213.51:9092", "172.16.213.75:9092", "172.16.213.109:9092"]
+  version: "0.10"
+  topic: '%{[fields][log_topic]}'
+  partition.round_robin:
+    reachable_only: true
+  worker: 2
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 10000000
+logging.level: debug
+```  
+6、配置logstash服务并收集beats日志  
 ```
 # cat beats-node01.conf 
 input {
@@ -345,7 +369,7 @@ output {
 }
 
 ```  
-6、配置logstash收集redis并发生到elasticsearch
+7、配置logstash收集redis并发生到elasticsearch
 ```
 # cat  redis-es.conf
 input {
