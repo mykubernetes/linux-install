@@ -41,7 +41,7 @@ network.host: node001         #监听的ip地址，如果是0.0.0.0，则表示�
 discovery.zen.minimum_master_nodes: 1              #master最小节点数，小于次节点数，es启动不了
 discovery.zen.ping.timeout: 3s           #超时时间
 discovery.zen.ping.multicast.enabled: false    #通过多播的方法发现es，建议关闭
-discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
+discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]   #默认使用9300，如果修改可node001:9300
 ```  
 4、优化内核限制文件数和打开的进程数  
 ```
