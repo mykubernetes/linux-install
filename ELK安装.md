@@ -12,12 +12,18 @@ export PATH=$PATH:$JAVA_HOME/bin
 ```
 
 二、安装elasticsearch  
-1下载eelasticsearch  
+1下载elasticsearch  
 ```
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.0.tar.gz
 tar -xvf elasticsearch-6.6.0.tar.gz -C /opt/module/
 ```  
-2、修改配置文件
+2、创建普通用户用于启动elasticsearch默认不支持root启动  
+```
+# useradd elasticsearch
+# chown -R elasticsearch:elasticsearch opt/module/elasticsearch-6.6.0/
+```  
+
+3、修改配置文件
 ```
 # vim /opt/module/elasticsearch-6.6.0/config/elasticsearch.yml
 cluster.name: my-elk        #集群的名称
@@ -32,25 +38,34 @@ path.logs: /opt/module/elasticsearch-6.6.0/logs  #日志路径
 network.host: node001       #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]
 ```  
-3、优化内核限制文件数和打开的进程数  
+4、优化内核限制文件数和打开的进程数  
 ```
 cat  /etc/security/limits.conf  |grep "^*"
     * soft    nofile    924511
-    * sift    nproc     924511
+    * hard    nofile    924511
+    * soft    nproc     924511
     * hard    nproc     924511
-    * hard nofile 924511
+    * soft    memlock   unlimited    #内存锁，不限制
+    * hard    memlock   unlimited
 ```  
-4、修改内核参数
+
+centos7系统的nproc修改位置  
+```
+cat /etc/security/limits.d/20-nproc.conf
+     * soft   nproc     20480
+```  
+5、修改内核参数
 ```  
 # vim /etc/sysctl.conf
-  vm.max_map_count=262144
+  fs.file-max=655360         #最大打开文件数
+  vm.max_map_count=262144    #最大线程数，用于限制一个进程可以拥有的VMA(虚拟内存区域)的大小
 # sysctl -p
 ```  
-5、启动elasticsearch  
+6、启动elasticsearch  
 ``` ./elasticsearch -d ```  
 不能使用root身份运行
 
-6、curl访问方法  
+7、curl访问方法  
 1)查看单记得点的工作状态  
 ``` curl -X GET 'http://node001:9200/?pretty' ```  
 2)查看cat支持的操作  
