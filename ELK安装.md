@@ -76,8 +76,13 @@ cat /etc/security/limits.d/20-nproc.conf
 - 可根据服务器内存大小，修改为合适的值。一般设置为服务器物理内存的一半最佳。  
 
 7、启动elasticsearch  
-``` ./elasticsearch -d ```  
-不能使用root身份运行
+```
+# su - elasticsearch
+$ cd /opt/module/elasticsearch-6.6.0/bin/
+./elasticsearch -d
+```  
+-d 参数的意思是将elasticsearch放到后台运行。  
+不能使用root身份运行  
 
 8、curl访问方法  
 1)查看单记得点的工作状态  
