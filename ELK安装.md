@@ -61,11 +61,20 @@ cat /etc/security/limits.d/20-nproc.conf
   vm.max_map_count=262144    #最大线程数，用于限制一个进程可以拥有的VMA(虚拟内存区域)的大小
 # sysctl -p
 ```  
-6、启动elasticsearch  
+
+6、JVM调优  
+```
+# vim /opt/module/elasticsearch-6.6.0/config/jvm.options
+-Xms2g
+-Xmx2g
+```  
+- 可根据服务器内存大小，修改为合适的值。一般设置为服务器物理内存的一半最佳。  
+
+7、启动elasticsearch  
 ``` ./elasticsearch -d ```  
 不能使用root身份运行
 
-7、curl访问方法  
+8、curl访问方法  
 1)查看单记得点的工作状态  
 ``` curl -X GET 'http://node001:9200/?pretty' ```  
 2)查看cat支持的操作  
