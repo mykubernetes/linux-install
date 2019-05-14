@@ -61,8 +61,13 @@ read_only=1
 # scp -p .ssh/id_rsa .ssh/authorized_keys root@node4:/root/.ssh/
 ```  
 
-7、安装mha
 
+7、安装mha  
+
+每个节点安装perl链接mysql依赖  
+```
+# yum install perl-DBD-MySQL -y
+```  
 Manager 节点：  
 ``` # yum install mha4mysql-manager-0.56-0.el6.noarch.rpm ```  
 所有节点，包括 Manager：  
