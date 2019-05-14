@@ -68,3 +68,62 @@ Manager 节点：
 所有节点，包括 Manager：  
 ``` # yum install mha4mysql-node-0.56-0.el6.noarch.rpm ```  
 
+8、初始化 MHA
+```
+# vim /etc/masterha/app1.cnf
+[server default]
+user=mhaadmin # MySQLAdministrator
+password=mhapass # MySQLAdministrator's password
+manager_workdir=/data/masterha/app1
+manager_log=/data/masterha/app1/manager.log
+remote_workdir=/data/masterha/app1
+ssh_user=root
+repl_user=repluser
+repl_password=replpass
+ping_interval=1
+[server1]
+hostname=192.168.101.67
+#ssh_port=22022
+candidate_master=1
+[server2]
+hostname=192.168.101.68
+#ssh_port=22022
+candidate_master=1
+[server3]
+hostname=192.168.101.69
+#ssh_port=22022
+#no_master=1
+```  
+
+9、检测各节点间 ssh 互信通信配置是否 OK：  
+```
+# masterha_check_ssh --conf=/etc/masterha/app1.cnf
+```  
+
+10、检查管理的 MySQL 复制集群的连接配置参数是否 OK：  
+```
+# masterha_check_repl --conf=/etc/masterha/app1.cnf
+
+Mon Nov 9 17:22:48 2015 - [info] Slaves settings check done.
+Mon Nov 9 17:22:48 2015 - [info]
+172.16.100.68(172.16.100.68:3306) (current master)
++--172.16.100.69(172.16.100.69:3306)
++--172.16.100.70(172.16.100.70:3306)
+MySQL Replication Health is OK.
+```  
+
+11、启动 MHA  
+```
+nohup masterha_manager --conf=/etc/masterha/app1.cnf >/data/masterha/app1/manager.log 2>&1 &
+```  
+
+12、启动成功后，可通过如下命令来查看 master 节点的状态  
+```
+# masterha_check_status --conf=/etc/masterha/app1.cnf
+app1 (pid:4978) is running(0:PING_OK), master:192.168.101.67
+```  
+
+13、停止 MHA  
+```
+# masterha_stop --conf=/etc/masterha/app1.cnf
+```  
