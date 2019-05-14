@@ -20,3 +20,51 @@ apply_diff_relay_logs           #识别relay log的差异
 filter_mysqlbinlog              #防止回滚事件
 purge_relay_logs                #清除中继日志
 ```  
+
+2、准备 MySQLReplication环境  
+node1: MHA Manager  
+node2: MariaDB master  
+node3: MariaDB slave  
+node4: MariaDB slave  
+
+
+3、各节点的/etc/hosts 文件配置内容中添加：  
+192.168.101.66 node1  
+192.168.101.67 node2  
+192.168.101.68 node3  
+192.168.101.69 node4  
+
+4、配置主从  
+```
+初始主节点 master 配置：
+server_id=1
+relay-log=relay-bin
+log-bin=master-bin
+所有 slava 节点依赖的配置：
+server_id=2 # 复制集群中的各节点的 id 均必须惟一；
+relay-log=relay-bin
+log-bin=master-bin
+relay_log_purge=0
+read_only=1
+```  
+
+5、在master节点运行权拥有管理权限  
+``` mysql> GRANTALL ON *.* TO 'mhaadmin'@'192.168.101.%' IDENTIFIED BY 'mhapass'; ```  
+
+6、ssh互信  
+```
+# ssh-keygen -t rsa -P ''
+# cat .ssh/id_rsa.pub >> .ssh/authorized_keys
+# chmod go= .ssh/authorized_keys
+# scp -p .ssh/id_rsa .ssh/authorized_keys root@node2:/root/.ssh/
+# scp -p .ssh/id_rsa .ssh/authorized_keys root@node3:/root/.ssh/
+# scp -p .ssh/id_rsa .ssh/authorized_keys root@node4:/root/.ssh/
+```  
+
+7、安装mha
+
+Manager 节点：  
+``` # yum install mha4mysql-manager-0.56-0.el6.noarch.rpm ```  
+所有节点，包括 Manager：  
+``` # yum install mha4mysql-node-0.56-0.el6.noarch.rpm ```  
+
