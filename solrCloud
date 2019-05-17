@@ -73,13 +73,17 @@ mode: follower or mode: Leader
 
 
 
-三.Solrcloud分布式集群搭建
-1.	cd /apps/soft
+二、Solrcloud分布式集群搭建  
+1、部署solr  
+```
+cd /apps/soft
 mkdir -p /apps/dat/web/working/solr/data(solr数据存储目录)
 wget archive.apache.org/dist/lucene/solr/4.8.1/solr-4.8.1.zip
 unzip solr-4.8.1.zip
+```  
 
-2.	cp -av /apps/soft/solr-4.8.1/example/webapps/solr.war /apps/dat/web/working/solr/
+2、 	
+cp -av /apps/soft/solr-4.8.1/example/webapps/solr.war /apps/dat/web/working/solr/
 cd /apps/dat/web/working/solr && jar -xvf solr.war
 cp -av /apps/svr/solr-4.8.1/example/lib/ext/*.jar /apps/dat/web/working/solr/WEB-INF/lib/
 
