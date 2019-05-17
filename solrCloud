@@ -1,70 +1,29 @@
-SolrCloud 分布式集群安装部署以及管理
-•	solrcloud
+SolrCloud 分布式集群
+======
 
-SolrCloud 分布式集群安装部署
-SolrCloud 是基于Solr和Zookeeper的分布式搜索方案，是正在开发中的Solr4.0的核心组件之一，它的主要思想是使用Zookeeper作为集群的配置信息中心。
-它有几个特色功能：
-1. 集中式的配置信息
-2. 自动容错
-3. 近实时搜索
-4. 查询时自动负载均衡
+一、正式solrcloud集群搭建  
+zookeeper 部署  
 
-一.环境准备工作：
-1. 5台物理服务器 centos5.8 64位
-2. apache-tomcat-7.0.54
-3. jdk1.8.0_11
-4. zookeeper-3.4.6.tar.gz
-5. solr-4.8.1.zip
-
-环境搭建：
-1. 设置环境变量(java、zookeeper)
-PS：可根据自己的服务器标准化准则自行设定；
-2. 修改主机名
-________________________________________
-solr-cloud-001
-solr-cloud-002
-solr-cloud-003
-solr-cloud-004
-solr-cloud-005
-________________________________________
-1.	为5台服务器配置映射节点（可直接使用IP+PORT的方式）
-cat /etc/hosts
-________________________________________
-10.0.0.1   solr-cloud-001
-10.0.0.2   solr-cloud-002
-10.0.0.3   solr-cloud-003
-10.0.0.4   solr-cloud-004
-10.0.0.5   solr-cloud-005
-________________________________________
-ZooKeeper集群中具有两个关键的角色：Leader和Follower;
-集群中所有的节点作为一个整体对分布式应用提供服务，集群中每个节点之间都互相连接，
-所以，在配置的ZooKeeper集群的时候，每一个节点的host到IP地址的映射都要配置上集群中其它节点的映射信息。
-ZooKeeper采用一种称为Leader election的选举算法。在整个集群运行过程中，只有一个Leader，其他的都是Follower，
-如果ZooKeeper集群在运行过程中 Leader出了问题，系统会采用该算法重新选出一个Leader。
-因此，各个节点之间要能够保证互相连接，必须配置上述映射。
-ZooKeeper集群启动的时候，会首先选出一个Leader，在Leader election过程中，某一个满足选举算的结点就能成为Leader;
-如有疑问，可参考官网介绍 http://zookeeper.apache.org/doc/trunk/zookeeperOver.html#sc_designGoals
-
-二.正式solrcloud集群搭建
-zookeeper 部署
-Zookeeper 分布式服务框架是 Apache Hadoop的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。
-PS：Zookeeper集群的机器个数推荐是奇数台，半数机器挂掉，服务是可以正常提供的；
-现在以10.0.0.1为例来部署zookeeper:
-
-1. mkdir -p /apps/soft
+1、下载zk  
+```
+mkdir -p /apps/soft
 cd /apps/soft
 wget http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz
 tar zxvf zookeeper-3.4.6.tar.gz
 mv /apps/soft/zookeeper-3.4.6 /apps/svr/zookeeper
+```  
 
-2.	新建zookeeper的数据存储目录和日志文件目录
+2、	新建zookeeper的数据存储目录和日志文件目录
+```
 mkdir -p /apps/dat/zookeeper
 mkdir -p /apps/logs/zookeeper
+```  
 
-3.	cd /apps/svr/zookeeper/conf
-cp -av zoo_sample.cfg zoo.cfg
-vim zoo.cfg并修改如下：
-________________________________________
+3、修改zk配置文件  
+```
+# cd /apps/svr/zookeeper/conf
+# cp -av zoo_sample.cfg zoo.cfg
+# vim zoo.cfg
 tickTime=2000
 initLimit=10
 syncLimit=5
@@ -79,43 +38,42 @@ server.2=solr-cloud-002:4888:5888
 server.3=solr-cloud-003:4888:5888
 server.4=solr-cloud-004:4888:5888
 server.5=solr-cloud-005:4888:5888
-________________________________________
+```  
 
-PS:如果之前没有配置/etc/hosts，此处可使用IP+PORT的方式
-tickTime：这个时间是作为 Zookeeper 服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。
-initLimit：这个配置项是用来配置 Zookeeper 接受客户端（这里所说的客户端不是用户连接 Zookeeper 服务器的客户端，而是 Zookeeper服务器集群中连接到 Leader 的 Follower 服务器）初始化连接时最长能忍受多少个心跳时间间隔数。当已经超过 10 个心跳的时间（也就是tickTime）长度后 Zookeeper 服务器还没有收到客户端的返回信息，那么表明这个客户端连接失败。总的时间长度就是52000=10秒。
-syncLimit：这个配置项标识 Leader 与 Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个tickTime 的时间长度，总的时间长度就是22000=4秒
-dataDir：顾名思义就是 Zookeeper 保存数据的目录，默认情况下，Zookeeper 将写数据的日志文件也保存在这个目录里。
-dataLogDir： Zookeeper的日志文件位置。
-server.A=B：C：D：其中 A 是一个数字，表示这个是第几号服务器；B是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader，而这个端口就是用来执行选举时服务器相互通信的端口。如果是伪集群的配置方式，由于 B 都是一样，所以不同的 Zookeeper 实例通信端口号不能一样，所以要给它们分配不同的端口号。
-clientPort：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。
+- tickTime：这个时间是作为 Zookeeper 服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。
+- initLimit：这个配置项是用来配置 Zookeeper 接受客户端（这里所说的客户端不是用户连接 Zookeeper 服务器的客户端，而是 Zookeeper服务器集群中连接到 Leader 的 Follower 服务器）初始化连接时最长能忍受多少个心跳时间间隔数。当已经超过 10 个心跳的时间（也就是tickTime）长度后 Zookeeper 服务器还没有收到客户端的返回信息，那么表明这个客户端连接失败。总的时间长度就是52000=10秒。
+- syncLimit：这个配置项标识 Leader 与 Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个tickTime 的时间长度，总的时间长度就是22000=4秒
+- dataDir：顾名思义就是 Zookeeper 保存数据的目录，默认情况下，Zookeeper 将写数据的日志文件也保存在这个目录里。
+- dataLogDir： Zookeeper的日志文件位置。
+- server.A=B：C：D：其中 A 是一个数字，表示这个是第几号服务器；B是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader，而这个端口就是用来执行选举时服务器相互通信的端口。如果是伪集群的配置方式，由于 B 都是一样，所以不同的 Zookeeper 实例通信端口号不能一样，所以要给它们分配不同的端口号。
+- clientPort：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。
 
-1.	同步至其余4台服务器;
+1.	同步至其余4台服务器  
+```
 scp -r /apps/svr/zookeeper username@'10.0.0.2':/app/svr/
 scp -r /apps/svr/zookeeper username@'10.0.0.3':/app/svr/
 scp -r /apps/svr/zookeeper username@'10.0.0.4':/app/svr/
 scp -r /apps/svr/zookeeper username@'10.0.0.5':/app/svr/
-
-2.	分别在每台机器上创建myid文件存储该机器的标识码
+```  
+2.	分别在每台机器上创建myid文件存储该机器的标识码  
+```
 echo "1" >> /apps/dat/zookeeper/myid
 echo "2" >> /apps/dat/zookeeper/myid
 echo "3" >> /apps/dat/zookeeper/myid
 echo "4" >> /apps/dat/zookeeper/myid
 echo "5" >> /apps/dat/zookeeper/myid
-以此类推；
+```  
 
-3.	启动zookeeper； PS：注意iptables limit
-启动方式：cd /apps/svr/zookeeper/bin && ./zkServer.sh start
-启动成功后查看启动状态： ./zkServer.sh status
-如显示mode: follower or mode: Leader
-就表示启动成功；
-PS：可通过查询结果看出，5台机器中哪台被选中当了Leader，哪台选中当了follower
-另外，可以通过客户端脚本，连接到ZooKeeper集群上。对于客户端来说，ZooKeeper是一个整体（ensemble），
-连接到ZooKeeper集群实际上感觉在独享整个集群的服务，所以，你可以在任何一个节点上建立到服务集群的连接。
+3.	启动zookeeper  
+```
+cd /apps/svr/zookeeper/bin && ./zkServer.sh start
+./zkServer.sh status
+mode: follower or mode: Leader
+```  
 
 
 
-三.Solrcloud分布式集群搭建  (将solr解压到tomcat发布目录）
+三.Solrcloud分布式集群搭建
 1.	cd /apps/soft
 mkdir -p /apps/dat/web/working/solr/data(solr数据存储目录)
 wget archive.apache.org/dist/lucene/solr/4.8.1/solr-4.8.1.zip
