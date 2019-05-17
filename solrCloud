@@ -209,29 +209,3 @@ curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collectio
 例如：curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collection=test_shard&shard=shard1_0&replica=core_node5'
 Zookeeper维护的集群状态数据是存放在solr/data目录下的。
 
-
-
-
-现在我们来剖析下这样一个简单的集群构建的基本流程：
-先从第一台solr服务器说起：
-1. 它首先启动一个嵌入式的Zookeeper服务器，作为集群状态信息的管理者，
-2. 将自己这个节点注册到/node_states/目录下
-3. 同时将自己注册到/live_nodes/目录下
-4. 创建/overseer_elect/leader，为后续Overseer节点的选举做准备，新建一个Overseer，
-5. 更新/clusterstate.json目录下json格式的集群状态信息
-6. 本机从Zookeeper中更新集群状态信息，维持与Zookeeper上的集群信息一致
-7. 上传本地配置文件到Zookeeper中，供集群中其他solr节点使用
-8. 启动本地的Solr服务器，
-9. Solr启动完成后，Overseer会得知shard中有第一个节点进来，更新shard状态信息，并将本机所在节点设置为shard1的leader节点，并向整个集群发布最新的集群状态信息。
-10.本机从Zookeeper中再次更新集群状态信息，第一台solr服务器启动完毕。
-然后来看第二台solr服务器的启动过程：
-1. 本机连接到集群所在的Zookeeper，
-2. 将自己这个节点注册到/node_states/目录下
-3. 同时将自己注册到/live_nodes/目录下
-4. 本机从Zookeeper中更新集群状态信息，维持与Zookeeper上的集群信息一致
-5. 从集群中保存的配置文件加载Solr所需要的配置信息
-6. 启动本地solr服务器，
-7. solr启动完成后，将本节点注册为集群中的shard，并将本机设置为shard2的Leader节点，
-8. 本机从Zookeeper中再次更新集群状态信息，第二台solr服务器启动完毕。
-这个集群现在就具备容错性了，你可以试着干掉一个Solr服务器，然后再发送查询请求。背后的实质是集群的ov erseer会监测各个shard的leader节点，如果leader节点挂了，则会启动自动的容错机制，会从同一个shard中的其他replica节点集中重新选举出一个leader节点，甚至如果overseer节点自己也挂了，同样会自动在其他节点上启用新的overseer节点，这样就确保了集群的高可用性
-
