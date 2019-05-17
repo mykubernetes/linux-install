@@ -113,8 +113,10 @@ cp -av /apps/svr/solr-4.8.1/example/lib/ext/*.jar /apps/svr/tomcat/lib/
 cp -av /apps/svr/solr-4.8.1/example/resources/log4j.properties /apps/svr/tomcat/lib/
 cp -av /apps/svr/solr-4.8.1/example/solr/solr.xml /apps/svr/solr-4.8.1/example/solr/zoo.cfg /apps/dat/web/working/solr/data
 ```  
-2.	
+2、配置  
+```
 # vim /apps/svr/tomcat/conf/server.xml
+```  
 
 3、配置zk
 ```
@@ -140,25 +142,27 @@ ________________________________________
 这时，已经存在5个active的节点了，但是SolrCloud集群并没有更多信息;
 
 
-1.	创建collection、Shard和replication
-上面链接中的几个参数的含义，说明如下：
+创建collection、Shard和replication  
+创建3个分片1个副本  
+```
 curl 'http://10.0.0.2:8080/solr/admin/collections?action=CREATE&name=userinfo&numShards=3&replicationFactor=1'
-创建3个分片1个副本
+```  
+创建5个分片3个副本  
+```
 curl 'http://10.0.0.2:8080/solr/admin/collections?action=CREATE&name=userinfo&numShards=5&replicationFactor=3&maxShardsPerNode=3'
-创建5个分片3个副本
-name 待创建Collection的名称
-numShards 分片的数量
-replicationFactor 复制副本的数量
-执行上述操作如果没有异常，已经创建了一个Collection，名称为userinfo；这时，也可以查看ZooKeeper中状态：
-[zk: solr-cloud-001:2181(CONNECTED) 3] ls /collections
-[collection1, userinfo]
-通过Web管理页面，访问http://10.0.0.1:8080/solr/#/~cloud查看SolrCloud集群的分片信息；
-到此为止，我们基于5个物理节点，配置完成了SolrCloud集群多节点的配置。
+```  
+- name 待创建Collection的名称  
+- numShards 分片的数量  
+- replicationFactor 复制副本的数量  
+
+通过Web管理页面查看SolrCloud集群的分片信息  
+访问http://10.0.0.1:8080/solr/#/~cloud  
 
 
-扩展内容：
+
+
 solrCloud 管理
-更多的solrcloude管理信息，请参考http://eksliang.iteye.com/blog/2124078
+----
 创建collection：
 ./zkcli.sh -cmd upconfig -zkhost 10.0.0.1:2181/solrcloud -confdir /apps/conf/solr/config-files-confname test_date
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=CREATE&name=test_date&numShards=1&replicationFactor=3'
