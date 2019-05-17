@@ -82,34 +82,45 @@ wget archive.apache.org/dist/lucene/solr/4.8.1/solr-4.8.1.zip
 unzip solr-4.8.1.zip
 ```  
 
-2、 	
+2、拷贝war包  
+```
 cp -av /apps/soft/solr-4.8.1/example/webapps/solr.war /apps/dat/web/working/solr/
 cd /apps/dat/web/working/solr && jar -xvf solr.war
 cp -av /apps/svr/solr-4.8.1/example/lib/ext/*.jar /apps/dat/web/working/solr/WEB-INF/lib/
+```  
 
-3.	mkdir -p /apps/conf/solr/config-files
+3、拷贝文件  
+```
+mkdir -p /apps/conf/solr/config-files
 mkdir -p /apps/conf/solr/solr-lib
 cp -av /apps/svr/solr-4.8.1/example/solr/collection1/conf/* /apps/conf/solr/config-files/
 cp -av /apps/dat/web/working/solr/WEB-INF/lib/*.jar /apps/conf/solr/solr-lib/
+```  
 
-4.	vim /apps/dat/web/working/solr/WEB-INF/web.xml(添加solr数据存储目录)
-________________________________________
+4、修改配置文件  
+```
+# vim /apps/dat/web/working/solr/WEB-INF/web.xml(添加solr数据存储目录)
 <env-entry>   
   <env-entry-name>solr/home</env-entry-name>   
   <env-entry-value>/apps/dat/web/working/solr/data</env-entry-value>   
   <env-entry-type>java.lang.String</env-entry-type>
 </env-entry>
-________________________________________
+```  
 
-1.	cp -av /apps/svr/solr-4.8.1/example/lib/ext/*.jar /apps/svr/tomcat/lib/
+1、
+```
+cp -av /apps/svr/solr-4.8.1/example/lib/ext/*.jar /apps/svr/tomcat/lib/
 cp -av /apps/svr/solr-4.8.1/example/resources/log4j.properties /apps/svr/tomcat/lib/
 cp -av /apps/svr/solr-4.8.1/example/solr/solr.xml /apps/svr/solr-4.8.1/example/solr/zoo.cfg /apps/dat/web/working/solr/data
-2.	vim /apps/svr/tomcat/conf/server.xml 修改如下：
+```  
+2.	
+# vim /apps/svr/tomcat/conf/server.xml
 
-3.	vim /apps/svr/tomcat/bin/catalina.sh 注释掉JAVA_OPTS，并且添加如下：
-________________________________________
-   JAVA_OPTS="$JAVA_OPTS  -Xmx8192m -Xms8192m -Xmn4g -Xss256k -XX:ParallelGCThreads=24 -DzkHost=solr-cloud-001:2181,solr-cloud-002:2181,solr-cloud-003:2181,solr-cloud-004:2181,solr-cloud-005:2181 -XX:+UseConcMarkSweepGC -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=8060 -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=10.0.0.1  -XX:PermSize=1024m -XX:MaxPermSize=1024m -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCApplicationConcurrentTime -XX:+PrintHeapAtGC -Xloggc:/apps/logs/tomcat/gc`date +%Y%m%d%H%M%S`.log -XX:ErrorFile=\"/apps/logs/tomcat/java_error.log\""
-________________________________________
+3、配置zk
+```
+# vim /apps/svr/tomcat/bin/catalina.sh 注释掉JAVA_OPTS，并且添加如下：
+JAVA_OPTS="$JAVA_OPTS  -Xmx8192m -Xms8192m -Xmn4g -Xss256k -XX:ParallelGCThreads=24 -DzkHost=solr-cloud-001:2181,solr-cloud-002:2181,solr-cloud-003:2181,solr-cloud-004:2181,solr-cloud-005:2181 -XX:+UseConcMarkSweepGC -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=8060 -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=10.0.0.1  -XX:PermSize=1024m -XX:MaxPermSize=1024m -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCApplicationConcurrentTime -XX:+PrintHeapAtGC -Xloggc:/apps/logs/tomcat/gc`date +%Y%m%d%H%M%S`.log -XX:ErrorFile=\"/apps/logs/tomcat/java_error.log\""
+```  
 1.	将tomcat的目录分发至其余服务器的相应的位置；
 2.	SolrCloud是通过ZooKeeper集群来保证配置文件的变更及时同步到各个节点上，所以，需要将配置文件上传到ZooKeeper集群中：执行如下操作：
 java -classpath .:/apps/conf/solr/solr-lib/* org.apache.solr.cloud.ZkCLI -cmd upconfig -zkhost 10.0.0.1:2181,10.0.0.2:2181,10.0.0.3:2181,10.0.0.4:2181,10.0.0.5:2181 -confdir /apps/conf/solr/config-files/ -confname myconf
