@@ -16,10 +16,34 @@ host_base = node01:7480
 host_bucket = %(bucket).node01:7480
 ……
 ```  
-5、创建桶并放入文件  
+5、创建删除测试  
+
+新建Bucket  
 ```
-s3cmd mb s3://first-bucket
+s3cmd mb s3://s3test1
+```  
+
+查看现有Bucket  
+```
 s3cmd ls
-s3cmd put /etc/hosts s3://first-bucket
-s3cmd ls s3://first-bucket
+```  
+
+删除Bucket  
+```
+s3cmd rb s3://s3test1
+```  
+
+上传Object  
+```
+s3cmd put default.conf s3://s3test1
+```  
+
+查看Object  
+```
+s3cmd ls s3://s3test1
+```  
+
+下载Object  
+```
+s3cmd get s3://s3test1/default.conf
 ```  
