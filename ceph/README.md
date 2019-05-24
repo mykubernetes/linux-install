@@ -1,7 +1,6 @@
 官方中文文档http://docs.ceph.org.cn/architecture/
 =====================================
 书https://github.com/frank6866/gitbook-ceph/blob/master/SUMMARY.md  
-
 =========
 
 1、创建  pool 
