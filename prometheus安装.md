@@ -6,7 +6,7 @@ https://prometheus.io/
 1、daemonize安装
 ```
 yum install gcc* git wget -y
-git clone https://github.com/bmc/daemonize.git
+git clone https://github.com/mykubernetes/daemonize.git
 cd daemonize/
 sh configure && make && make install
 ```  
