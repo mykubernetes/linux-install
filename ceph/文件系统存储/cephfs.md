@@ -29,7 +29,7 @@ scp ceph.client.cephfs.keyring node04:/etc/ceph/
 
 客户端挂载
 --------
-在linux中挂载有两种方式Kernel Driver和Fuse
+在linux中挂载有两种方式Kernel Driver和Fuse  
 1、通过内核驱动挂载Ceph FS  
 1)创建挂载目录  
 ``` # mkdir /mnt/cephfs ```  
