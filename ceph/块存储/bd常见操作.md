@@ -1,5 +1,7 @@
 rbd常见操作  
+===
 1、存储池pool  
+---
 1)创建一个存储池  
 ```
 # rados mkpool pool
@@ -11,6 +13,7 @@ rbd常见操作
 ```  
 
 2、RBD image  
+---
 1)在pool存储池中创建一个大小1GB的image  
 ```
 # rbd create pool/image1--size 1024 --image-format 2
@@ -44,6 +47,7 @@ ceph集群中一个object对象默认大小为4MB,也可以在创建image时指�
 ```  
 
 3、快照  
+---
 1)为image创建一个快照,快照名为image1_snap  
 ```
 # rbd snap create pool/image1@image1_snap
@@ -62,6 +66,7 @@ ceph集群中一个object对象默认大小为4MB,也可以在创建image时指�
 ```  
 
 4、克隆  
+---
 在克隆前，快照必须处于被保护状态，才能被克隆  
 ```
 # rbd snap protect pool/image1@image1_snap
@@ -79,6 +84,7 @@ protected: True状态
 ```  
 
 5、依赖Children/Flatten  
+---
 1)查看快照的"子"(children)  
 ```
 # rbd children pool/image1@image1_snap
@@ -96,6 +102,7 @@ rbd/image2
 ```  
 
 6、RBD导入导出  
+---
 导出RBD image  
 ```
 # rbd export pool/image1 /tmp/image_export
