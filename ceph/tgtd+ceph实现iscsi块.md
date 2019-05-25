@@ -1,7 +1,7 @@
 1、准备编译环境  
 ``` #yum install -y rpm-build gcc ceph librbd1-devel ```  
 
-2获取Tgt
+2获取Tgt  
 ``` # git clone https://github.com/mykubernetes/tgt.git ```  
 
 3、进入目录后编辑
@@ -25,7 +25,7 @@ export SD_NOTIFY
 %attr(0600,root,root) %config(noreplace) /etc/tgt/targets.conf
 ```  
 
-4、编译
+4、编译  
 ``` # make rpm ```  
 
 5、生成安装文件  
