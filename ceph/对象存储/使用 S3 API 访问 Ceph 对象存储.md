@@ -51,7 +51,7 @@ s3cmd get s3://s3test1/default.conf
 
 
 
-GUI客户端使用  
+GUI图形客户端使用  
 支持S3的GUI客户端比较丰富，配置也比较简单  
 cyberduck:开源,支持windows、Mac,下载地址 https://cyberduck.io/  
 
