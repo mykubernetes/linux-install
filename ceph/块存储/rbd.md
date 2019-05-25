@@ -72,16 +72,20 @@ priority=1
 客户端申请image
 -------------
 1、客户端创建 块设备  
+创建一个10G大小的块设备
 ```
 创建块设备rbd1为块名 --size默认以M为单位 --pool 池名
 # rbd create rbd1 --size 10240 --pool rbd --name client.rbd
+```  
+查看创建的块设备  
+```
 # rbd ls --name client.rbd
 # rbd ls -p rbd --name client.rbd
 # rbd list --name client.rbd
 # rbd --image rbd1 info --name client.rbd
 ```  
 
-2、查看块设备的详细信息  
+查看块设备的详细信息  
 ```
 # rbd info rbd/rbd1
 rbd image 'rbd1':
@@ -97,7 +101,8 @@ rbd image 'rbd1':
 - format: rbd image的格式，format1已经过期了。现在默认都是format2，被librbd和kernel3.11后面的版本支持
 - block_name_prefix: 表示这个image在pool中的名称前缀，可以通过rados -p pool-frank6866 ls | grep rbd_data.1ad6e2ae8944a命令查看这个rbd image在rados中的所有object。但是要注意的是，刚创建的image，如果里面没有数据，不会在rados中创建object，只有写入数据时才会有。size字段中的objects数量表示的是最大的objects数量
 
-3、更改块大小  
+下列命令不做  
+更改块大小  
 ```
 调大块设备的大小:
 # rbd resize rbd1 --size 2040 --name client.rbd
@@ -143,7 +148,7 @@ rbd image 'rbd1':
 或者  
 ``` # rbd map rbd1 --pool rbd --name client.rbd ```  
 
-4、查看映射到本地的块  
+4、查看系统中已经映射到本地的块  
 ``` 
 # rbd showmapped --name client.rbd
 id pool image snap device    
