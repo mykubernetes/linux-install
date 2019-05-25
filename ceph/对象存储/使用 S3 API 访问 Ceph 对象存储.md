@@ -47,3 +47,15 @@ s3cmd ls s3://s3test1
 ```
 s3cmd get s3://s3test1/default.conf
 ```  
+
+
+
+
+GUI客户端使用  
+支持S3的GUI客户端比较丰富，配置也比较简单  
+cyberduck:开源,支持windows、Mac,下载地址 https://cyberduck.io/  
+
+dragondisk:支持windows、Mac,下载地址 http://www.dragondisk.com/  
+
+Explorer for Amazon S3:分收费和免费版，只支持windows  
+下载地址： http://www.cloudberrylab.com/free-amazon-s3-explorer-cloudfront-IAM.aspx  
