@@ -34,11 +34,11 @@ scp ceph.client.cephfs.keyring node04:/etc/ceph/
 ``` # mkdir /mnt/cephfs ```  
 2)挂载  
 ```
-手动挂载
+手动输入key挂载
 ceph auth get-key client.cephfs        #在 ceph fs服务器上执行，获取key
 mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secret=……
 
-通过key文件挂载
+通过指定key文件挂载
 echo …secret…> /etc/ceph/cephfskey        #把 key保存起来
 mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secretfile=/etc/ceph/cephfskey   #name为认证用户名
 
