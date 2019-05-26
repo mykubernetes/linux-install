@@ -1,2 +1,2 @@
 # linux-install
-https://legacy.gitbook.com/@frank6866
+https://www.runoob.com/
