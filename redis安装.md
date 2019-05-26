@@ -1,7 +1,7 @@
 redis安装  
 =========
 1、下载  
-``` # wget 'http://download.redis.io/releases/redis-4.0.9.tar.gz' ```
+``` # wget 'http://download.redis.io/releases/redis-4.0.9.tar.gz' ```  
 2、安装开发者工具  
 ``` # yum install -y wget net-tools gcc gcc-c++ make tar openssl openssl-devel cmake ```  
 3、安装  
