@@ -39,3 +39,95 @@ Uuid: 948018c8-988b-4f77-9d12-629d0f630110
 State: Peer in Cluster (Connected)
 ```  
 
+
+通过Heketi提供的restapi使用
+===
+1、安装  
+``` # yum -y install heketi heketi-client ```  
+
+
+2、配置Heketi使用户能够基于ssh秘钥的认证方式连接至GluserFS集群中的各节点，并拥有相应的管理权限  
+```
+# ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''
+# chown heketi:heketi /etc/heketi/heketi_key*
+# for host in node01 node02 node03 ; do \
+  ssh-copy-id -i /etc/heketi/heketi_key.pub root@${host};done
+```  
+
+3、定义服务监听的端口、认证及连接cluster存储集群的方式  
+```
+# cat /etc/heketi/heketi.json
+{
+  "_port_comment": "Heketi Server Port Number",
+  "port": "8080",                                                #配置端口号
+
+  "_use_auth": "Enable JWT authorization. Please enable for deployment",
+  "use_auth": false,
+
+  "_jwt": "Private keys for access",
+  "jwt": {
+    "_admin": "Admin has access to all APIs",
+    "admin": {
+      "key": "123456"                                   #密码
+    },
+    "_user": "User only has access to /volumes endpoint",
+    "user": {
+      "key": "123456"                                   #密码
+    }
+  },
+
+  "_glusterfs_comment": "GlusterFS Configuration",
+  "glusterfs": {
+    "_executor_comment": [
+      "Execute plugin. Possible choices: mock, ssh",
+      "mock: This setting is used for testing and development.",
+      "      It will not send commands to any node.",
+      "ssh:  This setting will notify Heketi to ssh to the nodes.",
+      "      It will need the values in sshexec to be configured.",
+      "kubernetes: Communicate with GlusterFS containers over",
+      "            Kubernetes exec api."
+    ],
+    "executor": "ssh",                               #修改成ssh
+
+    "_sshexec_comment": "SSH username and private key file information",
+    "sshexec": {
+      "keyfile": "/etc/heketi/heketi_key",           #key路径
+      "user": "root",                                #用户
+      "port": "22",                                  #端口
+      "fstab": "/etc/fstab"                          #fstab路径
+    },
+
+    "_kubeexec_comment": "Kubernetes configuration",
+    "kubeexec": {
+      "host" :"https://kubernetes.host:8443",
+      "cert" : "/path/to/crt.file",
+      "insecure": false,
+      "user": "kubernetes username",
+      "password": "password for kubernetes user",
+      "namespace": "OpenShift project or Kubernetes namespace",
+      "fstab": "Optional: Specify fstab file on node.  Default is /etc/fstab"
+    },
+
+    "_db_comment": "Database file name",
+    "db": "/var/lib/heketi/heketi.db",
+
+    "_loglevel_comment": [
+      "Set log level. Choices are:",
+      "  none, critical, error, warning, info, debug",
+      "Default is warning"
+    ],
+    "loglevel" : "debug"
+  }
+}
+```  
+
+4、启动服务  
+```
+# systemctl enable heketi
+# systemctl restart heketi
+```  
+
+5、检查服务  
+```
+curl http://localhost:8080/hello
+```  
