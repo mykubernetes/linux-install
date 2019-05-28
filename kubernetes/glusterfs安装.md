@@ -236,9 +236,20 @@ curl http://localhost:8080/hello
 }
 ```  
 
-将该文件发送给heketi创建  
+将该文件发送给heketi创建下面提供三种方式  
 ```
+以systemd起heketi:
 # heketi-cli --server http://192.168.101.69:8080 --user admin --secret 123456 topology load --json=/etc/heketi/topology.json
+
+
+以容器起heketi&heketi-cli:
+    docker cp topology.json 容器ID:/etc/heketi/
+    docker exec 容器ID heketi-cli --server http://192.168.101.69:8080 --user admin --secret 123456 topology load --json=/etc/heketi/topology.json
+
+
+以k8s方式起heketi&heketi-cli:
+    kubectl cp topology.json heketi-67d99d8bb6-bzsvx:/etc/heketi/ -n kube-system
+    kubectl exec -it heketi-67d99d8bb6-bzsvx -n kube-system heketi-cli topology load -- --json=/etc/heketi/topology.json --server http://192.168.101.69:8080 --user admin --secret 123456
 ```  
 
 创建volume  
