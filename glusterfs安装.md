@@ -156,3 +156,82 @@ State: Peer in Cluster (Connected)
 ```
 curl http://localhost:8080/hello
 ```  
+
+6、使用方法  
+1)创建集群  
+``` # heketi-cli --server http://192.168.101.69:8080 --user admin --json=true ```  
+
+2）查看集群  
+``` #heketi-cli --server http://192.168.101.69:8080 --user admin --secret 123456 cluster list ```  
+
+3）依次将3个节点作为node添加到cluster  
+```
+# heketi-cli --server http://192.168.101.69:8080 --user admin --secret 123456 --json=true node add --cluster="0e2d27e7c9bb91801d850474e89fe11b" --management-host-name=192.168.101.69 --stopage-host-name=192.168.101.69 --zone=1
+```  
+
+4)每台设备node上各添加一块裸硬盘/dev/sdc(没创建过任何分区)，创建device  
+```
+# heketi-cli --server http://10.142.21.23:30088 --user admin --secret 123456 --json=true device add --name="/dev/sdc" --node="0e2d27e7c9bb91801d850474e89fe11b"
+```  
+
+5)以上步骤可以通过json文件配置  
+```
+# vim /etc/heketi/topology.json
+{
+  "clusters": [
+    {
+      "nodes": [
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "192.168.101.69"
+              ],
+              "storage": [
+                "192.168.101.69"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        },
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "192.168.101.70"
+              ],
+              "storage": [
+                "192.168.101.70"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        },
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "192.168.101.71"
+              ],
+              "storage": [
+                "192.168.101.71"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        }
+      ]
+    }
+  ]
+}
+```  
+
