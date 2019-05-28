@@ -65,7 +65,7 @@ State: Peer in Cluster (Connected)
     # gluster volume delete gv0
 ```  
 
-通过Heketi提供的restapi使用
+通过Heketi提供的restapi使用(kubernetes storageClass需要配置)
 ===
 1、安装  
 ``` # yum -y install heketi heketi-client ```  
@@ -168,6 +168,7 @@ curl http://localhost:8080/hello
 ```
 # heketi-cli --server http://192.168.101.69:8080 --user admin --secret 123456 --json=true node add --cluster="0e2d27e7c9bb91801d850474e89fe11b" --management-host-name=192.168.101.69 --stopage-host-name=192.168.101.69 --zone=1
 ```  
+- 对接k8s的话，上边这个必须management-host-name要用ip地址，不可以用域名  
 
 4)每台设备node上各添加一块裸硬盘/dev/sdc(没创建过任何分区)，创建device  
 ```
