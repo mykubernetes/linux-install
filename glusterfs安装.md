@@ -245,6 +245,11 @@ curl http://localhost:8080/hello
 # heketi-cli --server http://192.168.101.69:8080 --user admin --secret 123456 volume create --size=100 --replica=3 --clusters=0e2d27e7c9bb91801d850474e89fe11b
 ```  
 
+删除volume  
+```
+# heketi-cli --server http://192.168.101.69:8080 --user admin --secret 123456 volume delete --clusters=0e2d27e7c9bb91801d850474e89fe11b
+```  
+
 查看信息
 ```
 # gluster volume info
