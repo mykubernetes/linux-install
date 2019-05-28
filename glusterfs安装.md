@@ -39,6 +39,31 @@ Uuid: 948018c8-988b-4f77-9d12-629d0f630110
 State: Peer in Cluster (Connected)
 ```  
 
+5、使用方法  
+1)每台机器上以/gluster/gv0目录各创建一个brick  
+``` # mkdir -p /gluster/gv0 ```  
+
+2)以其中3台机器的brick创建一个有3复本的逻辑卷gv0  
+``` # gluster volume create gv0 replica 3 node01:/gluster/gv0 node02:/gluster/gv0 node03:/gluster force ```  
+
+3)启用volume
+``` # gluster volume start gv0 ```  
+
+4)client挂载gv0卷到/mnt/glusterfs目录并使用  
+```
+# mkdir /opt/glusterfs
+# mount -t glusterfs node01:/gv0 /opt/glusterfs/
+```  
+
+5)从GlusterFS卷gv0移除某一brick  
+```
+# gluster volume remove-brick gv0 replica 2 node01:/gluster/gv0 force
+删除GlusterFS卷gv0
+    需要先stop卷：
+    # gluster volume stop gv0
+    再删：
+    # gluster volume delete gv0
+```  
 
 通过Heketi提供的restapi使用
 ===
