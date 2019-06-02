@@ -262,6 +262,7 @@ output {
 http://www.kjson.com/
 
 五、安装Filebeat  
+官网配置文档https://www.elastic.co/guide/en/beats/filebeat/current/configuration-filebeat-options.html  
 1、下载安装包  
 ``` 
 wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.6.1-x86_64.rpm
