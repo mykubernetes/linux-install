@@ -126,7 +126,17 @@ systemctl enable alertmanager
 systemctl start alertmanager
 ```  
 
-五、LXCFS通过用户态文件系统，在容器中提供下列procfs的文件  
+五、LXCFS  
+https://github.com/lxc/lxcfs  
+LXCFS通过用户态文件系统，在容器中提供下列procfs的文件  
+/proc/cpuinfo  
+/proc/diskstats  
+/proc/meminfo  
+/proc/stat  
+/proc/swaps  
+/proc/uptime  
+/sys/devices/system/cpu/online  
+
 1、下载安装  
 ```
 wget https://copr-be.cloud.fedoraproject.org/results/ganto/lxd/epel-7-x86_64/00486278-lxcfs/lxcfs-2.0.5-3.el7.centos.x86_64.rpm
@@ -175,7 +185,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-  "initializer.kubernetes.io/lxcfs": "true"
+  "initializer.kubernetes.io/lxcfs": "true"     添加此项
   labels:
     app: web
   name: web
