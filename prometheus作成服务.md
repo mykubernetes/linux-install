@@ -126,3 +126,78 @@ systemctl enable alertmanager
 systemctl start alertmanager
 ```  
 
+五、LXCFS通过用户态文件系统，在容器中提供下列procfs的文件  
+1、下载安装  
+```
+wget https://copr-be.cloud.fedoraproject.org/results/ganto/lxd/epel-7-x86_64/00486278-lxcfs/lxcfs-2.0.5-3.el7.centos.x86_64.rpm
+yum localinstall lxcfs-2.0.5-3.el7.centos.x86_64.rpm
+```  
+
+2、启动lxcfs  
+```
+# systemctl enable lxcfs
+# systemctl start lxcfs
+# systemctl status lxcfs
+```  
+
+六、Initializer  
+Kubernetes提供了Initializer扩展机制，可以用于对资源创建进行拦截和注入处理，我们可以借助它优雅地完成对lxcfs文件的自动化挂载。  
+1、在集群 kube-apiserver配置文件中添加如下参数，并重启 kube-apiserver  
+``` --enable-admission-plugins=Initializers --runtime-config=admissionregistration.k8s.io/v1alpha1 ```  
+
+2、下载LXCFS  
+```
+# git clone https://github.com/denverdino/lxcfs-initializer
+Cloning into 'lxcfs-initializer'...
+remote: Enumerating objects: 1583, done.
+remote: Total 1583 (delta 0), reused 0 (delta 0), pack-reused 1583
+Receiving objects: 100% (1583/1583), 4.11 MiB | 1.92 MiB/s, done.
+Resolving deltas: 100% (520/520), done.
+```  
+
+3、通过如下命令在所有集群节点上自动安装、部署完成lxcfs  
+```
+# kubectl apply -f lxcfs-initializer.yaml
+# 查看 pod 运行是否正常
+# kubectl get pod
+NAME                               READY    STATUS     RESTARTS   AGE
+ceph-pod1                          1/1      Running    5          4d1h
+curl-66959f6557-8h4ll              1/1      Running    0          6d2h
+lxcfs-initializer-769d7fb857-p6p45 1/1      Running    2          15m
+nginx-test1-6d7fd56775-m2rzc       1/1      Running    0          111m
+nginx-test2-95c548cd4-68gzc        1/1      Running    0          112m
+nginx-test2-95c548cd4-ds9hf        1/1      Running    0          112m
+```  
+
+4、测试：kubectl apply -f web.yaml      #其他pod如果需要隔离资源，请确保lxcfs值为true  
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+  "initializer.kubernetes.io/lxcfs": "true"
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  teplate:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: httpd:2.4.32
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+```  
