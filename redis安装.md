@@ -203,3 +203,11 @@ mkdir /opt/twemproxy/{logs,pid}
 - -p指定pid文件  
 - -o指定log文件
 - -d后台运行
+
+测试  
+```
+redis-cli -h localhost -a 123456 -p 22121           #链接redis端口需要换成twemproxy的端口进行测试
+set a a
+set b b
+set c c                                             #数据将根据算法写到不同的redis数据库里
+```  
