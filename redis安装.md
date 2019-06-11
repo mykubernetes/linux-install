@@ -178,4 +178,18 @@ make && make install
 mkdir /opt/twemproxy/conf  #创建配置文件目录
 cp twemproxy-0.4.1/conf/nutcracker.yml /opt/twemproxy/conf/redis_master.conf     #将源码包里的配置文件拷贝到安装路径并重命名，文件名格式为redis_master.conf
 
+vim redis_master.conf               #修改配置文
+redis_master:                       #需要与配置文件名一样
+  listen: 0.0.0.0:22121             #twemproxy监听地址
+  hash: fnv1a_64
+  distribution: ketama
+  auto_eject_hosts: true
+  redis: true
+  redis_auth: 123456                #redis的master认证
+  server_retry_timeout: 2000
+  server_failure_limit: 1
+  servers:                          #配置redis的master节点
+   - 192.168.101.66:6379:1
+   - 192.168.101.67:6379:1
+   - 192.168.101.68:6379:1
 ```  
