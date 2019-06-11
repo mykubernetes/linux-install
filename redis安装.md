@@ -165,3 +165,14 @@ slave-priority 100 	        #指定slave优先级，如果有多个slave时，�
 
 redis数据分片  
 https://github.com/twitter/twemproxy  
+将数据进行分片分别写入多个redis的master节点  
+安装  
+```
+wget https://github.com/twitter/twemproxy/archive/v0.4.1.tar.gz
+tar xvf v0.4.1.tar.gz
+cd twemproxy-0.4.1/
+autoreconf -fvi            #使用autoreconf工具生成一些编译的程序文件
+mkdir /opt/twemproxy       #安装目录
+./configure --prefix=/opt/twemproxy
+make && make install
+```  
