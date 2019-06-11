@@ -193,3 +193,13 @@ redis_master:                       #需要与配置文件名一样
    - 192.168.101.67:6379:1
    - 192.168.101.68:6379:1
 ```  
+
+启动服务  
+```
+mkdir /opt/twemproxy/{logs,pid}
+/opt/twemproxy/sbin/nutcracker -c /opt/twemproxy/conf/redis_master.conf -p /opt/twemproxy/pid/redis_master.pid -o /opt/twemproxy/pid/redis_master.log -d 
+```  
+- -c指定配置文件  
+- -p指定pid文件  
+- -o指定log文件
+- -d后台运行
