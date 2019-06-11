@@ -241,10 +241,34 @@ sentinel failover-timeout redis_master_group3 10000
 创建重启twemproxy的重启脚本  
 ```
 mkdir /opt/twemproxy/sh
-vim /opt/twemproxy/sh/client-reconfig.sh     #百度搜索
 
+vim /opt/twemproxy/sh/client-reconfig.sh
+#!/bin/sh 
+#
+monitor_name="$1"
+master_old_ip="$4"
+master_old_port="$5"
+master_new_ip="$6"
+master_new_port="$7"
+twemproxy_name=$(echo $monitor_name |awk -F'_' '{print $1"_"$2}')
+
+twemproxy_bin="/usr/local/twemproxy/sbin/nutcracker"
+twemproxy_conf="/usr/local/twemproxy/conf/${twemproxy_name}.conf"
+twemproxy_pid="/usr/local/twemproxy/pid/${twemproxy_name}.pid"
+twemproxy_log="/usr/local/twemproxy/logs/${twemproxy_name}.log"
+twemproxy_cmd="${twemproxy_bin} -c ${twemproxy_conf} -p ${twemproxy_pid} -o ${twemproxy_log} -d"
+
+sed -i "s/${master_old_ip}:${master_old_port}/${master_new_ip}:${master_new_port}/" ${twemproxy_conf}
+
+ps -ef |grep "${twemproxy_cmd}" |grep -v grep |awk '{print $2}'|xargs kill
+${twemproxy_cmd}
+
+sleep 1
+ps -ef |grep "${twemproxy_cmd}" |grep -v grep
+```
 
 启动
+```
 redis-cli -h 192.168.101.66 -p 26379 sentinel set redis_master_group1 client-reconfig-script /opt/twemproxy/sh/client-reconfig.sh
 redis-cli -h 192.168.101.67 -p 26379 sentinel set redis_master_group2 client-reconfig-script /opt/twemproxy/sh/client-reconfig.sh
 redis-cli -h 192.168.101.68 -p 26379 sentinel set redis_master_group3 client-reconfig-script /opt/twemproxy/sh/client-reconfig.sh
