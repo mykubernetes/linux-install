@@ -163,7 +163,8 @@ slave-priority 100 	        #指定slave优先级，如果有多个slave时，�
 ```
 
 
-redis数据分片  
+redis数据分片
+---
 https://github.com/twitter/twemproxy  
 将数据进行分片分别写入多个redis的master节点  
 安装  
@@ -213,7 +214,8 @@ set c c                                             #数据将根据算法写到
 ```  
 
 配置sentinel整合twemproxy管理3个redis的master节点  
-所有sentinel节点需要配置此文件
+---
+所有sentinel节点需要配置此文件  
 ```
 prot 26379
 dir /usr/data/redis/sentinel
@@ -233,4 +235,12 @@ sentinel monitor redis_master_group3 192.169.101.68 6379 2
 sentinel auth-pass redis_master_group3 123456
 sentinel down-after-milliseconds redis_master_group3 10000
 sentinel failover-timeout redis_master_group3 10000
+```  
+注意三台redis的master节点需要跑sentinel进程外，twemproxy节点也需要启动sentinel进程  
+
+创建重启twemproxy的重启脚本  
+```
+mkdir /opt/twemproxy/sh
+vim /opt/twemproxy/sh/client-reconfig.sh
+
 ```  
