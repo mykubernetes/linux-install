@@ -243,4 +243,9 @@ sentinel failover-timeout redis_master_group3 10000
 mkdir /opt/twemproxy/sh
 vim /opt/twemproxy/sh/client-reconfig.sh     #百度搜索
 
+
+启动
+redis-cli -h 192.168.101.66 -p 26379 sentinel set redis_master_group1 client-reconfig-script /opt/twemproxy/sh/client-reconfig.sh
+redis-cli -h 192.168.101.67 -p 26379 sentinel set redis_master_group2 client-reconfig-script /opt/twemproxy/sh/client-reconfig.sh
+redis-cli -h 192.168.101.68 -p 26379 sentinel set redis_master_group3 client-reconfig-script /opt/twemproxy/sh/client-reconfig.sh
 ```  
