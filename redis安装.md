@@ -241,6 +241,6 @@ sentinel failover-timeout redis_master_group3 10000
 创建重启twemproxy的重启脚本  
 ```
 mkdir /opt/twemproxy/sh
-vim /opt/twemproxy/sh/client-reconfig.sh
+vim /opt/twemproxy/sh/client-reconfig.sh     #百度搜索
 
 ```  
