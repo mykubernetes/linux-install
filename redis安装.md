@@ -161,3 +161,7 @@ slave-priority 100 	        #指定slave优先级，如果有多个slave时，�
 127.0.0.1:6379> flushdb
 	OK
 ```
+
+
+redis数据分片  
+https://github.com/twitter/twemproxy  
