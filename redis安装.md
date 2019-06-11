@@ -61,6 +61,7 @@ vim /etc/redis-sentinel.conf
   sentinel down-after-milliseconds <master-name> <milliseconds>   #sentinel连接其他节点超时时间，单位为毫秒（默认为30秒）
   sentinel parallel-syncs <master-name> <numslaves>               #提升主服务器时，允许多少个从服务向新的主服务器发起同步请求
   sentinel failover-timeout <master-name> <milliseconds>          #故障转移超时时间，在指定时间没能完成则判定为失败，单位为毫秒（默认为180秒）
+  sentinel auth-pass <master-name> <password>                     #切换master是从节点配置为master的认证
 
 # systemctl start redis-sentinel 启动
 # redis-cli -p 26379
