@@ -211,3 +211,26 @@ set a a
 set b b
 set c c                                             #数据将根据算法写到不同的redis数据库里
 ```  
+
+配置sentinel整合twemproxy管理3个redis的master节点  
+所有sentinel节点需要配置此文件
+```
+prot 26379
+dir /usr/data/redis/sentinel
+protected-mode no
+
+sentinel monitor redis_master_group1 192.169.101.66 6379 2     #redis_master需要与配置文件一样为固定格式，后边的随便起
+sentinel auth-pass redis_master_group1 123456
+sentinel down-after-milliseconds redis_master_group1 10000
+sentinel failover-timeout redis_master_group1 10000
+
+sentinel monitor redis_master_group2 192.169.101.67 6379 2
+sentinel auth-pass redis_master_group2 123456
+sentinel down-after-milliseconds redis_master_group2 10000
+sentinel failover-timeout redis_master_group2 10000
+
+sentinel monitor redis_master_group3 192.169.101.68 6379 2
+sentinel auth-pass redis_master_group3 123456
+sentinel down-after-milliseconds redis_master_group3 10000
+sentinel failover-timeout redis_master_group3 10000
+```  
