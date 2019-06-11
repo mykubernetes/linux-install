@@ -1,3 +1,5 @@
+redis_3.0版本以后  
+配置每个redis以集群的方式启动  
 ```
 # bind 127.0.0.1                      #注销绑定地址
 protected-mode no                     #关闭保护模式
