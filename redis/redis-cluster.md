@@ -15,6 +15,10 @@ cluster-node-timeout 15000            #定义节点超时时间
 ```  
 注意：每台port和cluster-config-file需要修改对应文件  
 
+启动redis  
+```
+redis-server redis-6379.conf
+```
 查看redis是否启动  
 ```
 ps -ef |grep redis
@@ -48,7 +52,19 @@ redis-trib create --replicas 1 192.168.101.66:6379 192.168.101.66:6380 192.168.1
 - 给定 redis-trib.rb 程序的命令是 create ， 这表示我们希望创建一个新的集群。  
 - 选项 --replicas 1 表示我们希望为集群中的每个主节点创建一个从节点。  
 
+redis-cluster安装完毕  
 
+每个节点动态配置  
+```
+redis-cli -h 192.168.101.66 -p 6379
+> config set protected-mode yes     #开启保护模式 
+> config set requirepass 123456     #设置密码
+> auth 123456                       #因为设置了密码，需要先认证
+> config set masterauth 123456      #设置所有的master的认证
+> config rewrite                    #将配置写回到配置文件中
+> shutdown                          #关闭redis进程
+```  
+注意：所有节点依次执行此操作成功后重启所有节点  
 
 
 https://www.cnblogs.com/gomysql/p/4395504.html
