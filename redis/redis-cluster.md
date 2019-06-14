@@ -33,9 +33,21 @@ root    5028   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:
 yum install ruby rubygems -y
 ```  
 首先对redis进行编译处理  
+https://github.com/redis/redis-rb/  
 ```
 gem install redis
 ```  
+复制集群管理程序到/usr/local/bin  
+```
+cp redis-3.0.0/src/redis-trib.rb /usr/local/bin/redis-trib 
+```  
+创建集群：  
+```
+redis-trib create --replicas 1 192.168.101.66:6379 192.168.101.66:6380 192.168.101.66:6381 192.168.101.66:6382 192.168.101.66:6383 ...
+```  
+- 给定 redis-trib.rb 程序的命令是 create ， 这表示我们希望创建一个新的集群。  
+- 选项 --replicas 1 表示我们希望为集群中的每个主节点创建一个从节点。  
+
 
 
 
