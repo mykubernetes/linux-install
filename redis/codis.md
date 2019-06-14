@@ -155,3 +155,24 @@ nohup /usr/local/codis/bin/codis-fe --ncpu=2 --log=/usr/local/codis/logs/fe.log 
 
 3、打开浏览器，使用web进行配置  
 http://192.168.101.66:18090  
+
+
+codis-proxy
+---
+1、生成配置文件  
+```
+# /usr/local/codis/bin/codis-proxy --default-config | tee /usr/local/codis/conf/proxy.ini
+# vim /usr/local/codis/conf/proxy.ini
+product_name = "codis-1"                   #当前codis的标记名称
+product_auth = "123456" 
+admin_addr = "0.0.0.0:11080"
+jobis_addr = "192.168.101.66:2181"         #zk地址
+```  
+
+2、启动codis-proxy  
+```
+nohup /usr/local/codis/bin/codis-proxy --ncpu=2 --config=/usr/local/codis/conf/proxy.ini --log=/usr/local/codis/logs/proxy.log --log-level=WARN > /dev/null 2>&1 & 
+```  
+
+codis-Admin
+---
