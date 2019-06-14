@@ -112,7 +112,7 @@ sysctl -p
 /usr/data/gowork/src/github.com/CodisLabs/codis/extern/redis-3.2.4/src/redis-cli -h 192.168.101.66 -a 123456 -p 6379
 ```  
 
-8、将同样的操作在其他启动redis节点服务器执行  
+8、将上边所有操作在其他节点执行，并启动redis  
 
 
 
