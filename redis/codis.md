@@ -176,3 +176,54 @@ nohup /usr/local/codis/bin/codis-proxy --ncpu=2 --config=/usr/local/codis/conf/p
 
 codis-Admin
 ---
+
+1、通过命令创建组  
+```
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --create-group --gid=1
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --create-group --gid=2
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --create-group --gid=3
+```  
+
+2、为组添加服务器  
+```
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=1 --addr=192.168.101.66:6379
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=1 --addr=192.168.101.66:6380
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=1 --addr=192.168.101.66:6381
+
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=2 --addr=192.168.101.67:6379
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=2 --addr=192.168.101.67:6380
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=2 --addr=192.168.101.67:6381
+
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=3 --addr=192.168.101.68:6379
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=3 --addr=192.168.101.68:6380
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --group-add --gid=3 --addr=192.168.101.68:6381
+```  
+
+3、设置主从同步,主要设置两台从主机的同步状态  
+```
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.66:6379
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.66:6380
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.66:6381
+
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.67:6379
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.67:6380
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.67:6381
+
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.68:6379
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.68:6380
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --sync-action --create --addr=192.168.101.68:6381
+```  
+
+4、设置数据的可用工作插槽  
+```
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --slot-action --create-ranage --beg=1 --end=300 --gid=1
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --slot-action --create-ranage --beg=301 --end=700 --gid=2
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --slot-action --create-ranage --beg=701 --end=1023 --gid=3
+```  
+注意：插槽1到1023之间  
+
+5、创建一个代理codis-proxy  
+```
+/usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --create-proxy --addr=192.168.101.66:11080
+```  
+
