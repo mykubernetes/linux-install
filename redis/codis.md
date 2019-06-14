@@ -115,7 +115,9 @@ sysctl -p
 8、将上边所有操作在其他节点执行，并启动redis  
 
 
-
+部署zookeeper
+---
+https://github.com/mykubernetes/hadoop/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2zookeeper.md  
 
 
 
