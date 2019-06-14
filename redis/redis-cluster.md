@@ -79,5 +79,5 @@ redis-trib.rb check 192.168.101.66:6379
 
 客户端连接redis命令  
 ``` redis-cli -h 192.168.101.66 -p 6379 -a 123456 -c ```  
-- -c 选项连接集群
+- -c 选项连接集群  
 https://www.cnblogs.com/gomysql/p/4395504.html
