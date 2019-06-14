@@ -13,3 +13,17 @@ cluster-enabled yes                   #开启
 cluster-config-file nodes-6379.conf   #定义cluster配置的保存文件
 cluster-node-timeout 15000            #定义节点超时时间
 ```  
+注意：每台port和cluster-config-file需要修改对应文件  
+
+查看redis是否启动  
+```
+ps -ef |grep redis
+root    5035   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6379 [cluster]
+root    5037   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6380 [cluster]
+root    5036   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6381 [cluster]
+root    5038   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6382 [cluster]
+root    5039   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6383 [cluster]
+root    5028   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6384 [cluster]
+```  
+注意：配置成功后，后边会出现[cluster]字样  
+
