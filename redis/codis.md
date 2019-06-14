@@ -227,3 +227,11 @@ codis-Admin
 /usr/local/codis/bin/codis-admin --dashboard=192.168.101.66:18080 --create-proxy --addr=192.168.101.66:11080
 ```  
 
+测试
+---
+codis-proxy是所有redis操作的代理对象，其连接的端口19000  
+1、连接客户端测试  
+```
+/usr/data/gowork/src/github.com/CodisLabs/codis/extern/redis-3.2.4/src/redis-cli -h 192.168.101.66 -p 19000 -a 123456
+```  
+
