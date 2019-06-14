@@ -60,5 +60,65 @@ mkdir -p /usr/local/codis/{logs,conf,bin}
 cp -r /usr/data/gowork/src/github.com/CodisLabs/codis/bin/ /usr/local/codis/bin/
 ```  
 
+部署codisServer
+---
+
+1、拷贝redis的配置文件到codis的目录中  
+```
+# mkdir -p /usr/local/codis/conf/redis_conf/
+# cp /usr/data/gowork/src/github.com/CodisLabs/codis/extern/redis-3.2.4/redis.conf /usr/local/codis/conf/redis_conf/redis-6379.conf
+```  
+
+2、编辑redis配置文件  
+```
+vim /usr/local/codis/conf/redis_conf/redis-6379.conf
+# bind 127.0.0.1    #注释bind
+port 6379
+daemonize yes
+pidfile /usr/data/redis/redis-6379/run/redis_6379.pid
+logfile /usr/data/redis/redis-6379/log/logs_6379.log
+dir /usr/data/redis/redis-6379/db
+requirepass 123456
+```  
+
+3、将redis配置文件复制为redis-6380.conf和redis-6381.conf并修改端口和文件夹路径  
+```
+cp /usr/local/codis/conf/redis_conf/redis-6379.conf /usr/local/codis/conf/redis_conf/redis-6380.conf
+cp /usr/local/codis/conf/redis_conf/redis-6379.conf /usr/local/codis/conf/redis_conf/redis-6381.conf
+```  
+
+4、建立配置文件里的目录  
+```
+mkdir -p /usr/data/redis/redis-6379/{db,run,log}
+mkdir -p /usr/data/redis/redis-6380/{db,run,log}
+mkdir -p /usr/data/redis/redis-6381/{db,run,log}
+```  
+
+5、配置linux的环境参数，将所有的可用内存交个redis服务使用  
+```
+echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
+sysctl -p
+```  
+
+6、使用codis-server启动redis  
+```
+/usr/local/codis/bin/codis-server /usr/local/codis/conf/redis_conf/redis-6379.conf
+/usr/local/codis/bin/codis-server /usr/local/codis/conf/redis_conf/redis-6380.conf
+/usr/local/codis/bin/codis-server /usr/local/codis/conf/redis_conf/redis-6381.conf
+```  
+
+7、使用codis的客户端工程redis-cli连接redis测试  
+```
+/usr/data/gowork/src/github.com/CodisLabs/codis/extern/redis-3.2.4/src/redis-cli -h 192.168.101.66 -a 123456 -p 6379
+```  
+
+8、将同样的操作在其他启动redis节点服务器执行  
+
+
+
+
+
+
+
 
 
