@@ -27,3 +27,16 @@ root    5028   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:
 ```  
 注意：配置成功后，后边会出现[cluster]字样  
 
+配置redis-cluster集群  
+需要安装ruby环境  
+```
+yum install ruby rubygems -y
+```  
+首先对redis进行编译处理  
+```
+gem install redis
+```  
+
+
+
+https://www.cnblogs.com/gomysql/p/4395504.html
