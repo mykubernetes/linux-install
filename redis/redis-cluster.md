@@ -66,5 +66,15 @@ redis-cli -h 192.168.101.66 -p 6379
 ```  
 注意：所有节点依次执行此操作成功后重启所有节点  
 
+修改配置文件支持认证功能，否则不可以链接redis服务器  
+```
+vim /var/lib/gems/2.3.0/gems/redis-3.3.3/lib/redis/client.rb
+  :password => "123456"
+```  
+
+连接检查  
+```
+redis-trib.rb check 192.168.101.66:6379
+```  
 
 https://www.cnblogs.com/gomysql/p/4395504.html
