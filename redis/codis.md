@@ -120,7 +120,38 @@ sysctl -p
 https://github.com/mykubernetes/hadoop/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2zookeeper.md  
 
 
+codis-dashboard
+---
+1、生成配置文件  
+```
+# cd /usr/local/codis/bin/
+# codis-dashboard --default-config | tee /usr/local/codis/conf/dashboard.ini
+# vim /usr/local/codis/conf/dashboard.ini
+coordinator_name = "zookeeper"             #协调器的名字有zk和etcd两个
+coordinator_addr = "192.168.101.66:2181"   #协调器的地址
+product_name = "codis-1"                   #当前codis的标记名称
+product_auth = "123456"                    #
+admin_addr = "0.0.0.0:18080"               #后台管理路径的地址和端口
+sentine_quorum =2                          #配置有几个哨兵，默认
+```  
 
+2、启动  
+```
+nohup /usr/local/codis/bin/codis-dashboard --ncpu=2 --config=/usr/local/codis/conf/dashboard.ini --log=/usr/local/codis/logs/dashboard.log --log-leven=WARN > /dev/null 2>&1 &
+```  
 
+codis-FE
+---
 
+1、生成配置文件  
+```
+/usr/local/codis/bin/codis-admin --dashboard-list --zookeeper=192.168.101.66 | tee /usr/local/codis/conf/codis.json
+```  
 
+2、启动codis-fe的程序打开前端图形管理界面  
+```
+nohup /usr/local/codis/bin/codis-fe --ncpu=2 --log=/usr/local/codis/logs/fe.log --log-leven=WARN --dashboard-list=/usr/local/codis/conf/codis.json --listen=192.168.101.66:18090 > /dev/null 2>&1 &
+```  
+
+3、打开浏览器，使用web进行配置  
+http://192.168.101.66:18090  
