@@ -1,0 +1,17 @@
+---
+- hosts: all
+  vars:
+  - zabbix_server: 192.168.0.11
+  tasks:
+    - name: Install zabbix agent - CentOS6
+      yum: name=https://repo.zabbix.com/zabbix/4.0/rhel/6/x86_64/zabbix-agent-4.0.0-2.el6.x86_64.rpm state=present
+      when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+    - name: Install zabbix agent - CentOS7
+      yum: name=https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-agent-4.0.0-2.el7.x86_64.rpm state=present
+      when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+    - name: Copy zabbix agent configuration file
+      template: src=zabbix_agentd.conf.j2 dest=/etc/zabbix/zabbix_agentd.conf
+
+    - name: Start zabbix agent
+      service: name=zabbix-agent state=started enabled=true
