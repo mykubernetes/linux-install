@@ -8,7 +8,7 @@ yum install epel-release -y
 ```  
 
 临时关闭selinux  
-``` setenforce 0  
+``` setenforce 0 ```  
 	
 永久关闭selinux  
 ``` sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config ```  
