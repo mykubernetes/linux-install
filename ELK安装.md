@@ -127,6 +127,7 @@ auth_basic_user_file /usr/local/nginx/htpass.txt;
 ```  
 
 四、安装Logstash  
+https://github.com/logstash-plugins  
 1、下载安装包  
 ``` 
 wget https://artifacts.elastic.co/downloads/logstash/logstash-6.6.1.rpm
