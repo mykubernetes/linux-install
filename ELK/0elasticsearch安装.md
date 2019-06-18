@@ -20,7 +20,7 @@ tar -xvf elasticsearch-6.6.0.tar.gz -C /opt/module/
 2、创建普通用户用于启动elasticsearch默认不支持root启动  
 ```
 # useradd elasticsearch
-# chown -R elasticsearch:elasticsearch opt/module/elasticsearch-6.6.0/
+# chown -R elasticsearch:elasticsearch /opt/module/elasticsearch-6.6.0/
 ```  
 
 3、修改配置文件
