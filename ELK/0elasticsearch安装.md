@@ -33,8 +33,7 @@ node.data: true                                    #是否是数据节点，fals
 bootstrap.memory_lock: true                        #锁定物理内存，开启后只使用物理内存，不会使用swap,建议开启
 http.port: 9200                                    #es端口
 transport.tcp.port: 9300                           #集群选举通信端口
-network.host: node001         #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
-discovery.zen.ping.multicast.enabled: false        #通过多播的方法发现es，建议关闭
+network.host: 192.168.101.66         #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]   #默认使用9300，如果修改可node001:9300
 ```  
 4、优化内核限制文件数和打开的进程数  
