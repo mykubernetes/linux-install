@@ -29,4 +29,21 @@ tail logs/catalina.out
 netstat -antp |grep 8080
 ```  
 
+5、开启zabbix_java_gateway  
+```
+./startup
+ps -ef |grep java
+netstat -antp |grep 10052
+```  
+
+6、在zabbix-server中的配置文件添加javagateway  
+```
+# vim /etc/zabbix_server.conf
+JavaGateway=127.0.0.1
+JavaGatewayPort=10052
+StartJavaPollers=5           #启动线程
+```  
+
+7、重启zabbix-server  
+``` systemctl restart zabbix-server ```  
 
