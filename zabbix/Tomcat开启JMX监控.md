@@ -47,3 +47,4 @@ StartJavaPollers=5           #启动线程
 7、重启zabbix-server  
 ``` systemctl restart zabbix-server ```  
 
+8、进入zabbix-web添加主机，添加java模板测试  
