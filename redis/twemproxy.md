@@ -46,6 +46,10 @@ autoreconf -fvi            #使用autoreconf工具生成一些编译的程序文
 mkdir /opt/twemproxy       #安装目录
 ./configure --prefix=/opt/twemproxy
 make && make install
+```  
+
+配置  
+```
 mkdir /opt/twemproxy/conf  #创建配置文件目录
 cp twemproxy-0.4.1/conf/nutcracker.yml /opt/twemproxy/conf/redis_master.conf     #将源码包里的配置文件拷贝到安装路径并重命名，文件名格式为redis_master.conf
 
