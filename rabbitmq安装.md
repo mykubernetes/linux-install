@@ -5,6 +5,8 @@ https://www.rabbitmq.com/
 ```
 yum install -y build-essential openssl openssl-devel unixODBC unixODBC-devel make gcc gcc-c++ kernel-devel m4 ncurses-devel tk tc xz
 ```  
+erlang与rabbix版本对应关系，必选对应上，否则无法使用  
+https://www.rabbitmq.com/which-erlang.html  
 
 安装下载：  
 ```
