@@ -23,7 +23,7 @@ requirepass 123456
 将配置拷贝到其他节点，分别启动redis  
 ```
 # scp -rp redis node02:/opt/
-# scp -rp redis node02:/opt/
+# scp -rp redis node03:/opt/
 
 src/redis-server conf/redis-6379.conf
 src/redis-server conf/redis-6380.conf
