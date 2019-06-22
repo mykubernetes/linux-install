@@ -1,6 +1,21 @@
 redis数据分片
 ---
 https://github.com/twitter/twemproxy  
+
+
+配置redis集群主从配置  
+这里使用三台redis主机，每台主机启动三台redis,配置为一主两从模式  
+分别配置redis从主机
+```
+# vim redis-6370
+slaveof 192.168.101.69 6379
+requirepass 123456
+
+# vim redis-6371
+slaveof 192.168.101.69 6379
+requirepass 123456
+```
+
 将数据进行分片分别写入多个redis的master节点  
 安装  
 ```
