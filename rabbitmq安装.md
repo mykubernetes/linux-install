@@ -13,7 +13,10 @@ https://www.rabbitmq.com/which-erlang.html
 wget www.rabbitmq.com/releases/erlang/erlang-18.3-1.el7.centos.x86_64.rpm
 wget http://repo.iotti.biz/CentOS/7/x86_64/socat-1.7.3.2-5.el7.lux.x86_64.rpm
 wget www.rabbitmq.com/releases/rabbitmq-server/v3.6.5/rabbitmq-server-3.6.5-1.noarch.rpm
-yum localinstall * -y
+
+rpm -ivh erlang-18.3-1.el7.centos.x86_64.rpm
+rpm -ivh socat-1.7.3.2-5.el7.lux.x86_64.rpm
+rpm -ivh rabbitmq-server-3.6.5-1.noarch.rpm
 ```  
 
 修改配置文件  
