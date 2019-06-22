@@ -1,6 +1,5 @@
 redis数据分片
 ---
-https://github.com/twitter/twemproxy  
 
 
 配置redis集群主从配置  
@@ -36,8 +35,9 @@ root      35978      1  0 01:47 ?        00:00:00 src/redis-server 127.0.0.1:638
 ```  
 
 
-将数据进行分片分别写入多个redis的master节点  
-安装  
+
+安装twemproxy  
+https://github.com/twitter/twemproxy  
 ```
 wget https://github.com/twitter/twemproxy/archive/v0.4.1.tar.gz
 tar xvf v0.4.1.tar.gz
