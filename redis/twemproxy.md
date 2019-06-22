@@ -79,7 +79,7 @@ mkdir /opt/twemproxy/{logs,pid}
 - -o指定log文件
 - -d后台运行
 
-测试  
+测试,使用redis自带客户端连接twemproxy  
 ```
 redis-cli -h localhost -a 123456 -p 22121           #链接redis端口需要换成twemproxy的端口进行测试
 set a a
