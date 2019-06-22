@@ -14,9 +14,21 @@ wget www.rabbitmq.com/releases/erlang/erlang-18.3-1.el7.centos.x86_64.rpm
 wget http://repo.iotti.biz/CentOS/7/x86_64/socat-1.7.3.2-5.el7.lux.x86_64.rpm
 wget www.rabbitmq.com/releases/rabbitmq-server/v3.6.5/rabbitmq-server-3.6.5-1.noarch.rpm
 
-rpm -ivh erlang-18.3-1.el7.centos.x86_64.rpm
-rpm -ivh socat-1.7.3.2-5.el7.lux.x86_64.rpm
-rpm -ivh rabbitmq-server-3.6.5-1.noarch.rpm
+按照顺序依次安装
+#  rpm -ivh erlang-18.3-1.el7.centos.x86_64.rpm 
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:erlang-18.3-1.el7.centos         ################################# [100%]
+#  rpm -ivh socat-1.7.3.2-5.el7.lux.x86_64.rpm 
+warning: socat-1.7.3.2-5.el7.lux.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID 53e4e7a9: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:socat-1.7.3.2-5.el7.lux          ################################# [100%]
+#  rpm -ivh rabbitmq-server-3.6.5-1.noarch.rpm 
+warning: rabbitmq-server-3.6.5-1.noarch.rpm: Header V4 RSA/SHA1 Signature, key ID 6026dfca: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:rabbitmq-server-3.6.5-1          ################################# [100%]
 ```  
 
 修改配置文件  
