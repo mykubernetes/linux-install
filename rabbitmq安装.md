@@ -42,6 +42,7 @@ vim /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.5/ebin/rabbit.app
 
 启动 rabbitmq-server start &  
 停止 rabbitmqctl app_stop  
+状态 rabbitmqctl status  
 
 管理插件：rabbitmq-plugins enable rabbitmq_management  
 访问地址：http://192.168.11.76:15672/  
