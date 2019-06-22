@@ -228,3 +228,69 @@ OK
 192.168.101.69:6384> keys *
 1) "test1"
 ```  
+
+
+redis自带测试命令进行测试  
+```
+# src/redis-benchmark -h 192.168.101.69 -p 6379 -c 1000 -d -n 10000
+====== 10000 ======
+  100000 requests completed in 1.53 seconds
+  1000 parallel clients
+  1 bytes payload
+  keep alive: 1
+
+0.00% <= 3 milliseconds
+0.03% <= 4 milliseconds
+2.29% <= 5 milliseconds
+21.73% <= 6 milliseconds
+51.20% <= 7 milliseconds
+65.83% <= 8 milliseconds
+77.45% <= 9 milliseconds
+86.92% <= 10 milliseconds
+91.56% <= 11 milliseconds
+94.73% <= 12 milliseconds
+96.34% <= 13 milliseconds
+97.31% <= 14 milliseconds
+97.67% <= 15 milliseconds
+97.87% <= 16 milliseconds
+98.14% <= 17 milliseconds
+98.16% <= 18 milliseconds
+98.20% <= 19 milliseconds
+98.32% <= 20 milliseconds
+98.48% <= 21 milliseconds
+98.56% <= 22 milliseconds
+98.59% <= 23 milliseconds
+98.64% <= 24 milliseconds
+98.73% <= 25 milliseconds
+98.97% <= 27 milliseconds
+98.98% <= 28 milliseconds
+99.00% <= 40 milliseconds
+99.01% <= 41 milliseconds
+99.06% <= 42 milliseconds
+99.11% <= 43 milliseconds
+99.14% <= 44 milliseconds
+99.16% <= 45 milliseconds
+99.19% <= 46 milliseconds
+99.23% <= 47 milliseconds
+99.25% <= 48 milliseconds
+99.27% <= 49 milliseconds
+99.28% <= 50 milliseconds
+99.31% <= 51 milliseconds
+99.33% <= 52 milliseconds
+99.35% <= 53 milliseconds
+99.38% <= 54 milliseconds
+99.40% <= 55 milliseconds
+99.44% <= 56 milliseconds
+99.52% <= 57 milliseconds
+99.60% <= 58 milliseconds
+99.66% <= 59 milliseconds
+99.72% <= 60 milliseconds
+99.77% <= 61 milliseconds
+99.84% <= 62 milliseconds
+99.90% <= 63 milliseconds
+99.93% <= 64 milliseconds
+99.95% <= 65 milliseconds
+99.99% <= 66 milliseconds
+100.00% <= 66 milliseconds
+65316.79 requests per second
+```  
