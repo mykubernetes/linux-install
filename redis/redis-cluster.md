@@ -1,33 +1,69 @@
 redis_3.0版本以后  
+
+创建redis的pid,log,和数据保存目录,
+```
+mkdir -p /opt/redis/data/{redis-6379,redis-6380,redis-6381,redis-6382,redis-6383,redis-6384,redis-6385,redis-6386}/{run,logs,dbcache}
+```  
+
 配置每个redis以集群的方式启动  
 ```
-# bind 127.0.0.1                      #注销绑定地址
-protected-mode no                     #关闭保护模式
+# bind 127.0.0.1                                                                   #注销绑定地址
+protected-mode no                                                                  #关闭保护模式
 port 6379
-daemonize yes                         #工作在守护进程
-pidfile /usr/...                      #pid文件路径
-logfile /usr/...                      #日志保存路径
-dir /usr/...                          #数据保存目录
-# requirepass 123456                  #注释配置密码必须
-cluster-enabled yes                   #开启
-cluster-config-file nodes-6379.conf   #定义cluster配置的保存文件
-cluster-node-timeout 15000            #定义节点超时时间
+daemonize yes                                                                      #工作在守护进程
+pidfile /opt/redis/redis-3.2.13/data/redis-6379/run/redis_6379.pid                 #pid文件路径
+logfile /opt/redis/redis-3.2.13/data/redis-6379/logs/redis_6379.log                #日志保存路径
+dir /opt/redis/redis-3.2.13/data/redis-6379/dbcache/                               #数据保存目录
+# requirepass 123456                                                               #注释配置密码必须
+cluster-enabled yes                                                                #开启
+cluster-config-file nodes-6379.conf                                                #定义cluster配置的保存文件
+cluster-node-timeout 15000                                                         #定义节点超时时间
 ```  
 注意：每台port和cluster-config-file需要修改对应文件  
 
+复制配置文件，并修改端口号  
+```
+cp redis-6379.conf redis-6380.conf 
+cp redis-6379.conf redis-6381.conf 
+cp redis-6379.conf redis-6382.conf 
+cp redis-6379.conf redis-6383.conf 
+cp redis-6379.conf redis-6384.conf 
+cp redis-6379.conf redis-6385.conf 
+cp redis-6379.conf redis-6386.conf 
+sed -i 's/6379/6380/g' redis-6380.conf 
+sed -i 's/6379/6381/g' redis-6381.conf 
+sed -i 's/6379/6382/g' redis-6382.conf 
+sed -i 's/6379/6383/g' redis-6383.conf 
+sed -i 's/6379/6384/g' redis-6384.conf 
+sed -i 's/6379/6385/g' redis-6385.conf 
+sed -i 's/6379/6386/g' redis-6386.conf
+```  
+
 启动redis  
 ```
-redis-server redis-6379.conf
-```
+src/redis-server conf/redis-6379.conf 
+src/redis-server conf/redis-6378.conf 
+src/redis-server conf/redis-6380.conf 
+src/redis-server conf/redis-6381.conf 
+src/redis-server conf/redis-6382.conf 
+src/redis-server conf/redis-6383.conf 
+src/redis-server conf/redis-6384.conf 
+src/redis-server conf/redis-6385.conf 
+src/redis-server conf/redis-6386.conf
+```  
+
 查看redis是否启动  
 ```
-ps -ef |grep redis
-root    5035   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6379 [cluster]
-root    5037   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6380 [cluster]
-root    5036   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6381 [cluster]
-root    5038   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6382 [cluster]
-root    5039   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6383 [cluster]
-root    5028   1   0  10:04 ?     00:00:00  /usr/local/redis/bin/redis-server *:6384 [cluster]
+# ps -ef |grep redis
+root       4464      1  0 22:52 ?        00:00:00 src/redis-server *:6379 [cluster]
+root       4469      1  0 22:53 ?        00:00:00 src/redis-server *:6380 [cluster]
+root       4473      1  0 22:53 ?        00:00:00 src/redis-server *:6381 [cluster]
+root       4477      1  0 22:53 ?        00:00:00 src/redis-server *:6382 [cluster]
+root       4481      1  0 22:53 ?        00:00:00 src/redis-server *:6383 [cluster]
+root       4485      1  0 22:53 ?        00:00:00 src/redis-server *:6384 [cluster]
+root       4489      1  0 22:53 ?        00:00:00 src/redis-server *:6385 [cluster]
+root       4493      1  0 22:53 ?        00:00:00 src/redis-server *:6386 [cluster]
+root       4506   1154  0 22:54 pts/0    00:00:00 grep --color=auto redis
 ```  
 注意：配置成功后，后边会出现[cluster]字样  
 
@@ -41,13 +77,16 @@ https://github.com/redis/redis-rb/
 ```
 gem install redis
 ```  
+注意：如果升级报错需要升级ruby后只需gem install redis  
+https://blog.csdn.net/qq_26440803/article/details/82717244
+
 复制集群管理程序到/usr/local/bin  
 ```
 cp redis-3.0.0/src/redis-trib.rb /usr/local/bin/redis-trib 
 ```  
 创建集群：  
 ```
-redis-trib create --replicas 1 192.168.101.66:6379 192.168.101.66:6380 192.168.101.66:6381 192.168.101.66:6382 192.168.101.66:6383 ...
+redis-trib create --replicas 192.168.101.69:6379 192.168.101.69:6380 192.168.101.69:6381 192.168.101.69:6382 192.168.101.69:6383 192.168.101.69:6384 192.168.101.69:6385 192.168.101.69:6386
 ```  
 - 给定 redis-trib.rb 程序的命令是 create ， 这表示我们希望创建一个新的集群。  
 - 选项 --replicas 1 表示我们希望为集群中的每个主节点创建一个从节点。  
