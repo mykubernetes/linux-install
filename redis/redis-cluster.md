@@ -86,7 +86,8 @@ cp redis-3.0.0/src/redis-trib.rb /usr/local/bin/redis-trib
 ```  
 创建集群：  
 ```
-redis-trib create --replicas 1 192.168.101.69:6379 192.168.101.69:6380 192.168.101.69:6381 192.168.101.69:6382 192.168.101.69:6383 192.168.101.69:6384 192.168.101.69:6385 192.168.101.69:6386
+# redis-trib create --replicas 1 192.168.101.69:6379 192.168.101.69:6380 192.168.101.69:6381 192.168.101.69:6382 192.168.101.69:6383 192.168.101.69:6384 192.168.101.69:6385 192.168.101.69:6386
+
 >>> Creating cluster
 >>> Performing hash slots allocation on 8 nodes...
 Using 4 masters:
@@ -167,15 +168,50 @@ redis-cli -h 192.168.101.66 -p 6379
 ```  
 注意：所有节点依次执行此操作成功后重启所有节点  
 
-修改配置文件支持认证功能，否则不可以链接redis服务器  
+修改ruby连接redis的配置文件支持认证功能，否则不可以链接redis服务器  
+rpm包安装路径
 ```
-vim /var/lib/gems/2.3.0/gems/redis-3.3.3/lib/redis/client.rb
+# vim /var/lib/gems/2.3.0/gems/redis-3.3.3/lib/redis/client.rb
+  :password => "123456"
+```  
+升级后编译安装路径  
+```
+# vim /usr/local/rvm/gems/ruby-2.5.5/gems/redis-4.1.2/lib/redis/client.rb
   :password => "123456"
 ```  
 
 连接检查  
 ```
-redis-trib.rb check 192.168.101.66:6379
+# redis-trib.rb check 192.168.101.66:6379
+
+>>> Performing Cluster Check (using node 192.168.101.69:6379)
+S: ecd26de4c96890e75d2a1f5977d35f2129b76115 192.168.101.69:6379
+   slots: (0 slots) slave
+   replicates 1792f5d7cc36a46133ffffc92e3ac61ca7b29d36
+M: de5a3d575a536e2ee07888cdffae221c102730fb 192.168.101.69:6384
+   slots:4096-8191 (4096 slots) master
+   1 additional replica(s)
+M: 1792f5d7cc36a46133ffffc92e3ac61ca7b29d36 192.168.101.69:6383
+   slots:0-4095 (4096 slots) master
+   1 additional replica(s)
+S: 4e89d27e29bc95630674ab2d749750e64648f377 192.168.101.69:6381
+   slots: (0 slots) slave
+   replicates c702d27bc13da0ae89ae5c5ee2be9efcbf01079e
+M: c702d27bc13da0ae89ae5c5ee2be9efcbf01079e 192.168.101.69:6385
+   slots:8192-12287 (4096 slots) master
+   1 additional replica(s)
+S: 3488fa095ec160c044912c14cf0c9d7a66e8f6c8 192.168.101.69:6382
+   slots: (0 slots) slave
+   replicates 2c0524f9089213efb72cb97f8d8f11d171aba6b8
+S: ca664f1195919ef8f41be14c092bf03dfd1ef548 192.168.101.69:6380
+   slots: (0 slots) slave
+   replicates de5a3d575a536e2ee07888cdffae221c102730fb
+M: 2c0524f9089213efb72cb97f8d8f11d171aba6b8 192.168.101.69:6386
+   slots:12288-16383 (4096 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
 ```  
 
 客户端连接redis命令  
