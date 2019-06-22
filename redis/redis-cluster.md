@@ -86,7 +86,68 @@ cp redis-3.0.0/src/redis-trib.rb /usr/local/bin/redis-trib
 ```  
 创建集群：  
 ```
-redis-trib create --replicas 192.168.101.69:6379 192.168.101.69:6380 192.168.101.69:6381 192.168.101.69:6382 192.168.101.69:6383 192.168.101.69:6384 192.168.101.69:6385 192.168.101.69:6386
+redis-trib create --replicas 1 192.168.101.69:6379 192.168.101.69:6380 192.168.101.69:6381 192.168.101.69:6382 192.168.101.69:6383 192.168.101.69:6384 192.168.101.69:6385 192.168.101.69:6386
+>>> Creating cluster
+>>> Performing hash slots allocation on 8 nodes...
+Using 4 masters:
+192.168.101.69:6379
+192.168.101.69:6380
+192.168.101.69:6381
+192.168.101.69:6382
+Adding replica 192.168.101.69:6383 to 192.168.101.69:6379
+Adding replica 192.168.101.69:6384 to 192.168.101.69:6380
+Adding replica 192.168.101.69:6385 to 192.168.101.69:6381
+Adding replica 192.168.101.69:6386 to 192.168.101.69:6382
+M: ecd26de4c96890e75d2a1f5977d35f2129b76115 192.168.101.69:6379
+   slots:0-4095 (4096 slots) master
+M: ca664f1195919ef8f41be14c092bf03dfd1ef548 192.168.101.69:6380
+   slots:4096-8191 (4096 slots) master
+M: 4e89d27e29bc95630674ab2d749750e64648f377 192.168.101.69:6381
+   slots:8192-12287 (4096 slots) master
+M: 3488fa095ec160c044912c14cf0c9d7a66e8f6c8 192.168.101.69:6382
+   slots:12288-16383 (4096 slots) master
+S: 1792f5d7cc36a46133ffffc92e3ac61ca7b29d36 192.168.101.69:6383
+   replicates ecd26de4c96890e75d2a1f5977d35f2129b76115
+S: de5a3d575a536e2ee07888cdffae221c102730fb 192.168.101.69:6384
+   replicates ca664f1195919ef8f41be14c092bf03dfd1ef548
+S: c702d27bc13da0ae89ae5c5ee2be9efcbf01079e 192.168.101.69:6385
+   replicates 4e89d27e29bc95630674ab2d749750e64648f377
+S: 2c0524f9089213efb72cb97f8d8f11d171aba6b8 192.168.101.69:6386
+   replicates 3488fa095ec160c044912c14cf0c9d7a66e8f6c8
+Can I set the above configuration? (type 'yes' to accept): yes       #输入yes
+>>> Nodes configuration updated
+>>> Assign a different config epoch to each node
+>>> Sending CLUSTER MEET messages to join the cluster
+Waiting for the cluster to join.......
+>>> Performing Cluster Check (using node 192.168.101.69:6379)
+M: ecd26de4c96890e75d2a1f5977d35f2129b76115 192.168.101.69:6379
+   slots:0-4095 (4096 slots) master
+   1 additional replica(s)
+S: 1792f5d7cc36a46133ffffc92e3ac61ca7b29d36 192.168.101.69:6383
+   slots: (0 slots) slave
+   replicates ecd26de4c96890e75d2a1f5977d35f2129b76115
+M: ca664f1195919ef8f41be14c092bf03dfd1ef548 192.168.101.69:6380
+   slots:4096-8191 (4096 slots) master
+   1 additional replica(s)
+S: 2c0524f9089213efb72cb97f8d8f11d171aba6b8 192.168.101.69:6386
+   slots: (0 slots) slave
+   replicates 3488fa095ec160c044912c14cf0c9d7a66e8f6c8
+S: c702d27bc13da0ae89ae5c5ee2be9efcbf01079e 192.168.101.69:6385
+   slots: (0 slots) slave
+   replicates 4e89d27e29bc95630674ab2d749750e64648f377
+M: 4e89d27e29bc95630674ab2d749750e64648f377 192.168.101.69:6381
+   slots:8192-12287 (4096 slots) master
+   1 additional replica(s)
+S: de5a3d575a536e2ee07888cdffae221c102730fb 192.168.101.69:6384
+   slots: (0 slots) slave
+   replicates ca664f1195919ef8f41be14c092bf03dfd1ef548
+M: 3488fa095ec160c044912c14cf0c9d7a66e8f6c8 192.168.101.69:6382
+   slots:12288-16383 (4096 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
 ```  
 - 给定 redis-trib.rb 程序的命令是 create ， 这表示我们希望创建一个新的集群。  
 - 选项 --replicas 1 表示我们希望为集群中的每个主节点创建一个从节点。  
