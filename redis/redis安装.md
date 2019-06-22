@@ -1,27 +1,24 @@
 redis安装  
 =========
 1、下载  
-``` # wget 'http://download.redis.io/releases/redis-4.0.9.tar.gz' ```  
+``` wget http://download.redis.io/releases/redis-2.8.17.tar.gz ```  
 2、安装开发者工具  
 ``` # yum install -y wget net-tools gcc gcc-c++ make tar openssl openssl-devel cmake ```  
 3、安装  
 ```
-# cd /usr/local/src
-# tar -zxf redis-4.0.9.tar.gz
-# cd redis-4.0.9
-# make
-# mkdir -pv /usr/local/redis/conf /usr/local/redis/bin
-# cp src/redis* /usr/local/redis/bin/
-# cp redis.conf /usr/local/redis/conf
+tar xzf redis-2.8.17.tar.gz
+cd redis-2.8.17
+make CFLAGS="-march=x86-64"
 
 启动
-# /usr/local/redis/bin/redis-server /usr/local/redis/conf/redis.conf
+cd src
+./redis-server ../redis.conf
 ```  
 
 4、配置文件  
 ```
 vim /etc/redis.conf
-daemonize no  
+daemonize no                            #是否工作在守护进程模式
 port 6379                               #端口号
 bind 127.0.0.1                		#监听地址
 timeout 0                    		#0表示不启用此功能
