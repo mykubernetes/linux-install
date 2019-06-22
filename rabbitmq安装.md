@@ -34,7 +34,10 @@ Updating / installing...
 修改配置文件  
 ```
 vim /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.5/ebin/rabbit.app
-
+修改去掉<<>>
+{loopback_users, [<<"guest">>]}
+修改后
+{loopback_users, ["guest"]}
 ```  
 
 启动 rabbitmq-server start &  
