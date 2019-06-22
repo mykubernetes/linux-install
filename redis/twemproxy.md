@@ -8,13 +8,33 @@ https://github.com/twitter/twemproxy
 分别配置redis从主机
 ```
 # vim redis-6370
+port 6380
+pidfile /var/run/redis_6380.pid
 slaveof 192.168.101.69 6379
 requirepass 123456
 
 # vim redis-6371
+port 6380
+pidfile /var/run/redis_6380.pid
 slaveof 192.168.101.69 6379
 requirepass 123456
+```  
+
+将配置拷贝到其他节点，分别启动redis  
 ```
+# scp -rp redis node02:/opt/
+# scp -rp redis node02:/opt/
+
+src/redis-server conf/redis-6379.conf
+src/redis-server conf/redis-6380.conf
+src/redis-server conf/redis-6381.conf
+
+# ps -ef |grep redis
+root      35722      1  0 01:43 ?        00:00:00 src/redis-server 127.0.0.1:6379
+root      35925      1  0 01:46 ?        00:00:00 src/redis-server 127.0.0.1:6380
+root      35978      1  0 01:47 ?        00:00:00 src/redis-server 127.0.0.1:6381
+```  
+
 
 将数据进行分片分别写入多个redis的master节点  
 安装  
