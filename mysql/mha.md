@@ -103,7 +103,7 @@ MHA_Manager管理节点节点：
 ```
 # mkdir -p /etc/mha/scripts
 
-# cat /etc/masterha_default.cnf
+# vim /etc/mha/app1.cnf
 [server default]
 user=root
 password=123456
@@ -136,7 +136,7 @@ no_master=1
 
 配置说明  
 ```
-# vim /etc/masterha_default.cnf
+# vim /etc/mha/app1.cnf
 [server default]
 user=root                 # 这个是mysql的root 用户
 password=123456           # mysql的root用户密码
@@ -253,7 +253,7 @@ print
 
 9、检测各节点间 ssh 互信通信配置是否 OK：  
 ```
-# masterha_check_ssh --conf=/etc/masterha_default.cnf
+# masterha_check_ssh --conf=/etc/mha/app1.cnf
 Wed Jun 26 06:53:39 2019 - [info] Reading default configuration from /etc/masterha_default.cnf..
 Wed Jun 26 06:53:39 2019 - [info] Reading application default configuration from /etc/masterha_default.cnf..
 Wed Jun 26 06:53:39 2019 - [info] Reading server configuration from /etc/masterha_default.cnf..
@@ -278,13 +278,13 @@ Wed Jun 26 06:53:41 2019 - [info] All SSH connection tests passed successfully.
 
 10、检查管理的 MySQL 复制集群的连接配置参数是否 OK：  
 ```
-# masterha_check_repl --conf=/etc/masterha/app1.cnf
+# masterha_check_repl --conf=/etc/mha/app1.cnf
 
 Mon Nov 9 17:22:48 2015 - [info] Slaves settings check done.
 Mon Nov 9 17:22:48 2015 - [info]
-172.16.100.68(172.16.100.68:3306) (current master)
-+--172.16.100.69(172.16.100.69:3306)
-+--172.16.100.70(172.16.100.70:3306)
+192.168.101.66(192.168.101.66:3306) (current master)
++--192.168.101.67(192.168.101.67:3306)
++--192.168.101.68(192.168.101.68:3306)
 MySQL Replication Health is OK.
 ```  
 
