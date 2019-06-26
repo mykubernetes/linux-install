@@ -40,8 +40,7 @@ replicate-wild-ignore-table=information_schema.%
 4、在所有mysql节点运行权拥有管理权限  
 ```
 mysql>grant replication slave on *.* to 'repl_user'@'192.168.101.%' identified by 'repl_passwd';
-mysql>grant all on *.* to 'root'@'192.168.101.%' identified by '123456'; 
-第二条语句为防止权限过大也可以拆分为三条授权
+
 grant all on *.* to 'root'@'192.168.101.69' identified by '123456';
 grant all on *.* to 'root'@'192.168.101.70' identified by '123456';
 grant all on *.* to 'root'@'192.168.101.71' identified by '123456';
