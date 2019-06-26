@@ -89,10 +89,15 @@ ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.68
 ```
 # yum install perl-DBD-MySQL -y
 ```  
-Manager 节点：  
-``` # yum install mha4mysql-manager-0.56-0.el6.noarch.rpm ```  
-所有节点，包括 Manager：  
+所有mysql节点，包括 Manager：  
 ``` # yum install mha4mysql-node-0.56-0.el6.noarch.rpm ```  
+
+MHA_Manager管理节点节点：  
+``` 
+# yum install perl-DBD-MySQL perl-Config-Tiny perl-Log-Dispatch perl-Parallel-ForkManager perl-Config-IniFiles perl-Time-HiRes
+# yum install mha4mysql-manager-0.56-0.el6.noarch.rpm
+```  
+
 
 8、初始化 MHA
 ```
