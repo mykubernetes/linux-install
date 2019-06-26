@@ -111,7 +111,7 @@ ssh_user=root
 repl_user=repl_user
 repl_password=repl_passwd
 ping_interval=1
-secondary_check_script = masterha_secondary_check -s 192.168.101.66 -s 192.168.101.67 -s 192.168.101.68 --user=repl_user --master_host=node01 --master_ip=192.168.101.66 --master_port=3306
+secondary_check_script = masterha_secondary_check -s 192.168.101.69 -s 192.168.101.70 -s 192.168.101.71 --user=repl_user --master_host=node01 --master_ip=192.168.101.69 --master_port=3306
 master_ip_failover_script="/etc/mha/scripts/master_ip_failover"
 manager_log=/var/log/mha/app1/manager.log
 manager_workdir=/var/log/mha/app1
