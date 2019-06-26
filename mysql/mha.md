@@ -103,6 +103,39 @@ MHA_Manager管理节点节点：
 ```
 # mkdir -p /etc/mha/scripts
 
+# cat /etc/masterha_default.cnf
+[server default]
+user=root
+password=123456
+ssh_user=root
+repl_user=repl_user
+repl_password=repl_passwd
+ping_interval=1
+secondary_check_script = masterha_secondary_check -s 192.168.101.66 -s 192.168.101.67 -s 192.168.101.68 --user=repl_user --master_host=node01 --master_ip=192.168.101.66 --master_port=3306
+master_ip_failover_script="/etc/mha/scripts/master_ip_failover"
+manager_log=/var/log/mha/app1/manager.log
+manager_workdir=/var/log/mha/app1
+
+[server1]
+master_binlog_dir="/usr/local/mysql/data"
+hostname=192.168.101.69
+#ssh_port=22022
+candidate_master=1
+
+[server2]
+hostname=192.168.101.70
+#ssh_port=22022
+candidate_master=1
+
+[server3]
+hostname=192.168.101.71
+master_binlog_dir="/usr/local/mysql/data"
+#ssh_port=22022
+no_master=1
+```  
+
+配置说明  
+```
 # vim /etc/masterha_default.cnf
 [server default]
 user=root                 # 这个是mysql的root 用户
@@ -220,7 +253,27 @@ print
 
 9、检测各节点间 ssh 互信通信配置是否 OK：  
 ```
-# masterha_check_ssh --conf=/etc/masterha/app1.cnf
+# masterha_check_ssh --conf=/etc/masterha_default.cnf
+Wed Jun 26 06:53:39 2019 - [info] Reading default configuration from /etc/masterha_default.cnf..
+Wed Jun 26 06:53:39 2019 - [info] Reading application default configuration from /etc/masterha_default.cnf..
+Wed Jun 26 06:53:39 2019 - [info] Reading server configuration from /etc/masterha_default.cnf..
+Wed Jun 26 06:53:39 2019 - [info] Starting SSH connection tests..
+Wed Jun 26 06:53:40 2019 - [debug] 
+Wed Jun 26 06:53:39 2019 - [debug]  Connecting via SSH from root@192.168.101.69(192.168.101.69:22) to root@192.168.101.70(192.168.101.70:22)..
+Wed Jun 26 06:53:39 2019 - [debug]   ok.
+Wed Jun 26 06:53:39 2019 - [debug]  Connecting via SSH from root@192.168.101.69(192.168.101.69:22) to root@192.168.101.71(192.168.101.71:22)..
+Wed Jun 26 06:53:40 2019 - [debug]   ok.
+Wed Jun 26 06:53:41 2019 - [debug] 
+Wed Jun 26 06:53:40 2019 - [debug]  Connecting via SSH from root@192.168.101.71(192.168.101.71:22) to root@192.168.101.69(192.168.101.69:22)..
+Wed Jun 26 06:53:41 2019 - [debug]   ok.
+Wed Jun 26 06:53:41 2019 - [debug]  Connecting via SSH from root@192.168.101.71(192.168.101.71:22) to root@192.168.101.70(192.168.101.70:22)..
+Wed Jun 26 06:53:41 2019 - [debug]   ok.
+Wed Jun 26 06:53:41 2019 - [debug] 
+Wed Jun 26 06:53:39 2019 - [debug]  Connecting via SSH from root@192.168.101.70(192.168.101.70:22) to root@192.168.101.69(192.168.101.69:22)..
+Wed Jun 26 06:53:40 2019 - [debug]   ok.
+Wed Jun 26 06:53:40 2019 - [debug]  Connecting via SSH from root@192.168.101.70(192.168.101.70:22) to root@192.168.101.71(192.168.101.71:22)..
+Wed Jun 26 06:53:41 2019 - [debug]   ok.
+Wed Jun 26 06:53:41 2019 - [info] All SSH connection tests passed successfully.
 ```  
 
 10、检查管理的 MySQL 复制集群的连接配置参数是否 OK：  
