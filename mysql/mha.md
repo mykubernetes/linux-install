@@ -384,7 +384,28 @@ app1 (pid:4978) is running(0:PING_OK), master:192.168.101.69
 - --manger_log #日志存放位置
 - --ignore_last_failover #在缺省情况下，如果MHA检测到连续发生宕机，且两次宕机间隔不足8小时的话，则不会进行 Failover，之所以这样限制是为了避免 ping-pong效应。该参数代表忽略上次MHA触发切换产生的文件。默认情况下，MHA发生切换后会在日志目录，也就是上面我设置的/data产生app1.failover.complete 文件，下次再次切换的时候如果发现该目录下存在该文件将不允许触发切换，除非在第一次切换后收到删除该文件，为了方便，这里设置为--ignore_last_failover。
 
-13、停止 MHA  
+13、检查是否启动  
 ```
-# masterha_stop --conf=/etc/masterha/app1.cnf
+# tailf /var/log/mha/app1/manager.log
+
+IN SCRIPT TEST====/sbin/ifconfig ens33:1 down==/sbin/ifconfig ens33:1 192.168.101.50/24===
+
+Checking the Status of the script.. OK 
+Wed Jun 26 08:48:29 2019 - [info]  OK.
+Wed Jun 26 08:48:29 2019 - [warning] shutdown_script is not defined.
+Wed Jun 26 08:48:29 2019 - [info] Set master ping interval 1 seconds.
+Wed Jun 26 08:48:29 2019 - [info] Set secondary check script: masterha_secondary_check -s 192.168.101.66 -s 192.168.101.67 -s 192.168.101.68 --user=repl_user --master_host=node01 --master_ip=192.168.101.66 --master_port=3306
+Wed Jun 26 08:48:29 2019 - [info] Starting ping health check on 192.168.101.69(192.168.101.69:3306)..
+Wed Jun 26 08:48:29 2019 - [info] Ping(SELECT) succeeded, waiting until MySQL doesn't respond..
+```  
+
+14、检查masterz状态  
+```
+# masterha_check_status --conf=/etc/mha/app1.cnf
+app1 (pid:17363) is running(0:PING_OK), master:192.168.101.69
+```
+
+14、停止 MHA  
+```
+# masterha_stop --conf=/etc/mha/app1.cnf
 ```  
