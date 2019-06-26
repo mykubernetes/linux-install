@@ -138,7 +138,7 @@ master_binlog_dir="/usr/local/mysql/data"
 
 ```
 # 在master上生成vip地址，把地址写到脚本中
-# /sbin/ifconfig eth0:1 192.168.101.50
+# /sbin/ifconfig eth0:1 192.168.101.50/24
 
 # vim /etc/mha/scripts/master_ip_failover
 
@@ -150,7 +150,7 @@ my (
 $command, $ssh_user, $orig_master_host, $orig_master_ip,
 $orig_master_port, $new_master_host, $new_master_ip, $new_master_port
 );
-my $vip = '192.168.81.233/24';             #master的vip地址
+my $vip = '192.168.101.50/24';             #master的vip地址
 my $key = '1';
 my $ssh_start_vip = "/sbin/ifconfig eth1:$key $vip";
 my $ssh_stop_vip = "/sbin/ifconfig eth1:$key down";
