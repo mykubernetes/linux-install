@@ -22,34 +22,30 @@ purge_relay_logs                #清除中继日志
 ```  
 
 2、准备 MySQLReplication环境  
-node1: MHA Manager  
-node2: MariaDB master  
-node3: MariaDB slave  
-node4: MariaDB slave  
+node1: 192.168.101.66 Master  
+node2: 192.168.101.67 Slave/备选master  
+node3: 192.168.101.68 Slave/MHAManager 192.168.101.68  
 
-
-3、各节点的/etc/hosts 文件配置内容中添加：  
-192.168.101.66 node1  
-192.168.101.67 node2  
-192.168.101.68 node3  
-192.168.101.69 node4  
-
-4、配置主从  
+3、所有节点配置  
 ```
-初始主节点 master 配置：
-server_id=1
-relay-log=relay-bin
-log-bin=master-bin
-所有 slava 节点依赖的配置：
-server_id=2 # 复制集群中的各节点的 id 均必须惟一；
-relay-log=relay-bin
-log-bin=master-bin
-relay_log_purge=0
-read_only=1
+server-id = 1
+read-only=1
+log-bin=mysql-bin
+relay-log = mysql-relay-bin
+replicate-wild-ignore-table=mysql.%
+replicate-wild-ignore-table=test.%
+replicate-wild-ignore-table=information_schema.%
 ```  
 
-5、在master节点运行权拥有管理权限  
-``` mysql> GRANTALL ON *.* TO 'mhaadmin'@'192.168.101.%' IDENTIFIED BY 'mhapass'; ```  
+5、在所有mysql节点运行权拥有管理权限  
+```
+mysql>grant replication slave on *.* to 'repl_user'@'192.168.101.%' identified by 'repl_passwd';
+mysql>grant all on *.* to 'root'@'192.168.101.%' identified by '123456'; #
+第二条语句为防止权限过大也可以拆分为三条授权
+grant all on *.* to 'root'@'192.168.101.66' identified by '123456';
+grant all on *.* to 'root'@'192.168.101.67' identified by '123456';
+grant all on *.* to 'root'@'192.168.101.68' identified by '123456';
+```  
 
 6、ssh互信  
 ```
