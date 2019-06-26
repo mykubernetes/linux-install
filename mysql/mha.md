@@ -37,24 +37,44 @@ replicate-wild-ignore-table=test.%
 replicate-wild-ignore-table=information_schema.%
 ```  
 
-5、在所有mysql节点运行权拥有管理权限  
+3、在所有mysql节点运行权拥有管理权限  
 ```
 mysql>grant replication slave on *.* to 'repl_user'@'192.168.101.%' identified by 'repl_passwd';
-mysql>grant all on *.* to 'root'@'192.168.101.%' identified by '123456'; #
+mysql>grant all on *.* to 'root'@'192.168.101.%' identified by '123456'; 
 第二条语句为防止权限过大也可以拆分为三条授权
 grant all on *.* to 'root'@'192.168.101.66' identified by '123456';
 grant all on *.* to 'root'@'192.168.101.67' identified by '123456';
 grant all on *.* to 'root'@'192.168.101.68' identified by '123456';
 ```  
 
-6、ssh互信  
+4、配置主从  
 ```
-# ssh-keygen -t rsa -P ''
-# cat .ssh/id_rsa.pub >> .ssh/authorized_keys
-# chmod go= .ssh/authorized_keys
-# scp -p .ssh/id_rsa .ssh/authorized_keys root@node2:/root/.ssh/
-# scp -p .ssh/id_rsa .ssh/authorized_keys root@node3:/root/.ssh/
-# scp -p .ssh/id_rsa .ssh/authorized_keys root@node4:/root/.ssh/
+#在node01上面查看master日志状态
+mysql> show master status;
++------------------+----------+--------------+------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++------------------+----------+--------------+------------------+-------------------+
+| mysql-bin.000001 |      542 |              |                  |                   |
++------------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+
+
+#配置slave主机连接master主机
+mysql> change master to \
+master_host='192.168.101.66' \
+master_user='repl_user' \
+master_password='repl_passwd' \
+master_log_file='mysql-bin.000001 ' \
+master_log_pos=542;
+```  
+
+
+5、ssh互信  
+```
+ssh-keygen -t rsa
+ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.66
+ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.67
+ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.68
 ```  
 
 
