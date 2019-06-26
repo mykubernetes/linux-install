@@ -410,7 +410,13 @@ app1 (pid:17363) is running(0:PING_OK), master:192.168.101.69
 # masterha_stop --conf=/etc/mha/app1.cnf
 ```  
 
-16、将故障节点重新加入集群  
+16、mysql的master节点停止后mha切换完主从后会自动退出  
+```
+# masterha_check_status --conf=/etc/masterha/app1.cnf 
+app1 is stopped(2:NOT_RUNNING).
+```  
+
+17、将故障节点重新加入集群  
 ```
 添加被移除的主机的mysql
 vim /etc/mha/app1.conf
