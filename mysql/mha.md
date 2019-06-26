@@ -369,7 +369,7 @@ MySQL Replication Health is OK.
 
 11、启动 MHA  
 ```
-#nohup masterha_manager --conf=/etc/mha/app1.cnf \
+# nohup masterha_manager --conf=/etc/mha/app1.cnf \
 --remove_dead_master_conf --ignore_last_failover < /dev/null > \
 /var/log/mha/app1/manager.log 2>&1 &
 ```  
@@ -408,4 +408,41 @@ app1 (pid:17363) is running(0:PING_OK), master:192.168.101.69
 15、停止 MHA  
 ```
 # masterha_stop --conf=/etc/mha/app1.cnf
+```  
+
+16、将故障节点重新加入集群  
+```
+添加被移除的主机的mysql
+vim /etc/mha/app1.conf
+[server1]
+candidate_master=1
+hostname=192.168.81.236
+
+进入故障节点的mysql，重新配置主从，只能配置为slave
+在老的 master执行如下命令
+
+mysql> reset slave;
+Query OK, 0 rows affected (0.00 sec)
+# 然后查看目前新的 master 状态
+
+# 配置主从
+mysql> change master to \
+    -> master_host='192.168.101.70', \
+    -> master_user='repl_user', \
+    -> master_password='repl_passwd', \
+    -> master_log_file='mysql-bin.000002', \
+    -> master_log_pos=823;
+Query OK, 0 rows affected, 2 warnings (0.01 sec)
+
+# 启动从节点
+mysql> start slave;
+Query OK, 0 rows affected (0.00 sec)
+
+# 查看主从状态
+mysql> show slave status\G
+
+重启系统mha_master
+# nohup masterha_manager --conf=/etc/mha/app1.cnf \
+--remove_dead_master_conf --ignore_last_failover < /dev/null > \
+/var/log/mha/app1/manager.log 2>&1 &
 ```  
