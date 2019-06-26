@@ -405,7 +405,7 @@ Wed Jun 26 08:48:29 2019 - [info] Ping(SELECT) succeeded, waiting until MySQL do
 app1 (pid:17363) is running(0:PING_OK), master:192.168.101.69
 ```
 
-14、停止 MHA  
+15、停止 MHA  
 ```
 # masterha_stop --conf=/etc/mha/app1.cnf
 ```  
