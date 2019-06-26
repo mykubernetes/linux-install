@@ -281,7 +281,7 @@ Wed Jun 26 06:53:41 2019 - [info] All SSH connection tests passed successfully.
 
 10、检查管理的 MySQL 复制集群的连接配置参数是否 OK：  
 ```
-# masterha_check_repl --conf=/etc/masterha/app1.cnf
+# masterha_check_repl --conf=/etc/mha/app1.cnf
 
 Wed Jun 26 08:18:21 2019 - [warning] Global configuration file /etc/masterha_default.cnf not found. Skipping.
 Wed Jun 26 08:18:21 2019 - [info] Reading application default configuration from /etc/masterha/app1.cnf..
@@ -369,7 +369,9 @@ MySQL Replication Health is OK.
 
 11、启动 MHA  
 ```
-nohup masterha_manager --conf=/etc/masterha/app1.cnf >/data/masterha/app1/manager.log 2>&1 &
+#nohup masterha_manager --conf=/etc/mha/app1.cnf \
+--remove_dead_master_conf --ignore_last_failover < /dev/null > \
+/var/log/mha/app1/manager.log 2>&1 &
 ```  
 
 12、启动成功后，可通过如下命令来查看 master 节点的状态  
@@ -377,6 +379,10 @@ nohup masterha_manager --conf=/etc/masterha/app1.cnf >/data/masterha/app1/manage
 # masterha_check_status --conf=/etc/masterha/app1.cnf
 app1 (pid:4978) is running(0:PING_OK), master:192.168.101.69
 ```  
+- 日志保存在/var/log/masterha/app1/manager.log
+- --remove_dead_master_conf #该参数代表当发生主从切换后，老的主库的 ip 将会从配置文件中移除。
+- --manger_log #日志存放位置
+- --ignore_last_failover #在缺省情况下，如果MHA检测到连续发生宕机，且两次宕机间隔不足8小时的话，则不会进行 Failover，之所以这样限制是为了避免 ping-pong效应。该参数代表忽略上次MHA触发切换产生的文件。默认情况下，MHA发生切换后会在日志目录，也就是上面我设置的/data产生app1.failover.complete 文件，下次再次切换的时候如果发现该目录下存在该文件将不允许触发切换，除非在第一次切换后收到删除该文件，为了方便，这里设置为--ignore_last_failover。
 
 13、停止 MHA  
 ```
