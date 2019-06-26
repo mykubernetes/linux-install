@@ -101,17 +101,19 @@ MHA_Manager管理节点节点：
 
 8、初始化 MHA
 ```
+# mkdir -p /etc/mha/scripts
+
 # vim /etc/masterha/app1.cnf
 [server default]
-user=mhaadmin # MySQLAdministrator
-password=mhapass # MySQLAdministrator's password
-manager_workdir=/data/masterha/app1
-manager_log=/data/masterha/app1/manager.log
-remote_workdir=/data/masterha/app1
-ssh_user=root
-repl_user=repluser
-repl_password=replpass
-ping_interval=1
+user=root                 # 这个是mysql的root 用户
+password=123456           # mysql的root用户密码
+ssh_user=root             # 设置ssh的登录用户名
+repl_user=repl_user       # 设置复制环境中的复制用户名
+repl_password=repl_passwd # 设置复制用户的密码
+ping_interval=1           # 设置监控主库，发送ping包的时间间隔，默认是3秒,尝试三次没有回应的时候自动进行failover
+secondary_check_script = masterha_secondary_check -s 192.168.101.66 -s 192.168.101.67 -s 192.168.101.68 --user=repl_user --master_host=node01 --master_ip=192.168.101.66 --master_port=3306   #强烈建议有两个或多个网络线路检查MySQL主服务器的可用性
+master_ip_failover_script="/etc/mha/scripts/master_ip_failover"    #设置自动failover时，即在MySQL从服务器提升为新的主服务器时，调用此脚本，因此可以将 vip 信息写到此配置文件
+
 [server1]
 hostname=192.168.101.67
 #ssh_port=22022
@@ -125,52 +127,7 @@ hostname=192.168.101.69
 #ssh_port=22022
 #no_master=1
 ```  
-配置文件详解  
-```
-[server default]
-#设置manager的工作目录
-manager_workdir=/var/log/masterha/app1
-#设置manager的日志
-manager_log=/var/log/masterha/app1/manager.log 
-#设置master 保存binlog的位置，以便MHA可以找到master的日志，我这里的也就是mysql的数据目录
-master_binlog_dir=/data/mysql
-#设置自动failover时候的切换脚本
-master_ip_failover_script= /usr/local/bin/master_ip_failover
-#设置手动切换时候的切换脚本
-master_ip_online_change_script= /usr/local/bin/master_ip_online_change
-#设置mysql中root用户的密码，这个密码是前文中创建监控用户的那个密码
-password=123456
-#设置监控用户root
-user=root
-#设置监控主库，发送ping包的时间间隔，尝试三次没有回应的时候自动进行failover
-ping_interval=1
-#设置远端mysql在发生切换时binlog的保存位置
-remote_workdir=/tmp
-#设置复制用户的密码
-repl_password=123456
-#设置复制环境中的复制用户名 
-repl_user=rep
-#设置发生切换后发送的报警的脚本
-report_script=/usr/local/send_report
-#一旦MHA到server02的监控之间出现问题，MHA Manager将会尝试从server03登录到server02
-secondary_check_script= /usr/local/bin/masterha_secondary_check -s server03 -s server02 --user=root --master_host=server02 --master_ip=192.168.0.50 --master_port=3306
-#设置故障发生后关闭故障主机脚本（该脚本的主要作用是关闭主机放在发生脑裂,这里没有使用）
-shutdown_script=""
-#设置ssh的登录用户名
-ssh_user=root 
 
-[server1]
-hostname=10.0.0.51
-port=3306
-
-[server2]
-hostname=10.0.0.52
-port=3306
-#设置为候选master，如果设置该参数以后，发生主从切换以后将会将此从库提升为主库，即使这个主库不是集群中事件最新的slave。
-candidate_master=1
-#默认情况下如果一个slave落后master 100M的relay logs的话，MHA将不会选择该slave作为一个新的master，因为对于这个slave的恢复需要花费很长时间，通过设置check_repl_delay=0,MHA触发切换在选择一个新的master的时候将会忽略复制延时，这个参数对于设置了candidate_master=1的主机非常有用，因为这个候选主在切换的过程中一定是新的master
-check_repl_delay=0
-```  
 
 9、检测各节点间 ssh 互信通信配置是否 OK：  
 ```
