@@ -22,9 +22,9 @@ purge_relay_logs                #清除中继日志
 ```  
 
 2、准备 MySQLReplication环境  
-node1: 192.168.101.66 Master  
-node2: 192.168.101.67 Slave/备选master  
-node3: 192.168.101.68 Slave/MHAManager 192.168.101.68  
+node1: 192.168.101.69 Master  
+node2: 192.168.101.70 Slave/备选master  
+node3: 192.168.101.71 Slave/MHAManager 192.168.101.68  
 
 3、所有节点配置  
 ```
@@ -42,9 +42,9 @@ replicate-wild-ignore-table=information_schema.%
 mysql>grant replication slave on *.* to 'repl_user'@'192.168.101.%' identified by 'repl_passwd';
 mysql>grant all on *.* to 'root'@'192.168.101.%' identified by '123456'; 
 第二条语句为防止权限过大也可以拆分为三条授权
-grant all on *.* to 'root'@'192.168.101.66' identified by '123456';
-grant all on *.* to 'root'@'192.168.101.67' identified by '123456';
-grant all on *.* to 'root'@'192.168.101.68' identified by '123456';
+grant all on *.* to 'root'@'192.168.101.69' identified by '123456';
+grant all on *.* to 'root'@'192.168.101.70' identified by '123456';
+grant all on *.* to 'root'@'192.168.101.71' identified by '123456';
 ```  
 
 5、配置主从  
@@ -61,7 +61,7 @@ mysql> show master status;
 
 #配置slave主机连接master主机
 mysql> change master to \
-master_host='192.168.101.66', \
+master_host='192.168.101.69', \
 master_user='repl_user', \
 master_password='repl_passwd', \
 master_log_file='mysql-bin.000001', \
@@ -77,9 +77,9 @@ mysql> start slave;
 6、ssh互信  
 ```
 ssh-keygen -t rsa
-ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.66
-ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.67
-ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.68
+ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.69
+ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.70
+ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.71
 ```  
 
 
@@ -282,9 +282,9 @@ Wed Jun 26 06:53:41 2019 - [info] All SSH connection tests passed successfully.
 
 Mon Nov 9 17:22:48 2015 - [info] Slaves settings check done.
 Mon Nov 9 17:22:48 2015 - [info]
-192.168.101.66(192.168.101.66:3306) (current master)
-+--192.168.101.67(192.168.101.67:3306)
-+--192.168.101.68(192.168.101.68:3306)
+192.168.101.69(192.168.101.69:3306) (current master)
++--192.168.101.70(192.168.101.70:3306)
++--192.168.101.71(192.168.101.71:3306)
 MySQL Replication Health is OK.
 ```  
 
@@ -296,7 +296,7 @@ nohup masterha_manager --conf=/etc/masterha/app1.cnf >/data/masterha/app1/manage
 12、启动成功后，可通过如下命令来查看 master 节点的状态  
 ```
 # masterha_check_status --conf=/etc/masterha/app1.cnf
-app1 (pid:4978) is running(0:PING_OK), master:192.168.101.67
+app1 (pid:4978) is running(0:PING_OK), master:192.168.101.69
 ```  
 
 13、停止 MHA  
