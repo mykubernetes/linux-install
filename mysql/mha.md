@@ -61,10 +61,10 @@ mysql> show master status;
 
 #配置slave主机连接master主机
 mysql> change master to \
-master_host='192.168.101.66' \
-master_user='repl_user' \
-master_password='repl_passwd' \
-master_log_file='mysql-bin.000001 ' \
+master_host='192.168.101.66', \
+master_user='repl_user', \
+master_password='repl_passwd', \
+master_log_file='mysql-bin.000001', \
 master_log_pos=542;
 
 启动两个从库
