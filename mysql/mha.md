@@ -113,21 +113,110 @@ repl_password=repl_passwd # 设置复制用户的密码
 ping_interval=1           # 设置监控主库，发送ping包的时间间隔，默认是3秒,尝试三次没有回应的时候自动进行failover
 secondary_check_script = masterha_secondary_check -s 192.168.101.66 -s 192.168.101.67 -s 192.168.101.68 --user=repl_user --master_host=node01 --master_ip=192.168.101.66 --master_port=3306   #强烈建议有两个或多个网络线路检查MySQL主服务器的可用性
 master_ip_failover_script="/etc/mha/scripts/master_ip_failover"    #设置自动failover时，即在MySQL从服务器提升为新的主服务器时，调用此脚本，因此可以将 vip 信息写到此配置文件
+manager_log=/var/log/mha/app1/manager.log   #设置 manager 的日志路径
+manager_workdir=/var/log/mha/app1           #设置 manager 的工作目录
 
 [server1]
+master_binlog_dir="/usr/local/mysql/data" #指定每个节点 mysql 的 bin-log日志路径
 hostname=192.168.101.67
 #ssh_port=22022
-candidate_master=1
+candidate_master=1        # 表示该主机优先可被选为new master，当多个[serverX]等设置此参数时，优先级由[serverX]配置的顺序决定
+
 [server2]
 hostname=192.168.101.68
 #ssh_port=22022
 candidate_master=1
+
 [server3]
 hostname=192.168.101.69
+master_binlog_dir="/usr/local/mysql/data"
 #ssh_port=22022
-#no_master=1
+#no_master=1               #no_master 可以让某一个节点永远不成为新的主节点
 ```  
 
+配置vip  
+
+```
+# 在master上生成vip地址，把地址写到脚本中
+# /sbin/ifconfig eth0:1 192.168.101.50
+
+# vim /etc/mha/scripts/master_ip_failover
+
+#!/usr/bin/env perl
+use strict;
+use warnings FATAL => 'all';
+use Getopt::Long;
+my (
+$command, $ssh_user, $orig_master_host, $orig_master_ip,
+$orig_master_port, $new_master_host, $new_master_ip, $new_master_port
+);
+my $vip = '192.168.81.233/24';             #master的vip地址
+my $key = '1';
+my $ssh_start_vip = "/sbin/ifconfig eth1:$key $vip";
+my $ssh_stop_vip = "/sbin/ifconfig eth1:$key down";
+GetOptions(
+'command=s' => \$command,
+'ssh_user=s' => \$ssh_user,
+'orig_master_host=s' => \$orig_master_host,
+'orig_master_ip=s' => \$orig_master_ip,
+'orig_master_port=i' => \$orig_master_port,
+'new_master_host=s' => \$new_master_host,
+'new_master_ip=s' => \$new_master_ip,
+'new_master_port=i' => \$new_master_port,
+);
+exit &main();
+sub main {
+print "\n\nIN SCRIPT TEST====$ssh_stop_vip==$ssh_start_vip===\n\n";
+if ( $command eq "stop" || $command eq "stopssh" ) {
+my $exit_code = 1;
+eval {
+print "Disabling the VIP on old master: $orig_master_host \n";
+&stop_vip();
+$exit_code = 0;
+};
+if ($@) {
+warn "Got Error: $@\n";
+exit $exit_code;
+}
+exit $exit_code;
+}
+elsif ( $command eq "start" ) {
+my $exit_code = 10;
+eval {
+print "Enabling the VIP - $vip on the new master - $new_master_host \n";
+&start_vip();
+$exit_code = 0;
+};
+if ($@) {
+warn $@;
+exit $exit_code;
+}
+exit $exit_code;
+}
+elsif ( $command eq "status" ) {
+print "Checking the Status of the script.. OK \n";
+exit 0;
+}
+else {
+&usage();
+exit 1;
+}
+}
+sub start_vip() {
+`ssh $ssh_user\@$new_master_host \" $ssh_start_vip \"`;
+}
+sub stop_vip() {
+return 0 unless ($ssh_user);
+`ssh $ssh_user\@$orig_master_host \" $ssh_stop_vip \"`;
+}
+sub usage {
+print
+"Usage: master_ip_failover --command=start|stop|stopssh|status --orig_master_host=host
+--orig_master_ip=ip --orig_master_port=port --new_master_host=host --new_master_ip=ip
+--new_master_port=port\n";
+}
+```  
+注意:为了防止脑裂发生，推荐生产环境采用脚本的方式来管理虚拟ip，而不是使用keepalived来完成  
 
 9、检测各节点间 ssh 互信通信配置是否 OK：  
 ```
