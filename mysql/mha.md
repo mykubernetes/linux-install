@@ -37,7 +37,7 @@ replicate-wild-ignore-table=test.%
 replicate-wild-ignore-table=information_schema.%
 ```  
 
-3、在所有mysql节点运行权拥有管理权限  
+4、在所有mysql节点运行权拥有管理权限  
 ```
 mysql>grant replication slave on *.* to 'repl_user'@'192.168.101.%' identified by 'repl_passwd';
 mysql>grant all on *.* to 'root'@'192.168.101.%' identified by '123456'; 
@@ -47,7 +47,7 @@ grant all on *.* to 'root'@'192.168.101.67' identified by '123456';
 grant all on *.* to 'root'@'192.168.101.68' identified by '123456';
 ```  
 
-4、配置主从  
+5、配置主从  
 ```
 #在node01上面查看master日志状态
 mysql> show master status;
@@ -66,10 +66,15 @@ master_user='repl_user' \
 master_password='repl_passwd' \
 master_log_file='mysql-bin.000001 ' \
 master_log_pos=542;
+
+启动两个从库
+mysql> start slave;
 ```  
 
+如果mysql是安装在/usr/local/mysql 路径下，那么还需要做如下操作,rpm包安装无需此操作  
+``` ln -s /usr/local/mysql/bin/* /usr/bin/ # ```  
 
-5、ssh互信  
+6、ssh互信  
 ```
 ssh-keygen -t rsa
 ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.101.66
