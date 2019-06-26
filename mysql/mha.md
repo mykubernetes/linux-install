@@ -45,7 +45,7 @@ mysql>grant all on *.* to 'root'@'192.168.101.%' identified by '123456';
 grant all on *.* to 'root'@'192.168.101.69' identified by '123456';
 grant all on *.* to 'root'@'192.168.101.70' identified by '123456';
 grant all on *.* to 'root'@'192.168.101.71' identified by '123456';
-flush privileges；
+flush privileges;
 ```  
 
 5、配置主从  
