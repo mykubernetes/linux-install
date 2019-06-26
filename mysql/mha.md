@@ -103,7 +103,7 @@ MHA_Manager管理节点节点：
 ```
 # mkdir -p /etc/mha/scripts
 
-# vim /etc/masterha/app1.cnf
+# vim /etc/masterha_default.cnf
 [server default]
 user=root                 # 这个是mysql的root 用户
 password=123456           # mysql的root用户密码
