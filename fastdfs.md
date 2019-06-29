@@ -97,14 +97,15 @@ http.server_port=8888                  # http访问文件的端口
 ```  
 其它参数保留默认配置， 具体配置解释可参考官方文档说明：http://bbs.chinaunix.net/thread-1941456-1-1.html  
 2、创建基础数据目录  
-``` mkdir -p /fastdfs/storage ```  
+``` mkdir -p /fastdfs/storage/0 ```  
 
 3、启动storage服务器  
 ```
 /etc/init.d/fdfs_storaged start
 初次启动，会在/fastdfs/storage目录下生成logs、data两个目录。
-drwxr-xr-x 259 root root 4096 Mar 31 06:22 data
-drwxr-xr-x   2 root root 4096 Mar 31 06:22 logs
+drwxr-xr-x. 3 root root 18 Jun 29 04:19 0
+drwxr-xr-x. 3 root root 90 Jun 29 04:19 data
+drwxr-xr-x. 2 root root 26 Jun 29 04:19 logs
 检查FastDFS Tracker Server是否启动成功：
 ps -ef | grep fdfs_storaged
 ```  
