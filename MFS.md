@@ -86,3 +86,14 @@ MASTER_HOST = 192.168.101.69
 sbin/mfsmetalogger start
 netstat -antpu | grep 9419
 ```  
+
+存储Chunk Server  
+---
+1、下载安装
+```
+wget https://github.com/moosefs/moosefs/archive/v3.0.105.tar.gz
+tar xvf v3.0.105.tar.gz 
+cd moosefs-3.0.105/
+./configure --prefix=/opt/mfsostor --with-default-user=mfs --with-default-group=mfs
+make && make install
+```  
