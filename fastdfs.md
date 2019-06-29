@@ -183,15 +183,24 @@ make && make install
 
 5、复制 fastdfs-nginx-module 源码中的配置文件到/etc/fdfs 目录,并修改  
 ```
-cp /root/fastdfs-nginx-module/src/mod_fastdfs.conf /etc/fdfs/ 
+cp /opt/fastdfs-nginx-module/src/mod_fastdfs.conf /etc/fdfs/ 
 vim /etc/fdfs/mod_fastdfs.conf
 connect_timeout=10
 base_path=/fastdfs/storage
 tracker_server=192.168.101.69:22122    # tracker服务器IP和端口
-tracker_server=192.168.101.70:22122    #tracker服务器IP2和端口
-url_have_group_name=true               #url中包含group名称 
-#在最后添加 [group1] 
+tracker_server=192.168.101.70:22122    # tracker服务器IP2和端口
+url_have_group_name=true               # url中包含group名称
+store_path0=/fastdfs/storage
+group_count = 2                        # group个数
+#在最后添加
+[group1]
 group_name=group1 
+storage_server_port=23000 
+store_path_count=1 
+store_path0=/fastdfs/storage/0
+
+[group2]
+group_name=group2 
 storage_server_port=23000 
 store_path_count=1 
 store_path0=/fastdfs/storage/0
@@ -199,7 +208,7 @@ store_path0=/fastdfs/storage/0
 
 6、复制 FastDFS 的部分配置文件到/etc/fdfs 目录  
 ```
-cd /root/fastdfs/conf
+cd /opt/fastdfs/conf
 cp http.conf mime.types /etc/fdfs/
 ```  
 
