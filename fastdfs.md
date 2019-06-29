@@ -126,8 +126,13 @@ fdfs_monitor /etc/fdfs/storage.conf
 cp /etc/fdfs/client.conf.sample /etc/fdfs/client.conf
 vim /etc/fdfs/client.conf
 base_path=/fastdfs/tracker
-tracker_server=10.100.139.121:22122  # tracker服务器IP和端口
-tracker_server=10.100.138.180:22122  #tracker服务器IP2和端口
+tracker_server=192.168.101.69:22122  # tracker服务器IP和端口
+tracker_server=192.168.101.70:22122  #tracker服务器IP2和端口
+```  
+
+2、查看节点状态  
+```
+fdfs_monitor client.conf
 ```  
 
 2、执行文件上传命令  
