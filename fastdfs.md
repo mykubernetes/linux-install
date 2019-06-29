@@ -279,24 +279,3 @@ useradd -g nginx -r nginx          #创建ngixn用户
 http://192.168.101.69:8888/group1/M00/00/00/CmSKtFj13gyAen4oAAH0yXi-HW8296  
 http://192.168.101.70:8888/group1/M00/00/00/CmSKtFj13gyAen4oAAH0yXi-HW8296  
 
-七、客户端配置  
-1、项目pom.xml引入  
-```
-<dependency>
-	<groupId>fastdfs_client</groupId>
-	<artifactId>fastdfs_client</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
-</dependency>
-```  
-2、resources下加入文件fastdfs_client.conf  
-注意修改ip0为tracker服务器Ip地址  
-```
-connect_timeout = 2
-network_timeout = 30
-charset = ISO8859-1
-http.tracker_http_port = 8888
-http.anti_steal_token = no
-tracker_server=192.168.101.69:22122
-tracker_server=192.1618.101.70:22122
-default_group_name=group1
-```  
