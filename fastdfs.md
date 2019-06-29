@@ -1,60 +1,38 @@
-服务器规划：
-VIP :10.100.139.129
-跟踪服务器1【主机】（Tracker Server）：10.100.139.121
-跟踪服务器2【备机】（Tracker Server）：10.100.138.180
-
-存储服务器1（Storage Server）：10.100.139.121
-存储服务器2（Storage Server）：10.100.138.180
-存储服务器3（Storage Server）：10.100.138.153
-
-操作系统：CentOS7 
-用户：root 
-数据存储目录：
-应用	安装目录
-Nginx	/opt/nginx
-Fastdfs	/usr/bin
-Keepalived	/usr/local
-安装包	/home/yxgly/resources
-/usr/local/src
-Tracker_data	/fastdfs/tracker
-Storage_data	/fastdfs/storage
-
-安装包： 
-1.	FastDFS_v5.08.tar.gz：FastDFS源码 
-2.	libfastcommon-master.zip：（从 FastDFS 和 FastDHT 中提取出来的公共 C 函数库） 
-3.	fastdfs-nginx-module-master.zip：storage节点http服务nginx模块 
-4.	nginx-1.10.0.tar.gz：Nginx安装包 
-5.	ngx_cache_purge-2.3.tar.gz：图片缓存清除Nginx模块（集群环境会用到） 
-
-
-下载完成后，将压缩包解压到/usr/local/src目录下
-一、所有tracker和storage节点都执行如下操作
-1、安装所需的依赖包
-yum install make cmake gcc gcc-c++
-2、安装libfatscommon
-cd /usr/local/src
-#安装unzip 命令： yum install -y unzip zip
-unzip libfastcommon-master.zip    
-cd libfastcommon-master
-## 编译、安装
+安装fastdfs
+===
+一、所有tracker和storage节点都执行如下操作  
+---
+1、安装所需的依赖包  
+``` yum install make cmake gcc gcc-c++ ```  
+2、安装libfatscommon  
+```
+git clone https://github.com/happyfish100/libfastcommon.git
+cd libfastcommon
 ./make.sh
 ./make.sh install
-3、安装FastDFS
-cd /usr/local/src
-tar -xzvf FastDFS_v5.08.tar.gz
-cd FastDFS
+```  
+3、安装FastDFS  
+```
+git clone https://github.com/happyfish100/fastdfs.git
+cd fastdfs
 ./make.sh
 ./make.sh install
-采用默认安装方式，相应的文件与目录检查如下：
-1> 服务脚本：
+```  
+采用默认安装方式，相应的文件与目录检查如下：  
+1> 服务脚本：  
+```
 /etc/init.d/fdfs_storaged
 /etc/init.d/fdfs_trackerd
-2> 配置文件（示例配置文件）：
+```
+2> 配置文件（示例配置文件）：  
+ ```
  ll /etc/fdfs/
 -rw-r--r-- 1 root root  1461 1月   4 14:34 client.conf.sample
 -rw-r--r-- 1 root root  7927 1月   4 14:34 storage.conf.sample
 -rw-r--r-- 1 root root  7200 1月   4 14:34 tracker.conf.sample
-3> 命令行工具（/usr/bin目录下）
+```  
+3> 命令行工具（/usr/bin目录下）  
+```
 ll /usr/bin/fdfs_*
 
 -rwxr-xr-x    1 root root     260584 1月   4 14:34 fdfs_appender_test
@@ -71,8 +49,10 @@ ll /usr/bin/fdfs_*
 -rwxr-xr-x    1 root root     371336 1月   4 14:34 fdfs_trackerd
 -rwxr-xr-x    1 root root     251651 1月   4 14:34 fdfs_upload_appender
 -rwxr-xr-x    1 root root     252781 1月   4 14:34 fdfs_upload_file
+```  
 
-二、配置tracker服务器
+二、配置tracker服务器  
+---
 1、复制tracker样例配置文件，并重命名
  cp /etc/fdfs/tracker.conf.sample /etc/fdfs/tracker.conf
 2、修改tracker配置文件
