@@ -172,26 +172,25 @@ CORE_INCS="$CORE_INCS /usr/local/include/fastdfs /usr/local/include/fastcommon/"
 CORE_INCS="$CORE_INCS /usr/include/fastdfs /usr/include/fastcommon/"
 ```  
 
-3、安装Nginx上传当前的版本 Nginx(nginx-1.10.0.tar.gz)到/usr/local/src 目录  
-
-4、安装编译 Nginx 所需的依赖包  
+3、安装编译 Nginx 所需的依赖包  
 ```
 yum install gcc gcc-c++ make automake autoconf libtool pcre* zlib openssl openssl-devel
 ```  
 
-5、编译安装 Nginx (添加 fastdfs-nginx-module 模块)   
+4、编译安装 Nginx (添加 fastdfs-nginx-module 模块)   
 ```
 tar -zxvf nginx-1.10.0.tar.gz
 tar –zxvf ngx_cache_purge_2.3.tar.gz
 
 cd nginx-1.10.0
 
-./configure --prefix=/opt/nginx --add-module=/usr/local/src/fastdfs-nginx-module/src --add-module=/usr/local/src/ngx_cache_purge-2.3
+./configure --prefix=/opt/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --user=nginx --group=nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre 
+--add-module=/root/fastdfs-nginx-module/src --add-module=/root/ngx_cache_purge/src/ngx_cache_purge-2.3
  
 make && make install
 ```  
 
-6.复制 fastdfs-nginx-module 源码中的配置文件到/etc/fdfs 目录,并修改  
+5.复制 fastdfs-nginx-module 源码中的配置文件到/etc/fdfs 目录,并修改  
 ```
 cp /usr/local/src/fastdfs-nginx-module/src/mod_fastdfs.conf      /etc/fdfs/ 
 vim /etc/fdfs/mod_fastdfs.conf
@@ -207,16 +206,16 @@ store_path_count=1
 store_path0=/fastdfs/storage
 ```  
 
-7、复制 FastDFS 的部分配置文件到/etc/fdfs 目录  
+6、复制 FastDFS 的部分配置文件到/etc/fdfs 目录  
 ```
 cd /usr/local/src/FastDFS/conf
 cp http.conf mime.types /etc/fdfs/
 ```  
 
-8、在/fastdfs/storage 文件存储目录下创建软连接,将其链接到实际存放数据的目录  
+7、在/fastdfs/storage 文件存储目录下创建软连接,将其链接到实际存放数据的目录  
 ``` ln -s /fastdfs/storage/data/ /fastdfs/storage/data/M00 ```  
 
-9、配置 Nginx  
+8、配置 Nginx  
 ```
 user nobody;
 worker_processes 1;
@@ -257,7 +256,7 @@ http {
 ```  
 C、如查下载时如发现老报 404,将 nginx.conf 第一行 user nobody 修改为 user root 后重新启动。  
 
-10、防火墙中打开 Nginx 的 8888 端口  
+9、防火墙中打开 Nginx 的 8888 端口  
 ```
 vi /etc/sysconfig/iptables
  添加:
