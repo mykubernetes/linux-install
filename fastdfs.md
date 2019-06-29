@@ -85,6 +85,7 @@ ps -ef | grep fdfs_trackerd
 cp /etc/fdfs/storage.conf.sample /etc/fdfs/storage.conf
 vi /etc/fdfs/storage.conf
 disabled=false                       # 启用配置文件
+group_name=group1                    # 属于第几个组，默认属于第一个组
 port=23000                           # storage服务端口
 base_path=/fastdfs/storage           # 数据和日志文件存储根目录
 store_path0=/fastdfs/storage         # 第一个存储目录
@@ -103,13 +104,13 @@ http.server_port=8888                # http访问文件的端口
 drwxr-xr-x 259 root root 4096 Mar 31 06:22 data
 drwxr-xr-x   2 root root 4096 Mar 31 06:22 logs
 检查FastDFS Tracker Server是否启动成功：
- ps -ef | grep fdfs_storaged
+ps -ef | grep fdfs_storaged
 ```  
 
 
-注：集群环境下
-追踪+存储节点操作步骤一、步骤二、步骤三
-存储节点只做存储则只操作步骤三
+注：集群环境下  
+追踪+存储节点操作步骤一、步骤二、步骤三  
+存储节点只做存储则只操作步骤三  
 
 四、文件上传测试（ip01）
 1、修改Tracker服务器客户端配置文件
