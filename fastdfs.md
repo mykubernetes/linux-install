@@ -360,7 +360,7 @@ http {
             proxy_cache http-cache;
             proxy_cache_valid 200 304 12h;
             #对应group1的服务设置
-            proxy_cache_key $uri$ais_args$args;
+            proxy_cache_key $uri$is_args$args;
             proxy_pass http://fdfs_group1;
             expires 30d;
         }
@@ -385,3 +385,6 @@ http {
         }
 
 ```  
+
+6、创建缓存目录  
+``` mkdir /fastdfs/cache/nginx/proxy_cache -pv ```  
