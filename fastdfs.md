@@ -138,7 +138,7 @@ fdfs_monitor /etc/fdfs/client.conf
 ```
 #/etc/fstab 是需要上传文件路径
 /usr/bin/fdfs_upload_file /etc/fdfs/client.conf /etc/fstab
-返回文件ID号：group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07quU0oE095
+返回文件ID号：group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337
 （能返回以上文件ID，说明文件已经上传成功）
 或者: 
 /usr/bin/fdfs_test /etc/fdfs/client.conf upload client.conf
@@ -146,12 +146,12 @@ fdfs_monitor /etc/fdfs/client.conf
 
 4、查看上传的文件  
 ```
-fdfs_file_info /etc/fdfs/client.conf group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07quU0oE095
+fdfs_file_info /etc/fdfs/client.conf group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337
 ```  
 
 5、下载文件  
 ```
-fdfs_download_file /etc/fdfs/client.conf group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07quU0oE095 /tmp/fstab
+fdfs_download_file /etc/fdfs/client.conf group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337 /tmp/fstab
 ```  
 
 五、在所有storage节点安装fastdfs-nginx-module  
