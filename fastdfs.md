@@ -271,7 +271,7 @@ useradd -g nginx -r nginx          #创建ngixn用户
 
 六、验证：通过浏览器访问测试时上传的文件  
  
-切换追踪服务器IP同样可以访问  
-http://192.168.101.69:8888/group1/M00/00/00/CmSKtFj13gyAen4oAAH0yXi-HW8296  
-http://192.168.101.70:8888/group1/M00/00/00/CmSKtFj13gyAen4oAAH0yXi-HW8296  
+浏览器访问
+http://192.168.101.69:8888/group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337
+http://192.168.101.70:8888/group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337
 
