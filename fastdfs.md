@@ -53,74 +53,64 @@ ll /usr/bin/fdfs_*
 
 二、配置tracker服务器  
 ---
-1、复制tracker样例配置文件，并重命名
- cp /etc/fdfs/tracker.conf.sample /etc/fdfs/tracker.conf
-2、修改tracker配置文件
+1、修改tracker配置文件
+```
+cp /etc/fdfs/tracker.conf.sample /etc/fdfs/tracker.conf
 vim /etc/fdfs/tracker.conf
-# 修改的内容如下：
 disabled=false              # 启用配置文件
 port=22122                  # tracker服务器端口（默认22122）
 base_path=/fastdfs/tracker  # 存储日志和数据的根目录
-store_group=group1
-其它参数保留默认配置， 具体配置解释可参考官方文档说明：http://bbs.chinaunix.net/thread-1941456-1-1.html
-3、创建base_path指定的目录
-mkdir -p /fastdfs/tracker
-4、防火墙中打开tracker服务器端口（ 默认为 22122）
-vi /etc/sysconfig/iptables 
-附加：若/etc/sysconfig 目录下没有iptables文件可随便写一条iptables命令配置个防火墙规则：如：
-　　iptables -P OUTPUT ACCEPT
-　　然后用命令：service iptables save 进行保存，默认就保存到 /etc/sysconfig/iptables 文件里。这时既有了这个文件。防火墙也可以启动了。接下来要写策略，也可以直接写在/etc/sysconfig/iptables 里了。
-添加如下端口行： 
--A INPUT -m state --state NEW -m tcp -p tcp --dport 22122 -j ACCEPT 
-重启防火墙
-service iptables restart
-5、启动tracker服务器
- /etc/init.d/fdfs_trackerd start
+store_lookup=2              # 0代表轮训，1代表挑选的组，如果是1则安装store_group=group1的配置写入，2挑选空闲最多的空间写入
+store_group=group1          # store_lookup=1才生效
+reserved_storage_space = 10%   # 硬盘空间至少保留的最大空间，以免被占满，影响其他进程使用
+```  
+其它参数保留默认配置， 具体配置解释可参考官方文档说明：http://bbs.chinaunix.net/thread-1941456-1-1.html  
+2、创建base_path指定的目录  
+``` mkdir -p /fastdfs/tracker ```  
+
+3、启动tracker服务器  
+```
+/etc/init.d/fdfs_trackerd start
 初次启动，会在/fastdfs/tracker目录下生成logs、data两个目录。
-drwxr-xr-x 2 root root 4096 1月   4 15:00 data
-drwxr-xr-x 2 root root 4096 1月   4 14:38 logs
+drwxr-xr-x. 2 root root 83 Jun 28 23:40 data
+drwxr-xr-x. 2 root root 26 Jun 28 23:39 logs
 检查FastDFS Tracker Server是否启动成功：
 ps -ef | grep fdfs_trackerd
- 
-三、配置storage服务器
-1、复制storage样例配置文件，并重命名
- cp /etc/fdfs/storage.conf.sample /etc/fdfs/storage.conf
-2、编辑配置文件
+```  
+
+三、配置storage服务器  
+---
+1、编辑配置文件  
+```
+cp /etc/fdfs/storage.conf.sample /etc/fdfs/storage.conf
 vi /etc/fdfs/storage.conf
+disabled=false                       # 启用配置文件
+port=23000                           # storage服务端口
+base_path=/fastdfs/storage           # 数据和日志文件存储根目录
+store_path0=/fastdfs/storage         # 第一个存储目录
+tracker_server=192.168.101.69:22122  # tracker服务器IP和端口
+tracker_server=192.168.101.70:22122  #tracker服务器IP2和端口
+http.server_port=8888                # http访问文件的端口
+```  
+其它参数保留默认配置， 具体配置解释可参考官方文档说明：http://bbs.chinaunix.net/thread-1941456-1-1.html  
+2、创建基础数据目录  
+``` mkdir -p /fastdfs/storage ```  
 
-# 修改的内容如下:
-disabled=false                      # 启用配置文件
-port=23000                          # storage服务端口
-base_path=/fastdfs/storage          # 数据和日志文件存储根目录
-store_path0=/fastdfs/storage        # 第一个存储目录
-tracker_server=10.100.139.121:22122  # tracker服务器IP和端口
-tracker_server=10.100.138.180:22122  #tracker服务器IP2和端口
-http.server_port=8888               # http访问文件的端口
-其它参数保留默认配置， 具体配置解释可参考官方文档说明：http://bbs.chinaunix.net/thread-1941456-1-1.html
-3、创建基础数据目录
-mkdir -p /fastdfs/storage
-4、防火墙中打开storage服务器端口（ 默认为 23000）
-vi /etc/sysconfig/iptables
-
-#添加如下端口行： 
--A INPUT -m state --state NEW -m tcp -p tcp --dport 23000 -j ACCEPT
-重启防火墙
- service iptables restart
-
-注：集群环境下
-追踪+存储节点操作步骤一、步骤二、步骤三
-存储节点只做存储则只操作步骤三
-5、启动storage服务器
+3、启动storage服务器  
+```
 /etc/init.d/fdfs_storaged start
 初次启动，会在/fastdfs/storage目录下生成logs、data两个目录。
 drwxr-xr-x 259 root root 4096 Mar 31 06:22 data
 drwxr-xr-x   2 root root 4096 Mar 31 06:22 logs
- 
 检查FastDFS Tracker Server是否启动成功：
-[root@gyl-test-t9 ~]# ps -ef | grep fdfs_storaged
-root      1336     1  3 06:22 ?        00:00:01 /usr/bin/fdfs_storaged /etc/fdfs/storage.conf
-root      1347   369  0 06:23 pts/0    00:00:00 grep fdfs_storaged
- 
+ ps -ef | grep fdfs_storaged
+```  
+
+
+注：集群环境下
+追踪+存储节点操作步骤一、步骤二、步骤三
+存储节点只做存储则只操作步骤三
+
 四、文件上传测试（ip01）
 1、修改Tracker服务器客户端配置文件
 cp /etc/fdfs/client.conf.sample /etc/fdfs/client.conf
