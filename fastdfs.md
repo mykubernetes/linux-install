@@ -269,7 +269,7 @@ useradd -g nginx -r nginx          #创建ngixn用户
 /opt/nginx/sbin/nginx -s reload    #重启
 ```  
  
-浏览器访问  
+浏览器访问storage  
 http://192.168.101.69:8888/group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337  
 http://192.168.101.70:8888/group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337  
 
@@ -353,7 +353,6 @@ http {
         listen       8000;
         server_name  localhost;
 
-        #charset koi8-r;
         #group1的复制均衡配置
         location /group1/M00 {
             proxy_next_upstream http_502 http_504 error timeout invalid_header;
@@ -388,3 +387,15 @@ http {
 
 6、创建缓存目录  
 ``` mkdir /fastdfs/cache/nginx/proxy_cache -pv ```  
+
+7、启动 Nginx  
+```
+groupadd -r nginx                  #创建nginx组
+useradd -g nginx -r nginx          #创建ngixn用户
+/opt/nginx/sbin/nginx              #启动
+/opt/nginx/sbin/nginx -s reload    #重启
+```  
+
+8、浏览器访问tracker  
+http://192.168.101.69:8000/group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337  
+http://192.168.101.70:8000/group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337  
