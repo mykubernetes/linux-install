@@ -184,8 +184,7 @@ tar –zxvf ngx_cache_purge_2.3.tar.gz
 
 cd nginx-1.10.0
 
-./configure --prefix=/opt/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --user=nginx --group=nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre 
---add-module=/root/fastdfs-nginx-module/src --add-module=/root/ngx_cache_purge/src/ngx_cache_purge-2.3
+./configure --prefix=/opt/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --user=nginx --group=nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre --add-module=/root/fastdfs-nginx-module/src --add-module=/root/ngx_cache_purge/src/ngx_cache_purge-2.3
  
 make && make install
 ```  
@@ -196,8 +195,8 @@ cp /usr/local/src/fastdfs-nginx-module/src/mod_fastdfs.conf      /etc/fdfs/
 vim /etc/fdfs/mod_fastdfs.conf
 connect_timeout=10
 base_path=/tmp  
-tracker_server=10.100.139.121:22122  # tracker服务器IP和端口
-tracker_server=10.100.138.180:22122  #tracker服务器IP2和端口
+tracker_server=192.168.101.69:22122  # tracker服务器IP和端口
+tracker_server=192.168.101.70:22122  #tracker服务器IP2和端口
 url_have_group_name=true   #url中包含group名称 
 #在最后添加 [group1] 
 group_name=group1 
@@ -229,7 +228,7 @@ http {
     keepalive_timeout 65;
     server {
         listen 8888;
-        server_name 10.100.139.121;
+        server_name 192.168.101.69;
         location ~/group1/M00 {
             ngx_fastdfs_module;
         }
@@ -240,9 +239,9 @@ http {
         }
     }
  upstream storage_server_group1{                                                                                              
-                 server 10.100.139.121:8888 weight=10;                                                                               
-                 server 10.100.138.180:8888 weight=10;                                                                               
-                 server 10.100.138.153:8888 weight=10;                                                                               
+                 server 192.168.101.69:8888 weight=10;                                                                               
+                 server 192.168.101.70:8888 weight=10;                                                                               
+                 server 192.168.101.71:8888 weight=10;                                                                               
         }
 }
 ```  
@@ -293,7 +292,7 @@ network_timeout = 30
 charset = ISO8859-1
 http.tracker_http_port = 8888
 http.anti_steal_token = no
-tracker_server =10.100.139.121:22122
-tracker_server=10.100.138.180:22122
+tracker_server=192.168.101.69:22122
+tracker_server=192.1618.101.70:22122
 default_group_name=group1
 ```  
