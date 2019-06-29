@@ -207,7 +207,7 @@ store_path0=/fastdfs/storage
 
 6、复制 FastDFS 的部分配置文件到/etc/fdfs 目录  
 ```
-cd /usr/local/src/FastDFS/conf
+cd /root/fastdfs/conf
 cp http.conf mime.types /etc/fdfs/
 ```  
 
