@@ -1,3 +1,5 @@
+mfsmaster
+---
 1、安装依赖  
 ``` yum install rpm-build gcc gcc-c++ fuse-devel zlib-devel -y ```  
 
@@ -55,4 +57,32 @@ rw                     读写
 alldirs                允许挂载任何指定的子目录 
 maproot                映射为 root 用户还是指定的用户
 password               指定客户端密码
+```  
+
+安装元数据mfsmetalogger
+---
+1、下载安装
+```
+wget https://github.com/moosefs/moosefs/archive/v3.0.105.tar.gz
+tar xvf v3.0.105.tar.gz 
+cd moosefs-3.0.105/
+./configure --prefix=/opt/mfsmeta --with-default-user=mfs --with-default-group=mfs
+make && make install
+```  
+
+2、拷贝配置文件  
+```
+cd /opt/mfsmeta/etc/mfs
+cp mfsmetalogger.cfg.sample mfsmetalogger.cfg
+vim mfsmetalogger.cfg
+MASTER_HOST = 192.168.101.69
+```  
+
+3、更改属主属组  
+``` chown -R mfs.mfs /opt/mfsmeta/ ```  
+
+4、启动  
+```
+sbin/mfsmetalogger start
+netstat -antpu | grep 9419
 ```  
