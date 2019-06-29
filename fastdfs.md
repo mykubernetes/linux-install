@@ -349,4 +349,39 @@ http {
         server 192.168.101.72:8888 weight=1 max_fails=2 fail_timeout=30s;
     }
 
+    server {
+        listen       8000;
+        server_name  localhost;
+
+        #charset koi8-r;
+        #group1的复制均衡配置
+        location /group1/M00 {
+            proxy_next_upstream http_502 http_504 error timeout invalid_header;
+            proxy_cache http-cache;
+            proxy_cache_valid 200 304 12h;
+            #对应group1的服务设置
+            proxy_cache_key $uri$ais_args$args;
+            proxy_pass http://fdfs_group1;
+            expires 30d;
+        }
+
+       #group2的复制均衡配置
+       location /group2/M00 {
+            proxy_next_upstream http_502 http_504 error timeout invalid_header;
+            proxy_cache http-cache;
+            proxy_cache_valid 200 304 12h;
+            #对应group2的服务设置
+            proxy_cache_key $uri$is_args$args;
+            proxy_pass http://fdfs_group2;
+            expires 30d;
+        }
+                                            
+        #清除缓存的访问权限
+        location  ~/purge(/.*) {
+            allow 127.0.0.1;
+            allow 192.168.101.0/24;
+            deny all;
+            proxy_cache_purge http-cache $1$is_args$args;
+        }
+
 ```  
