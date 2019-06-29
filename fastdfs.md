@@ -157,15 +157,15 @@ fdfs_download_file /etc/fdfs/client.conf group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07q
 
 五、在所有storage节点安装fastdfs-nginx-module  
 ---
-1、解压 fastdfs-nginx-module_v1.16.tar.gz  
+1、下载 fastdfs-nginx-module模块  
 ```
-tar -xzvf fastdfs-nginx-module_v1.16.tar.gz
+git clone https://github.com/happyfish100/fastdfs-nginx-module.git
 ```  
 
 2、修改 fastdfs-nginx-module 的 config 配置文件  
 ```
 cd fastdfs-nginx-module/src
-vi config
+vim config
 将
 CORE_INCS="$CORE_INCS /usr/local/include/fastdfs /usr/local/include/fastcommon/" 
 修改为:
