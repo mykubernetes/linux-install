@@ -173,12 +173,10 @@ yum install gcc gcc-c++ make automake autoconf libtool pcre* zlib openssl openss
 
 4、编译安装 Nginx (添加 fastdfs-nginx-module 模块)   
 ```
-tar -zxvf nginx-1.10.0.tar.gz
-tar –zxvf ngx_cache_purge_2.3.tar.gz
+tar -zxvf nginx-1.16.0.tar.gz
+cd nginx-1.16.0
 
-cd nginx-1.10.0
-
-./configure --prefix=/opt/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --user=nginx --group=nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre --add-module=/root/fastdfs-nginx-module/src --add-module=/root/ngx_cache_purge/src/ngx_cache_purge-2.3
+./configure --prefix=/opt/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --user=nginx --group=nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre --add-module=/opt/fastdfs-nginx-module/src
  
 make && make install
 ```  
