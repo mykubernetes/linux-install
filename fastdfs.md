@@ -194,7 +194,7 @@ make && make install
 cp /root/fastdfs-nginx-module/src/mod_fastdfs.conf /etc/fdfs/ 
 vim /etc/fdfs/mod_fastdfs.conf
 connect_timeout=10
-base_path=/tmp  
+base_path=/fastdfs/storage
 tracker_server=192.168.101.69:22122    # tracker服务器IP和端口
 tracker_server=192.168.101.70:22122    #tracker服务器IP2和端口
 url_have_group_name=true               #url中包含group名称 
@@ -226,9 +226,10 @@ http {
     default_type application/octet-stream;
     sendfile on;
     keepalive_timeout 65;
+    
     server {
         listen 8888;
-        server_name 192.168.101.69;
+        server_name localhost;
         location ~/group1/M00 {
             ngx_fastdfs_module;
         }
@@ -238,6 +239,7 @@ http {
             root html;
         }
     }
+ 
  upstream storage_server_group1{                                                                                              
                  server 192.168.101.69:8888 weight=10;                                                                               
                  server 192.168.101.70:8888 weight=10;                                                                               
@@ -257,17 +259,19 @@ C、如查下载时如发现老报 404,将 nginx.conf 第一行 user nobody 修�
 
 9、防火墙中打开 Nginx 的 8888 端口  
 ```
-vi /etc/sysconfig/iptables
- 添加:
+vim /etc/sysconfig/iptables
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 8888 -j ACCEPT
 
-#重启防火墙
 service iptables restart
 ```  
 
-启动 Nginx  
-``` /opt/nginx/sbin/nginx -s reload ```  
-
+10、启动 Nginx  
+```
+groupadd -r nginx                  #创建nginx组
+useradd -g nginx -r nginx          #创建ngixn用户
+/opt/nginx/sbin/nginx              #启动
+/opt/nginx/sbin/nginx -s reload    #重启
+```  
 
 六、验证：通过浏览器访问测试时上传的文件  
  
