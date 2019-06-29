@@ -135,16 +135,26 @@ tracker_server=192.168.101.70:22122  #tracker服务器IP2和端口
 fdfs_monitor client.conf
 ```  
 
-2、执行文件上传命令  
+3、执行文件上传命令  
 ```
-#/usr/local/src/test.png 是需要上传文件路径
-/usr/bin/fdfs_upload_file /etc/fdfs/client.conf /usr/local/src/test.png
-返回文件ID号：group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07quU0oE095.png
+#/etc/fstab 是需要上传文件路径
+/usr/bin/fdfs_upload_file /etc/fdfs/client.conf /etc/fstab
+返回文件ID号：group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07quU0oE095
 （能返回以上文件ID，说明文件已经上传成功）
-Or : 
+或者: 
 /usr/bin/fdfs_test /etc/fdfs/client.conf upload client.conf
 ```  
- 
+
+4、查看上传的文件  
+```
+fdfs_file_info /etc/fdfs/client.conf group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07quU0oE095
+```  
+
+5、下载文件  
+```
+fdfs_download_file /etc/fdfs/client.conf group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07quU0oE095 /tmp/fstab
+```  
+
 五、在所有storage节点安装fastdfs-nginx-module
 1、fastdfs-nginx-module 作用说明
    FastDFS 通过 Tracker 服务器,将文件放在 Storage 服务器存储,但是同组存储服务器之间需要进入 文件复制,有同步延迟的问题。假设 Tracker 服务器将文件上传到了 ip01,上传成功后文件 ID 已经返回给客户端。此时 FastDFS 存储集群机制会将这个文件同步到同组存储 ip02,在文件还 没有复制完成的情况下,客户端如果用这个文件 ID 在 ip02 上取文件,就会出现文件无法访问的 错误。而 fastdfs-nginx-module 可以重定向文件连接到源服务器取文件,避免客户端由于复制延迟导致的 文件无法访问错误。(解压后的 fastdfs-nginx-module 在 nginx 安装时使用)
