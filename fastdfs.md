@@ -400,4 +400,3 @@ useradd -g nginx -r nginx          #创建ngixn用户
 http://192.168.101.69:8000/group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337  
 http://192.168.101.70:8000/group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0ZE__og7799337  
 
-参考https://www.jianshu.com/p/88ccae4cbd82  
