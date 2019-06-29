@@ -248,43 +248,47 @@ http {
 }
 ```  
 
- A、8888 端口值是要与/etc/fdfs/storage.conf 中的 http.server_port=8888 相对应, 因为 http.server_port 默认为 8888,如果想改成 80,则要对应修改过来。
- B、Storage 对应有多个 group 的情况下,访问路径带 group 名,如/group1/M00/00/00/xxx, 对应的 Nginx 配置为:
+ A、8888 端口值是要与/etc/fdfs/storage.conf 中的 http.server_port=8888 相对应, 因为 http.server_port 默认为 8888,如果想改成 80,则要对应修改过来。  
+ B、Storage 对应有多个 group 的情况下,访问路径带 group 名,如/group1/M00/00/00/xxx, 对应的 Nginx 配置为:  
+ ```
      location ~/group([0-9])/M00 {
          ngx_fastdfs_module;
 }
-C、如查下载时如发现老报 404,将 nginx.conf 第一行 user nobody 修改为 user root 后重新启动。
-12、防火墙中打开 Nginx 的 8888 端口
+```  
+C、如查下载时如发现老报 404,将 nginx.conf 第一行 user nobody 修改为 user root 后重新启动。  
+
+10、防火墙中打开 Nginx 的 8888 端口  
+```
 vi /etc/sysconfig/iptables
  添加:
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 8888 -j ACCEPT
 
 #重启防火墙
 service iptables restart
- 启动 Nginx
-若出现图中错误：
- 
-解决方案: /opt/nginx/sbin/nginx -c /usr/local/src/nginx-1.10.0/conf/nginx.conf  
-错误2：
- 
-解决方案2：ln -s /usr/local/lib/libpcre.so.1 /lib64
+```  
 
- /opt/nginx/sbin/nginx
-(重启 Nginx 的命令为:/opt/nginx/sbin/nginx -s reload)
- 六、验证：通过浏览器访问测试时上传的文件
-切换追踪服务器IP同样可以访问
-http://10.100.139.121:8888/group1/M00/00/00/CmSKtFj13gyAen4oAAH0yXi-HW8296.png
-http://10.100.138.180:8888/group1/M00/00/00/CmSKtFj13gyAen4oAAH0yXi-HW8296.png
-七、客户端配置
-1、项目pom.xml引入 
+启动 Nginx  
+``` /opt/nginx/sbin/nginx -s reload ```  
+
+
+六、验证：通过浏览器访问测试时上传的文件  
+ 
+切换追踪服务器IP同样可以访问  
+http://192.168.101.69:8888/group1/M00/00/00/CmSKtFj13gyAen4oAAH0yXi-HW8296  
+http://192.168.101.70:8888/group1/M00/00/00/CmSKtFj13gyAen4oAAH0yXi-HW8296  
+
+七、客户端配置  
+1、项目pom.xml引入  
+```
 <dependency>
-			<groupId>fastdfs_client</groupId>
-			<artifactId>fastdfs_client</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
-		</dependency>
-2、resources下加入文件fastdfs_client.conf 
-	注意修改ip0为tracker服务器Ip地址
-
+	<groupId>fastdfs_client</groupId>
+	<artifactId>fastdfs_client</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
+</dependency>
+```  
+2、resources下加入文件fastdfs_client.conf  
+注意修改ip0为tracker服务器Ip地址  
+```
 connect_timeout = 2
 network_timeout = 30
 charset = ISO8859-1
@@ -293,3 +297,4 @@ http.anti_steal_token = no
 tracker_server =10.100.139.121:22122
 tracker_server=10.100.138.180:22122
 default_group_name=group1
+```  
