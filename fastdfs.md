@@ -60,7 +60,7 @@ vim /etc/fdfs/tracker.conf
 disabled=false              # 启用配置文件
 port=22122                  # tracker服务器端口（默认22122）
 base_path=/fastdfs/tracker  # 存储日志和数据的根目录
-store_lookup=2              # 0代表轮训，1代表挑选的组，如果是1则安装store_group=group1的配置写入，2挑选空闲最多的空间写入
+store_lookup=2              # 如果有多个group,写入group的方式，0代表轮训，1代表挑选的组，如果是1则安装store_group=group1的配置写入，2挑选空闲最多的空间写入
 store_group=group1          # store_lookup=1才生效
 reserved_storage_space = 10%   # 硬盘空间至少保留的最大空间，以免被占满，影响其他进程使用
 ```  
