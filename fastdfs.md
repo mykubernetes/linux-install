@@ -300,3 +300,53 @@ cd nginx-1.16.0
 make && make install
 ```  
 
+5、配置nginx  
+```
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+    #设置缓存
+    server_names_hash_bucket_size 128;
+    client_header_buffer_size 32k;
+    large_client_header_buffers 4 32k;
+    client_max_body_size 300m;
+
+    proxy_redirect off;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_connect_timeout 90;
+    proxy_send_timeout 90;
+    proxy_read_timeout 90;
+    proxy_buffer_size 16k;
+    proxy_buffers 4 64k;
+    proxy_busy_buffers_size 128k;
+    proxy_temp_file_write_size 128k;
+    #设置缓存存储路径，存储方式，分别内存大小，磁盘最大空间，缓存期限
+    proxy_cache_path /fastdfs/cache/nginx/proxy_cache levels=1:2
+    keys_zone=http-cache:200m max_size=1g inactive=30d;
+    proxy_temp_path /fastdfs/cache/nginx/proxy_cache/tmp;
+    #group1的服务设置
+    upstream fdfs_group1 {
+        server 192.168.101.69:8888 weight=1 max_fails=2 fail_timeout=30s;
+        server 192.168.101.70:8888 weight=1 max_fails=2 fail_timeout=30s;
+    }
+    #group1的服务设置
+    upstream fdfs_group2 {
+        server 192.168.101.71:8888 weight=1 max_fails=2 fail_timeout=30s;
+        server 192.168.101.72:8888 weight=1 max_fails=2 fail_timeout=30s;
+    }
+
+```  
