@@ -131,7 +131,7 @@ tracker_server=192.168.101.70:22122  #tracker服务器IP2和端口
 
 2、查看节点状态  
 ```
-fdfs_monitor client.conf
+fdfs_monitor /etc/fdfs/client.conf
 ```  
 
 3、执行文件上传命令  
