@@ -84,16 +84,16 @@ ps -ef | grep fdfs_trackerd
 ```
 cp /etc/fdfs/storage.conf.sample /etc/fdfs/storage.conf
 vi /etc/fdfs/storage.conf
-disabled=false                       # 启用配置文件
-group_name=group1                    # 属于第几个组，默认属于第一个组
-port=23000                           # storage服务端口
-base_path=/fastdfs/storage           # 数据和日志文件存储根目录
-store_path_count=1                   # 指定默认有几个设备存储数据默认一个，如果有多个需要store_path0,store_path1来指定
-store_path0=/fastdfs/storage/0         # 第一个存储目录,如果只有一个挂载设备可以不用指0，直接到/fastdfs/storage/即可
-store_path1=/fastdfs/storage/1         # 第二个存储目录
-tracker_server=192.168.101.69:22122  # tracker服务器IP和端口
-tracker_server=192.168.101.70:22122  #tracker服务器IP2和端口
-http.server_port=8888                # http访问文件的端口
+disabled=false                         # 启用配置文件
+group_name=group1                      # 属于第几个组，默认属于第一个组
+port=23000                             # storage服务端口
+base_path=/fastdfs/storage             # 数据和日志文件存储根目录
+store_path_count=1                     # 指定默认有几个设备存储数据默认一个，如果有多个需要store_path0,store_path1来指定
+store_path0=/fastdfs/storage/0         # 第一个存储目录
+# store_path1=/fastdfs/storage/1       # 第二个存储目录
+tracker_server=192.168.101.69:22122    # tracker服务器IP和端口
+tracker_server=192.168.101.70:22122    #tracker服务器IP2和端口
+http.server_port=8888                  # http访问文件的端口
 ```  
 其它参数保留默认配置， 具体配置解释可参考官方文档说明：http://bbs.chinaunix.net/thread-1941456-1-1.html  
 2、创建基础数据目录  
@@ -191,18 +191,18 @@ make && make install
 
 5.复制 fastdfs-nginx-module 源码中的配置文件到/etc/fdfs 目录,并修改  
 ```
-cp /usr/local/src/fastdfs-nginx-module/src/mod_fastdfs.conf      /etc/fdfs/ 
+cp /root/fastdfs-nginx-module/src/mod_fastdfs.conf /etc/fdfs/ 
 vim /etc/fdfs/mod_fastdfs.conf
 connect_timeout=10
 base_path=/tmp  
-tracker_server=192.168.101.69:22122  # tracker服务器IP和端口
-tracker_server=192.168.101.70:22122  #tracker服务器IP2和端口
-url_have_group_name=true   #url中包含group名称 
+tracker_server=192.168.101.69:22122    # tracker服务器IP和端口
+tracker_server=192.168.101.70:22122    #tracker服务器IP2和端口
+url_have_group_name=true               #url中包含group名称 
 #在最后添加 [group1] 
 group_name=group1 
 storage_server_port=23000 
 store_path_count=1 
-store_path0=/fastdfs/storage
+store_path0=/fastdfs/storage/0
 ```  
 
 6、复制 FastDFS 的部分配置文件到/etc/fdfs 目录  
@@ -212,7 +212,7 @@ cp http.conf mime.types /etc/fdfs/
 ```  
 
 7、在/fastdfs/storage 文件存储目录下创建软连接,将其链接到实际存放数据的目录  
-``` ln -s /fastdfs/storage/data/ /fastdfs/storage/data/M00 ```  
+``` ln -s /fastdfs/storage/0/data/ /fastdfs/storage/0/data/M00 ```  
 
 8、配置 Nginx  
 ```
