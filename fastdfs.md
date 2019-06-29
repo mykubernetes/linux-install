@@ -231,21 +231,16 @@ http {
     server {
         listen 8888;
         server_name localhost;
-        location ~/group1/M00 {
+        location ~/group([0-9])/M00 {
             ngx_fastdfs_module;
         }
+
         error_page 500 502 503 504 /50x.html;
 
         location = /50x.html {
             root html;
         }
     }
- 
- upstream storage_server_group1{                                                                                              
-                 server 192.168.101.69:8888 weight=10;                                                                               
-                 server 192.168.101.70:8888 weight=10;                                                                               
-                 server 192.168.101.71:8888 weight=10;                                                                               
-        }
 }
 ```  
 
