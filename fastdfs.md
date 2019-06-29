@@ -76,6 +76,7 @@ drwxr-xr-x. 2 root root 83 Jun 28 23:40 data
 drwxr-xr-x. 2 root root 26 Jun 28 23:39 logs
 检查FastDFS Tracker Server是否启动成功：
 ps -ef | grep fdfs_trackerd
+tailf /fastdfs/tracker/logs/trackerd.log
 ```  
 
 三、配置storage服务器  
@@ -108,12 +109,9 @@ drwxr-xr-x. 3 root root 90 Jun 29 04:19 data
 drwxr-xr-x. 2 root root 26 Jun 29 04:19 logs
 检查FastDFS Tracker Server是否启动成功：
 ps -ef | grep fdfs_storaged
+tailf /fastdfs/storage/logs/storaged.log
 ```  
 
-
-注：集群环境下  
-追踪+存储节点操作步骤一、步骤二、步骤三  
-存储节点只做存储则只操作步骤三  
 
 查看集群状态  
 ```
