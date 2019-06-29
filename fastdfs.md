@@ -161,14 +161,9 @@ fdfs_download_file /etc/fdfs/client.conf group1/M00/00/00/wKhlRV0XJJmAJsndAAAB0Z
 git clone https://github.com/happyfish100/fastdfs-nginx-module.git
 ```  
 
-2、修改 fastdfs-nginx-module 的 config 配置文件  
+2、下载nginx  
 ```
-cd fastdfs-nginx-module/src
-vim config
-将
-CORE_INCS="$CORE_INCS /usr/local/include/fastdfs /usr/local/include/fastcommon/" 
-修改为:
-CORE_INCS="$CORE_INCS /usr/include/fastdfs /usr/include/fastcommon/"
+wget http://nginx.org/download/nginx-1.16.0.tar.gz
 ```  
 
 3、安装编译 Nginx 所需的依赖包  
@@ -188,7 +183,7 @@ cd nginx-1.10.0
 make && make install
 ```  
 
-5.复制 fastdfs-nginx-module 源码中的配置文件到/etc/fdfs 目录,并修改  
+5、复制 fastdfs-nginx-module 源码中的配置文件到/etc/fdfs 目录,并修改  
 ```
 cp /root/fastdfs-nginx-module/src/mod_fastdfs.conf /etc/fdfs/ 
 vim /etc/fdfs/mod_fastdfs.conf
