@@ -114,23 +114,31 @@ ps -ef | grep fdfs_storaged
 追踪+存储节点操作步骤一、步骤二、步骤三  
 存储节点只做存储则只操作步骤三  
 
-四、文件上传测试（ip01）
-1、修改Tracker服务器客户端配置文件
+查看集群状态  
+```
+fdfs_monitor /etc/fdfs/storage.conf
+```  
+
+四、文件上传测试 
+---
+1、修改Tracker服务器客户端配置文件  
+```
 cp /etc/fdfs/client.conf.sample /etc/fdfs/client.conf
 vim /etc/fdfs/client.conf
-# 修改以下配置，其它保持默认
 base_path=/fastdfs/tracker
 tracker_server=10.100.139.121:22122  # tracker服务器IP和端口
 tracker_server=10.100.138.180:22122  #tracker服务器IP2和端口
+```  
 
-2、执行文件上传命令
+2、执行文件上传命令  
+```
 #/usr/local/src/test.png 是需要上传文件路径
 /usr/bin/fdfs_upload_file /etc/fdfs/client.conf /usr/local/src/test.png
 返回文件ID号：group1/M00/00/00/tlxkwlhttsGAU2ZXAAC07quU0oE095.png
 （能返回以上文件ID，说明文件已经上传成功）
 Or : 
 /usr/bin/fdfs_test /etc/fdfs/client.conf upload client.conf
- 
+```  
  
 五、在所有storage节点安装fastdfs-nginx-module
 1、fastdfs-nginx-module 作用说明
