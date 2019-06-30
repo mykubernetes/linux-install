@@ -97,3 +97,51 @@ cd moosefs-3.0.105/
 ./configure --prefix=/opt/mfsostor --with-default-user=mfs --with-default-group=mfs
 make && make install
 ```  
+
+2、修改配置文件  
+```
+cp mfschunkserver.cfg.sample mfschunkserver.cfg
+vim  mfschunkserver.cfg
+MASTER_HOST = 192.168.101.69
+MASTER_PORT = 9420
+
+cp mfshdd.cfg.sample mfshdd.cfg
+/tmp     #填写要共享的目录路径
+
+```  
+
+3、更改属主属组  
+``` chown -R mfs.mfs /opt/mfsostor ```  
+
+4、启动  
+```
+sbin/mfschunkserver start
+netstat -anput |grep 9422
+```  
+
+
+安装客户端
+1、下载安装
+```
+wget https://github.com/moosefs/moosefs/archive/v3.0.105.tar.gz
+tar xvf v3.0.105.tar.gz 
+cd moosefs-3.0.105/
+./configure --prefix=/opt/mfsclient --with-default-user=mfs --with-default-group=mfs --enable-mfsmount
+make && make install
+```  
+
+2、添加模块
+```
+# lsmod |grep fuse
+# modprobe fuse
+# lsmod |grep fuse
+fuse                   91874  1 
+```  
+
+3、挂载  
+```
+#创建要挂载的目录
+mkdir /opt/mount_t 
+# ./mfsmount /opt/mount_t -H 192.168.101.69   #master主机IP
+mfsmaster accepted connection with parameters: read-write,restricted_ip,admin ; root mapped to root:root
+```  
