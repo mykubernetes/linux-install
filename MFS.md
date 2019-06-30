@@ -120,7 +120,8 @@ netstat -anput |grep 9422
 ```  
 
 
-安装客户端
+安装客户端  
+---
 1、下载安装
 ```
 wget https://github.com/moosefs/moosefs/archive/v3.0.105.tar.gz
