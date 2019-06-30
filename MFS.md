@@ -134,3 +134,19 @@ mkdir /opt/mount_t
 # ./mfsmount /opt/mount_t -H 192.168.101.69 -p  #master主机IP
 mfsmaster accepted connection with parameters: read-write,restricted_ip,admin ; root mapped to root:root
 ```  
+
+4、命令  
+查看数据有几个备份  
+```
+# ./mfsgetgoal  /opt
+/opt: 2              #两个备份
+# ./mfsfileinfo /opt/fstab        #查看文件有几个备份
+/opt/fstab: 
+        chunk 0: 00000000000013C_00000001 / (id:316 ver:1)
+               copy 1:192.168.101.70:9422 (status:VALID)
+               copy 2:192.168.101.71:9422 (status:VALID)
+设置目录有几个备份
+./mfsgetgoal  -r 2 /opt
+
+```  
+
