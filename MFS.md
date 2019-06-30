@@ -34,7 +34,7 @@ cp metadata.mfs.empty metadata.mfs
 7、配置共享访问权限  
 ```
 vim mfsexports.cfg
-192.168.101.0/24         /       rw,alldirs,maproot=0,passwork=123456
+192.168.101.0/24         /       rw,alldirs,maproot=0,password=123456
 ```  
 
 - / 表示 MooseFS 的根  
