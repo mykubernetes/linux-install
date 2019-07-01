@@ -18,7 +18,7 @@ mv apache-zookeeper-3.5.5 /opt/zookeeper
 
 2、	新建zookeeper的数据存储目录和日志文件目录
 ```
-mkdir -p /opt/zookeeper/log
+mkdir -p /opt/zookeeper/logs
 mkdir -p /opt/zookeeper/data
 ```  
 
@@ -31,7 +31,7 @@ tickTime=2000
 initLimit=10
 syncLimit=5
 dataDir=/opt/zookeeper/data
-dataLogDir=/opt/zookeeper/log
+dataLogDir=/opt/zookeeper/logs
 clientPort=2181
  #maxClientCnxns=60
  #minSessionTimeout=4000
