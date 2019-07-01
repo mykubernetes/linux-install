@@ -36,11 +36,9 @@ clientPort=2181
  #maxClientCnxns=60
  #minSessionTimeout=4000
  #maxSessionTimeout=40000
-server.1=solr-cloud-001:4888:5888
-server.2=solr-cloud-002:4888:5888
-server.3=solr-cloud-003:4888:5888
-server.4=solr-cloud-004:4888:5888
-server.5=solr-cloud-005:4888:5888
+server.1=node01:4888:5888
+server.2=node02:4888:5888
+server.3=node03:4888:5888
 ```  
 
 
@@ -52,14 +50,14 @@ scp -r /opt/zookeeper node02:/app/svr/
 
 5、分别在每台机器上创建myid文件存储该机器的标识码  
 ```
-echo "1" >> /opt/zookeeper/myid
-echo "2" >> /opt/zookeeper/myid
-echo "3" >> /opt/zookeeper/myid
+echo "1" >> /opt/zookeeper/data/myid
+echo "2" >> /opt/zookeeper/data/myid
+echo "3" >> /opt/zookeeper/data/myid
 ```  
 
 3.	启动zookeeper  
 ```
-cd /apps/svr/zookeeper/bin && ./zkServer.sh start
+cd /opt/zookeeper/bin && ./zkServer.sh start
 ./zkServer.sh status
 mode: follower or mode: Leader
 ```  
