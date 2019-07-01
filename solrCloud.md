@@ -44,8 +44,8 @@ server.3=node03:4888:5888
 
 4	同步至其余4台服务器  
 ```
-scp -r /opt/zookeeper node01:/app/svr/
-scp -r /opt/zookeeper node02:/app/svr/
+scp -r /opt/zookeeper node01:/opt
+scp -r /opt/zookeeper node02:/opt
 ```  
 
 5、分别在每台机器上创建myid文件存储该机器的标识码  
