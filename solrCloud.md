@@ -1,8 +1,11 @@
 SolrCloud 分布式集群
 ======
 
-一、正式solrcloud集群搭建  
-zookeeper 部署  
+软件下载地址  
+https://www.apache.org/dist/  
+https://www.apache.org/dist/lucene/
+搭建solrcloud集群  
+zookeeper部署  
 
 1、下载zk  
 ```
@@ -40,22 +43,15 @@ server.4=solr-cloud-004:4888:5888
 server.5=solr-cloud-005:4888:5888
 ```  
 
-- tickTime：这个时间是作为 Zookeeper 服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。
-- initLimit：这个配置项是用来配置 Zookeeper 接受客户端（这里所说的客户端不是用户连接 Zookeeper 服务器的客户端，而是 Zookeeper服务器集群中连接到 Leader 的 Follower 服务器）初始化连接时最长能忍受多少个心跳时间间隔数。当已经超过 10 个心跳的时间（也就是tickTime）长度后 Zookeeper 服务器还没有收到客户端的返回信息，那么表明这个客户端连接失败。总的时间长度就是52000=10秒。
-- syncLimit：这个配置项标识 Leader 与 Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个tickTime 的时间长度，总的时间长度就是22000=4秒
-- dataDir：顾名思义就是 Zookeeper 保存数据的目录，默认情况下，Zookeeper 将写数据的日志文件也保存在这个目录里。
-- dataLogDir： Zookeeper的日志文件位置。
-- server.A=B：C：D：其中 A 是一个数字，表示这个是第几号服务器；B是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader，而这个端口就是用来执行选举时服务器相互通信的端口。如果是伪集群的配置方式，由于 B 都是一样，所以不同的 Zookeeper 实例通信端口号不能一样，所以要给它们分配不同的端口号。
-- clientPort：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。
 
-1.	同步至其余4台服务器  
+4	同步至其余4台服务器  
 ```
 scp -r /apps/svr/zookeeper username@'10.0.0.2':/app/svr/
 scp -r /apps/svr/zookeeper username@'10.0.0.3':/app/svr/
 scp -r /apps/svr/zookeeper username@'10.0.0.4':/app/svr/
 scp -r /apps/svr/zookeeper username@'10.0.0.5':/app/svr/
 ```  
-2.	分别在每台机器上创建myid文件存储该机器的标识码  
+5、分别在每台机器上创建myid文件存储该机器的标识码  
 ```
 echo "1" >> /apps/dat/zookeeper/myid
 echo "2" >> /apps/dat/zookeeper/myid
@@ -123,23 +119,29 @@ cp -av /apps/svr/solr-4.8.1/example/solr/solr.xml /apps/svr/solr-4.8.1/example/s
 # vim /apps/svr/tomcat/bin/catalina.sh 注释掉JAVA_OPTS，并且添加如下：
 JAVA_OPTS="$JAVA_OPTS  -Xmx8192m -Xms8192m -Xmn4g -Xss256k -XX:ParallelGCThreads=24 -DzkHost=solr-cloud-001:2181,solr-cloud-002:2181,solr-cloud-003:2181,solr-cloud-004:2181,solr-cloud-005:2181 -XX:+UseConcMarkSweepGC -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=8060 -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=10.0.0.1  -XX:PermSize=1024m -XX:MaxPermSize=1024m -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCApplicationConcurrentTime -XX:+PrintHeapAtGC -Xloggc:/apps/logs/tomcat/gc`date +%Y%m%d%H%M%S`.log -XX:ErrorFile=\"/apps/logs/tomcat/java_error.log\""
 ```  
-1.	将tomcat的目录分发至其余服务器的相应的位置；
+1.	将tomcat的目录分发至其余服务器的相应的位置；  
 2.	SolrCloud是通过ZooKeeper集群来保证配置文件的变更及时同步到各个节点上，所以，需要将配置文件上传到ZooKeeper集群中：执行如下操作：
+```
 java -classpath .:/apps/conf/solr/solr-lib/* org.apache.solr.cloud.ZkCLI -cmd upconfig -zkhost 10.0.0.1:2181,10.0.0.2:2181,10.0.0.3:2181,10.0.0.4:2181,10.0.0.5:2181 -confdir /apps/conf/solr/config-files/ -confname myconf
 java -classpath .:/apps/conf/solr/solr-lib/* org.apache.solr.cloud.ZkCLI -cmd linkconfig -collection collection1 -confname myconf -zkhost 10.0.0.1:2181,10.0.0.2:2181,10.0.0.3:2181,10.0.0.4:2181,10.0.0.5:2181
-3.	分发完毕以后，我们可以检查一下zookeeper的存储情况：
+```  
+
+3.	分发完毕以后，我们可以检查一下zookeeper的存储情况：  
+```
 cd /apps/svr/zookeeper/bin/
 ./zkCli.sh -server solr-cloud-001:2181
 ________________________________________
 [zk: solr-cloud-001:2181(CONNECTED) 2] ls /configs/myconf
 [currency.xml, mapping-FoldToASCII.txt, protwords.txt, synonyms.txt, scripts.conf, stopwords.txt, velocity, _schema_analysis_synonyms_english.json, admin-extra.html, update-script.js, _schema_analysis_stopwords_english.json, solrconfig.xml, admin-extra.menu-top.html, elevate.xml, schema.xml, clustering, spellings.txt, xslt, mapping-ISOLatin1Accent.txt, lang, admin-extra.menu-bottom.html]
-________________________________________
+```  
 
-1.	启动10.0.0.1上的tomcat，这时候，SolrCloud集群中只有一个活跃的节点，而且默认生成了一个collection1实例，可以通过web界面访问http://10.0.0.1:8080/solr
-2.	启动其余4台服务器的tomcat，会在zookeeper集群中查看到当前所有的集群状态：
+1.	启动10.0.0.1上的tomcat，这时候，SolrCloud集群中只有一个活跃的节点，而且默认生成了一个collection1实例，可以通过web界面访问http://10.0.0.1:8080/solr  
+2.	启动其余4台服务器的tomcat，会在zookeeper集群中查看到当前所有的集群状态：   
+```
 [zk: solr-cloud-001:2181(CONNECTED) 1] ls /live_nodes
 [10.0.0.1:8080_solr, 10.0.0.2:8080_solr, 10.0.0.3:8080_solr, 10.0.0.4:8080_solr, 10.0.0.5:8080_solr]
-这时，已经存在5个active的节点了，但是SolrCloud集群并没有更多信息;
+```  
+这时，已经存在5个active的节点了，但是SolrCloud集群并没有更多信息;  
 
 
 创建collection、Shard和replication  
