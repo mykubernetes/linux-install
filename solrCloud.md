@@ -11,27 +11,27 @@ zookeeper部署
 ```
 mkdir -p /apps/soft
 cd /apps/soft
-wget http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz
-tar zxvf zookeeper-3.4.6.tar.gz
-mv /apps/soft/zookeeper-3.4.6 /apps/svr/zookeeper
+wget https://www.apache.org/dist/zookeeper/zookeeper-3.5.5/apache-zookeeper-3.5.5.tar.gz
+tar zxvf apache-zookeeper-3.5.5.tar.gz
+mv apache-zookeeper-3.5.5 /opt/zookeeper
 ```  
 
 2、	新建zookeeper的数据存储目录和日志文件目录
 ```
-mkdir -p /apps/dat/zookeeper
-mkdir -p /apps/logs/zookeeper
+mkdir -p /opt/zookeeper/log
+mkdir -p /opt/zookeeper/data
 ```  
 
 3、修改zk配置文件  
 ```
-# cd /apps/svr/zookeeper/conf
+# cd /opt/zookeeper/conf
 # cp -av zoo_sample.cfg zoo.cfg
 # vim zoo.cfg
 tickTime=2000
 initLimit=10
 syncLimit=5
-dataDir=/apps/dat/zookeeper
-dataLogDir=/apps/logs/zookeeper
+dataDir=/opt/zookeeper/data
+dataLogDir=/opt/zookeeper/log
 clientPort=2181
  #maxClientCnxns=60
  #minSessionTimeout=4000
@@ -46,18 +46,15 @@ server.5=solr-cloud-005:4888:5888
 
 4	同步至其余4台服务器  
 ```
-scp -r /apps/svr/zookeeper username@'10.0.0.2':/app/svr/
-scp -r /apps/svr/zookeeper username@'10.0.0.3':/app/svr/
-scp -r /apps/svr/zookeeper username@'10.0.0.4':/app/svr/
-scp -r /apps/svr/zookeeper username@'10.0.0.5':/app/svr/
+scp -r /opt/zookeeper node01:/app/svr/
+scp -r /opt/zookeeper node02:/app/svr/
 ```  
+
 5、分别在每台机器上创建myid文件存储该机器的标识码  
 ```
-echo "1" >> /apps/dat/zookeeper/myid
-echo "2" >> /apps/dat/zookeeper/myid
-echo "3" >> /apps/dat/zookeeper/myid
-echo "4" >> /apps/dat/zookeeper/myid
-echo "5" >> /apps/dat/zookeeper/myid
+echo "1" >> /opt/zookeeper/myid
+echo "2" >> /opt/zookeeper/myid
+echo "3" >> /opt/zookeeper/myid
 ```  
 
 3.	启动zookeeper  
