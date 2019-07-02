@@ -150,3 +150,10 @@ mfsmaster accepted connection with parameters: read-write,restricted_ip,admin ; 
 
 ```  
 
+配置master节点开启MFS监控   
+```
+/opt/mfs/sbin/mfscgiserv 
+```  
+
+浏览器访问  
+http://192.168.101.69:9425  
