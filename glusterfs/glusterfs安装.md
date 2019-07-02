@@ -19,7 +19,7 @@ glusterfs安装
 192.168.101.71 node03
 ```  
 
-3、在任一节点上适用glusterfs peer probe命令"发现"其他节点，组件集群
+3、在任一节点上适用glusterfs peer probe命令"发现"其他节点，组件集群  
 ```
 # gluster peer probe node02
 # gluster peer probe node03
@@ -46,7 +46,7 @@ State: Peer in Cluster (Connected)
 2)以其中3台机器的brick创建一个有3复本的逻辑卷gv0  
 ``` # gluster volume create gv0 replica 3 node01:/gluster/gv0 node02:/gluster/gv0 node03:/gluster force ```  
 
-3)启用volume
+3)启用volume  
 ``` # gluster volume start gv0 ```  
 
 4)client挂载gv0卷到/mnt/glusterfs目录并使用  
