@@ -37,6 +37,9 @@ State: Peer in Cluster (Connected)
 Hostname: node03
 Uuid: 948018c8-988b-4f77-9d12-629d0f630110
 State: Peer in Cluster (Connected)
+
+
+# gluster volume info
 ```  
 
 5、使用方法  
@@ -63,6 +66,50 @@ State: Peer in Cluster (Connected)
     # gluster volume stop gv0
     再删：
     # gluster volume delete gv0
+```  
+
+相关命令  
+```
+#删除卷
+gluster volume stop gfs01
+gluster volume delete gfs01
+#将机器移出集群
+gluster peer detach 192.168.1.100
+#只允许172.28.0.0的网络访问glusterfs
+gluster volume set gfs01 auth.allow 172.28.26.*
+gluster volume set gfs01 auth.allow 192.168.222.1,192.168.*.*
+#加入新的机器并添加到卷里(由于副本数设置为2,至少要添加2（4、6、8..）台机器)
+gluster peer probe 192.168.222.134
+gluster peer probe 192.168.222.135
+#新加卷
+gluster volume add-brick gfs01 repl 2 192.168.222.134:/data/gluster 192.168.222.135:/data/gluster force
+#删除卷
+gluster volume remove-brick gfs01 repl 2 192.168.222.134:/opt/gfs 192.168.222.135:/opt/gfs start
+gluster volume remove-brick gfs01 repl 2 192.168.222.134:/opt/gfs 192.168.222.135:/opt/gfs status
+gluster volume remove-brick gfs01 repl 2 192.168.222.134:/opt/gfs 192.168.222.135:/opt/gfs commit
+注意：扩展或收缩卷时，也要按照卷的类型，加入或减少的brick个数必须满足相应的要求。
+#当对卷进行了扩展或收缩后，需要对卷的数据进行重新均衡。
+gluster volume rebalance mamm-volume start|stop|status
+###########################################################
+迁移卷---主要完成数据在卷之间的在线迁移
+#启动迁移过程
+gluster volume replace-brick gfs01 192.168.222.134:/opt/gfs 192.168.222.134:/opt/test start force
+#查看迁移状态
+gluster volume replace-brick gfs01 192.168.222.134:/opt/gfs 192.168.222.134:/opt/test status
+#迁移完成后提交完成
+gluster volume replace-brick gfs01 192.168.222.134:/opt/gfs 192.168.222.134:/opt/test commit
+#机器出现故障,执行强制提交
+gluster volume replace-brick gfs01 192.168.222.134:/opt/gfs 192.168.222.134:/opt/test commit force
+###########################################################
+触发副本自愈
+gluster volume heal mamm-volume #只修复有问题的文件
+gluster volume heal mamm-volume full #修复所有文件
+gluster volume heal mamm-volume info #查看自愈详情
+#####################################################
+data-self-heal, metadata-self-heal and entry-self-heal
+启用或禁用文件内容、文件元数据和目录项的自我修复功能，默认情况下三个全部是“on”。
+#将其中的一个设置为off的范例：
+gluster volume set gfs01 entry-self-heal off
 ```  
 
 通过Heketi提供的restapi使用(kubernetes storageClass需要配置)
