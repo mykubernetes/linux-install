@@ -4,6 +4,7 @@ SolrCloud 分布式集群
 软件下载地址  
 https://www.apache.org/dist/  
 https://www.apache.org/dist/lucene/  
+https://www.w3cschool.cn/solr_doc/solr_doc-s4kg2fp6.html  
 搭建solrcloud集群  
 zookeeper部署  
 
