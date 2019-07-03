@@ -65,3 +65,4 @@ http://192.168.101.66:9090
 Ceph-Cluster： [ID: 2842]  
 Ceph-OSD: [ID: 5336]  
 Ceph-Pools: [ID: 5342]  
+https://grafana.com/orgs/galexrt  
