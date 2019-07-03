@@ -5,7 +5,7 @@
 #下载官网包安装方法
 # wget http://download.ceph.com/nfs-ganesha/rpm-V2.7-stable/luminous/x86_64/libntirpc-1.7.1-0.1.el7.x86_64.rpm
 # wget http://download.ceph.com/nfs-ganesha/rpm-V2.7-stable/luminous/x86_64/nfs-ganesha-2.7.1-0.1.el7.x86_64.rpm
-# http://download.ceph.com/nfs-ganesha/rpm-V2.7-stable/luminous/x86_64/nfs-ganesha-ceph-2.7.1-0.1.el7.x86_64.rpm
+# wget http://download.ceph.com/nfs-ganesha/rpm-V2.7-stable/luminous/x86_64/nfs-ganesha-ceph-2.7.1-0.1.el7.x86_64.rpm
 # yum -y install libntirpc-1.7.1-0.1.el7.x86_64.rpm nfs-ganesha-2.7.1-0.1.el7.x86_64.rpm nfs-ganesha-ceph-2.7.1-0.1.el7.x86_64.rpm
 
 
