@@ -8,7 +8,8 @@
 
 4、可配置80端口（不用修改）  
 ```
-# vim ceph.conf # mycluster/ceph.conf
+# vim ceph.conf       # mycluster/ceph.conf
+追加
 [client.rgw.node01]
 rgw_frontends = "civetweb port=80"
 
@@ -18,10 +19,10 @@ rgw_frontends = "civetweb port=80"
 [client.rgw.node03]
 rgw_frontends = "civetweb port=80"
 
-$ ceph-deploy --overwrite-conf config push node01 node02 node03
-$ sudo systemctl restart ceph-radosgw@rgw.node01.service
-$ sudo systemctl restart ceph-radosgw@rgw.node02.service
-$ sudo systemctl restart ceph-radosgw@rgw.node03.service
+# ceph-deploy --overwrite-conf config push node01 node02 node03
+# sudo systemctl restart ceph-radosgw@rgw.node01.service
+# sudo systemctl restart ceph-radosgw@rgw.node02.service
+# sudo systemctl restart ceph-radosgw@rgw.node03.service
 ```
 
 5、创建池  
