@@ -280,3 +280,104 @@ Removing snap: 100% complete...done.
 语法： rbd snap purge <pool-name>/<image-name>  
 ``` rbd snap purge rbd/rbd1 --name client.rbd ```  
 
+
+克隆
+---
+1、创建具有 layering 功能的 RBD image  
+```
+# rbd create rbd2 --size 1024 --image-feature layering --name client.rbd
+
+# rbd info --image rbd2 -n client.rbd
+rbd image 'rbd2':
+    size 10240 MB in 2560 objects
+    order 22 (4096 kB objects)
+    block_name_prefix: rbd_data.1102238e1f29
+    format: 2
+    features: layering
+    flags:
+```  
+
+2、挂载 rbd2 块设备  
+```
+# rbd map --image rbd2 --name client.rbd
+# mkfs.xfs /dev/rbd1
+# mkdir /opt/ceph-disk2
+# mount /dev/rbd1 /opt/ceph-disk2
+# df -h /opt/ceph-disk2
+# echo "devopsedu.net,rbd2" > /opt/ceph-disk2/rbd2file
+# sync
+```  
+
+3、创建此 RBD image 的快照  
+``` # rbd snap create rbd/rbd2@snapshot_for_clone -n client.rbd ```  
+
+注意：要创建COW克隆，需要保护快照，因为如果快照被删除，所有附加的COW克隆将被销毁：  
+
+4、保护快照  
+```
+# rbd snap protect rbd/rbd2@snapshot_for_clone -n client.rbd
+# echo "devopsedu.net,rbd2snapshot" > /opt/ceph-disk2/rbd2-snapshot
+```  
+
+5、创建链接克隆  
+语法： rbd clone <pool-name>/<parent-image-name>@<snap-name> <pool-name>/<child_image-name> --image-feature <feature-name>  
+``` # rbd clone rbd/rbd2@snapshot_for_clone rbd/clone_rbd2 --image-feature layering -n client.rbd ```  
+
+克隆的速度应该是非常快的，这时一个链接克隆。  
+查看克隆后信息  
+```
+# rbd info rbd/clone_rbd2 -n client.rbd
+rbd image 'clone_rbd2':
+    size 1024 MB in 2560 objects
+    order 22 (4096 kB objects)
+    block_name_prefix: rbd_data.110b2eb141f2
+    format: 2
+    features: layering
+    flags:
+    parent: rbd/rbd2@snapshot_for_clone
+    overlap: 1024 MB
+
+# rbd children rbd/rbd2@snapshot_for_clone -n client.rbd rbd/clone_rbd2
+
+# umount /opt/ceph-disk2
+# rbd map --image clone_rbd2 --name client.rbd
+# mount /dev/rbd2 /opt/ceph-disk2
+# ll /opt/ceph-disk2
+  -rw-r--r-- 1 root root 19 May 4 15:03 rbd2file
+# echo "devopsedu.net,clone_rbd2" > /opt/ceph-disk2/clone_rbd2  
+```  
+
+6、创建完整克隆  
+```
+# rbd flatten rbd/clone_rbd2 -n client.rbd
+Image flatten: 100% complete...done.
+# rbd info --image clone_rbd2 --name client.rbd
+rbd image 'clone_rbd2':
+    size 10240 MB in 2560 objects
+    order 22 (4096 kB objects)
+    block_name_prefix: rbd_data.110b2eb141f2
+    format: 2
+    features: layering
+    flags:
+```  
+注意：如果在deep-flatten映像上启用了该功能，则默认情况下图像克隆与其父级分离。  
+
+删除父镜像  
+```
+# rbd snap unprotect rbd/rbd2@snapshot_for_clone -n client.rbd    # 掉快照保护
+# rbd snap rm rbd/rbd2@snapshot_for_clone -n client.rbd
+Removing snap: 100% complete...done.
+```  
+
+验证数据  
+验证父映像 rbd2  
+```
+# rbd list -n client.rbd
+clone_rbd2
+rbd1
+rbd2
+
+# umount /opt/ceph-disk2
+# mount /dev/rbd1 /opt/ceph-disk2
+# ll /opt/ceph-disk2/         # rbd2最终的文件
+```  
