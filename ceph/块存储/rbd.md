@@ -227,4 +227,56 @@ xfs_growfs -d /mnt/ceph-disk1
 ```  
 
 
+创建快照
+---
+
+1、创建一个测试文件到挂载目录  
+``` echo "Hello cephtest,This is snapshot test" > /opt/ceph/ceph-snapshot-file ```  
+
+2、创建快照  
+语法： rbd snap create <pool name>/<image name>@<snap name>  
+``` rbd snap create rbd/rbd1@snapshot1 -n client.rbd ```  
+
+3、显示 image 的快照  
+语法： rbd snap ls <pool name>/<image name>  
+``` rbd snap ls rbd/rbd1 -n client.rbd ```  
+    
+恢复快照测试  
+---
+1、删除文件  
+```  rm -rf /opt/ceph/* ```  
+
+2、恢复快照  
+语法： rbd snap rollback <pool-name>/<image-name>@<snap-name>  
+```
+# umount /mnt/ceph-disk1 # 卸载文件系统
+# rbd snap rollback rbd/rbd1@snapshot1 --name client.rbd # 回滚快照
+```  
+
+3、验证回滚  
+```
+# mount /dev/rbd0 /mnt/ceph-disk1 # 重新挂载
+# cat /opt/ceph/ceph-snapshot-file
+Hello cephtest,This is snapshot test
+```  
+
+重命名快照  
+---
+1、重命名  
+语法： rbd snap rename <pool-name>/<image-name>@<original-snapshot-name> <pool-name>/<image-name>@<new-snapshot-name>  
+``` rbd snap rename rbd/rbd1@snapshot1 rbd/rbd1@snapshot1_new -n client.rbd ```  
+ 
+删除快照  
+---  
+1、删除  
+语法： rbd snap rm <pool-name>/<image-name>@<snap-name>  
+```
+# rbd snap rm rbd/rbd1@snapshot1_new --name client.rbd
+Removing snap: 100% complete...done.
+```  
+
+删除多个快照,使用 purge  
+---
+语法： rbd snap purge <pool-name>/<image-name>  
+``` rbd snap purge rbd/rbd1 --name client.rbd ```  
 
