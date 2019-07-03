@@ -380,4 +380,15 @@ rbd2
 # umount /opt/ceph-disk2
 # mount /dev/rbd1 /opt/ceph-disk2
 # ll /opt/ceph-disk2/         # rbd2最终的文件
+-rw-r--r-- 1 root root 19 May 4 15:03 rbd2file
+-rw-r--r-- 1 root root 27 May 4 15:04 rbd2-snapshot
+```  
+
+验证完整克隆映像 clone_rbd2  
+```
+# umount /opt/ceph-disk2
+# rbd unmap /dev/rbd1
+# rbd rm rbd2 -n client.rbd
+# mount /dev/rbd2 /opt/ceph-disk2
+# ll /opt/ceph-disk2/
 ```  
