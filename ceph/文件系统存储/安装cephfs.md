@@ -5,21 +5,26 @@ cephfs
 1、部署 cephfs  
 ``` # ceph-deploy mds create node02 ```  
 注意：查看输出，应该能看到执行了哪些命令，以及生成的keyring  
+
 mds需要创建两个pool一个存储数据，一个存储元数据  
 ```
-# ceph osd pool create cephfs_data 128
+# ceph osd pool create cephfs_data 64
 # ceph osd pool create cephfs_metadata 64
 ```  
+
 创建一个cephfs  
+语法：ceph fs new <fs_name> <metadata> <data>
 ```
 # ceph fs new cephfs cephfs_metadata cephfs_data
 ```
+
 查看创建的cephfs  
 ```
 # ceph mds stat
 # ceph osd pool ls
 # ceph fs ls
 ```  
+
 2、创建用户并赋予权限  
 ```
 ceph auth get-or-create client.cephfs mon 'allow r' mds 'allow r, allow rw path=/' osd 'allow rw pool=cephfs_data' -o ceph.client.cephfs.keyring
