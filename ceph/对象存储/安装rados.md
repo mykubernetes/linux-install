@@ -1,18 +1,29 @@
 1、安装ceph-radosgw  
 ``` # yum -y install ceph-radosgw ```  
 2、部署  
-``` # ceph-deploy rgw create node01 node02 node03 ```  
+``` # ceph-deploy rgw create node01 node02 node03     # 指定要部署radsgw到的哪些服务器 ```  
 3、检查服务是否开启  
 ``` netstat -tnlupn |grep 7480 ```  
+浏览器打开： http://192.168.20.176:7480  
 
 4、可配置80端口（不用修改）  
 ```
-vi /etc/ceph/ceph.conf
-…….
+# vim ceph.conf # mycluster/ceph.conf
 [client.rgw.node01]
 rgw_frontends = "civetweb port=80"
-sudo systemctl restart ceph-radosgw@rgw.node01.service
+
+[client.rgw.node02]
+rgw_frontends = "civetweb port=80"
+
+[client.rgw.node03]
+rgw_frontends = "civetweb port=80"
+
+$ ceph-deploy --overwrite-conf config push node01 node02 node03
+$ sudo systemctl restart ceph-radosgw@rgw.node01.service
+$ sudo systemctl restart ceph-radosgw@rgw.node02.service
+$ sudo systemctl restart ceph-radosgw@rgw.node03.service
 ```
+
 5、创建池  
 ```
 # cat ./pool
