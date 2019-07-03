@@ -337,7 +337,8 @@ rbd image 'clone_rbd2':
     parent: rbd/rbd2@snapshot_for_clone
     overlap: 1024 MB
 
-# rbd children rbd/rbd2@snapshot_for_clone -n client.rbd rbd/clone_rbd2
+# rbd children rbd/rbd2@snapshot_for_clone -n client.rbd
+rbd/clone_rbd2
 
 # umount /opt/ceph-disk2
 # rbd map --image clone_rbd2 --name client.rbd
