@@ -72,7 +72,8 @@ dd if=/dev/zero of=/mnt/cephfs/file1 bs=1M count=1024
 ```  
 
 
-5、通过FUSE客户端挂载  
+通过FUSE客户端挂载  
+---
 1)安装软件包  
 ```
 [ceph]
@@ -101,20 +102,27 @@ priority=1
 # rpm -qa |grep -i ceph-fuse 
 # yum -y install ceph-fuse
 ``` 
-2)挂载  
+
+2)从服务器把 key文件拷贝到客户端  
+``` scp ceph.client.cephfs.keyring root@c720153:/etc/ceph/ ```  
+
+3)挂载  
+命令挂载  
 ```
-命令挂载
 # ceph-fuse --keyring /etc/ceph/ceph.client.cephfs.keyring --name client.cephfs -m node02:6789 /mnt/cephfs
 # df -h /mnt/cephfs/
 Filesystem      Size  Used Avail Use% Mounted on
 ceph-fuse       6.5G     0  6.5G   0% /mnt/cephfs
-
-使用配置文件命令挂载挂载
-# echo "id=cephfs,keyring=/etc/ceph/ceph.client.cephfs.keyring /mnt/cephfs fuse.ceph defaults 0 0 _netdev" >> /etc/fstab
-# mount /mnt/cephfs/
-# df -h /mnt/cephfs/
-Filesystem      Size  Used Avail Use% Mounted on
-ceph-fuse       6.5G     0  6.5G   0% /mnt/cephfs
-
 ```  
-注：因为 keyring文件包含了用户名，所以fstab不需要指定用了  
+
+使用配置文件命令挂载挂载  
+```
+# vi /etc/ceph/ceph.conf
+[global]
+mon_host = node01,node02,node03
+
+# vi /etc/fstab
+...
+none /mnt/cephfs fuse.ceph ceph.id=cephfs,_netdev,defaults 0 0
+```  
+注：因为 keyring文件包含了用户名，前提是，必须要有ceph.conf文件，指明 mon地址。
