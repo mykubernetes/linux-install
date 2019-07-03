@@ -74,7 +74,10 @@ EXPORT
 
 4、通过提供Ganesha.conf 启动NFS Ganesha守护进程，并输出日志到/var/log/ganesha.log下，为deubg模式 
 ```
-# ganesha.nfsd -f /etc/ganesha/ganesha.conf -L /var/log/ganesha.log -N NIV_DEBUG
+# ganesha.nfsd -f /etc/ganesha/ganesha.conf -L /var/log/ganesha.log -N NIV_DEBUG   # 不需要执行，改成守护进程模式启动
+启动
+# systemctl start nfs-ganesha
+# systemctl enable nfs-ganesha
 
 # showmount -e
 Export list for node02:
@@ -84,7 +87,7 @@ Export list for node02:
 ```
 # yum install -y nfs-utils
 # mkdir /mnt/cephnfs
-# mount -o rw,noatime node02:/ /mnt/cephnfs
+# mount -t nfs -o nfsvers=4.1,noauto,soft,sync,proto=tcp node02:/ /mnt/cephnfs
 验证
 # df -h /mnt/cephnfs
 Filesystem      Size  Used Avail Use% Mounted on
