@@ -44,9 +44,10 @@ http://docs.ceph.org.cn/man/8/mount.ceph/#mount-ceph-ceph
 
 手动输入key挂载  
 ```
-# ceph auth get-key client.cephfs        #在 ceph fs服务器上执行，获取key
+# ceph auth get-key client.cephfs        #在ceph fs服务器上执行，获取key
 AQCpdblcDYdhGBAATHHTR0Fd7cwZ0hFmz1VjtQ==
-# mount -t ceph node01:6789:/ /mnt/cephfs -o name=cephfs,secret=AQCpdblcDYdhGBAATHHTR0Fd7cwZ0hFmz1VjtQ==
+# mount -t ceph node01:6789:/ /mnt/cephfs -o name=cephfs,secret=AQCpdblcDYdhGBAATHHTR0Fd7cwZ0hFmz1VjtQ==      # -o name=cephfs的name为创建key的时候client.cephfs的cephfs名
+
 
 $ umount /mnt/cephfs //使用多个mon挂载
 $ mount -t ceph node01,node02,node03:/ /mnt/cephfs -o name=cephfs,secret=AQCpdblcDYdhGBAATHHTR0Fd7cwZ0hFmz1VjtQ==
