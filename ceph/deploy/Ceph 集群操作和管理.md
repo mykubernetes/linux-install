@@ -23,8 +23,8 @@ Ceph 服务的管理
 
 查看当前节点上特定服务的状态  
 ```
-systemctl status ceph-mon@node01
-systemctl status ceph-osd@1
+systemctl status ceph-mon@node01    #主机名
+systemctl status ceph-osd@1         #osd 1号磁盘
 ```  
 
 查看远端节点上所有服务  
@@ -54,7 +54,7 @@ systemctl start ceph-radosgw.target
 ``` systemctl stop ceph-mon.target ```  
 
 停止远端节点 Ceph mon 守护程序  
-``` sudo systemctl -H c720177 stop ceph.mon.target ```  
+``` sudo systemctl -H node02 stop ceph.mon.target ```  
 
 其它类型  
 ```
