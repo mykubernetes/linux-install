@@ -58,7 +58,7 @@ $ mount -t ceph node01,node02,node03:/ /mnt/cephfs -o name=cephfs,secret=AQCpdbl
 # mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secretfile=/etc/ceph/cephfskey   #name为认证用户名
 ```  
 
-启动挂载
+启动挂载  
 ``` # echo "node02:6789:/ /mnt/cephfs ceph name=cephfs,secretfile=/etc/ceph/cephfskey,_netdev,noatime 0 0" >> /etc/fstab ```  
 
 3)、校验  
