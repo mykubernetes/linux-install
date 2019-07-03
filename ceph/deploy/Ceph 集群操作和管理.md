@@ -78,7 +78,7 @@ systemctl stop ceph-radosgw@rgw-node01
 
 按实例停止特定守护程序  
 停止当前节点的 ceph mon 守护程序  
-``` systemctl stop ceph-mon@c720176 ```  
+``` systemctl stop ceph-mon@node02 ```  
 
 其它类型  
 ```
