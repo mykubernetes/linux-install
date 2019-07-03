@@ -249,13 +249,13 @@ xfs_growfs -d /mnt/ceph-disk1
 2、恢复快照  
 语法： rbd snap rollback <pool-name>/<image-name>@<snap-name>  
 ```
-# umount /mnt/ceph-disk1 # 卸载文件系统
+# umount /opt/ceph-disk1 # 卸载文件系统
 # rbd snap rollback rbd/rbd1@snapshot1 --name client.rbd # 回滚快照
 ```  
 
 3、验证回滚  
 ```
-# mount /dev/rbd0 /mnt/ceph-disk1 # 重新挂载
+# mount /dev/rbd0 /opt/ceph-disk1 # 重新挂载
 # cat /opt/ceph/ceph-snapshot-file
 Hello cephtest,This is snapshot test
 ```  
