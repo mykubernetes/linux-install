@@ -51,6 +51,26 @@ EXPORT
 	}
 }
 ```  
+或者  
+```
+# grep -v ".*#" /etc/ganesha/ganesha.conf|grep -v "^$"
+EXPORT
+{
+    Export_Id = 12345;
+    Path = /;
+    Pseudo = /cephfs;
+    Protocols = 4;
+    Access_Type = RW;
+    Squash = no_root_squash;
+    Sectype = sys;
+    FSAL {
+        Name = CEPH;
+            User_Id = cephfs;
+            Secret_Access_Key = "AQAj8s9cJ/u/ERAAMh+Ey9mNLaBEk1/yff7AOw==";
+    }
+}
+```  
+如果放在ceph集群节点，可以直接使用ceph.client.admin ,就不需要设置User_Id和Secret_Access_Key  
 
 4、通过提供Ganesha.conf 启动NFS Ganesha守护进程，并输出日志到/var/log/ganesha.log下，为deubg模式 
 ```
