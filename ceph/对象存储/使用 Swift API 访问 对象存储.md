@@ -30,10 +30,14 @@ $ radosgw-admin subuser create --uid=radosgw --subuser=radosgw:swift --access=fu
 # yum install -y python-pip
 # pip install --upgrade python-swiftclient
 
-# swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC list
-first-bucket
+查看指定bucket的内容
+# swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC list first-bucket
+default.conf
+
+创建bucket
 # swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC post second-bucket
 
+列出所有bucket
 # swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC list
 first-bucket
 second-bucket
