@@ -171,4 +171,56 @@ mon_host = 192.168.101.66,192.168.101.67,192.168.101.68,192.168.101.69
 # ceph-deploy --overwrite-conf config push node01 node02 node03 node04
 ```  
 
+Ceph 集群缩减
+---
+删除 Ceph OSD  
 
+1、把osd标记出群集  
+``` ceph osd out osd.9 ```
+此时，Ceph就会通过将PG从OSD中移出到群集内的其他OSD来开始重新平衡群集。群集状态将在一段时间内变得不健康。根据删除的OSD数量，在恢复时间完成之前，群集性能可能会有所下降。  
+
+2、查看集群平衡状态，直到osd.9的数据完全写入其他磁盘后继续操作  
+```
+# ceph -s     # 集群现在应该处于恢复模式，但同时向客户端提供数据
+# ceph -w
+```  
+
+注意：一个一个移除，然后移除osd.10和osd.11,否则会导致数据丢失
+
+
+3、停止移除的osd  
+虽然已把osd.9，osd.10，osd.11从集群中标记out，不会参与存储数据，但他们的服务仍然还在运行。下面top OSD  
+```
+# systemctl -H node04 stop ceph-osd.target     # 此操作关闭node04上的所有 osd
+# ceph osd tree
+```  
+
+4、既然这些OSD不再是Ceph集群的一部分，那么就从Crush map中删除  
+```
+# ceph osd crush remove osd.9
+# ceph osd crush remove osd.10
+# ceph osd crush remove osd.11
+```  
+- 一旦从CRUSH地图中移除OSD，Ceph集群就会变得健康还应该观察OSD地图; 因为还没有删除OSD，它仍然会显示12个OSD，9个UP和9个IN：  
+
+``` # ceph -s ```  
+
+5、删除 OSD 身份验证密钥  
+```
+# ceph auth del osd.9
+# ceph auth del osd.10
+# ceph auth del osd.11
+```  
+
+6、最后，删除 OSD 并检查集群状态，此时应该有 9个OSD，9个UP和9个IN，并且群集运行状况应该是正常的：  
+```
+# ceph osd rm osd.9
+# ceph osd rm osd.10
+# ceph osd rm osd.11
+```  
+
+7、从 Crush map 中删除此节点的痕迹  
+```
+# ceph osd crush remove node04
+# ceph -s
+```  
