@@ -224,3 +224,58 @@ Ceph 集群缩减
 # ceph osd crush remove node04
 # ceph -s
 ```  
+
+删除 Ceph MON
+---
+1、停止mon服务  
+```
+# ceph mon stat    # 查看 mon 的状态
+e3: 3 mons at {node01=192.168.101.69:6789/0,node02=192.168.101.70:6789/0,node03=192.168.101.71:6789/0}, election epoch 22, leader 0 node01,quorum 0,1,2 node01,node02,node03
+
+# sudo systemctl -H node04 stop ceph-mon.target   #停止
+```  
+
+2、删除mon节点  
+```
+# ceph mon remove node04
+```  
+
+3、查看 mon是否从法定人数里面删除  
+```
+# ceph quorum_status --format json-pretty
+{
+    "election_epoch": 22,
+    "quorum": [
+        0,
+        1,
+        2
+    ],
+    "quorum_names": [
+        "node01",
+        "node02",
+        "node03"
+    ],
+...
+```  
+
+4、备份或删除 Mon 数据， 要去该节点删除  
+```
+# 备份
+# mkdir /var/lib/ceph/mon/removed
+# mv /var/lib/ceph/mon/ceph-node04 /var/lib/ceph/mon/removed/ceph-node04
+# 删除
+# rm -r /var/lib/ceph/mon/ceph-node04
+```  
+
+5、更新 ceph.conf 文件  
+```
+# vi ceph.conf
+...
+mon_initial_members = node01,node02,node03
+mon_host = 192.168.101.66,192.168.101.67,192.168.101.68
+...
+
+# ceph-deploy --overwrite-conf config push node01 node02 node03
+
+# ceph mon stat
+```  
