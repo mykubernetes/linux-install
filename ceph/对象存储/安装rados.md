@@ -75,3 +75,17 @@ for i in `cat ./pool`
 sudo cp /var/lib/ceph/radosgw/ceph-rgw.node01/keyring ./
 ceph -s -k keyring --name client.rgw.node01
 ```
+
+7、删除池（如果操作错误，需要删除时，才执行这步，否则请略过）  
+```
+# vi /etc/ceph/ceph.conf
+...
+[mon]
+mon_allow_pool_delete = true
+...
+
+# systemctl restart ceph-mon.target
+
+# ceph osd pool delete poolname poolname --yes-i-really-really-mean-it
+```  
+
