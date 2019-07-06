@@ -7,13 +7,14 @@ nginx从1.9.0版本开始，新增了ngx_stream_core_module模块，使nginx支�
 1、下载安装nginx  
 ```
 wget http://nginx.org/download/nginx-1.16.0.tar.gz
+tar xvf nginx-1.16.0.tar.gz
 cd nginx-1.16.0
 ./configure --prefix=/opt/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --user=nginx --group=nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre --with-stream
 make && make install
 groupadd -r nginx
 useradd -g nginx -r nginx
 #检查配置文件语法
-/opt/sbin/nginx -t
+/opt/nginx/sbin/nginx -t
 #启动
 /opt/sbin/nginx
 #查看服务器是否启动
