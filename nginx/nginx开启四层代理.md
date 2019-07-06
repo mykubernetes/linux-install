@@ -16,7 +16,7 @@ useradd -g nginx -r nginx
 #检查配置文件语法
 /opt/nginx/sbin/nginx -t
 #启动
-/opt/sbin/nginx
+/opt/nginx/sbin/nginx
 #查看服务器是否启动
 netstat -lntp|grep nginx
 ```  
