@@ -93,6 +93,7 @@ worker_rlimit_nofile 65535
 
 一般放在http标签即可
 ---
+```
 http {
 sendfile        on;
 tcp_nopush on;
@@ -105,7 +106,7 @@ client_header_timeout 15s;
 client_body_timeout 15s;
 send_timeout 60s;
 }
-
+```  
 
 
 
