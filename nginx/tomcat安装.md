@@ -60,6 +60,7 @@ https://www.zyops.com/java-tomcat/
 ```  
 
 5、设置Tomcat内存限制  
+优化catalina.sh配置文件。在catalina.sh配置文件中添加以下代码：  
 ```
 JAVA_OPTS="-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms1024m -Xmx1024m -XX:NewSize=512m -XX:MaxNewSize=512m -XX:PermSize=512m -XX:MaxPermSize=512m"
 
