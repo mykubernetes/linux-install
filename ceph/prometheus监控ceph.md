@@ -58,11 +58,14 @@ grafana 安装
 # systemctl start grafana-server
 ```  
 
-3、设置数据源  
+3、打开浏览器  
+192.168.101.66:3000  
+
+4、设置数据源  
 http://192.168.101.66:9090  
 
-4、导入模板  
-Ceph-Cluster： [ID: 2842]  
+5、导入模板  
+Ceph-Cluster：[ID: 2842]  
 Ceph-OSD: [ID: 5336]  
 Ceph-Pools: [ID: 5342]  
 https://grafana.com/orgs/galexrt  
