@@ -11,7 +11,7 @@ prometheus 下载
 ```
 # wget https://github.com/prometheus/prometheus/releases/download/v2.9.2/prometheus-2.9.2.linux-amd64.tar.gz
 # tar xf prometheus-2.9.2.linux-amd64.tar.gz
-# cd cd prometheus-2.9.2.linux-amd64
+# cd prometheus-2.9.2.linux-amd64
 ```  
 
 3、添加主机发现配置
