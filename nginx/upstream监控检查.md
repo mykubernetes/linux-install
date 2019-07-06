@@ -66,8 +66,8 @@ http {
     keepalive_timeout  65;
 
 upstream test {
-       server 10.4.81.41:900;
-       server 10.4.81.42:900;
+       server 192.168.101.67:80;
+       server 192.168.101.68:80;
        check interval=3000 rise=2 fall=5 timeout=1000 type=tcp;
     }
 
@@ -104,6 +104,8 @@ check interval=3000 rise=2 fall=5 timeout=1000 type=tcp;
 /usr/local/nginx/sbin/nginx -t
 /usr/local/nginx/sbin/nginx -s reload
 
-
+浏览器访问：  
+192.168.101.66/status1
+192.168.101.66/status2
 
 
