@@ -91,8 +91,20 @@ worker_rlimit_nofile 65535
 参考资料: http://nginx.org/en/docs/ngx_core_module.html#worker_rlimit_nofile  
 
 
-
-
+一般放在http标签即可
+---
+http {
+sendfile        on;
+tcp_nopush on;
+tcp_nodelay on;
+server_tokens off;
+server_names_hash_bucket_size 128;
+server_names_hash_max_size 512;
+keepalive_timeout  65;
+client_header_timeout 15s;
+client_body_timeout 15s;
+send_timeout 60s;
+}
 
 
 
