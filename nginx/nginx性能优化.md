@@ -22,7 +22,7 @@ Accept-Ranges: bytes
 ```  
 
 
-2、修改Nginx软件名及版本号  
+修改Nginx软件名及版本号  
 ---
 ```
 # wget http://nginx.org/download/nginx-1.16.0.tar.gz
@@ -54,7 +54,7 @@ static u_char ngx_http_server_string[] = "Server: ABCDE" CRLF;      #Curl显示�
 # netstat -lntp|grep nginx
 ```
 
-3、更改Nginx服务的默认用户  
+更改Nginx服务的默认用户  
 ---
 为了Web服务更安全，我们要尽可能地改掉软件默认的所有配置，包括端口、用户等  
 1)修改配置文件方式  
@@ -65,13 +65,43 @@ user  nginx;
 
 2)或者在编译时直接指定用户即可  
 
-4、优化Nginx服务的worker进程个数  
+优化Nginx服务的worker进程个数  
 ---
 
 ```
 worker_processes  4;                        #Nginx服务的Worker进程数,cpu核心数或者cpu核心数减1
 worker_cpu_affinity 0001 0010 0100 1000;    #优化绑定不同的Nginx进程到不同CPU上
 ```  
+
+调整Nginx单个进程允许的客户端最大连接数
+---
+```
+events {
+    worker_connections  20480;
+}
+```  
+
+
+配置Nginx worker进程最大打开文件数
+---  
+```
+worker_rlimit_nofile 65535
+#最大打开文件数，可设置为系统优化有的ulimit-HSn的结果。
+```  
+参考资料: http://nginx.org/en/docs/ngx_core_module.html#worker_rlimit_nofile  
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
