@@ -109,10 +109,31 @@ send_timeout 60s;
 ```  
 
 
+fastcgi相关参数调优（配合PHP引擎动态服务）
+---
+在http{}里面  
+```
+fastcgi_connect_timeout 240;
+fastcgi_send_timeout 240;
+fastcgi_read_timeout 240;
+fastcgi_buffer_size 64k;
+fastcgi_buffers 4 64k;
+fastcgi_busy_buffers_size 128k;
+fastcgi_temp_file_write_size 128k;
+#fastcgi_temp_path /data/ngx_fcgi_tmp;  需要有路径
+fastcgi_cache_path /data/ngx_fcgi_cache levels=2:2 keys_zone=ngx_fcgi_cache:512m inactive=1d max_size=40g;
+```  
 
-
-
-
+PHP缓存 可以配置在server标签和http标签  
+```
+fastcgi_cache ngx_fcgi_cache;
+ fastcgi_cache_valid 200 302 1h;
+fastcgi_cache_valid 301 1d;
+fastcgi_cache_valid any 1m;
+fastcgi_cache_min_uses 1;
+fastcgi_cache_use_stale error timeout invalid_header http_500;
+fastcgi_cache_key http://$host$request_uri;
+```  
 
 
 
