@@ -11,6 +11,7 @@ wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
 rpm -ivh mysql-community-release-el7-5.noarch.rpm
 yum -y install mysql-community-server
 systemctl start mysqld.service
+mysqladmin -uroot password '123456'
 ```
 
 3、导入数据库和表  
