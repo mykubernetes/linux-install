@@ -49,6 +49,9 @@ mysql> show master status;
 | mysql-bin-1.000001 |      120 |              |                  |                   |
 +--------------------+----------+--------------+------------------+-------------------+
 1 row in set (0.00 sec)
+mysql> grant replication slave on *.* to 'repl_user'@'192.168.101.%' identified by 'repl_passwd';
+mysql> flush privileges;
+
 
 
 #在slave端
@@ -57,7 +60,14 @@ server_id=1
 log_bin=mysql-bin-1
 # systemctl restart mysql
 # mysql -uroot -p123456
-mysql> 
+mysql> stop slave;
+mysql> change master to master_host='192.168.101.69', \
+    -> master_user='repl_user', \
+    -> master_password='repl_passwd', \
+    -> master_log_file='mysql-bin.000001', \
+    -> master_log_pos=120;
+mysql> start slave;
+mysql> show slave status\G
 ```  
 
 5、配置hosts文件  
