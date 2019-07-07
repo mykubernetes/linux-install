@@ -113,7 +113,7 @@ tcp6       0      0 :::8066                 :::*                    LISTEN      
 tcp6       0      0 :::9066                 :::*                    LISTEN      13777/java
 ```  
 
-9、连接mycat  
+9、查看连接mycat用户密码权限  
 ```
 # vim server.xml
         <user name="root">
