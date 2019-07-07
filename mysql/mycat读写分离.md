@@ -14,27 +14,7 @@ systemctl start mysqld.service
 mysqladmin -uroot password '123456'
 ```
 
-3、导入数据库和表  
-```
-# mysql
-DROP DATABASE IF EXISTS mldn ;
-CREATE DATABASE mldn CHARACTER SET UTF8 ;
-use mldn ;
-CREATE TABLE member(
-   mid VARCHAR(50) ,
-   name VARCHAR(50) ,
-   age INT ,
-   salary DOUBLE ,
-   birthday DATE ,
-   note  TEXT ,
-   CONSTRAINT pk_mid PRIMARY KEY(mid)
-) ;
-INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('mldn','hello',10,2000.0,'2005-11-11','very good') ;
-INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('admin','administrator',10,2000.0,'2005-11-11','very good') ;
-INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('guest','administrator',10,2000.0,'2005-11-11','very good') ;
-```  
-
-4、配置mysql主从  
+3、配置mysql主从  
 ```
 #在master端
 # vim /etc/my.cnf
@@ -68,6 +48,26 @@ mysql> change master to master_host='192.168.101.69', \
     -> master_log_pos=120;
 mysql> start slave;
 mysql> show slave status\G
+```  
+
+4、在master导入数据库和表  
+```
+# mysql
+DROP DATABASE IF EXISTS mldn ;
+CREATE DATABASE mldn CHARACTER SET UTF8 ;
+use mldn ;
+CREATE TABLE member(
+   mid VARCHAR(50) ,
+   name VARCHAR(50) ,
+   age INT ,
+   salary DOUBLE ,
+   birthday DATE ,
+   note  TEXT ,
+   CONSTRAINT pk_mid PRIMARY KEY(mid)
+) ;
+INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('mldn','hello',10,2000.0,'2005-11-11','very good') ;
+INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('admin','administrator',10,2000.0,'2005-11-11','very good') ;
+INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('guest','administrator',10,2000.0,'2005-11-11','very good') ;
 ```  
 
 5、配置hosts文件  
