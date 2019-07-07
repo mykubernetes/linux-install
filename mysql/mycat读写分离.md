@@ -97,3 +97,59 @@ switchType属性，有三种取值
 重启服务:mycat restart  
 暂停:mycat pause  
 查看启动状态:mycat status  
+
+7、启动  
+```
+# mycat console      #查看日志是否有报错
+# mycat start        #如果没有报错可以后台启动
+```  
+
+8、查看运行状态  
+管理端口:9066 (查看mycat的运行状态)  
+数据端口:8066 (进行数据的CRUD操作)  
+```
+# netstat -ntlup |grep 66
+tcp6       0      0 :::8066                 :::*                    LISTEN      13777/java          
+tcp6       0      0 :::9066                 :::*                    LISTEN      13777/java
+```  
+
+9、连接mycat  
+```
+# vim server.xml
+        <user name="root">
+                <property name="password">123456</property>
+                <property name="schemas">TESTDB</property>   #TESTDB对应schema.xml配置文件的<schema name="TESTDB"配置
+
+                <!-- 表级 DML 权限设置 -->
+                <!--            
+                <privileges check="false">
+                        <schema name="TESTDB" dml="0110" >
+                                <table name="tb01" dml="0000"></table>
+                                <table name="tb02" dml="1111"></table>
+                        </schema>
+                </privileges>           
+                 -->
+        </user>
+
+        <user name="user">
+                <property name="password">user</property>
+                <property name="schemas">TESTDB</property>
+                <property name="readOnly">true</property>
+        </user>
+```  
+
+
+10、连接mycat的管理端口  
+```
+# mysql -uroot -p123456 -h192.168.101.70 -P9066 -D TESTDB
+# show @@help;      #查看所有管理命令
+# show @@database;  #查看所有数据库
+# show @@datanode;  #查看所有数据节点
+show @@datasource;  #查看所有数据源
+```  
+
+11、进入数据端口  
+```
+# mysql -uroot -p123456 -h192.168.101.70 -P8066 -D TESTDB
+```  
+
