@@ -3,16 +3,16 @@ mycat-web
 
 1、安装zookpeer  
 ```
-wget  http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz
-tar -xzvf  zookeeper-3.4.6.tar.gz 
+wget  http://dl.mycat.io/zookeeper-3.4.6.tar.gz
+tar -xzvf  zookeeper-3.4.6.tar.gz
 cd zookeeper-3.4.6/conf
-cp zoo_sample.cfg zoo.cfg 
+cp zoo_sample.cfg zoo.cfg
 cd zookeeper-3.4.6/bin
-./zkServer.sh start 
-出现一下信息 说明启动成功 
-JMX enabled by default 
-Using config: /usr1/zookeeper/bin/../conf/zoo.cfg 
-Starting zookeeper ... STARTED 
+./zkServer.sh start
+出现一下信息 说明启动成功
+JMX enabled by default
+Using config: /usr1/zookeeper/bin/../conf/zoo.cfg
+Starting zookeeper ... STARTED
 ```  
 
 
