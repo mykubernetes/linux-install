@@ -89,3 +89,11 @@ switchType属性，有三种取值
 - -1，表示不自动切换
 - 1，默认值，自动切换
 - 2，基于mysql主从同步状态决定是否切换
+
+
+启动mycat :mycat start  
+停止mycat:mycat stop  
+前台运行:mycat console  
+重启服务:mycat restart  
+暂停:mycat pause  
+查看启动状态:mycat status  
