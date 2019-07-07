@@ -64,7 +64,7 @@ mysql> stop slave;
 mysql> change master to master_host='192.168.101.69', \
     -> master_user='repl_user', \
     -> master_password='repl_passwd', \
-    -> master_log_file='mysql-bin.000001', \
+    -> master_log_file='mysql-bin-1.000001', \
     -> master_log_pos=120;
 mysql> start slave;
 mysql> show slave status\G
