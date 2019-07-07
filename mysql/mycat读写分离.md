@@ -77,14 +77,19 @@ INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('guest','administr
 192.168.101.70 node02
 ```  
 
-5、安装mycat  
+6、安装java  
+```
+# yum install java -y
+```  
+
+7、安装mycat  
 ```
 wget http://dl.mycat.io/1.6-RELEASE/Mycat-server-1.6-RELEASE-20161028204710-linux.tar.gz
 tar xvf Mycat-server-1.6-RELEASE-20161028204710-linux.tar.gz
 cd mycat
 ```  
 
-6、配置mycat  
+8、配置mycat  
 ```
 vim schema.xml
 <?xml version="1.0"?>
@@ -134,13 +139,13 @@ switchType属性，有三种取值
 暂停:mycat pause  
 查看启动状态:mycat status  
 
-7、启动  
+9、启动  
 ```
 # mycat console      #查看日志是否有报错
 # mycat start        #如果没有报错可以后台启动
 ```  
 
-8、查看运行状态  
+10、查看运行状态  
 管理端口:9066 (查看mycat的运行状态)  
 数据端口:8066 (进行数据的CRUD操作)  
 ```
@@ -149,7 +154,7 @@ tcp6       0      0 :::8066                 :::*                    LISTEN      
 tcp6       0      0 :::9066                 :::*                    LISTEN      13777/java
 ```  
 
-9、查看连接mycat用户密码权限  
+11、查看连接mycat用户密码权限  
 ```
 # vim server.xml
         <user name="root">
@@ -175,7 +180,7 @@ tcp6       0      0 :::9066                 :::*                    LISTEN      
 ```  
 
 
-10、连接mycat的管理端口  
+12、连接mycat的管理端口  
 ```
 # mysql -uroot -p123456 -h192.168.101.70 -P9066 -D TESTDB
 # show @@help;      #查看所有管理命令
@@ -184,7 +189,7 @@ tcp6       0      0 :::9066                 :::*                    LISTEN      
 show @@datasource;  #查看所有数据源
 ```  
 
-11、进入数据端口  
+13、进入数据端口  
 ```
 # mysql -uroot -p123456 -h192.168.101.70 -P8066 -D TESTDB
 ```  
