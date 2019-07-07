@@ -74,3 +74,18 @@ vim schema.xml
 		</dataHost>
 </mycat:schema>
 ```  
+balance属性，负载均衡类型
+- 0,不开启读写分离机制，所有读操作都发送到当前可用的writeHost上
+- 1,全部的readHost与writeHost参与select语句的负载均衡
+- 2,所有读操作都随机在writeHost、readHost上分发
+- 3,所有读请求随机分发到wiriterHost对应的readHost执行，writerHost不负担读压力
+
+writeType属性，复制均衡类型
+- 0，所有的写操作发送到第一个writeHost,第一个挂了切到第二个writeHost
+- 1，所有的写操作都随机的发送到配置的writeHost
+- 2，没实现
+
+switchType属性，有三种取值
+- -1，表示不自动切换
+- 1，默认值，自动切换
+- 2，基于mysql主从同步状态决定是否切换
