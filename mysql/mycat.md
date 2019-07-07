@@ -1,1 +1,0 @@
-http://dl.mycat.io/
