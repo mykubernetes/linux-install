@@ -34,7 +34,33 @@ INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('admin','administr
 INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('guest','administrator',10,2000.0,'2005-11-11','very good') ;
 ```  
 
-4、配置hosts文件  
+4、配置mysql主从  
+```
+#在master端
+# vim /etc/my.cnf
+server_id=1
+log_bin=mysql-bin-1
+# systemctl restart mysql
+# mysql -uroot -p123456
+mysql> show master status;
++--------------------+----------+--------------+------------------+-------------------+
+| File               | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++--------------------+----------+--------------+------------------+-------------------+
+| mysql-bin-1.000001 |      120 |              |                  |                   |
++--------------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+
+
+#在slave端
+# vim /etc/my.cnf
+server_id=1
+log_bin=mysql-bin-1
+# systemctl restart mysql
+# mysql -uroot -p123456
+mysql> 
+```  
+
+5、配置hosts文件  
 ```
 # cat /etc/hosts
 192.168.101.69 node01
