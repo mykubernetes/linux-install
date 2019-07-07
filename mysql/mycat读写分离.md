@@ -64,12 +64,12 @@ vim schema.xml
 		<!-- “database="mldn"”：定义数据节点要使用的数据库名称 -->
         <dataNode name="dn1" dataHost="localhost1" database="mldn" />
 		<!-- 定义数据节点，包括了各种逻辑项的配置 -->
-		<dataHost name="localhost1" maxCon="1000" minCon="10" balance="0" writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+		<dataHost name="localhost1" maxCon="1000" minCon="10" balance="3" writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
 			<!-- 配置真实MySQL与MyCat的心跳 -->
 			<heartbeat>select user()</heartbeat>
 			<!-- 配置真实的MySQL的连接路径 -->
 			<writeHost host="hostM1" url="192.168.101.69:3306" user="root" password="123456">
-				<readHost host="hostS1" url="192.168.101.70:3306" user="root" password="123456"/>
+			<readHost host="hostS1" url="192.168.101.70:3306" user="root" password="123456"/>
 			</writeHost>
 		</dataHost>
 </mycat:schema>
