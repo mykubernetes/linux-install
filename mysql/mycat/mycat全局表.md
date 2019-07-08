@@ -54,3 +54,27 @@ CREATE TABLE dict(
 ) ;
 ```  
 
+3、配置mycat  
+```
+# vim schema.xml
+<!DOCTYPE mycat:schema SYSTEM "schema.dtd">
+<mycat:schema xmlns:mycat="http://io.mycat/">
+        <schema name="TESTADB" checkSQLschema="false" sqlMaxLimit="100">
+                <table name="dict" primaryKey="did" type="global" dataNode="dnGdb,dnMdb"/>
+        </schema>
+        <schema name="TESTGDB" checkSQLschema="false" sqlMaxLimit="100" dataNode="dnGdb"/>
+        <schema name="TESTMDB" checkSQLschema="false" sqlMaxLimit="100" dataNode="dnMdb"/>
+        <dataNode name="dnGdb" dataHost="localhost1" database="gdb" />
+        <dataNode name="dnMdb" dataHost="localhost2" database="mdb" />
+        <dataHost name="localhost1" maxCon="1000" minCon="10" balance="2"
+                          writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+                <heartbeat>select user()</heartbeat>
+                <writeHost host="hostM1" url="192.168.101.69:3306" user="root" password="123456"/>
+        </dataHost>
+        <dataHost name="localhost2" maxCon="1000" minCon="10" balance="2"
+                          writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+                <heartbeat>select user()</heartbeat>
+                <writeHost host="hostM2" url="192.168.101.70:3306" user="root" password="123456"/>
+        </dataHost>
+</mycat:schema>
+```  
