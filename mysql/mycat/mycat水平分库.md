@@ -119,4 +119,33 @@ CREATE TABLE orders(
 mysql> INSERT INTO orders(oid,title,pubdate) VALUES (1,@@hostname,'2020-01-01');
 mysql> INSERT INTO orders(oid,title,pubdate) VALUES (2,@@hostname,'2020-01-01');
 mysql> INSERT INTO orders(oid,title,pubdate) VALUES (3,@@hostname,'2020-01-01');
+
+分别在node01、node02、node03查询数据写入
+# node01
+mysql> select * from orders;
++-----+--------+------------+
+| oid | title  | pubdate    |
++-----+--------+------------+
+|   1 | node01 | 2020-01-01 |
++-----+--------+------------+
+1 row in set (0.00 sec)
+
+# node02
+mysql> select * from orders;
++-----+--------+------------+
+| oid | title  | pubdate    |
++-----+--------+------------+
+|   1 | node02 | 2020-01-01 |
++-----+--------+------------+
+1 row in set (0.10 sec)
+
+# node03
+mysql> select * from orders;
++-----+--------+------------+
+| oid | title  | pubdate    |
++-----+--------+------------+
+|   2 | node03 | 2020-01-01 |
++-----+--------+------------+
+1 row in set (0.00 sec)
+发现数据已经分片写入到三台机器  
 ```  
