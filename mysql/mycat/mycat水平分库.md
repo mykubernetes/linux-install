@@ -112,3 +112,11 @@ CREATE TABLE orders(
                 <property name="readOnly">true</property>
         </user>
 ```  
+
+6、连接mycat测试  
+```
+# mysql -uroot -p123456 -h192.168.101.70 -P8066 -D TESTDB
+mysql> INSERT INTO orders(oid,title,pubdate) VALUES (1,@@hostname,'2020-01-01');
+mysql> INSERT INTO orders(oid,title,pubdate) VALUES (2,@@hostname,'2020-01-01');
+mysql> INSERT INTO orders(oid,title,pubdate) VALUES (3,@@hostname,'2020-01-01');
+```  
