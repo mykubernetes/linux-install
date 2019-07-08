@@ -77,7 +77,7 @@ CREATE TABLE orders(
 # vim rule.xml
         <tableRule name="myorders-mod-long">        #名字对应上边配置的rule="myorders-mod-long" 名
                 <rule>
-                        <columns>id</columns>
+                        <columns>oid</columns>
                         <algorithm>mod-long</algorithm>
                 </rule>
         </tableRule>
