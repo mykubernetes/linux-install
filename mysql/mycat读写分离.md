@@ -189,8 +189,32 @@ tcp6       0      0 :::9066                 :::*                    LISTEN      
 show @@datasource;  #查看所有数据源
 ```  
 
-13、进入数据端口  
+13、进入数据端口测试  
 ```
 # mysql -uroot -p123456 -h192.168.101.70 -P8066 -D TESTDB
+mysql> INSERT INTO member(mid,name) VALUES ('hello',@@hostname);    #在数据端口插入数据@@hostname表示主机名
+mysql> select * from member;
++-------+---------------+------+--------+------------+-----------+
+| mid   | name          | age  | salary | birthday   | note      |
++-------+---------------+------+--------+------------+-----------+
+| admin | administrator |   10 |   2000 | 2005-11-11 | very good |
+| guest | administrator |   10 |   2000 | 2005-11-11 | very good |
+| hello | node02        | NULL |   NULL | NULL       | NULL      |
+| mldn  | hello         |   10 |   2000 | 2005-11-11 | very good |
++-------+---------------+------+--------+------------+-----------+
+4 rows in set (0.00 sec)
+
+mysql> select * from member;
++-------+---------------+------+--------+------------+-----------+
+| mid   | name          | age  | salary | birthday   | note      |
++-------+---------------+------+--------+------------+-----------+
+| admin | administrator |   10 |   2000 | 2005-11-11 | very good |
+| guest | administrator |   10 |   2000 | 2005-11-11 | very good |
+| hello | node02        | NULL |   NULL | NULL       | NULL      |
+| mldn  | hello         |   10 |   2000 | 2005-11-11 | very good |
++-------+---------------+------+--------+------------+-----------+
+4 rows in set (0.00 sec)
 ```  
+查询主机都在node02上测试完毕
+
 
