@@ -75,3 +75,16 @@ vim server.xml
                 <property name="readOnly">true</property>
         </user>
 ```  
+
+5、登录管理端口查看有几个数据库  
+```
+# mysql -uroot -p123456 -h192.168.101.70 -P9066
+show @@database;
++----------+
+| DATABASE |
++----------+
+| TESTGDB  |
+| TESTMDB  |
++----------+
+2 rows in set (0.01 sec)
+```  
