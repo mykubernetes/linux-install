@@ -44,7 +44,7 @@ CREATE TABLE goods(
 <?xml version="1.0"?>
 <!DOCTYPE mycat:schema SYSTEM "schema.dtd">
 <mycat:schema xmlns:mycat="http://io.mycat/">
-		<schema name="TESTGDB" checkSQLschema="false" sqlMaxLimit="100" dataNode="dnGdb"/>
+        <schema name="TESTGDB" checkSQLschema="false" sqlMaxLimit="100" dataNode="dnGdb"/>
         <schema name="TESTMDB" checkSQLschema="false" sqlMaxLimit="100" dataNode="dnMdb"/>
         <dataNode name="dnGdb" dataHost="localhost1" database="gdb" />
         <dataNode name="dnMdb" dataHost="localhost2" database="mdb" />
