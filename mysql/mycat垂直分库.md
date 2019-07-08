@@ -51,12 +51,12 @@ CREATE TABLE goods(
         <dataHost name="localhost1" maxCon="1000" minCon="10" balance="2"
                           writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
                 <heartbeat>select user()</heartbeat>
-                <writeHost host="hostM1" url="192.168.101.69:3306" user="root" password="123456"/>
+                <writeHost host="hostM1" url="192.168.101.70:3306" user="root" password="123456"/>
         </dataHost>
         <dataHost name="localhost2" maxCon="1000" minCon="10" balance="2"
                           writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
                 <heartbeat>select user()</heartbeat>
-                <writeHost host="hostM2" url="192.168.101.70:3306" user="root" password="123456"/>
+                <writeHost host="hostM2" url="192.168.101.69:3306" user="root" password="123456"/>
         </dataHost>
 </mycat:schema>
 ```  
