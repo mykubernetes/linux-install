@@ -49,7 +49,7 @@ CREATE TABLE orders(
 <!DOCTYPE mycat:schema SYSTEM "schema.dtd">
 <mycat:schema xmlns:mycat="http://io.mycat/">
         <schema name="TESTDB" checkSQLschema="false" sqlMaxLimit="100">
-                <table name="orders" primaryKey="oid" dataNode="dn1,dn2,dn3" rule="myorders-mod-long"/>
+                <table name="orders" primaryKey="oid" type="global" dataNode="dn1,dn2,dn3" rule="myorders-mod-long"/>
         </schema>
         <dataNode name="dn1" dataHost="localhost1" database="mdb" />
         <dataNode name="dn2" dataHost="localhost2" database="gdb" />
