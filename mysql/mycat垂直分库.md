@@ -68,4 +68,10 @@ vim server.xml
                 <property name="password">123456</property>
                 <property name="schemas">TESTGDB,TESTMDB</property>
         </user>
+        
+        <user name="user">
+                <property name="password">user</property>
+                <property name="schemas">TESTGDB,TESTMDB</property>
+                <property name="readOnly">true</property>
+        </user>
 ```  
