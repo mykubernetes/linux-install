@@ -1,12 +1,12 @@
-1、集群规划
-
+1、集群规划  
+```
 主机      服务                 表
 node01   mysql          mdb.member mdb.dict
 node02   mysql mycat    gdb.goods gbd.dict
+```  
 
-2、导入表
----
-# node01创建一个数据库两个表  
+2、导入表  
+node01创建一个数据库两个表  
 ```
 CREATE DATABASE mdb CHARACTER SET UTF8 ;
 use mdb ;
@@ -34,7 +34,7 @@ CREATE TABLE dict(
 
 
 
-# node02创建一个数据库两个表  
+node02创建一个数据库两个表  
 ```
 CREATE DATABASE gdb CHARACTER SET UTF8 ;
 use gdb ;
