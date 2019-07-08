@@ -60,3 +60,12 @@ CREATE TABLE goods(
         </dataHost>
 </mycat:schema>
 ```  
+
+4、添加mycat链接的数据库  
+```
+vim server.xml
+        <user name="root">
+                <property name="password">123456</property>
+                <property name="schemas">TESTGDB,TESTMDB</property>
+        </user>
+```  
