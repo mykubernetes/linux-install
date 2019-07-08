@@ -71,3 +71,19 @@ CREATE TABLE orders(
         </dataHost>
 </mycat:schema>
 ```  
+
+4、配置规则  
+```
+# vim rule.xml
+        <tableRule name="myorders-mod-long">        #名字对应上边配置的rule="myorders-mod-long" 名
+                <rule>
+                        <columns>id</columns>
+                        <algorithm>mod-long</algorithm>
+                </rule>
+        </tableRule>
+        
+        
+        <function name="myorders-mod-long" class="io.mycat.route.function.PartitionByMod">     #名字对应上边配置的rule="myorders-mod-long" 名
+                <property name="count">3</property>
+        </function>
+```  
