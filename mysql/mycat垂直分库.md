@@ -88,3 +88,28 @@ show @@database;
 +----------+
 2 rows in set (0.01 sec)
 ```  
+
+6、链接数据端口测试  
+```
+# mysql -uroot -p123456 -h192.168.101.70 -P8066 -D TESTMDB
+mysql> show tables;
++---------------+
+| Tables_in_mdb |
++---------------+
+| member        |
++---------------+
+1 row in set (0.00 sec)
+
+
+mysql> use TESTGDB
+mysql> insert into goods(title,price) values ('hello',1.1);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from goods;
++-----+-------+-------+
+| gid | title | price |
++-----+-------+-------+
+|   1 | hello |   1.1 |
++-----+-------+-------+
+1 row in set (0.01 sec)
+```  
