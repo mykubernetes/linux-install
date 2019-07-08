@@ -103,3 +103,46 @@ CREATE TABLE dict(
                 <property name="readOnly">true</property>
         </user>
 ```  
+
+测试  
+```
+# mysql -uroot -p123456 -h192.168.101.70 -P8066 -D TESTADB
+mysql> show tables;
++-------------------+
+| Tables in TESTADB |
++-------------------+
+| dict              |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> insert into dict(title,content) values ('news','mldn');
+Query OK, 1 row affected (2.21 sec)
+
+mysql> select * from dict;
++-----+-------+---------+
+| did | title | content |
++-----+-------+---------+
+|   1 | news  | mldn    |
++-----+-------+---------+
+1 row in set (0.32 sec)
+
+#分别进入node01和node02测试
+# node01
+mysql> select * from dict;
++-----+-------+---------+
+| did | title | content |
++-----+-------+---------+
+|   1 | news  | mldn    |
++-----+-------+---------+
+1 row in set (0.01 sec)
+
+# node02
+mysql> select * from dict;
++-----+-------+---------+
+| did | title | content |
++-----+-------+---------+
+|   1 | news  | mldn    |
++-----+-------+---------+
+1 row in set (0.01 sec)
+说明全局数据表，可以一次写入多个数据库
+```  
