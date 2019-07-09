@@ -168,11 +168,10 @@ ALARM_DB_USER = os.environ.get("ALARM_DB_USER","root")
 ALARM_DB_PASS = os.environ.get("ALARM_DB_PASS","123456")
 ALARM_DB_NAME = os.environ.get("ALARM_DB_NAME","alarms")
 
-启动停止
+启动
 bash control start
 浏览器打开
-http://127.0.0.1:8081
+http://192.168.101.71:8081
+停止
 bash control stop
-
-
 ```  
