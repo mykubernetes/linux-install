@@ -129,5 +129,50 @@ agent  aggregator  alarm  api  gateway  graph  hbs  judge  nodata  open-falcon  
 8、启动单个服务  
 ```
 # ./open-falcon [start|stop|restart|check|monitor|reload] module
-./open-falcon start agent
+# ./open-falcon start agent
+```  
+
+9、web安装  
+```
+下载dashboard
+# git clone https://github.com/open-falcon/dashboard.git
+安装依赖
+# yum install -y python-virtualenv python-devel openldap-devel mysql-devel
+# yum groupinstall "Development tools" -y
+安装dashboard
+# cd dashboard
+# virtualenv ./env
+# ./env/bin/pip install -r pip_requirements.txt -i https://pypi.douban.com/simple
+注意：如果执行上面有问题，就直接执行./env/bin/pip install -r pip_requirements.txt
+
+修改配置文件，配置连接mysql的账号密码
+# vim rrd/config.py
+# Falcon+ API
+API_ADDR = os.environ.get("API_ADDR","http://127.0.0.1:8080/api/v1")
+API_USER = os.environ.get("API_USER","admin")
+API_PASS = os.environ.get("API_PASS","password")
+
+# portal database
+# TODO: read from api instead of db
+PORTAL_DB_HOST = os.environ.get("PORTAL_DB_HOST","127.0.0.1")
+PORTAL_DB_PORT = int(os.environ.get("PORTAL_DB_PORT",3306))
+PORTAL_DB_USER = os.environ.get("PORTAL_DB_USER","root")
+PORTAL_DB_PASS = os.environ.get("PORTAL_DB_PASS","123456")
+PORTAL_DB_NAME = os.environ.get("PORTAL_DB_NAME","falcon_portal")
+
+# alarm database
+# TODO: read from api instead of db
+ALARM_DB_HOST = os.environ.get("ALARM_DB_HOST","127.0.0.1")
+ALARM_DB_PORT = int(os.environ.get("ALARM_DB_PORT",3306))
+ALARM_DB_USER = os.environ.get("ALARM_DB_USER","root")
+ALARM_DB_PASS = os.environ.get("ALARM_DB_PASS","123456")
+ALARM_DB_NAME = os.environ.get("ALARM_DB_NAME","alarms")
+
+启动停止
+bash control start
+浏览器打开
+http://127.0.0.1:8081
+bash control stop
+
+
 ```  
