@@ -51,4 +51,10 @@ graph是存储绘图数据的组件。graph组件 接收transfer组件推送上�
 查看表：show tables;
 查询表：select * from endpoint;
 删除不需要的数据：delete from endpoint where id=153;
+
+可以一起删除falcon_portal库中的host表中的无用数据。
+use falcon_portal;
+show tables;
+select * from host;
+delete from host where id=153;
 ```  
