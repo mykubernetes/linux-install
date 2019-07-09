@@ -98,7 +98,7 @@ agent  aggregator  alarm  api  gateway  graph  hbs  judge  nodata  open-falcon  
 }
 ```  
 
-7、启动  
+7、启动所有服务  
 ```
 # ./open-falcon start
 [falcon-graph] 16736
@@ -124,4 +124,10 @@ agent  aggregator  alarm  api  gateway  graph  hbs  judge  nodata  open-falcon  
       falcon-gateway         UP           16789 
           falcon-api         UP           16797 
         falcon-alarm         UP           16810 
+```  
+
+8、启动单个服务  
+```
+# ./open-falcon [start|stop|restart|check|monitor|reload] module
+./open-falcon start agent
 ```  
