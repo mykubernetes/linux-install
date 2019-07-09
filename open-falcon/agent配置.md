@@ -54,3 +54,13 @@
     }
 }
 ```  
+
+启动停止  
+```
+./open-falcon start agent  启动进程
+./open-falcon stop agent  停止进程
+./open-falcon monitor agent  查看日志
+看var目录下的log是否正常，或者浏览器访问其1988端口。另外agent提供了一个--check参数，可以检查agent是否可以正常跑在当前机器上
+cd agent/bin/
+./falcon-agent --check
+```  
