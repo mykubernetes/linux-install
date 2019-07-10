@@ -1,3 +1,5 @@
+https://github.com/open-falcon/book/blob/master/zh_0_2/SUMMARY.md  
+
 1、配置yum源  
 ```
 # wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
