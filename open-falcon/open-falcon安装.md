@@ -1,4 +1,5 @@
 https://github.com/open-falcon/book/blob/master/zh_0_2/SUMMARY.md  
+https://github.com/iambocai  
 
 1、配置yum源  
 ```
