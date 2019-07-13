@@ -64,7 +64,97 @@ mysql> start slave;
 mysql> show slave status\G
 ```  
 
+5、安装keepalived  
+```
+# yum install keepalived -y
+# vim /etc/keepalived/keepalived.conf
+global_defs {
+  notification_email {
+    acassen@firewall.loc
+    failover@firewall.loc
+    sysadmin@firewall.loc
+  }
 
+  notification_email_from Alexandre.Cassen@firewall.loc
+  smtp_server 192.168.101.11
+  smtp_connect_timeout 30
+  router_id MySQLHA_DEVEL
+}
+vrrp_script check_mysqld {
+  script "/etc/keepalived/mysqlcheck/check_slave.pl 127.0.0.1" # 检测 mysql  复制状态的脚本
+  interval 2
+}
 
+vrrp_instance HA_1 {
+  state BACKUP   #在DB1和DB2上均配置为BACKUP
+  interface ens33
+  virtual_router_id 80
+  priority 100
+  advert_int 2
+  nopreempt      #不抢占模式，只在优先级高的机器上设置即可，优先级低的机器不设置
 
+  authentication {
+    auth_type PASS
+    auth_pass qweasdzxc
+  }
+
+  track_script {
+    check_mysqld
+  }
+  virtual_ipaddress {
+    192.168.101.71/24 dev eth0 #mysql的对外服务 IP，即VIP
+  }
+}
+```  
+
+6、检查mysql复制状态脚本
+```
+# cat check_slave.pl 
+#!/usr/bin/perl -w
+use DBI;
+use DBD::mysql;
+
+# CONFIG VARIABLES
+$SBM = 120;
+$db = "mysql";
+$host = $ARGV[0];
+$port = 3306;
+$user = "root";
+$pw = "123456";
+
+# SQL query
+$query = "show slave status";
+
+$dbh = DBI->connect("DBI:mysql:$db:$host:$port", $user, $pw, { RaiseError => 0,PrintError => 0 });
+
+if (!defined($dbh)) {
+    exit 1;
+}
+
+$sqlQuery = $dbh->prepare($query);
+$sqlQuery->execute;
+
+$Slave_IO_Running = "";
+$Slave_SQL_Running = "";
+$Seconds_Behind_Master = "";
+
+while (my $ref = $sqlQuery->fetchrow_hashref()) {
+    $Slave_IO_Running = $ref->{'Slave_IO_Running'};
+    $Slave_SQL_Running = $ref->{'Slave_SQL_Running'};
+    $Seconds_Behind_Master = $ref->{'Seconds_Behind_Master'};
+}
+
+$sqlQuery->finish;
+$dbh->disconnect();
+
+if ( $Slave_IO_Running eq "No" || $Slave_SQL_Running eq "No" ) {
+    exit 1;
+} else {
+    if ( $Seconds_Behind_Master > $SBM ) {
+        exit 1;
+    } else {
+        exit 0;
+    }
+}
+```  
 
