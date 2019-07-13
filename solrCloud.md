@@ -68,8 +68,8 @@ mode: follower or mode: Leader
 1、下载tomcat  
 ```
 cd /opt/
-wget https://www.apache.org/dist/tomcat/tomcat-8/v8.5.42/src/apache-tomcat-8.5.42-src.tar.gz
-mv apache-tomcat-8.5.42-src.tar.gz tomcat
+wget http://dl.mycat.io/apache-tomcat-7.0.62.tar.gz
+mv apache-tomcat-7.0.62.tar.gz tomcat
 
 ```  
 
