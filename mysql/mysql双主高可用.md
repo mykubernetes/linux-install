@@ -81,17 +81,17 @@ global_defs {
   router_id MySQLHA_DEVEL
 }
 vrrp_script check_mysqld {
-  script "/etc/keepalived/mysqlcheck/check_slave.pl 127.0.0.1" # 检测 mysql  复制状态的脚本
+  script "/etc/keepalived/mysqlcheck/check_slave.pl 127.0.0.1"    #检测mysql复制状态的脚本
   interval 2
 }
 
 vrrp_instance HA_1 {
-  state BACKUP   #在DB1和DB2上均配置为BACKUP
+  state BACKUP           #在DB1和DB2上均配置为BACKUP
   interface ens33
   virtual_router_id 80
-  priority 100
+  priority 100           #主比从高
   advert_int 2
-  nopreempt      #不抢占模式，只在优先级高的机器上设置即可，优先级低的机器不设置
+  nopreempt              #不抢占模式，只在优先级高的机器上设置即可，优先级低的机器不设置
 
   authentication {
     auth_type PASS
@@ -101,6 +101,7 @@ vrrp_instance HA_1 {
   track_script {
     check_mysqld
   }
+  
   virtual_ipaddress {
     192.168.101.71/24 dev eth0 #mysql的对外服务 IP，即VIP
   }
