@@ -55,7 +55,7 @@ frontend oos_api_http
 #      acl is_post method POST
 #      acl is_put method PUT
 #      use_backend local_api if is_put or is_post
-      default_backend oos_api_backend
+      default_backend api_backend
 
       option forwardfor
       option logasap
@@ -72,7 +72,7 @@ frontend oos_api_https
 
       reqadd X-Forwarded-Proto:\ https
 
-      default_backend oos_api_backend
+      default_backend api_backend
       option forwardfor
       option logasap
       option dontlognull
@@ -82,7 +82,7 @@ frontend oos_api_https
       capture request header Content-Length len 60
       capture request  header Host len 40
 
-backend oos_api_backend
+backend api_backend
       option allbackups
       mode        http
       hash-type   consistent
