@@ -61,6 +61,7 @@ master_log_pos=542;
 
 # 启动两个从库
 mysql> start slave;
+mysql> show slave status\G
 ```  
 
 
