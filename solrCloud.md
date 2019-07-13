@@ -37,23 +37,23 @@ clientPort=2181
  #maxClientCnxns=60
  #minSessionTimeout=4000
  #maxSessionTimeout=40000
-server.1=node01:4888:5888
-server.2=node02:4888:5888
-server.3=node03:4888:5888
+server.1=node01:2888:3888
+server.2=node02:2888:3888
+server.3=node03:2888:3888
 ```  
 
 
 4	同步至其余4台服务器  
 ```
-scp -r /opt/zookeeper node01:/opt
 scp -r /opt/zookeeper node02:/opt
+scp -r /opt/zookeeper node03:/opt
 ```  
 
 5、分别在每台机器上创建myid文件存储该机器的标识码  
 ```
-echo "1" >> /opt/zookeeper/data/myid
-echo "2" >> /opt/zookeeper/data/myid
-echo "3" >> /opt/zookeeper/data/myid
+echo "1" > /opt/zookeeper/data/myid
+echo "2" > /opt/zookeeper/data/myid
+echo "3" > /opt/zookeeper/data/myid
 ```  
 
 3.	启动zookeeper  
