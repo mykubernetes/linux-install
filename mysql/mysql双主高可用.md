@@ -39,6 +39,7 @@ replicate-wild-ignore-table=information_schema.%
 
 4、两台主机分别配置主从同步  
 ```
+# 配置master端
 mysql> grant replication slave on *.* to 'repl_user'@'192.168.101.%' identified by 'repl_passwd';
 mysql> flush privileges;
 mysql> show master status;
@@ -50,13 +51,16 @@ mysql> show master status;
 1 row in set (0.00 sec)
 
 
-#配置slave主机连接master主机
+# 配置slave主机连接master主机
 mysql> change master to \
 master_host='192.168.101.69', \
 master_user='repl_user', \
 master_password='repl_passwd', \
 master_log_file='mysql-bin.000001', \
 master_log_pos=542;
+
+# 启动两个从库
+mysql> start slave;
 ```  
 
 
