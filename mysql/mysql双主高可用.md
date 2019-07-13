@@ -87,11 +87,11 @@ vrrp_script check_mysqld {
 
 vrrp_instance HA_1 {
   state BACKUP           #在DB1和DB2上均配置为BACKUP
-  interface ens33
+  interface eth0
   virtual_router_id 80
-  priority 100           #主比从高
+  priority 100           #主节点比备节点高（###主备不同###）
   advert_int 2
-  nopreempt              #不抢占模式，只在优先级高的机器上设置即可，优先级低的机器不设置
+  nopreempt              #不抢占模式，只在优先级高的机器上设置即可，优先级低的机器不设置,备用节点去掉此项（###主备不同###）
 
   authentication {
     auth_type PASS
