@@ -159,3 +159,7 @@ if ( $Slave_IO_Running eq "No" || $Slave_SQL_Running eq "No" ) {
 }
 ```  
 
+7、查看日志路径  
+```
+tailf /var/log/messages
+```  
