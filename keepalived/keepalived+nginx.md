@@ -111,3 +111,18 @@ vrrp_instance VI_1 {
     }
 }
 ```  
+
+如果检查haproxy可使用此脚本  
+---
+```
+#!/bin/bash
+log_file="/usr/local/keepalived/haproxy_check.log"
+date=`date '+%F_%H_%M'`
+if [ `ps -C haproxy --no-header |wc -l` -eq 0 ];then
+  echo "date" >> $ log_fileecho "haproxy is stopped, vip shift!" >> $ log_file
+  echo " " >> $ log_file
+  exit 1
+else
+  exit 0
+fi
+```  
