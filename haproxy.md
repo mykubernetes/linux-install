@@ -113,7 +113,8 @@ hash-type：哈希算法
 - map-based：除权取余法，哈希数据结构是静态的数组；
 - consistent：一致性哈希，哈希数据结构是一个树；
 
-连接超时时长：		
+连接超时时长：  
+```
 - timeout client <timeout> 默认单位是毫秒;
 - timeout server <timeout>
 - timeout http-keep-alive <timeout> 持久连接的持久时长
@@ -121,8 +122,10 @@ hash-type：哈希算法
 - timeout connect <timeout> 设置等待服务器连接尝试成功的最长时间
 - timeout client-fin <timeout> 为半关闭的连接在客户端设置非活动超时。
 - timeout server-fin <timeout> 为半关闭的连接在服务器端设置的非活动超时。 
+```  
 
-日志系统：			
+日志系统：	
+```
 - log：
   log global  
   log <address> [len <length>] <facility> [<level> [<minlevel>]]  
@@ -136,3 +139,4 @@ capture request header X-Forwarded-For len 15
 列:
 capture response header Content-length len 9  
 capture response header Location len 15  
+```  
