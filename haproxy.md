@@ -168,3 +168,16 @@ capture response header <name> len <length> 捕获并记录指定响应头的最
 capture response header Content-length len 9  
 capture response header Location len 15  
 ```  
+
+```
+reqadd  <string> [{if | unless} <cond>] 在HTTP请求的末尾添加一个头
+rspadd <string> [{if | unless} <cond>] 在HTTP响应的末尾添加一个头
+列：
+rspadd X-Via:\ HAPorxy
+						
+reqdel  <search> [{if | unless} <cond>] 删除HTTP请求中与正则表达式匹配的所有头
+reqidel <search> [{if | unless} <cond>]  (ignore case)
+						
+rspdel  <search> [{if | unless} <cond>] 删除HTTP响应中与正则表达式匹配的所有头
+rspidel <search> [{if | unless} <cond>]  (ignore case)
+```  
