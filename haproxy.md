@@ -37,7 +37,7 @@ defaults
       #maxconn 50000
       #crt-base /etc/haproxy
 
-#listen admin_status
+listen admin_status
       bind 192.168.101.69:6575           #监听地址
       mode http                          #模式为http
       stats enable                       #开启管理页面
