@@ -38,13 +38,15 @@ defaults
       #crt-base /etc/haproxy
 
 #listen admin_status
-#      bind 192.168.101.69:6575
-#      mode http
-#      stats enable
-#      stats realm Haproxy\ Statistics
-#      stats uri /admin?stats
-#      stats refresh 5s
-#      stats hide-version
+      bind 192.168.101.69:6575           #监听地址
+      mode http                          #模式为http
+      stats enable                       #开启管理页面
+      stats realm Haproxy\ Statistics    #认证时显示的名
+      stats uri /admin?stats             #管理页面的uri路径
+      stats refresh 5s                   #设定自动刷新时间间隔
+      stats hide-version                 #隐藏统计页面上HAProxy的版本信息
+      stats auth admin:admin             #开启认证
+      stats admin if TRUE                #启用管理功能，如果认证成功就开启
 
 frontend oos_api_http
       bind 192.169.101.69:80
