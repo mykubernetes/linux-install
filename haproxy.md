@@ -106,6 +106,22 @@ listen test1
       server s2 127.0.0.1:8011 weight 1 maxconn 10000 check inter 10s
       server s3 127.0.0.1:8012 weight 1 maxconn 10000 check inter 10s
 ```  
+- maxconn：当前server的最大并发连接数；
+- backlog：当前server的连接数达到上限后的后援队列长度；
+- backup：设定当前server为备用服务器；
+- weight：权重，默认为1; 
+- disabled：标记为不可用；
+- cookie (value)：为当前server指定其cookie值，用于实现基于cookie的会话黏性；
+- disabled：标记为不可用；
+- redir (prefix)：将发往此server的所有GET和HEAD类的请求重定向至指定的URL；
+- check：对当前server做健康状态检测；
+  addr：检测时使用的IP地址；
+  port：针对此端口进行检测；
+  inter：连续两次检测之间的时间间隔，默认为2000ms; 
+  rise：连续多少次检测结果为“成功”才标记服务器为可用；默认为2；
+  fall：连续多少次检测结果为“失败”才标记服务器为不可用；默认为3；
+
+
 
 算法：  
 - roundrobin：动态算法：支持权重的运行时调整，支持慢启动；每个后端中最多支持4095个server；
