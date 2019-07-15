@@ -1,4 +1,4 @@
-````
+```
 # cat /etc/haproxy/haproxy.cfg
 global
       maxconn     5000
@@ -95,4 +95,20 @@ backend api_backend
       server node002  node002:8080 check inter 1s rise 2 fall 5 backup 
       server node003  node003:8080 check inter 1s rise 2 fall 5 backup
       server node004  node004:8080 check inter 1s rise 2 fall 5 backup
-```
+```  
+
+算法：  
+- roundrobin：动态算法：支持权重的运行时调整，支持慢启动；每个后端中最多支持4095个server；
+- static-rr：静态算法：不支持权重的运行时调整及慢启动；后端主机数量无上限；
+- leastconn：推荐使用在具有较长会话的场景中，例如MySQL、LDAP等；
+- first：根据服务器在列表中的位置，自上而下进行调度；前面服务器的连接数达到上限，新请求才会分配给下一台服务；
+- source：源地址hash；除权取余法：一致性哈希：
+- uri：对URI的左半部分做hash计算，并由服务器总权重相除以后派发至某挑出的服务器；
+- url_param：对用户请求的uri听<params>部分中的参数的值作hash计算，并由服务器总权重相除以后派发至某挑出的服务器；通常用于追踪用户，以确保来自同一个用户的请求始终发往同一个Backend Server；
+- hdr(<name>)：对于每个http请求，此处由<name>指定的http首部将会被取出做hash计算； 并由服务器总权重相除以后派发至某挑出的服务器；没有有效值的会被轮询调度； 
+- hdr(Cookie)	
+- rdp-cookierdp-cookie(<name>)
+
+hash-type：哈希算法  
+- map-based：除权取余法，哈希数据结构是静态的数组；
+- consistent：一致性哈希，哈希数据结构是一个树；
