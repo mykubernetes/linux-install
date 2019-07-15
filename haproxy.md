@@ -114,12 +114,12 @@ listen test1
 - cookie (value)：为当前server指定其cookie值，用于实现基于cookie的会话黏性；
 - disabled：标记为不可用；
 - redir (prefix)：将发往此server的所有GET和HEAD类的请求重定向至指定的URL；
-- check：对当前server做健康状态检测；
-  addr：检测时使用的IP地址；
-  port：针对此端口进行检测；
-  inter：连续两次检测之间的时间间隔，默认为2000ms; 
-  rise：连续多少次检测结果为“成功”才标记服务器为可用；默认为2；
-  fall：连续多少次检测结果为“失败”才标记服务器为不可用；默认为3；
+- check：对当前server做健康状态检测；  
+  addr：检测时使用的IP地址；  
+  port：针对此端口进行检测；  
+  inter：连续两次检测之间的时间间隔，默认为2000ms;   
+  rise：连续多少次检测结果为“成功”才标记服务器为可用；默认为2；  
+  fall：连续多少次检测结果为“失败”才标记服务器为不可用；默认为3；  
 
 
 
