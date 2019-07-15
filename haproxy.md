@@ -115,27 +115,29 @@ hash-type：哈希算法
 
 连接超时时长：  
 ```
-- timeout client <timeout> 默认单位是毫秒;
-- timeout server <timeout>
-- timeout http-keep-alive <timeout> 持久连接的持久时长
-- timeout http-request <timeout> HTTP请求的最大允许时间
-- timeout connect <timeout> 设置等待服务器连接尝试成功的最长时间
-- timeout client-fin <timeout> 为半关闭的连接在客户端设置非活动超时。
-- timeout server-fin <timeout> 为半关闭的连接在服务器端设置的非活动超时。 
+timeout client <timeout> 默认单位是毫秒;
+timeout server <timeout>
+timeout http-keep-alive <timeout> 持久连接的持久时长
+timeout http-request <timeout> HTTP请求的最大允许时间
+timeout connect <timeout> 设置等待服务器连接尝试成功的最长时间
+timeout client-fin <timeout> 为半关闭的连接在客户端设置非活动超时。
+timeout server-fin <timeout> 为半关闭的连接在服务器端设置的非活动超时。 
 ```  
 
 日志系统：	
 ```
-- log：
+log：
   log global  
   log <address> [len <length>] <facility> [<level> [<minlevel>]]  
   no log  
-- log-format <string>：
-- capture cookie <name> len <length>  在请求和响应中捕获并记录cookie。 
-- capture request header <name> len <length> 捕获并记录指定请求头的最后一次出现。 
+log-format <string>：
+capture cookie <name> len <length>  在请求和响应中捕获并记录cookie。 
+
+capture request header <name> len <length> 捕获并记录指定请求头的最后一次出现。 
 列:
 capture request header X-Forwarded-For len 15  
-- capture response header <name> len <length> 捕获并记录指定响应头的最后一次出现。
+
+capture response header <name> len <length> 捕获并记录指定响应头的最后一次出现。
 列:
 capture response header Content-length len 9  
 capture response header Location len 15  
