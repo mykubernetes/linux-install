@@ -95,6 +95,14 @@ backend api_backend
       server node002  node002:8080 check inter 1s rise 2 fall 5 backup 
       server node003  node003:8080 check inter 1s rise 2 fall 5 backup
       server node004  node004:8080 check inter 1s rise 2 fall 5 backup
+      
+listen test1
+      bind 0.0.0.0:8008
+      mode tcp
+      balance roundrobin
+      server s1 127.0.0.1:8010 weight 1 maxconn 10000 check inter 10s
+      server s2 127.0.0.1:8011 weight 1 maxconn 10000 check inter 10s
+      server s3 127.0.0.1:8012 weight 1 maxconn 10000 check inter 10s
 ```  
 
 算法：  
