@@ -48,7 +48,7 @@ listen admin_status
       stats auth admin:admin             #开启认证
       stats admin if TRUE                #启用管理功能，如果认证成功就开启
 
-frontend oos_api_http
+frontend api_http
       bind 192.169.101.69:80
 #      bind *:80
       backlog 8192
@@ -68,7 +68,7 @@ frontend oos_api_http
       capture request header Content-Length len 60
       capture request  header Host len 40
 
-frontend oos_api_https
+frontend api_https
       bind 192.168.101.69:443 ssl crt /etc/haproxy/crt/test.ca.pem
       backlog 8192
 
