@@ -2,6 +2,9 @@ prometheus安装
 =============
 prometheus官网  
 https://prometheus.io/  
+电子书  
+https://love2.io/@1046102779/doc/prometheus/introductions/overview.md  
+
 一、安装后台运行程序  
 1、daemonize安装
 ```
