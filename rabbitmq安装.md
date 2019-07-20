@@ -46,3 +46,39 @@ vim /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.5/ebin/rabbit.app
 
 管理插件：rabbitmq-plugins enable rabbitmq_management  
 访问地址：http://192.168.11.76:15672/  
+
+
+配置方式：  
+```
+环境变量：/etc/rabbitmq/rabbitmq-env.conf
+RABBITMQ_BASE: 数据库和日志文件,主要适用于windows主机，linux不常用
+RABBITMA_CONFIGFILE：
+RABBITMA_LOGS
+RABBITMQ_NODE_IP_ADDRESS
+RABBITMQ_NODE_PORT
+RABBITMQ_PLUGIN_DIR
+```  
+
+配置文件：  
+```
+auth_mechanisms: 认机机制
+default_user: guest
+default_pass: guest
+default_permission
+dis_free_limit
+heartbeat
+hipe_compile
+log_levels {none| error|waring|info}
+tcp_listeners: 监听的地址和端口
+ssl_listeners:基于ssl通信协议鉴定的地址和端口
+vm_memory_hight_watermark
+```  
+
+运行时参数：  
+```
+rabbitmqctl命令：
+命令行语法风格：使用下划线
+rabbitctl add_user <username> <password>
+rabbitctl set_user_tags <username> <tags>
+list_users
+```  
