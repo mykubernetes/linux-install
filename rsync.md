@@ -41,3 +41,15 @@ make install
 # ps -ef |grep rsync
 root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
 ```  
+
+客户端配置  
+```
+rsync --delete --progress backup@192.168.101.69::ixdba/ixdba.net --password-file=/etc/server.pass -v
+```
+- -v 详细信息
+- -z 对备份文件进行压缩
+- -r 对子目录以递归式处理
+- -t 保持文件时间信息
+- -o 保持文件属主信息
+- -g 保持文件属组信息
+- -p 保持文件权限信息
