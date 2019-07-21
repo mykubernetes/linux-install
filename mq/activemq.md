@@ -95,14 +95,16 @@ Mode: follower
 
 四、安装activemq  
 ---
-1、下载activemq  
+1、3台机器分别下载activemq  
 ```
 # wget http://archive.apache.org/dist/activemq/5.15.9/apache-activemq-5.15.9-bin.tar.gz
 # tar xvf apache-activemq-5.15.9-bin.tar.gz
 ```  
 
-2、配置activemq  
+2、3台机器分别配置activemq  
+参考官网配置http://activemq.apache.org/replicated-leveldb-store.html  
 ```
+vim apache-activemq-5.15.9/conf/activemq.xml
 注释默认的kahanDB持久化存储
         <!--
         <persistenceAdapter>
@@ -110,5 +112,36 @@ Mode: follower
         </persistenceAdapter>
         -->
 	
-	
+       <persistenceAdapter>
+          <replicatedLevelDB  
+            directory="${activemq.data}/leveldb"  
+            replicas="3"  
+            bind="tcp://0.0.0.0:0"  
+            zkAddress="192.168.101.69:2181,192.168.101.70:2181,192.168.101.71:2181"   
+            zkPath="/activemq/leveldb-stores"  
+            hostname="192.168.101.69"  
+         />
+       </persistenceAdapter>
+```  
+- directory： 存储数据的路径
+- replicas：集群中的节点数【(replicas/2)+1公式表示集群中至少要正常运行的服务数量】，3台集群那么允许1台宕机， 另外两台要正常运行  
+- bind：当该节点成为master后，它将绑定已配置的地址和端口来为复制协议提供服务。还支持使用动态端口。只需使用tcp://0.0.0.0:0进行配置即可，默认端口为61616。 
+- zkAddress：ZK的ip和port， 如果是集群，则用逗号隔开
+- zkPassword：当连接到ZooKeeper服务器时用的密码，没有密码则不配置。 
+- zkPah：ZK选举信息交换的存贮路径，启动服务后actimvemq会到zookeeper上注册生成此路径   
+- hostname： ActiveMQ所在主机的IP
+
+3、修改监听地址和端口号保持默认，不用修改  
+```
+vim activemq/conf/jetty.xml
+    <bean id="jettyPort" class="org.apache.activemq.web.WebConsolePort" init-method="start">
+             <!-- the default port number for the web console -->
+        <property name="host" value="0.0.0.0"/>
+        <property name="port" value="8161"/>
+    </bean>
+```  
+
+4、3台机器分别启动activemq  
+```
+./activemq start
 ```  
