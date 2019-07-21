@@ -6,9 +6,9 @@ http://activemq.apache.org/persistence
 一、 集群规划  
 ---
 ```
-node001			node002			node003
-zk       	  zk          zk
-activemq		activemq    activemq
+node001        node002         node003
+zk             zk              zk
+activemq       activemq        activemq
 ```
 
 二、安装jdk  
@@ -190,3 +190,6 @@ ephemeralOwner = 0x16c1247c8f80001
 dataLength = 90
 numChildren = 0
 ```  
+- "elected":"0000000000" 代表master节点  
+- "elected":null 代表slave节点  
+- "id":"localhost" 这个id可通过配置文件activemq.xml的brokerName="localhost"进行修改  
