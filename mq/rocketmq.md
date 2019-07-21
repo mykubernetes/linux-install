@@ -6,29 +6,18 @@
 一个集群无Slave，全是Master，例如2个Master或者 3个Master  
 优点：配置简单，单个 Master 宕机或重启维护对应用无影响，在磁盘配置为 RAID10时，即使机器宕机不可恢复情况下，由与 RAID10 磁盘非常可靠，消息也不会丢（异步刷盘丢失少量消息，同步刷盘一条不丢）。性能最高。  
 缺点：单台机器宕机期间，这台机器上未被消费的消息在机器恢复之前不可订阅，消息实时性会受到受到影响。  
-### 先启动 NameServer  
-### 在机器 A，启动第一个 Master  
-### 在机器 B，启动第二个 Master  
+
 
 3、  多Master多Slave模式，异步复制  
 每个Master配置一个Slave，有多对 Master-Slave，HA采用异步复制方式，主备有短暂消息延迟，毫秒级。  
 优点：即使磁盘损坏，消息丢失的非常少，且消息实时性不会受影响，因为Master宕机后，消费者仍然可以从Slave消费，此过程对应用透明。不需要人工干预。性能同多Master 模式几乎一样。  
 缺点：Master 宕机，磁盘损坏情况，会丢失少量消息。  
-### 先启动 NameServer  
-### 在机器 A，启动第一个 Master  
-### 在机器 B，启动第二个 Master  
-### 在机器 C，启动第一个 Slave  
-### 在机器 D，启动第二个 Slave  
 
 4、多Master多Slave模式，同步双写  
 每个Master配置一个Slave，有多对 Master-Slave，HA 采用同步双写方式，主备都写成功，向应用返回成功。  
 优点：数据与服务都无单点，Master 宕机情况下，消息无延迟，服务可用性与数据可用性都非常高  
 缺点：性能比异步复制模式略低，大约低 10%左右，发送单个消息的 RT 会略高。目前主宕机后，备机不能自动切换为主机，后续会支持自动切换功能。  
-### 先启动 NameServer  
-### 在机器 A，启动第一个 Master  
-### 在机器 B，启动第二个 Master  
-### 在机器 C，启动第一个 Slave  
-### 在机器 D，启动第二个 Slave  
+ 
 
 以上Broker与Slave配对是通过指定相同的brokerName参数来配对，Master的BrokerId必须是 0，Slave的 rokerId必须是大与0的数。另外一个Master下面可以挂载多个Slave，同一Master下的多个Slave通过指定不同的 BrokerId 来区分。  
 
