@@ -120,7 +120,7 @@ maxMessageSize=65536
 #- ASYNC_MASTER 异步复制 Master
 #- SYNC_MASTER 同步双写 Master
 #- SLAVE
-brokerRole=ASYNC_MASTER
+brokerRole=SYNC_MASTER
 #刷盘方式
 #- ASYNC_FLUSH 异步刷盘
 #- SYNC_FLUSH 同步刷盘
