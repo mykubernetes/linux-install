@@ -23,6 +23,8 @@
 
 多主多从模式部署
 ---
+https://github.com/apache/rocketmq  
+
 1、多主多从模式分为俩种方式，第一种为异步复制，第二种为同步双写  
 双主模式，文件夹配置为： conf/2m-noslave/  
 多主多从模式（异步复制），文件夹配置为： conf/2m-2s-async/  
