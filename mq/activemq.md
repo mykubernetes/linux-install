@@ -145,3 +145,48 @@ vim activemq/conf/jetty.xml
 ```
 ./activemq start
 ```  
+
+5、进入zk查看  
+```
+[zk: localhost:2181(CONNECTED) 11] get /activemq/leveldb-stores/00000000000
+{"id":"localhost","container":null,"address":"tcp://192.168.101.69:46019","position":-1,"weight":1,"elected":"0000000000"}
+cZxid = 0x400000004
+ctime = Sat Jul 20 23:13:08 EDT 2019
+mZxid = 0x40000000c
+mtime = Sat Jul 20 23:13:19 EDT 2019
+pZxid = 0x400000004
+cversion = 0
+dataVersion = 4
+aclVersion = 0
+ephemeralOwner = 0x16c1247c8f80000
+dataLength = 122
+numChildren = 0
+
+[zk: localhost:2181(CONNECTED) 12] get /activemq/leveldb-stores/00000000001
+{"id":"localhost","container":null,"address":null,"position":-1,"weight":1,"elected":null}
+cZxid = 0x400000007
+ctime = Sat Jul 20 23:13:18 EDT 2019
+mZxid = 0x40000000a
+mtime = Sat Jul 20 23:13:18 EDT 2019
+pZxid = 0x400000007
+cversion = 0
+dataVersion = 2
+aclVersion = 0
+ephemeralOwner = 0x26c1247c9a80000
+dataLength = 90
+numChildren = 0
+
+[zk: localhost:2181(CONNECTED) 13] get /activemq/leveldb-stores/00000000002
+{"id":"localhost","container":null,"address":null,"position":-1,"weight":1,"elected":null}
+cZxid = 0x40000000e
+ctime = Sat Jul 20 23:13:31 EDT 2019
+mZxid = 0x40000000e
+mtime = Sat Jul 20 23:13:31 EDT 2019
+pZxid = 0x40000000e
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x16c1247c8f80001
+dataLength = 90
+numChildren = 0
+```  
