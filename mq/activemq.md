@@ -193,3 +193,9 @@ numChildren = 0
 - "elected":"0000000000" 代表master节点  
 - "elected":null 代表slave节点  
 - "id":"localhost" 这个id可通过配置文件activemq.xml的brokerName="localhost"进行修改  
+
+
+master节点可通过域名范围  
+http://192.168.101.69:8161  
+admin/admin  
+master节点可读可写，slave节点可读不可写  
