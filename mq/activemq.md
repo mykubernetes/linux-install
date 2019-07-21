@@ -4,6 +4,7 @@ http://activemq.apache.org/components/classic/download/
 http://activemq.apache.org/persistence  
 
 一、 集群规划  
+---
 ```
 node001			node002			node003
 zk       	  zk          zk
@@ -11,6 +12,7 @@ activemq		activemq    activemq
 ```
 
 二、安装jdk  
+---
 1、卸载现有jdk  
 （1）查询是否安装java软件：  
 ``` # rpm -qa|grep java ```  
@@ -41,7 +43,8 @@ export PATH=$PATH:$JAVA_HOME/bin
 ```  
 
 三、安装Zookeeper  
-1）解压安装  
+---
+1、解压安装  
 （1）解压zookeeper安装包到/opt/module/目录下  
 ``` $ tar -zxvf zookeeper-3.4.10.tar.gz -C /opt/module/ ```  
 （2）在/opt/module/zookeeper-3.4.10/这个目录下创建zkData  
@@ -49,7 +52,7 @@ export PATH=$PATH:$JAVA_HOME/bin
 （3）重命名/opt/module/zookeeper-3.4.10/conf这个目录下的zoo_sample.cfg为zoo.cfg  
 ``` $ mv zoo_sample.cfg zoo.cfg ```  
 
-2）配置zoo.cfg文件
+2、配置zoo.cfg文件
 ```
 dataDir=/opt/module/zookeeper-3.4.10/zkData
 增加如下配置
@@ -60,7 +63,7 @@ server.3=node003:2888:3888
 集群模式下配置一个文件myid，这个文件在dataDir目录下
 ```  
 
-3）集群操作  
+3、集群操作  
 （1）在/opt/module/zookeeper-3.4.10/zkData目录下创建一个myid的文件  
 ``` $ echo 1 > myid ```  
 （2）拷贝配置好的zookeeper到其他机器上  
@@ -90,3 +93,22 @@ Using config: /opt/module/zookeeper-3.4.10/bin/../conf/zoo.cfg
 Mode: follower
 ```  
 
+四、安装activemq  
+---
+1、下载activemq  
+```
+# wget http://archive.apache.org/dist/activemq/5.15.9/apache-activemq-5.15.9-bin.tar.gz
+# tar xvf apache-activemq-5.15.9-bin.tar.gz
+```  
+
+2、配置activemq  
+```
+注释默认的kahanDB持久化存储
+        <!--
+        <persistenceAdapter>
+            <kahaDB directory="${activemq.data}/kahadb"/>
+        </persistenceAdapter>
+        -->
+	
+	
+```  
