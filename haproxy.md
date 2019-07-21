@@ -1,5 +1,34 @@
 官方提供配置信息 https://cbonte.github.io/haproxy-dconv/  
 下载https://www.haproxy.org/download/  
+安装  
+```
+下载依赖包
+# yum install gcc vim wget
+下载haproxy
+# wget https://www.haproxy.org/download/1.6/src/haproxy-1.6.5.tar.gz
+解压
+# tar -zxvf haproxy-1.6.5.tar.gz -C /usr/local
+进入目录、进行编译、安装
+# cd /usr/local/haproxy-1.6.5
+# make TARGET=linux31 PREFIX=/usr/local/haproxy
+# make install PREFIX=/usr/local/haproxy
+# mkdir /etc/haproxy
+赋权
+# groupadd -r -g 149 haproxy
+# useradd -g haproxy -r -s /sbin/nologin -u 149 haproxy
+创建haproxy配置文件
+# touch /etc/haproxy/haproxy.cfg
+Haproxy配置
+# vim /etc/haproxy/haproxy.cfg
+启动haproxy
+# /usr/local/haproxy/sbin/haproxy -f /etc/haproxy/haproxy.cfg
+查看haproxy进程状态
+# ps -ef | grep haproxy
+关闭haproxy
+#killall haproxy
+# ps -ef | grep haproxy
+```
+
 ```
 # cat /etc/haproxy/haproxy.cfg
 global
