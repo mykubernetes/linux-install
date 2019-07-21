@@ -12,27 +12,27 @@ make
 make install
 ```  
 
-2、配置  
+2、服务器端配置  
 ```
 # vim /etc/rsyncd.conf 
- uid = nobody
- gid = nobody
- use chroot = no
- max connections = 10
- pid file = /var/run/rsyncd.pid
- lock file = /var/run/rsync.lock
- log file = /var/log/rsync.log
+uid = nobody
+gid = nobody
+use chroot = no
+max connections = 10
+pid file = /var/run/rsyncd.pid
+lock file = /var/run/rsync.lock
+log file = /var/log/rsync.log
 
- [ixdba]
- path = /webdata
- comment = ixdba file
- ignore errors
- read only = true
- list = false
- uid = root
- gid = root
- auth user = backup
- secrets file = /etc/server.pass
+[ixdba]
+path = /webdata
+comment = ixdba file
+ignore errors
+read only = true
+list = false
+uid = root
+gid = root
+auth user = backup
+secrets file = /etc/server.pass
 ```  
 
 启动  
@@ -42,9 +42,10 @@ make install
 root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
 ```  
 
-客户端配置  
+3、客户端配置  
+
 ```
-rsync --delete --progress backup@192.168.101.69::ixdba /ixdba.net --password-file=/etc/server.pass -v
+# rsync -vzrtopg --delete --progress backup@192.168.101.69::ixdba /ixdba.net --password-file=/etc/server.pass
 ```
 - -vzrtopg 详细信息
 - -z 对备份文件进行压缩
