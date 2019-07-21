@@ -59,3 +59,5 @@ root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
 - backup@192.168.101.69::ixdba 用户@rsync_IP::rsync_模块
 - /ixdba.net 用于指定备份文件在客户端的目录
 - --password-file=/etc/server.pass 用于指定客户端存放的密码文件位置
+- -c 打开效验开关，强制对文件传输进行效验
+- -a 归档模式，以归档方式传输，并保持所有文件属性
