@@ -24,13 +24,13 @@ make install
  log file = /var/log/rsync.log
 
  [ixdba]
-  path = /webdata
-  comment = ixdba file
-  ignore errors
-  read only = true
-  list = false
-  uid = root
-  gid = root
-  auth user = backup
-  secrets file = /etc/server.pass
+ path = /webdata
+ comment = ixdba file
+ ignore errors
+ read only = true
+ list = false
+ uid = root
+ gid = root
+ auth user = backup
+ secrets file = /etc/server.pass
 ```  
