@@ -34,3 +34,10 @@ make install
  auth user = backup
  secrets file = /etc/server.pass
 ```  
+
+启动  
+```
+# rsync --daemon
+# ps -ef |grep rsync
+root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
+```  
