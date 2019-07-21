@@ -1,5 +1,5 @@
 官方提供配置信息 https://cbonte.github.io/haproxy-dconv/  
-
+下载https://www.haproxy.org/download/  
 ```
 # cat /etc/haproxy/haproxy.cfg
 global
