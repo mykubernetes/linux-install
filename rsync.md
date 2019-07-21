@@ -46,6 +46,7 @@ root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
 
 ```
 # rsync -vzrtopg --delete --progress backup@192.168.101.69::ixdba /ixdba.net --password-file=/etc/server.pass
+# rsync -avzPL --timeout=600  backup@192.168.101.69::ixdba /test
 ```
 - -vzrtopg 详细信息
 - -z 对备份文件进行压缩
