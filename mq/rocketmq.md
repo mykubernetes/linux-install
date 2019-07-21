@@ -77,8 +77,7 @@ brokerName=broker-a|broker-b
 #0 表示 Master，>0 表示 Slave
 brokerId=0
 #nameServer 地址，分号分割
-namesrvAddr=rocketmq-nameserver1:9876;rocketmq-nameserver2:9876;rocketmq-
-nameserver3:9876;rocketmq-nameserver4:9876
+namesrvAddr=rocketmq-nameserver1:9876;rocketmq-nameserver2:9876;rocketmq-nameserver3:9876;rocketmq-nameserver4:9876
 #在发送消息时，自动创建服务器不存在的 topic，默认创建的队列数
 defaultTopicQueueNums=4
 #是否允许 Broker 自动创建 Topic，建议线下开启，线上关闭
@@ -142,8 +141,7 @@ brokerName=broker-a|broker-b
 #0 表示 Master，>0 表示 Slave
 brokerId=1
 #nameServer 地址，分号分割
-namesrvAddr=rocketmq-nameserver1:9876;rocketmq-nameserver2:9876;rocketmq-
-nameserver3:9876;rocketmq-nameserver4:9876
+namesrvAddr=rocketmq-nameserver1:9876;rocketmq-nameserver2:9876;rocketmq-nameserver3:9876;rocketmq-nameserver4:9876
 #在发送消息时，自动创建服务器不存在的 topic，默认创建的队列数
 defaultTopicQueueNums=4
 #是否允许 Broker 自动创建 Topic，建议线下开启，线上关闭
