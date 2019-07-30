@@ -60,9 +60,52 @@ cd /usr/local/src/httpd-2.4.16
 - --with-apr=/usr/local/apr #apr路径  
 - --with-apr-util=/usr/local/apr-util #apr-util路径  
 
+5、配置Apache的启动脚本  
+```
+cp /usr/local/apache2.4/bin/apachectl  /etc/init.d/httpd
+
+脚本添加参数
+vim /etc/init.d/httpd
+#!/bin/sh
+# chkconfig: 2345 64 36
+# description: Apache2.4.16 start script
 
 
+# service httpd start
+# chkconfig httpd on
 
+手动启动
+/usr/local/apache2.4/bin/httpd -k start
+
+查看进程是否启动
+# netstat -an|grep 80
+tcp6       0      0 :::80                   :::*                    LISTEN     
+unix  2      [ ACC ]     STREAM     LISTENING     19280    private/rewrite
+unix  2      [ ]         DGRAM                    16803 
+
+发现运行用户为daemon
+# ps aux |grep httpd
+root      48913  0.0  0.1  72632  2184 ?        Ss   10:58   0:00 /usr/local/apache2.4/bin/httpd -k start
+daemon    48914  0.1  0.2 361596  3968 ?        Sl   10:58   0:01 /usr/local/apache2.4/bin/httpd -k start
+daemon    48915  0.1  0.2 361596  3964 ?        Sl   10:58   0:01 /usr/local/apache2.4/bin/httpd -k start
+daemon    48916  0.1  0.2 361596  3972 ?        Sl   10:58   0:01 /usr/local/apache2.4/bin/httpd -k start
+
+创建apache用户
+useradd -M -s /sbin/nologin apache
+vim /usr/local/apache2.4/conf/httpd.conf
+User apache
+Group apache
+
+重启
+/usr/local/apache2.4/bin/httpd -k restart
+
+查看用户
+# ps aux |grep httpd
+root      48913  0.0  0.1  72632  2720 ?        Ss   10:58   0:00 /usr/local/apache2.4/bin/httpd -k start
+apache    49062  0.2  0.2 361596  4204 ?        Sl   11:16   0:00 /usr/local/apache2.4/bin/httpd -k start
+apache    49063  0.4  0.2 361596  4204 ?        Sl   11:16   0:00 /usr/local/apache2.4/bin/httpd -k start
+apache    49064  0.2  0.2 361596  4204 ?        Sl   11:16   0:00 /usr/local/apache2.4/bin/httpd -k start
+```  
 
 
 
