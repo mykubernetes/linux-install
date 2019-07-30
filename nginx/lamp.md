@@ -156,8 +156,44 @@ yum install -y cmake ncurses-devel
 https://dev.mysql.com/doc/refman/5.6/en/source-configuration-options.html  
 
 
+3、配置mysql  
+```
+修改属主属组
+# chown -R mysql:mysql /usr/local/mysql/
 
+复制配置文件
+# cp /usr/local/mysql/support-files/my-default.cnf /etc/my.cnf
 
+复制启动脚本
+# cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld 
 
+更改启动脚本中指定mysql位置
+# vim /etc/init.d/mysqld
+basedir=/usr/local/mysql
+datadir=/usr/local/mysql/data
 
+开启启动
+# chkconfig mysqld  on
+```  
+
+4、初始化数据库  
+```
+# /usr/local/mysql/scripts/mysql_install_db \
+--defaults-file=/etc/my.cnf  \
+--basedir=/usr/local/mysql/\
+--datadir=/usr/local/mysql/data/\
+--user=mysql
+```  
+
+5、配置软连接  
+```
+ln -s /usr/local/mysql/bin/* /bin/ 
+```  
+
+6、启动  
+```
+# servie mysqld  start          启动数据库
+# mysql_secure_installation     初始安全设置（设置root密码，123456）
+# mysql -uroot -p123456         测试登录（OK）
+```  
 
