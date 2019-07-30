@@ -1,22 +1,17 @@
 一、安装nginx  
 ---
 
-1、下载fastdfs-nginx-module模块  
-```
-git clone https://github.com/happyfish100/fastdfs-nginx-module.git
-```  
-
-2、下载nginx  
+1、下载nginx  
 ```
 wget http://nginx.org/download/nginx-1.16.0.tar.gz
 ```  
 
-3、安装编译 Nginx 所需的依赖包  
+2、安装编译 Nginx 所需的依赖包  
 ```
 yum install gcc gcc-c++ make automake autoconf libtool pcre* zlib openssl openssl-devel
 ```  
 
-4、编译安装 Nginx (添加 fastdfs-nginx-module 模块)  
+3、编译安装 Nginx (添加 fastdfs-nginx-module 模块)  
 ```
 tar -zxvf nginx-1.16.0.tar.gz
 cd nginx-1.16.0
@@ -26,7 +21,7 @@ cd nginx-1.16.0
 make && make install
 ```  
 
-5、启动测试  
+4、启动测试  
 ```
 groupadd -r nginx
 useradd -g nginx -r nginx
@@ -34,6 +29,15 @@ useradd -g nginx -r nginx
 /opt/nginx/sbin/nginx              #启动
 /opt/nginx/sbin/nginx -s reload    #重启
 ```  
+
+二、安装php  
+
+1、下载php  
+```
+wget https://github.com/php/php-src/archive/php-5.6.37.tar.gz
+tar xvf php-5.6.37.tar.gz
+cd php-src-php-5.6.37/
+```
 
 php与nginx结合  
 ---
