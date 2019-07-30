@@ -20,7 +20,7 @@ apr-util version：apr-util-1.5.4
 mysql version：mysql-5.6.26  
 php version：php-5.6.13  
 
-三、安装  
+三、安装http  
 1、安装依赖  
 ```
 wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
@@ -107,6 +107,53 @@ apache    49062  0.2  0.2 361596  4204 ?        Sl   11:16   0:00 /usr/local/apa
 apache    49063  0.4  0.2 361596  4204 ?        Sl   11:16   0:00 /usr/local/apache2.4/bin/httpd -k start
 apache    49064  0.2  0.2 361596  4204 ?        Sl   11:16   0:00 /usr/local/apache2.4/bin/httpd -k start
 ```  
+
+6、查看web  
+http://192.168.101.70/
+
+
+四、MYSQL源码编译  
+
+1、安装依赖  
+```
+yum install -y cmake ncurses-devel
+```  
+
+2、编译安装MySql  
+```
+# tar xf mysql-5.6.26.tar.gz -C /usr/local/src/
+# cd /usr/local/src/mysql-5.6.26
+# useradd -M -s /sbin/nologin mysql
+# cmake \
+ -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+ -DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+ -DDEFAULT_CHARSET=utf8 \
+ -DDEFAULT_COLLATION=utf8_general_ci \
+ -DWITH_EXTRA_CHARSETS=all \
+ -DWITH_MYISAM_STORAGE_ENGINE=1\
+ -DWITH_INNOBASE_STORAGE_ENGINE=1\
+ -DWITH_MEMORY_STORAGE_ENGINE=1\
+ -DWITH_READLINE=1\
+ -DENABLED_LOCAL_INFILE=1\
+ -DMYSQL_DATADIR=/usr/local/mysql/data \
+ -DMYSQL-USER=mysql
+
+# make -j 4 && make install
+```  
+- DCMAKE_INSTALL_PREFIX #制定mysql的安装根目录，目录在安装的时候会自动创建，这个值也可以在服务器启动时，用--basedir来设置
+- DMYSQL_UNIX_ADDR #服务器与本地客户端进行通信的Unix套接字文件，必须是绝对路径，默认位置/tmp/mysql.sock，可以在服务器启动时，用--socket改变
+- DDEFAULT_CHARSET #mysql默认使用的字符集，不指定将默认使用Latin1西欧字符集
+- DDEFAULT_COLLATION #默认字符校对
+- DWITH_EXTRA_CHARSETS #制定mysql拓展字符集，默认值也是all支持所有的字符集
+- DWITH_MYISAM_STORAGE_ENGINE #静态编译MYISAM，INNOBASE，MEMORY存储引擎到MYSQL服务器，这样MYSQL就支持这三种存储引擎
+- DWITH_INNOBASE_STORAGE_ENGINE #静态编译MYISAM，INNOBASE，MEMORY存储引擎到MYSQL服务器，这样MYSQL就支持这三种存储引擎
+- DWITH_MEMORY_STORAGE_ENGINE #静态编译MYISAM，INNOBASE，MEMORY存储引擎到MYSQL服务器，这样MYSQL就支持这三种存储引擎
+- DWITH_READLINE #支持readline库
+- DENABLED_LOCAL_INFILE #允许本地倒入数据，启用加载本地数据
+- DMYSQL_DATADIR #mysql数据库存放路径
+- DMYSQL-USER #运行mysql的用户
+官网参数详解  
+https://dev.mysql.com/doc/refman/5.6/en/source-configuration-options.html  
 
 
 
