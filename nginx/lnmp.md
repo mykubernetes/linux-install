@@ -1,3 +1,5 @@
+链接：https://pan.baidu.com/s/1u-A2cgHXTzuoOTrldH2Egw 提取码：ylx3 
+
 一、安装nginx  
 ---
 
