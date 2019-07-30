@@ -252,6 +252,9 @@ ln -s /usr/local/mysql/bin/* /bin/
 <?php
         phpinfo();
 ?>
+
+# chown apache.apache /usr/local/apache2.4/htdocs/index.php
+# /usr/local/apache2.4/bin/httpd -k restart
 ```  
 
 浏览器访问web  
