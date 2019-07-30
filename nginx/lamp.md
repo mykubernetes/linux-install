@@ -192,7 +192,7 @@ ln -s /usr/local/mysql/bin/* /bin/
 
 6、启动  
 ```
-# servie mysqld  start          启动数据库
+# service mysqld  start          启动数据库
 # mysql_secure_installation     初始安全设置（设置root密码，123456）
 # mysql -uroot -p123456         测试登录（OK）
 ```  
