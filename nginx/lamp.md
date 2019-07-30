@@ -62,20 +62,20 @@ cd /usr/local/src/httpd-2.4.16
 
 5、配置Apache的启动脚本  
 ```
-cp /usr/local/apache2.4/bin/apachectl  /etc/init.d/httpd
+# cp /usr/local/apache2.4/bin/apachectl  /etc/init.d/httpd
 
 脚本添加参数
-vim /etc/init.d/httpd
+# vim /etc/init.d/httpd
 #!/bin/sh
 # chkconfig: 2345 64 36
 # description: Apache2.4.16 start script
 
-
+设置开启启动
 # service httpd start
 # chkconfig httpd on
 
 手动启动
-/usr/local/apache2.4/bin/httpd -k start
+# /usr/local/apache2.4/bin/httpd -k start
 
 查看进程是否启动
 # netstat -an|grep 80
@@ -91,13 +91,14 @@ daemon    48915  0.1  0.2 361596  3964 ?        Sl   10:58   0:01 /usr/local/apa
 daemon    48916  0.1  0.2 361596  3972 ?        Sl   10:58   0:01 /usr/local/apache2.4/bin/httpd -k start
 
 创建apache用户
-useradd -M -s /sbin/nologin apache
-vim /usr/local/apache2.4/conf/httpd.conf
+# useradd -M -s /sbin/nologin apache
+# chown -R apache:apache /usr/local/apache2.4/
+# vim /usr/local/apache2.4/conf/httpd.conf
 User apache
 Group apache
 
 重启
-/usr/local/apache2.4/bin/httpd -k restart
+# /usr/local/apache2.4/bin/httpd -k restart
 
 查看用户
 # ps aux |grep httpd
