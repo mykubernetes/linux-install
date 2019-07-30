@@ -30,5 +30,43 @@ yum install gcc gcc-c++ openssl-devel
 
 2、安装apr和apr-util依赖  
 ```
+tar xf apr-1.5.2.tar.gz -C /usr/local/src/
+tar xf apr-util-1.5.4.tar.bz2 -C /usr/local/src/
+cd /usr/local/src/apr-1.5.2/
+./configure --prefix=/usr/local/apr && make -j 2 && make install
 
+cd /usr/local/src/apr-util-1.5.4/
+./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr && make -j 2 && make install
 ```  
+
+3、安装pcre依赖  
+```
+tar xf pcre-8.37.tar.bz2 -C /usr/local/src/
+cd /usr/local/src/pcre-8.37/
+./configure --prefix=/usr/local/pcre && make -j 2 && make install
+```  
+
+4、Apache源码编译  
+```
+tar xvf httpd-2.4.16.tar.bz2 -C /usr/local/src/
+cd /usr/local/src/httpd-2.4.16
+./configure --prefix=/usr/local/apache2.4 --enable-so --enable-rewrite --enable-ssl --with-pcre=/usr/local/pcre --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util --enable-modules=most --enable-mpms-shared=all --with-mpm=event && make -j 2 && make install
+```  
+- --prefix=/usr/local/apache2.4 #安装路径  
+- --enable-so #支持动态加载模块  
+- --enable-rewrite #支持网站地址重写  
+- --enable-ssl #支持SSL加密  
+- --with-pcre=/usr/local/pcre #pcre路径  
+- --with-apr=/usr/local/apr #apr路径  
+- --with-apr-util=/usr/local/apr-util #apr-util路径  
+
+
+
+
+
+
+
+
+
+
+
