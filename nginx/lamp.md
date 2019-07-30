@@ -197,3 +197,62 @@ ln -s /usr/local/mysql/bin/* /bin/
 # mysql -uroot -p123456         测试登录（OK）
 ```  
 
+五、安装php  
+1、安装依赖  
+```
+# yum install -y libxml2-devel
+```  
+
+2、安装php  
+```
+# tar xf php-5.6.13.tar.bz2 -C  /usr/local/src/
+# cd /usr/local/src/php-5.6.13
+# ./configure --prefix=/usr/local/php --with-mysql=/usr/local/mysql/ --with-apxs2=/usr/local/apache2.4/bin/apxs --with-config-file-path=/usr/local/php
+
+# make –j 3 ; make install
+```  
+- --prefix #指定安装路径
+- --with-apxs2 #用apache的apxs工具将php编译成apache的一个模块
+- --with-mysql #与mysql结合，如果不跟路径，编译出来的版本将是低版本
+- --with-config-file-path #php的主配置文件php.ini路径
+
+3、复制配置文件
+```
+ # cd /usr/local/src/php-5.6.13
+ # cp php.ini-production /usr/local/php/php.ini
+```  
+
+4、只有有下面这两个文件（模块），代表apache就可以支持php了  
+```
+#ls  /usr/local/apache2.4/modules/httpd.exp 
+/usr/local/apache2.4/modules/httpd.exp
+
+# ls /usr/local/apache2.4/modules/libphp5.so
+/usr/local/apache2.4/modules/libphp5.so
+```  
+
+5、配置Apache支持PHP  
+```
+# vim /usr/local/apache2.4/conf/httpd.conf
+……
+248    <IfModule dir_module>
+249       DirectoryIndex index.html index.php           #添加index.php
+250    </IfModule>
+……
+376     AddType application/x-compress .Z
+377     AddType application/x-gzip .gz .tgz       #上面两行是以前有的
+378     AddType application/x-httpd-php .php      #下面两行是添加的，需要添加以支持PHP
+379     AddType application/x-httpd-php-source .phps
+修改完，重启下Apache服务。
+```  
+
+6、测试  
+```
+# vim /usr/local/apache2.4/htdocs/index.php 
+<?php
+        phpinfo();
+?>
+```  
+
+浏览器访问web  
+192.168.101.70/index.php
