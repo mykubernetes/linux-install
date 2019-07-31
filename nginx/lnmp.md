@@ -146,7 +146,7 @@ yum install -y cmake ncurses-devel
 # cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
 
 更改启动脚本中指定mysql位置
-vim /etc/init.d/ 
+vim /etc/init.d/mysqld
 basedir=
 datadir=
 #修改为
@@ -161,18 +161,20 @@ datadir=/usr/local/mysql/data
 ```
 # /usr/local/mysql/scripts/mysql_install_db \
 --defaults-file=/etc/my.cnf  \
---basedir=/usr/local/mysql/\
---datadir=/usr/local/mysql/data/\
+--basedir=/usr/local/mysql/ \
+--datadir=/usr/local/mysql/data/ \
 --user=mysql
 ```  
 
 5、命令软连接  
 ```
-# ln -s /usr/local/mysql/bin/*
+# ln -s /usr/local/mysql/bin/* /bin/
 ```  
 
 6、启动  
 ```
 # service mysqld  start
+# netstat -tanlp |grep 3306
+tcp6       0      0 :::3306                 :::*                    LISTEN      35090/mysqld
 ```  
 
