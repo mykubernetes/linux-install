@@ -145,10 +145,95 @@ MySQL Cluster启动
 启动顺序：管理结点服务->数据结点服务->sql结点服务  
 关闭顺序：关闭管理结点服务，关闭管理结点服务后，nbdb数据结点服务会自动关闭->手动把sql结点服务关了
 
-启动  
+1、管理节点启动mysql cluster  
 ```
 ndb_mgmd --ndb_nodeid=1 --initial -f /usr/mysql-cluster/config.ini
 ```  
 - --ndb_nodeid 管理节点ID为1的是管理节点
 - --initial 初始化
 - -f 配置文件
+
+2、启动数据节点服务  
+```
+# ndbd --initial
+```  
+
+3、启动SQL结点服务
+```
+# systemctl start mysqld
+```  
+
+4、查看mysql 集群状态  
+```
+#ndb_mgm
+ndb_mgm> show
+```  
+
+数据同步实验测试
+---
+1、修改mysql密码
+```
+查看mysql root用户密码
+注意：我们只需修改sql节点的密码
+# grep password /var/log/messages
+# The random password set for the root user at Wed Apr  1 21:10:53 2015 (local time): gDVpNRBxTcgd17di
+
+
+5.7以上版本 关闭密码安全策略插件
+在my.cnf添加 validate-password=off 重启mysql
+
+
+# mysql –uroot –p'gDVpNRBxTcgd17di'
+mysql> set password for 'root'@'localhost'=password('123456');
+mysql> grant all privileges on *.* to cluster@”%” identified by “123456” #授权
+mysql> flush privileges;
+```  
+
+2、模拟外部机器的一个客户端插入数据  
+```
+# mysql -ucluster -p123456 -h 192.168.101.72
+注意：创建表的时候使用ndb引擎
+mysql> create database db;
+mysql> use db;
+mysql> create table test(id int) engine=ndb;
+mysql> insert into test values(1000);
+mysql> select * from test;
+
+
+登陆另一台sql节点查看 
+# mysql -ucluster -p123456 -h 10.10.10.73
+mysql> use db;
+mysql> select * from test;
+```  
+
+3、停掉一个sql节点测试  
+```
+# mysqladmin -uroot -p123456 shutdown
+ndb_mgm> show       #查看状态
+```  
+
+MySQL Cluster关闭  
+---
+关闭mysql集群顺序： 关闭管理节点服务-》 关闭管理节点时，数据结点服务自动关闭 –》 需要手动关闭SQL结点服务
+
+1、关闭管理节点服务  
+```
+# ndb_mgm
+-- NDB Cluster -- Management Client --
+ndb_mgm> shutdown
+Node 2: Cluster shutdown initiated
+Node 3: Cluster shutdown initiated
+3 NDB Cluster node(s) have shutdown.
+Disconnecting to allow management server to shutdown.
+Node 2: Node shutdown completed.
+ndb_mgm> exit
+
+# ps -axu | grep ndbd	   	#查看不到，说明数据节点已经被关
+```  
+
+
+2、手动关闭SQL节点服务  
+```
+# mysqladmin -uroot -p123456 shutdown
+# ps -aux | grep mysq
+```  
