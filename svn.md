@@ -31,20 +31,20 @@ tomcat = 123        #用户密码
 tomcat = rw
 ```
 
-6、启动svn服务器  
+
+
+6、导入文件夹到版本库(此步可忽略)  
+```
+# svn import /opt/new_dir file:///opt/svn/repos/new_dir -m "my first project"
+```  
+
+7、启动svn服务器  
 ```
 # svnserve -d -r /opt/svn/
 # ps -ef |grep svn
 root      12546      1  0 09:58 ?        00:00:00 svnserve -d -r /opt/svn/
 root      12548  12421  0 09:58 pts/0    00:00:00 grep --color=auto svn
 ```  
-
-7、导入文件夹到版本库：
-```
-svn import new_dir file:///opt/svn/repos/
-svn import /tmp/shell file:///opt/svn/repos/new_dir -m "my first project"
-```  
-
 
 7、查看网络服务器信息及版本信息：
 ```
