@@ -8,8 +8,8 @@ mysql cluster集群各机器角色如下分配：
 mysql 管理节点：node01 IP：192.168.101.69  
 mysql 数据节点：node02 IP：192.168.101.70  
 mysql 数据节点：node03 IP：192.168.101.71  
-msyql SQL节点：node02 IP：192.168.101.72  
-msyql SQL节点：node03 IP：192.168.101.73  
+msyql SQL节点：node04 IP：192.168.101.72  
+msyql SQL节点：node05 IP：192.168.101.73  
 
 
 mysql cluster 7.5版本安装
@@ -139,3 +139,16 @@ ndb-connectstring=192.168.101.69
 注意：数据节点和SQL结点配置文件区别 ，就多一行，数据结点有：datadir=/var/lib/mysql SQL节点上没有。
 
 
+MySQL Cluster启动  
+---
+初次启动命令以及用户密码更改调整：（请严格按照次序启动）  
+启动顺序：管理结点服务->数据结点服务->sql结点服务  
+关闭顺序：关闭管理结点服务，关闭管理结点服务后，nbdb数据结点服务会自动关闭->手动把sql结点服务关了
+
+启动  
+```
+ndb_mgmd --ndb_nodeid=1 --initial -f /usr/mysql-cluster/config.ini
+```  
+- --ndb_nodeid 管理节点ID为1的是管理节点
+- --initial 初始化
+- -f 配置文件
