@@ -220,3 +220,36 @@ echo "source /etc/profile" >>/etc/rc.local
 service mysqld restart
 echo "If you now running mysql and others commands,Please running: source /etc/profile"
 ```  
+
+五、编译安装PHP  
+http://php-fpm.org/download  
+
+1、安装依赖  
+```
+# yum install php-pear -y 
+```  
+
+2、PHP添加libmcrypt拓展  
+```
+# tar xf libmcrypt-2.5.8.tar.bz2 -C /usr/local/src/
+# cd /usr/local/src/libmcrypt-2.5.8/
+# ./configure --prefix=/usr/local/libmcrypt
+# make && make install
+```  
+
+3、除开上面的依赖解决之外，还需要安装图片，xml，字体支持基本库  
+```
+# yum install -y libxml2-devel libcurl-devel libjpeg-devel libpng-devel freetype freetype-devel libzip libzip-devel
+```  
+
+4、需要添加到库文件路径  
+由于系统默认规定只在/lib、/lib64、/lib/lib64下面找库文件，所以我们需要手动添加进去。  
+```
+# vim /etc/ld.so.conf
+include ld.so.conf.d/*.conf                    #此行原有
+/usr/local/libmcrypt/lib                       #此行添加
+/usr/local/mysql/lib                           #此行添加
+
+# ldconfig
+# echo 'ldconfig' >> /etc/rc.local
+```  
