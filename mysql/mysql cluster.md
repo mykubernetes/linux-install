@@ -8,8 +8,8 @@ mysql cluster集群各机器角色如下分配：
 mysql 管理节点：node01 IP：192.168.101.69  
 mysql 数据节点：node02 IP：192.168.101.70  
 mysql 数据节点：node03 IP：192.168.101.71  
-msyql SQL节点：node02 IP：192.168.101.70  
-msyql SQL节点：node03 IP：192.168.101.71  
+msyql SQL节点：node02 IP：192.168.101.72  
+msyql SQL节点：node03 IP：192.168.101.73  
 
 
 mysql cluster 7.5版本安装
@@ -95,9 +95,47 @@ DataDir=/var/lib/mysql
 nodeid=3
 # SQL node options: #关于SQL结点
 [mysqld]
-HostName=192.168.101.70
+HostName=192.168.101.72
 nodeid=4
 [mysqld]
-HostName=192.168.101.71
+HostName=192.168.101.73
 nodeid=5
 ```  
+
+数据节点配置
+```
+# vim  /etc/my.cnf	
+[mysqld]
+#mysql数据存储路径
+datadir=/var/lib/mysql
+#启动ndb引擎
+ndbcluster
+# 管理节点IP地址 
+ndb-connectstring=192.168.101.69
+[mysqld_safe]
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+[mysql_cluster]
+# 管理节点IP地址
+ndb-connectstring=192.168.101.69
+```  
+
+SQL节点配置  
+```
+#vim /etc/my.cnf   
+[mysqld]
+#启动ndb引擎
+ndbcluster
+# 管理节点IP地址
+ndb-connectstring=192.168.101.69
+[mysqld_safe]
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+[mysql_cluster]
+#管理节点IP地址
+ndb-connectstring=192.168.101.69
+```  
+
+注意：数据节点和SQL结点配置文件区别 ，就多一行，数据结点有：datadir=/var/lib/mysql SQL节点上没有。
+
+
