@@ -253,3 +253,49 @@ include ld.so.conf.d/*.conf                    #此行原有
 # ldconfig
 # echo 'ldconfig' >> /etc/rc.local
 ```  
+
+5、编译安装php  
+```
+# tar xf php-5.6.13.tar.bz2 -C /usr/local/src/
+# cd /usr/local/src/php-5.6.13
+# ./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-iconv-dir --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex  --enable-fpm --enable-mbstring --with-gd --enable-mysqlnd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-soap --with-gettext --with-mcrypt=/usr/local/libmcrypt
+# make -j 3 && make install
+```  
+
+6、配置php和php-fpm  
+```
+拷贝PHP配置文件
+# cp /usr/local/src/php-5.6.13/php.ini-production /usr/local/php/php.ini
+
+PHP-FPM配置文件
+# cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+
+修改 /usr/local/php/etc/php-fpm.conf 运行用户和组改为nginx
+# vim /usr/local/php/etc/php-fpm.conf
+user = nginx
+group = nginx
+
+拷贝PHP-FPM启动脚本
+# cp /usr/local/src/php-5.6.13/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+# chmod +x /etc/init.d/php-fpm
+
+启动php
+# /etc/init.d/php-fpm start
+
+查看是否启动
+# netstat -tnalp |grep 9000
+tcp        0      0 127.0.0.1:9000          0.0.0.0:*               LISTEN      56186/php-fpm: mast 
+
+# ps aux |grep php
+root      56186  0.0  0.3 218532  4964 ?        Ss   23:04   0:00 php-fpm: master process (/usr/local/php/etcphp-fpm.conf)
+nginx     56187  0.0  0.2 218532  4504 ?        S    23:04   0:00 php-fpm: pool www
+nginx     56188  0.0  0.2 218532  4504 ?        S    23:04   0:00 php-fpm: pool www
+```  
+
+7、测试LNMP的PHP支持  
+```
+# echo "<?php phpinfo(); ?>" > /usr/local/nginx/html/index.php
+```  
+
+浏览器访问  
+http://192.168.101.70/  
