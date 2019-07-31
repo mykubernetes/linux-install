@@ -67,9 +67,8 @@ rpm -ql mysql-cluster-community-server
 ```  
 
 
-配置
+管理节点配置(生产环境配置数值需要调大)  
 ```
-
 [ndbd default]
 #数据写入数量。2表示两份
 NoOfReplicas=2
