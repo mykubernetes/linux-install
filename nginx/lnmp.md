@@ -127,9 +127,16 @@ http://192.168.101.70/
 yum install -y cmake ncurses-devel
 ```  
 
+2、编译安装mysql  
+```
+# tar xf mysql-5.6.26.tar.gz -C /usr/local/src/ 
+# cd /usr/local/src/mysql-5.6.26
+# useradd -M -s /sbin/nologin mysql
+# cmake  -DCMAKE_INSTALL_PREFIX=/usr/local/mysql  -DMYSQL_UNIX_ADDR=/tmp/mysql.sock  -DDEFAULT_CHARSET=utf8  -DDEFAULT_COLLATION=utf8_general_ci  -DWITH_EXTRA_CHARSETS=all  -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DENABLED_LOCAL_INFILE=1 -DMYSQL_DATADIR=/usr/local/mysql/data  -DMYSQL-USER=mysql
+# make -j 2 ; make install
+```
 
-
-2、配置mysql  
+3、配置mysql  
 ```
 配置属主属组
 # chown -R mysql:mysql /usr/local/mysql/
@@ -150,7 +157,7 @@ datadir=/usr/local/mysql/data
 # chkconfig mysqld  on
 ```  
 
-3、初始化数据库  
+4、初始化数据库  
 ```
 # /usr/local/mysql/scripts/mysql_install_db \
 --defaults-file=/etc/my.cnf  \
@@ -159,12 +166,12 @@ datadir=/usr/local/mysql/data
 --user=mysql
 ```  
 
-4、命令软连接  
+5、命令软连接  
 ```
 # ln -s /usr/local/mysql/bin/*
 ```  
 
-5、启动  
+6、启动  
 ```
 # service mysqld  start
 ```  
