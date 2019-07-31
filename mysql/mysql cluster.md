@@ -188,7 +188,7 @@ set global validate_password_length=1;
 修改密码
 # mysql –uroot –p'gDVpNRBxTcgd17di'
 mysql> set password for 'root'@'localhost'=password('123456');
-mysql> grant all privileges on *.* to cluster@”%” identified by “123456” #授权
+mysql> grant all privileges on *.* to cluster@'%' identified by '123456' #授权
 mysql> flush privileges;
 ```  
 
