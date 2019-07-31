@@ -104,9 +104,9 @@ nodeid=5
 
 数据节点配置
 ```
-# vim  /etc/my.cnf	
+# vim /etc/my.cnf	
 [mysqld]
-#mysql数据存储路径
+# mysql数据存储路径
 datadir=/var/lib/mysql
 #启动ndb引擎
 ndbcluster
@@ -122,7 +122,7 @@ ndb-connectstring=192.168.101.69
 
 SQL节点配置  
 ```
-#vim /etc/my.cnf   
+# vim /etc/my.cnf   
 [mysqld]
 #启动ndb引擎
 ndbcluster
@@ -132,7 +132,7 @@ ndb-connectstring=192.168.101.69
 log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
 [mysql_cluster]
-#管理节点IP地址
+# 管理节点IP地址
 ndb-connectstring=192.168.101.69
 ```  
 
