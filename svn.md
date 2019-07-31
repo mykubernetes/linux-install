@@ -48,18 +48,18 @@ svn import /tmp/shell file:///opt/svn/repos/new_dir -m "my first project"
 
 7、查看网络服务器信息及版本信息：
 ```
-# svn list svn://10.1.1.2/repos
-# svn list svn://10.1.1.2/repos/new_dir
-# svn info svn://10.1.1.2/repos 
+# svn list svn://192.168.101.70/repos
+# svn list svn://192.168.101.70/repos/new_dir
+# svn info svn://192.168.101.70/repos 
 ```  
 
 8、下载工作目录到本地：  
 ```
-# svn checkout svn://10.1.1.2/repos/new_dir
+# svn checkout svn://192.168.101.70/repos/new_dir
 # cd new_dir/
 # vim test_file
 # svn add test_file
-# svn co --username tomcat --password 123 svn://10.1.1.2/repos/shell
+# svn co --username tomcat --password 123 svn://192.168.101.70/repos/shell
 ```  
 
 
@@ -81,12 +81,12 @@ svn commit -m "add while.sh and modify c.sh"  /tmp/shell/
 
 11、删除库中文件：  
 ```
-svn delete svn://10.1.1.2/repos/shell/if/c.sh -m "delete c.sh"
+svn delete svn://192.168.101.70/repos/shell/if/c.sh -m "delete c.sh"
 ```  
 
 12、查看版本日志：  
 ```
-# svn log svn://10.1.1.2/repos/shell
+# svn log svn://192.168.101.70/repos/shell
 与版本系统中最新的文件进行对比。
 # svn diff c.sh
 比较历史版本。
