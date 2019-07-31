@@ -178,11 +178,14 @@ ndb_mgm> show
 # grep password /var/log/messages
 # The random password set for the root user at Wed Apr  1 21:10:53 2015 (local time): gDVpNRBxTcgd17di
 
-
-5.7以上版本 关闭密码安全策略插件
+此步骤可忽略
+5.7以上版本 关闭密码安全策略插件，否则需要输入复杂密码
 在my.cnf添加 validate-password=off 重启mysql
+命令执行方式去掉复杂密码格式
+set global validate_password_policy=0;
+set global validate_password_length=1;
 
-
+修改密码
 # mysql –uroot –p'gDVpNRBxTcgd17di'
 mysql> set password for 'root'@'localhost'=password('123456');
 mysql> grant all privileges on *.* to cluster@”%” identified by “123456” #授权
