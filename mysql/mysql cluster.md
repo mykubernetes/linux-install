@@ -53,7 +53,6 @@ rpm -ql mysql-cluster-community-server
 ---
 ```
 # yum install -y mysql-cluster-community-data-node
-# yum install -y mysql-cluster-community-data-node
 ```  
 
 管理节点安装management管理包  
@@ -61,3 +60,9 @@ rpm -ql mysql-cluster-community-server
 ```
 # yum -y install mysql-cluster-community-management-server
 ```  
+
+管理节点创建配置目录：
+```
+# mkdir -p /usr/mysql-cluster/
+```  
+
