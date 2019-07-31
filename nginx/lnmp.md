@@ -1,61 +1,65 @@
-链接：https://pan.baidu.com/s/1u-A2cgHXTzuoOTrldH2Egw 提取码：ylx3 
+链接：https://pan.baidu.com/s/1u-A2cgHXTzuoOTrldH2Egw 提取码：ylx3  
 
-一、安装nginx  
----
-
-1、下载nginx  
+一、LNMP软件所需要的软件包  
 ```
-wget http://nginx.org/download/nginx-1.16.0.tar.gz
+MySQL=http://dev.mysql.com/downloads/mysql/                mysql主程序包
+PHP=http://php.net/downloads.php                           php主程序包
+Nginx=http://nginx.org/en/download.html                    Nginx主程序包
+libmcrypt=http://mcrypt.hellug.gr/index.html               libmcrypt加密算法扩展库，支持3DES等加密
+或者：http://mcrypt.sourceforge.net/                        MCrypt/Libmcrypt development site (secure access)
+pcre=http://pcre.org/                                      pcre是php的依赖包
 ```  
 
-2、安装编译 Nginx 所需的依赖包  
+二、软件版本  
+libmcrypt-2.5.8  
+mysql-5.6.26  
+nginx-1.8.0  
+pcre-8.37  
+php-5.6.13  
+
+旧版本下载：http://mirrors.sohu.com/  
+
+三、编译安装Nginx  
+
+1、安装依赖  
 ```
-yum install gcc gcc-c++ make automake autoconf libtool pcre* zlib openssl openssl-devel
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+yum groupinstall "Development Tools" "Development Libraries" -y
+yum install gcc gcc-c++ autoconf automake zlib zlib-devel openssl openssl-devel pcre* pcre-devel  -y
 ```  
 
-3、编译安装 Nginx (添加 fastdfs-nginx-module 模块)  
+2、解压编译安装  
 ```
-tar -zxvf nginx-1.16.0.tar.gz
-cd nginx-1.16.0
-
-./configure --prefix=/opt/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --user=nginx --group=nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre
- 
-make && make install
+# tar xf pcre-8.37.tar.bz2 -C /usr/local/src/
+# tar xvf nginx-1.8.0.tar.gz -C /usr/local/src/
+# cd /usr/local/src/nginx-1.8.0
+# ./configure --prefix=/usr/local/nginx --with-http_dav_module --with-http_stub_status_module --with-http_addition_module --with-http_sub_module --with-http_flv_module --with-http_mp4_module --with-pcre=/usr/local/src/pcre-8.37
+# make –j 3 ; make install
+# useradd -M -u 8001 -s /sbin/nologin nginx 
+# ll /usr/local/nginx/
+total 4
+drwxr-xr-x. 2 root root 4096 Jul 30 21:44 conf   #Nginx相关配置文件
+drwxr-xr-x. 2 root root   40 Jul 30 21:44 html   #网站根目录
+drwxr-xr-x. 2 root root    6 Jul 30 21:44 logs   #日志文件
+drwxr-xr-x. 2 root root   19 Jul 30 21:44 sbin   #Nginx启动脚本
 ```  
 
-4、启动测试  
-```
-groupadd -r nginx
-useradd -g nginx -r nginx
-/opt/nginx/sbin/nginx -t           #测试配置文件
-/opt/nginx/sbin/nginx              #启动
-/opt/nginx/sbin/nginx -s reload    #重启
-```  
-
-二、安装php  
-
-1、下载php  
-```
-wget https://github.com/php/php-src/archive/php-5.6.37.tar.gz
-tar xvf php-5.6.37.tar.gz
-cd php-src-php-5.6.37/
+3、配置Nginx支持php文件  
 ```
 
-php与nginx结合  
----
-1、nginx.conf配置如下
-```
-# cat nginx.conf
-user  nginx;
-worker_processes  2;
-error_log  /var/log/nginx/error.log;
-pid        /var/run/nginx.pid;
+#user  nobody;
+worker_processes  1;
 
+user nginx nginx;
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
 
 
 events {
-    use epoll;
-    worker_connections  65535;
+    worker_connections  1024;
 }
 
 
@@ -63,53 +67,62 @@ http {
     include       mime.types;
     default_type  application/octet-stream;
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
 
-    access_log  /var/log/nginx/access.log  main;
+    #access_log  logs/access.log  main;
 
-    server_tokens off;
     sendfile        on;
-    tcp_nopush     on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
     keepalive_timeout  65;
-    tcp_nodelay on;
-    client_header_buffer_size 4k;
-    open_file_cache max=65535 inactive=60s;
-    open_file_cache_valid 80s;
-    client_body_buffer_size 512k;
-    large_client_header_buffers 4 512k;
-    proxy_connect_timeout 30;
-    proxy_read_timeout 60;
-    proxy_send_timeout 20;
-    proxy_buffering on;
-    proxy_buffer_size 16k;
-    proxy_buffers 4 64k;
-    proxy_busy_buffers_size 128k;
-    proxy_temp_file_write_size 128k;
-    gzip  on;
-    gzip_min_length 1k;
-    gzip_buffers 4 16k;
-    gzip_http_version 1.1;
-    gzip_comp_level 2;
-    gzip_types text/plainapplication/x-javascript text/css application/xml;
-    gzip_vary on;
 
-server {
+    #gzip  on;
 
-    listen       80;
-    server_name  www.test.com;
-    access_log  /var/log/nginx/zentao_access.log main;
-        root   /application/php_php/zentao/www;
-    location / {
-        index  index.php index.html index.htm;
-    }
-    location ~ .*\.(php|php5)?$ {
-        fastcgi_pass  127.0.0.1:9000;
-        fastcgi_index index.php;
-        include fastcgi.conf;
+    server {
+        listen       80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            root   html;
+            index index.php index.html index.htm;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+    location ~ \.php$ {
+        root           html;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  /usr/local/nginx/html$fastcgi_script_name;  
+        include        fastcgi_params;
     }
 }
-
 }
+```  
+
+4、启动nginx  
+```
+# /usr/local/nginx/sbin/nginx
+# netstat -tlnp | grep nginx
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      20177/nginx: master
+```  
+使用浏览器测试  
+http://192.168.101.70/  
+
+
+四、编译安装Mysql  
+
+1、安装依赖  
+```
+yum install -y cmake ncurses-devel
 ```  
