@@ -66,3 +66,39 @@ rpm -ql mysql-cluster-community-server
 # mkdir -p /usr/mysql-cluster/
 ```  
 
+
+配置
+```
+
+[ndbd default]
+#数据写入数量。2表示两份
+NoOfReplicas=2
+#配置数据存储可使用的内存
+DataMemory=200M
+#索引给100M
+IndexMemory=100M
+[ndb_mgmd]
+nodeid=1
+#管理结点的日志
+datadir=/var/lib/mysql
+#管理结点的IP地址。本机IP
+HostName=192.168.101.69
+###### data node options:#存储结点
+[ndbd]
+HostName=192.168.101.70
+#mysql数据存储路径
+DataDir=/var/lib/mysql
+nodeid=2
+[ndbd]
+HostName=192.168.101.71
+#mysql数据存储路径
+DataDir=/var/lib/mysql
+nodeid=3
+# SQL node options: #关于SQL结点
+[mysqld]
+HostName=192.168.101.70
+nodeid=4
+[mysqld]
+HostName=192.168.101.71
+nodeid=5
+```  
