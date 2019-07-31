@@ -49,7 +49,7 @@ rpm -ql mysql-cluster-community-server
 ```  
 
 
-数据节点主机都要安装数据节点的相关包（2台）
+数据节点主机都要安装数据节点的相关包  
 ---
 ```
 # yum install -y mysql-cluster-community-data-node
