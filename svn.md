@@ -73,25 +73,28 @@ root      12548  12421  0 09:58 pts/0    00:00:00 grep --color=auto svn
 
 10、查看状态：  
 ```
-svn status /tmp/shell/   ----------- 正常状态命令返回为空，M代表修改过的文件，A代表add的文件但是还没有commit
-M       /tmp/shell/if/c.sh
-
-svn commit -m "add while.sh and modify c.sh"  /tmp/shell/
+# svn status /opt/new_dir/
+M       /opt/new_dir/1     正常状态命令返回为空，M代表修改过的文件，A代表add的文件但是还没有commit
+                 
+# svn commit -m "add 1"  /opt/new_dir/
 ```  
 
 11、删除库中文件：  
 ```
-svn delete svn://192.168.101.70/repos/shell/if/c.sh -m "delete c.sh"
+# svn delete svn://192.168.101.70/repos/new_dir/2 -m "delete 2"
 ```  
 
 12、查看版本日志：  
 ```
-# svn log svn://192.168.101.70/repos/shell
+# svn log svn://192.168.101.70/repos/new_dir
 与版本系统中最新的文件进行对比。
-# svn diff c.sh
+# svn diff 1
 比较历史版本。
-# svn diff -r 3:5 c.sh
+# svn diff -r 3:5 1   
 ```  
+- 3:5 第三个和第五比较
+- 1 文件名
+
 
 钩子hook实现自动同步
 ```
@@ -101,5 +104,3 @@ cat post-commit
 
 /usr/bin/ssh root@10.1.1.4 "export LANG=en_US.UTF-8; /usr/bin/svn update --username tomcat --password 123 /var/www/html/project/shell"
 ```  
-
-
