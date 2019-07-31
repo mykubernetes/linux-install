@@ -126,3 +126,46 @@ http://192.168.101.70/
 ```
 yum install -y cmake ncurses-devel
 ```  
+
+
+
+2、配置mysql  
+```
+配置属主属组
+# chown -R mysql:mysql /usr/local/mysql/
+拷贝配置文件
+# cp /usr/local/mysql/support-files/my-default.cnf /etc/my.cnf
+拷贝启动脚本
+# cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+
+更改启动脚本中指定mysql位置
+vim /etc/init.d/ 
+basedir=
+datadir=
+#修改为
+basedir=/usr/local/mysql
+datadir=/usr/local/mysql/data
+
+开机启动
+# chkconfig mysqld  on
+```  
+
+3、初始化数据库  
+```
+# /usr/local/mysql/scripts/mysql_install_db \
+--defaults-file=/etc/my.cnf  \
+--basedir=/usr/local/mysql/\
+--datadir=/usr/local/mysql/data/\
+--user=mysql
+```  
+
+4、命令软连接  
+```
+# ln -s /usr/local/mysql/bin/*
+```  
+
+5、启动  
+```
+# service mysqld  start
+```  
+
