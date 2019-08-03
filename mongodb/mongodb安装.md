@@ -194,8 +194,8 @@ net:
 #replication:
 #   oplogSizeMB: 1024              #复制操作日志的大小
 #   replSetName: goumin            #副本集名称，同一个副本集的所有主机必须设置相同的名称
-security: #认证
-  authorization: enabled #启用或者禁用基于角色的访问控制来管理每个用户对数据库资源和操作的访问enabled或者disables
+security:                          #认证
+  authorization: enabled           #启用或者禁用基于角色的访问控制来管理每个用户对数据库资源和操作的访问enabled或者disables
 
 6、启动mongodb数据库
 # mongo 127.0.0.1:27017 -u admin -p
