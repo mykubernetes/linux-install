@@ -35,8 +35,11 @@ processManagement:                 #使用处理系统守护进程的控制处�
 
 net:
   port: 27017                      #监听端口
-  bindIp: 127.0.0.1,10.0.0.201     #绑定 ip
+  bindIp: 127.0.0.1,192.168.101.70     #绑定 ip
 #replication:
 #   oplogSizeMB: 1024              #复制操作日志的大小
 #   replSetName: goumin            #副本集名称，同一个副本集的所有主机必须设置相同的名称
 ```  
+
+所有配置选项  https://docs.mongodb.com/manual/reference/configuration-options/  
+
