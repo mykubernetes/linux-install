@@ -347,13 +347,13 @@ goumin:PRIMARY> rs.stepDown()
 增加新节点  
 首先部署新节点，和上边安装一样  
 ```
-goumin:SECONDARY> use admin
-goumin:SECONDARY> rs.add("192.168.101.72:27017")
+goumin:PRIMARY> use admin
+goumin:PRIMARY> rs.add("192.168.101.72:27017")
 ```  
  
 删除旧节点  
 ```
-rs.remove("192.168.101.72:27017")
+goumin:PRIMARY> rs.remove("192.168.101.72:27017")
 { "ok" : 1 }
 
 角色状态为OTHER时可以关闭
