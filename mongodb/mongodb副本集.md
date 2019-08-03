@@ -74,7 +74,7 @@ root       3061      1  1 04:33 ?        00:00:02 mongod -f /opt/mongodb/conf/mo
 
 将mongodb服务器加入集群  
 ```
-1、登录任意节点执行命令
+1、登录任意节点执行命令写入配置
 config = {
 _id : "goumin",
 members : [
@@ -109,7 +109,7 @@ members : [
 	]
 }
 
-2、成功后执行
+2、成功后执行初始化配置
 rs.initiate(config)
 
 执行后结果
@@ -222,6 +222,7 @@ db.inventory.insertMany( [
     { "item": "postcard", "qty": 45, "size": { "h": 10, "w": 15.25, "uom": "cm" }, "status": "A" }
 ]);
 
+执行结果
 goumin:PRIMARY> db.inventory.insertMany( [
 ... { "item": "journal", "qty": 25, "size": { "h": 14, "w": 21, "uom": "cm" }, "status": "A" },
 ... { "item": "notebook", "qty": 50, "size": { "h": 8.5, "w": 11, "uom": "in" }, "status": "A" },
@@ -246,7 +247,7 @@ goumin:PRIMARY> show tables
 inventory
 
 
-3、查
+3、查询
 goumin:PRIMARY> db.inventory.find()
 { "_id" : ObjectId("5d4550b20f9d40fb6fb14750"), "item" : "journal", "qty" : 25, "size" : { "h" : 14, "w" : 21, "uom" : "cm" }, "status" : "A" }
 { "_id" : ObjectId("5d4550b20f9d40fb6fb14751"), "item" : "notebook", "qty" : 50, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "A" }
@@ -254,7 +255,7 @@ goumin:PRIMARY> db.inventory.find()
 { "_id" : ObjectId("5d4550b20f9d40fb6fb14753"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
 { "_id" : ObjectId("5d4550b20f9d40fb6fb14754"), "item" : "postcard", "qty" : 45, "size" : { "h" : 10, "w" : 15.25, "uom" : "cm" }, "status" : "A" }
 
-4、在从节点设置可读，才可查询
+4、在从节点设置可读，才可查询，查询只对当前有效，退出无效
 goumin:SECONDARY> rs.slaveOk();
 goumin:SECONDARY> db.inventory.find()
 { "_id" : ObjectId("5d4550b20f9d40fb6fb14754"), "item" : "postcard", "qty" : 45, "size" : { "h" : 10, "w" : 15.25, "uom" : "cm" }, "status" : "A" }
@@ -262,5 +263,70 @@ goumin:SECONDARY> db.inventory.find()
 { "_id" : ObjectId("5d4550b20f9d40fb6fb14750"), "item" : "journal", "qty" : 25, "size" : { "h" : 14, "w" : 21, "uom" : "cm" }, "status" : "A" }
 { "_id" : ObjectId("5d4550b20f9d40fb6fb14751"), "item" : "notebook", "qty" : 50, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "A" }
 { "_id" : ObjectId("5d4550b20f9d40fb6fb14753"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+```  
 
+获取配置  
+```
+goumin:PRIMARY> rs.config()
+{
+	"_id" : "goumin",
+	"version" : 1,
+	"protocolVersion" : NumberLong(1),
+	"members" : [
+		{
+			"_id" : 0,
+			"host" : "192.168.101.69:27017",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		},
+		{
+			"_id" : 1,
+			"host" : "192.168.101.70:27017",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		},
+		{
+			"_id" : 2,
+			"host" : "192.168.101.71:27017",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		}
+	],
+	"settings" : {
+		"chainingAllowed" : true,
+		"heartbeatIntervalMillis" : 2000,
+		"heartbeatTimeoutSecs" : 10,
+		"electionTimeoutMillis" : 10000,
+		"catchUpTimeoutMillis" : 60000,
+		"getLastErrorModes" : {
+			
+		},
+		"getLastErrorDefaults" : {
+			"w" : 1,
+			"wtimeout" : 0
+		},
+		"replicaSetId" : ObjectId("5d454f39d421fc2cd51418ce")
+	}
+}
 ```  
