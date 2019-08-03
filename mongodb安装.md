@@ -11,7 +11,15 @@ Mongodb 二进制包安装
 # mkdir conf data logs pid
 ```  
 
-2、配置mondodb  
+2、配置环境变量  
+```
+# vim /etc/profile
+PATH=$PATH:/opt/mongodb/bin
+
+# source /etc/profile
+```  
+
+3、配置mondodb  
 ```
 # vim mongodb/conf/mongodb.conf
 systemLog:
@@ -43,3 +51,10 @@ net:
 
 所有配置选项  https://docs.mongodb.com/manual/reference/configuration-options/  
 
+4、启动mongodb  
+```
+# mongod -f /opt/mongodb/conf/mongodb.conf 
+about to fork child process, waiting until server is ready for connections.
+forked process: 12951
+child process started successfully, parent exiting
+```  
