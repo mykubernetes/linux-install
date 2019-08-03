@@ -117,5 +117,150 @@ rs.initiate(config)
 { "ok" : 1 }
 goumin:OTHER> 
 goumin:SECONDARY>
+```  
+
+查看状态  
+```
+goumin:PRIMARY> rs.status()
+{
+	"set" : "goumin",
+	"date" : ISODate("2019-08-03T09:11:26.908Z"),
+	"myState" : 1,
+	"term" : NumberLong(1),
+	"heartbeatIntervalMillis" : NumberLong(2000),
+	"optimes" : {
+		"lastCommittedOpTime" : {
+			"ts" : Timestamp(1564823485, 1),
+			"t" : NumberLong(1)
+		},
+		"appliedOpTime" : {
+			"ts" : Timestamp(1564823485, 1),
+			"t" : NumberLong(1)
+		},
+		"durableOpTime" : {
+			"ts" : Timestamp(1564823485, 1),
+			"t" : NumberLong(1)
+		}
+	},
+	"members" : [
+		{
+			"_id" : 0,
+			"name" : "192.168.101.69:27017",
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 281,
+			"optime" : {
+				"ts" : Timestamp(1564823485, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2019-08-03T09:11:25Z"),
+			"electionTime" : Timestamp(1564823364, 1),
+			"electionDate" : ISODate("2019-08-03T09:09:24Z"),
+			"configVersion" : 1,
+			"self" : true
+		},
+		{
+			"_id" : 1,
+			"name" : "192.168.101.70:27017",
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 133,
+			"optime" : {
+				"ts" : Timestamp(1564823485, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1564823485, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2019-08-03T09:11:25Z"),
+			"optimeDurableDate" : ISODate("2019-08-03T09:11:25Z"),
+			"lastHeartbeat" : ISODate("2019-08-03T09:11:26.813Z"),
+			"lastHeartbeatRecv" : ISODate("2019-08-03T09:11:26.575Z"),
+			"pingMs" : NumberLong(0),
+			"syncingTo" : "192.168.101.69:27017",
+			"configVersion" : 1
+		},
+		{
+			"_id" : 2,
+			"name" : "192.168.101.71:27017",
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 133,
+			"optime" : {
+				"ts" : Timestamp(1564823485, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1564823485, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2019-08-03T09:11:25Z"),
+			"optimeDurableDate" : ISODate("2019-08-03T09:11:25Z"),
+			"lastHeartbeat" : ISODate("2019-08-03T09:11:26.816Z"),
+			"lastHeartbeatRecv" : ISODate("2019-08-03T09:11:26.712Z"),
+			"pingMs" : NumberLong(0),
+			"syncingTo" : "192.168.101.69:27017",
+			"configVersion" : 1
+		}
+	],
+	"ok" : 1
+}
+```  
+
+在主节点测试，从节点不支持写入查询  
+```
+1、写入命令
+db.inventory.insertMany( [
+    { "item": "journal", "qty": 25, "size": { "h": 14, "w": 21, "uom": "cm" }, "status": "A" },
+    { "item": "notebook", "qty": 50, "size": { "h": 8.5, "w": 11, "uom": "in" }, "status": "A" },
+    { "item": "paper", "qty": 100, "size": { "h": 8.5, "w": 11, "uom": "in" }, "status": "D" },
+    { "item": "planner", "qty": 75, "size": { "h": 22.85, "w": 30, "uom": "cm" }, "status": "D" },
+    { "item": "postcard", "qty": 45, "size": { "h": 10, "w": 15.25, "uom": "cm" }, "status": "A" }
+]);
+
+goumin:PRIMARY> db.inventory.insertMany( [
+... { "item": "journal", "qty": 25, "size": { "h": 14, "w": 21, "uom": "cm" }, "status": "A" },
+... { "item": "notebook", "qty": 50, "size": { "h": 8.5, "w": 11, "uom": "in" }, "status": "A" },
+... { "item": "paper", "qty": 100, "size": { "h": 8.5, "w": 11, "uom": "in" }, "status": "D" },
+... { "item": "planner", "qty": 75, "size": { "h": 22.85, "w": 30, "uom": "cm" }, "status": "D" },
+... { "item": "postcard", "qty": 45, "size": { "h": 10, "w": 15.25, "uom": "cm" }, "status": "A" }
+... ]);
+{
+	"acknowledged" : true,
+	"insertedIds" : [
+		ObjectId("5d4550b20f9d40fb6fb14750"),
+		ObjectId("5d4550b20f9d40fb6fb14751"),
+		ObjectId("5d4550b20f9d40fb6fb14752"),
+		ObjectId("5d4550b20f9d40fb6fb14753"),
+		ObjectId("5d4550b20f9d40fb6fb14754")
+	]
+}
+
+
+2、查询表
+goumin:PRIMARY> show tables
+inventory
+
+
+3、查
+goumin:PRIMARY> db.inventory.find()
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14750"), "item" : "journal", "qty" : 25, "size" : { "h" : 14, "w" : 21, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14751"), "item" : "notebook", "qty" : 50, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "A" }
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14752"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14753"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14754"), "item" : "postcard", "qty" : 45, "size" : { "h" : 10, "w" : 15.25, "uom" : "cm" }, "status" : "A" }
+
+4、在从节点设置可读，才可查询
+goumin:SECONDARY> rs.slaveOk();
+goumin:SECONDARY> db.inventory.find()
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14754"), "item" : "postcard", "qty" : 45, "size" : { "h" : 10, "w" : 15.25, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14752"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14750"), "item" : "journal", "qty" : 25, "size" : { "h" : 14, "w" : 21, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14751"), "item" : "notebook", "qty" : 50, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "A" }
+{ "_id" : ObjectId("5d4550b20f9d40fb6fb14753"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
 
 ```  
