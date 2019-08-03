@@ -58,3 +58,91 @@ about to fork child process, waiting until server is ready for connections.
 forked process: 12951
 child process started successfully, parent exiting
 ```  
+
+5、启动mongodb发现有四个WARNING  
+```
+# mongo 192.168.101.70:27017
+MongoDB shell version v3.4.6
+connecting to: 192.168.101.70:27017
+MongoDB server version: 3.4.6
+Server has startup warnings: 
+2019-08-03T01:08:26.745-0400 I CONTROL  [initandlisten] 
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] 
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] 
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] 
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'.
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2019-08-03T01:08:26.746-0400 I CONTROL  [initandlisten] 
+> 
+```  
+
+解决办法
+```
+下面两个WARNING告警解决办法
+WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'.
+
+# cat /sys/kernel/mm/transparent_hugepage/enabled
+[always] madvise never
+# cat /sys/kernel/mm/transparent_hugepage/defrag
+[always] madvise never
+
+
+1、运行以下命令即时禁用THP
+# echo never > /sys/kernel/mm/transparent_hugepage/enabled
+# echo never > /sys/kernel/mm/transparent_hugepage/defrag
+
+2、编辑rc.local 文件：
+# chmod +x /etc/rc.d/rc.local
+# vim /etc/rc.d/rc.local
+# echo never > /sys/kernel/mm/transparent_hugepage/enabled
+# echo never > /sys/kernel/mm/transparent_hugepage/defrag
+
+
+3、使用127.0.0.1身份登录mongodb关闭服务器并重启
+# mongo 127.0.0.1:27017
+> use admin
+switched to db admin
+> db.shutdownServer()
+
+4、重新启动
+# mongod -f /opt/mongodb/conf/mongodb.conf
+```  
+
+
+```
+WARNING告警解决办法
+WARNING: Access control is not enabled for the database.
+
+1、连接mongodb数据库
+# mongo 192.168.101.70:27017
+
+2、创建用户权限
+> db.createUser({user: "admin",pwd: "123456",roles:[ { role: "root", db:"admin"}]})
+
+3、查看用户权限
+> db.getUsers()
+
+4、重启mongodb数据库
+# mongo 127.0.0.1:27017
+> use admin
+switched to db admin
+> db.shutdownServer()
+
+5、启动mongodb数据库
+# mongo 127.0.0.1:27017 -u admin -p
+```  
+
+```
+这个告警需要使用普遍用户启动数据库
+WARNING: You are running this process as the root user, which is not
+# useradd mongodb
+# chown mongodb.mongodb /opt/mongodb -R
+# su - mongodb 
+$ mongod -f /opt/mongodb/conf/mongodb.conf
+```  
