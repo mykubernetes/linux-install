@@ -367,3 +367,11 @@ goumin:OTHER> db.shutdownServer()
 mongo localhost:28010
 ```  
 
+增加仲裁节点  
+Arbiter 节点只参与投票，不能被选为 Primary，并且不从 Primary 同步数据。  
+```  
+rs.addArb("192.168.101.72:27017")
+
+查看集群状态
+goumin:PRIMARY> rs.status()
+```  
