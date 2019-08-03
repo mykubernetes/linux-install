@@ -1,7 +1,14 @@
 
-node01  mongodb
-node02  mongodb
-node03  mongodb
+集群规划  
+```
+主机名       服务        IP地址
+node01    mongodb    192.168.101.69
+node02    mongodb    192.168.101.70
+node03    mongodb    192.168.101.71
+```  
+
+所有节点分别执行此操作
+---
 
 1、下载安装
 ```
@@ -12,7 +19,7 @@ node03  mongodb
 # mkdir conf data logs pid
 ```
 2、配置环境变量
-
+```
 # vim /etc/profile
 PATH=$PATH:/opt/mongodb/bin
 
@@ -42,8 +49,73 @@ processManagement:                 #使用处理系统守护进程的控制处�
 
 net:
   port: 27017                      #监听端口
-  bindIp: 127.0.0.1,192.168.101.69     #绑定 ip
+  bindIp: 127.0.0.1,192.168.101.69     #绑定 ip   IP需要更改
 replication:
    oplogSizeMB: 1024              #复制操作日志的大小
-   replSetName: goumin            #副本集名称，同一个副本集的所有主机必须设置相同的名称
+   replSetName: goumin            #副本集名称，同一个副本集的所有主机必须设置相同的名称   此名称需要一致
+```  
+
+分别启动每台服务器的mongodb  
+---
+```
+[root@node01 ~]# mongod -f /opt/mongodb/conf/mongodb.conf
+[root@node02 ~]# mongod -f /opt/mongodb/conf/mongodb.conf
+[root@node03 ~]# mongod -f /opt/mongodb/conf/mongodb.conf
+
+分别查看进程是否启动
+# ps -ef |grep mongodb
+root       3061      1  1 04:33 ?        00:00:02 mongod -f /opt/mongodb/conf/mongodb.conf
+
+连接测试
+# mongo 192.168.101.69:27017
+# mongo 192.168.101.70:27017
+# mongo 192.168.101.71:27017
+```  
+
+将mongodb服务器加入集群  
+```
+1、登录任意节点执行命令
+config = {
+_id : "goumin",
+members : [
+{_id : 0, host : "192.168.101.69:27017"},
+{_id : 1, host : "192.168.101.70:27017"},
+{_id : 2, host : "192.168.101.71:27017"},
+] }
+
+输出结果为执行成功
+> config = {
+... _id : "goumin",
+... members : [
+... {_id : 0, host : "192.168.101.69:27017"},
+... {_id : 1, host : "192.168.101.70:27017"},
+... {_id : 2, host : "192.168.101.71:27017"},
+... ] }
+{
+	"_id" : "goumin",
+	"members" : [
+		{
+			"_id" : 0,
+			"host" : "192.168.101.69:27017"
+		},
+		{
+			"_id" : 1,
+			"host" : "192.168.101.70:27017"
+		},
+		{
+			"_id" : 2,
+			"host" : "192.168.101.71:27017"
+		}
+	]
+}
+
+2、成功后执行
+rs.initiate(config)
+
+执行后结果
+> rs.initiate(config)
+{ "ok" : 1 }
+goumin:OTHER> 
+goumin:SECONDARY>
+
 ```  
