@@ -1,3 +1,34 @@
+
+安装方式rpm包
+===
+1.添加 yum 源
+```
+# vim /etc/yum.repos.d/mongodb-org-3.4.repo
+[mongodb-org-3.4]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.4/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-3.4.asc
+```
+2.安装
+```
+# yum install -y mongodb-org
+
+mongodb-org                    x86_64             3.4.22-1.el7             mongodb-org-3.4             5.8 k
+mongodb-org-mongos             x86_64             3.4.22-1.el7             mongodb-org-3.4              12 M
+mongodb-org-server             x86_64             3.4.22-1.el7             mongodb-org-3.4              20 M
+mongodb-org-shell              x86_64             3.4.22-1.el7             mongodb-org-3.4              11 M
+mongodb-org-tools              x86_64             3.4.22-1.el7             mongodb-org-3.4              69 M
+```  
+
+- mongodb-org #一个名称，将自动安装以下列出的四个组件包
+- mongodb-org-mongos #数据分片
+- mongodb-org-server #服务端包
+- mongodb-org-shell #客户端包
+- mongodb-org-tools #备份导入导出包
+
+
 Mongodb 二进制包安装
 ===
 官网下载地址：https://www.mongodb.com/download-center?jmp=nav#production  
