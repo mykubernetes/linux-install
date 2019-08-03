@@ -330,3 +330,40 @@ goumin:PRIMARY> rs.config()
 	}
 }
 ```  
+
+调整权重  
+```
+goumin:PRIMARY> config.members[0].priority=90
+90
+goumin:PRIMARY> rs.reconfig(config)
+{ "ok" : 1 }
+```  
+
+主节点主动降级  
+```
+goumin:PRIMARY> rs.stepDown()
+```  
+ 
+增加新节点  
+首先部署新节点，和上边安装一样  
+```
+goumin:SECONDARY> use admin
+goumin:SECONDARY> rs.add("192.168.101.72:27017")
+```  
+ 
+删除旧节点  
+```
+rs.remove("192.168.101.72:27017")
+{ "ok" : 1 }
+
+角色状态为OTHER时可以关闭
+goumin:OTHER>
+
+# mongo localhost:7017
+goumin:OTHER> use admin
+switched to db admin
+goumin:OTHER> db.shutdownServer()
+
+mongo localhost:28010
+```  
+
