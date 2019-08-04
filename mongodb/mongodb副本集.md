@@ -331,6 +331,11 @@ goumin:PRIMARY> rs.config()
 }
 ```  
 
+查看slave的延时情况  
+```
+rs.printSlaveReplicationInfo()
+```  
+
 调整权重  
 ```
 goumin:PRIMARY> config.members[0].priority=90
