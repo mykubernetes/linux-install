@@ -51,8 +51,8 @@ net:
   port: 27017                      #监听端口
   bindIp: 127.0.0.1,192.168.101.69     #绑定 ip   IP需要更改
 replication:
-   oplogSizeMB: 1024              #复制操作日志的大小
-   replSetName: goumin            #副本集名称，同一个副本集的所有主机必须设置相同的名称   此名称需要一致
+  oplogSizeMB: 1024              #复制操作日志的大小
+  replSetName: goumin            #副本集名称，同一个副本集的所有主机必须设置相同的名称   此名称需要一致
 ```  
 
 分别启动每台服务器的mongodb  
