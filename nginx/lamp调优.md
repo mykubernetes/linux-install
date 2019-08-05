@@ -103,4 +103,28 @@ Include /etc/httpd/extra/httpd-default.conf
 # 将Full改为On
 ServerTokens Prod
 ServerTokens On
+
+重启前测试
+# curl -I 192.168.101.71
+HTTP/1.1 200 OK
+Date: Mon, 05 Aug 2019 15:46:43 GMT
+Server: Apache/2.4.27 (Unix)    #有版本信息
+Last-Modified: Mon, 11 Jun 2007 18:53:14 GMT
+ETag: "2d-432a5e4a73a80"
+Accept-Ranges: bytes
+Content-Length: 45
+Content-Type: text/html
+
+# systemctl restart httpd
+
+重启后测试
+# curl -I 192.168.101.71
+HTTP/1.1 200 OK
+Date: Mon, 05 Aug 2019 15:46:51 GMT
+Server: Apache                  #无版本信息
+Last-Modified: Mon, 11 Jun 2007 18:53:14 GMT
+ETag: "2d-432a5e4a73a80"
+Accept-Ranges: bytes
+Content-Length: 45
+Content-Type: text/html
 ```  
