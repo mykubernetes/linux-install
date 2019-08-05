@@ -103,6 +103,8 @@ Include /etc/httpd/extra/httpd-default.conf
 # 将Full改为On
 ServerTokens Prod
 ServerTokens On
+如果这里不是off需要修改
+ServerSignature Off
 
 重启前测试
 # curl -I 192.168.101.71
