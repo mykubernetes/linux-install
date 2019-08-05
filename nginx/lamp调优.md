@@ -40,3 +40,53 @@ make install
 --enable-mpms-shared=all              #启动所有的MPM模块
 --with-mpm=event                      #指定默认使用event模块
 ```  
+
+4、查看配置文件：
+```
+# ls /etc/httpd/httpd.conf 
+/etc/httpd/httpd.conf
+```  
+
+5、存放网站的根目录：  
+```
+# ls /usr/local/apache/htdocs/index.html 
+/usr/local/apache/htdocs/index.html
+```  
+
+6、启动http  
+1)配置apache可以开机启动并且可以使用systemctl命令启动apache服务器  
+```
+# vim /usr/lib/systemd/system/httpd.service
+[Unit]
+Description=The Apache HTTP Server
+After=network.target remote-fs.target nss-lookup.target
+Documentation=man:httpd(8)
+Documentation=man:apachectl(8)
+
+[Service]
+Type=forking
+EnvironmentFile=/etc/httpd/httpd.conf
+ExecStart=/usr/local/apache/bin/apachectl
+ExecRestart=/usr/local/apache/bin/apachectl restart
+ExecStop=/usr/local/apache/bin/apachectl stop
+KillSignal=SIGCONT
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+```  
+
+2)重新加载unit文件：
+```
+# systemctl daemon-reload
+```  
+
+3)设置开机自动启动：
+```
+# systemctl enable httpd
+```  
+
+4)启动apache：
+```
+# systemctl start httpd
+```  
