@@ -90,3 +90,17 @@ WantedBy=multi-user.target
 ```
 # systemctl start httpd
 ```  
+
+开始调优
+1、隐藏版本信息
+```
+# vim /etc/httpd/httpd.conf
+# 将注释去掉
+#Include /etc/httpd/extra/httpd-default.conf
+Include /etc/httpd/extra/httpd-default.conf
+
+# vim /etc/httpd/extra/httpd-default.conf
+# 将Full改为On
+ServerTokens Prod
+ServerTokens On
+```  
