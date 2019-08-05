@@ -131,7 +131,7 @@ Content-Length: 45
 Content-Type: text/html
 ```  
 
-2、修改显示版本信息  
+2、彻底让版本等敏感信息消失  
 ```
 1、编译前修改配置
 # tar xf httpd-2.4.27.tar.bz2 -C /usr/local/src/
