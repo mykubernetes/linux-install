@@ -91,7 +91,7 @@ WantedBy=multi-user.target
 # systemctl start httpd
 ```  
 
-开始调优
+开始调优  
 1、隐藏版本信息
 ```
 # vim /etc/httpd/httpd.conf
@@ -129,4 +129,33 @@ ETag: "2d-432a5e4a73a80"
 Accept-Ranges: bytes
 Content-Length: 45
 Content-Type: text/html
+```  
+
+2、修改显示版本信息  
+```
+1、编译前修改配置
+# tar xf httpd-2.4.27.tar.bz2 -C /usr/local/src/
+# cd /usr/local/src/httpd-2.4.27/
+# vim include/ap_release.h
+#define AP_SERVER_BASEVENDOR "Apache Software Foundation"   #服务的供应商名称
+#define AP_SERVER_BASEPROJECT "Apache HTTP Server"          #服务的项目名称
+#define AP_SERVER_BASEPRODUCT "Apache"                      #服务的产品名
+#define AP_SERVER_MAJORVERSION_NUMBER 2                     #主要版本号
+#define AP_SERVER_MINORVERSION_NUMBER 4                     #小版本号
+#define AP_SERVER_PATCHLEVEL_NUMBER  6                      #补丁级别
+#define AP_SERVER_DEVBUILD_BOOLEAN  0
+修改为：
+#define AP_SERVER_BASEVENDOR "web"
+#define AP_SERVER_BASEPROJECT "web server"
+#define AP_SERVER_BASEPRODUCT "web"
+
+#define AP_SERVER_MAJORVERSION_NUMBER 8
+#define AP_SERVER_MINORVERSION_NUMBER 1
+#define AP_SERVER_PATCHLEVEL_NUMBER   2
+#define AP_SERVER_DEVBUILD_BOOLEAN    3
+
+2、修改完后需要重新编译安装
+./configure --prefix=/usr/local/apache --sysconfdir=/etc/httpd --enable-so --enable-ssl --enable-cgi --enable-rewrite --with-zlib --with-pcre --with-apr=/usr/local/apr --enable-deflate --with-apr-util=/usr/local/apr-util --enable-modules=most --enable-mpms-shared=all --with-mpm=event
+make -j 2
+make install
 ```  
