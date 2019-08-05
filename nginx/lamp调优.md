@@ -21,8 +21,8 @@ cd /usr/local/src/apr-util-1.5.4/
 tar xf httpd-2.4.27.tar.bz2 -C /usr/local/src/
 cd /usr/local/src/httpd-2.4.27/
 ./configure --prefix=/usr/local/apache --sysconfdir=/etc/httpd --enable-so --enable-ssl --enable-cgi --enable-rewrite --with-zlib --with-pcre --with-apr=/usr/local/apr --enable-deflate --with-apr-util=/usr/local/apr-util --enable-modules=most --enable-mpms-shared=all --with-mpm=event
-   40  make -j  4
-   41  make install
+make -j 2
+make install
 ```  
 注解：
 ```
