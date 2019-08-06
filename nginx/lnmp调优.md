@@ -309,3 +309,23 @@ http {
 - fastcgi_cache_valid any 1m; #将其他应答缓存为1分钟
 - fastcgi_cache_min_uses 1; #请求的数量
 - fastcgi_cache_path #定义缓存的路径
+
+
+14、gzip调优  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+    gzip on;
+    gzip_min_length  1k;
+    gzip_buffers     4 32k;
+    gzip_http_version 1.1;
+    gzip_comp_level 9;
+    gzip_types  text/css text/xml application/javascript;
+    gzip_vary on;
+```  
+- gzip on; #开启压缩功能
+- gzip_min_length  1k; #设置允许压缩的页面最小字节数，页面字节数从header头的Content-Length（内容长度）中获取，默认值是0，不管页面多大都进行压缩，建议设置成大于1K，如果小与1K可能会越压越大。
+- gzip_buffers 4 32k; #压缩缓冲区大小，表示申请4个单位为32K的内存作为压缩结果流缓存，默认值是申请与原始数据大小相同的内存空间来存储gzip压缩结果。
+- gzip_http_version 1.1; #压缩版本（默认1.1，前端为squid2.5时使用1.0）用于设置识别HTTP协议版本，默认是1.1，目前大部分浏览器已经支持GZIP解压，使用默认即可
+- gzip_comp_level 9;  #压缩比例，用来指定GZIP压缩比，1压缩比最小，处理速度最快，9压缩比最大，传输速度快，但是处理慢，也比较消耗CPU资源。
+- gzip_types  text/css text/xml application/javascript;   #用来指定压缩的类型，‘text/html’类型总是会被压缩。
+- gzip_vary on;   #vary header支持，该选项可以让前端的缓存服务器缓存经过GZIP压缩的页面，例如用Squid缓存经过nginx压缩的数据
