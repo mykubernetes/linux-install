@@ -329,3 +329,49 @@ http {
 - gzip_comp_level 9;  #压缩比例，用来指定GZIP压缩比，1压缩比最小，处理速度最快，9压缩比最大，传输速度快，但是处理慢，也比较消耗CPU资源。
 - gzip_types  text/css text/xml application/javascript;   #用来指定压缩的类型，‘text/html’类型总是会被压缩。
 - gzip_vary on;   #vary header支持，该选项可以让前端的缓存服务器缓存经过GZIP压缩的页面，例如用Squid缓存经过nginx压缩的数据
+
+
+15、expires缓存调优  
+缓存，主要针对于图片，css，js等元素更改机会比较少的情况下使用，特别是图片，占用带宽大，我们完全可以设置图片在浏览器本地缓存365d，css，js，html可以缓存个10来天，这样用户第一次打开加载慢一点，第二次，就非常快了！缓存的时候，我们需要将需要缓存的拓展名列出来！  
+xpires缓存配置在server字段里面  
+```
+location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$
+      {
+      expires      3650d;
+      }
+location ~ .*\.(js|css)?$
+      {
+      expires      30d;
+      }
+```  
+同时也可以对目录及其进行判断  
+```
+location ~ ^/(images|javascript|js|css|flash|media|static)/ {
+      expires 360d;
+      }
+location ~(robots.txt) {
+      expires 7d;
+      break;
+      }
+```  
+expire功能优点  
+（1）expires可以降低网站购买的带宽，节约成本  
+（2）同时提升用户访问体验  
+（3）减轻服务的压力，节约服务器成本，甚至可以节约人力成本，是web服务非常重要的功能。  
+expire功能缺点：  
+被缓存的页面或数据更新了，用户看到的可能还是旧的内容，反而影响用户体验。  
+解决办法：  
+第一个 缩短缓存时间，例如：1天，不彻底，除非更新频率大于1天  
+第二个 对缓存的对象改名  
+a.图片，附件一般不会被用户修改，如果用户修改了，实际上也是更改文件名重新传了而已  
+b.网站升级对于js，css元素，一般可以改名，把css，js，推送到CDN。  
+网站不希望被缓存的内容  
+1）广告图片  
+2）网站流量统计工具  
+3）更新频繁的文件（google的logo）  
+
+
+16、日志切割优化  
+```
+
+```  
