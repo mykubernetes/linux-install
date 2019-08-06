@@ -452,3 +452,99 @@ MaxKeepAliveRequests指令限制了当启用KeepAlive时，每个连接允许的
 这个数字的设置，必须考虑在一个时间段内，同一个用户访问你的服务会发多少请求。要结合KeepAliveTimeout参数来考虑。  
 
 
+7、查看当前使用的MPM模型,并修改
+```
+查看当前使用的MPM模型
+# /usr/local/apache/bin/httpd -M | grep event
+  mpm_event_module (shared)
+查看模块：
+     httpd -l      #查看MPM模块
+     httpd -M      #查看DSO模块，由于mod_mpm_event.so，mod_mpm_prefork.so，mod_mpm_worker.so，此三个模块被做成DSO模块，所以使用httpd -M查看
+
+查看当前使用的MPM模型
+# /usr/local/apache/bin/httpd -V
+Server version: Apache/2.4.27 (Unix)
+Server built:   Aug  5 2019 12:04:06
+Server's Module Magic Number: 20120211:68
+Server loaded:  APR 1.5.2, APR-UTIL 1.5.2
+Compiled using: APR 1.5.2, APR-UTIL 1.5.2
+Architecture:   64-bit
+Server MPM:     event                #当前使用的是event模型
+  threaded:     yes (fixed thread count)
+    forked:     yes (variable process count)
+Server compiled with....
+
+# vim /etc/httpd/httpd.conf 
+#LoadModule mpm_event_module modules/mod_mpm_event.so
+LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
+#LoadModule mpm_worker_module modules/mod_mpm_worker.so
+
+# systemctl restart httpd
+[root@node03 ~]# /usr/local/apache/bin/httpd -V
+Server version: Apache/2.4.27 (Unix)
+Server built:   Aug  5 2019 12:04:06
+Server's Module Magic Number: 20120211:68
+Server loaded:  APR 1.5.2, APR-UTIL 1.5.2
+Compiled using: APR 1.5.2, APR-UTIL 1.5.2
+Architecture:   64-bit
+Server MPM:     prefork           #当前使用的是prefork模型
+  threaded:     no
+    forked:     yes (variable process count)
+```  
+httpd2.4 新特性  
+```
+1）MPM支持在运行时装载
+     指定启用：
+             --enable-mpms-shared=all --with-mpm=event      //把所有支持的MPM都编译进来，但启用默认的是event
+2) 支持event
+3）异步读写
+4) 在每模块及每目录上指定日志级别
+5）每请求配置：<If> <Elseif>
+6) 增强版的表达式分析器
+7) 毫秒级的keepalive timeout ，使用ms指定为毫秒
+8）支持主机名的虚拟主机不在需要NameVirtualHost指令
+9) 支持使用自定义变量
+新增一些模块：mod_proxy_fcgi（基于fcgi方式调用执行环境）
+mod_ratelimit（用于做速率限定）
+mod_request（对请求方法做限定）
+mod_remoteip（对远端IP做限定）
+对于基于IP的访问做了修改，不在使用order,allow,deny这些机制；而是统一使用require进行
+```  
+RHEL6/7系统自带的apache默认采用的是prefork进程模型；在编译apache源码时，如果不用--with-mpm显式指定某种MPM，prefork就是缺省的MPM  
+
+8、对prefork模式进行优化。 修改apache 的httpd-mpm.conf 配置  
+```
+# vim /etc/httpd/httpd.conf
+将注释去掉
+#Include /etc/httpd/extra/httpd-mpm.conf
+Include /etc/httpd/extra/httpd-mpm.conf
+
+
+# vim /etc/httpd/extra/httpd-mpm.conf
+将
+<IfModule mpm_prefork_module>
+    StartServers             5
+    MinSpareServers          5
+    MaxSpareServers         10
+    MaxRequestWorkers      250
+    MaxConnectionsPerChild   0
+</IfModule>
+修改为
+<IfModule mpm_prefork_module>
+ServerLimit 3000
+StartServers 50
+MinSpareServers 50
+MaxSpareServers 100
+MaxRequestWorkers    3000
+MaxRequestsPerChild 1000
+</IfModule>
+
+#systemctl restart httpd
+```  
+- ServerLimit 是最大的进程数  
+- MaxRequestWorkers 是最大的请求并发。  
+注：所以他们的关系是MaxRequestWorkers=ServerLimit*进程的线程数。因为，在prefork模式下一个进程只有一个线程，并且一个进程对应一个连接。  
+所以这里配置成：MaxRequestWorkers=ServerLimit，MaxRequestWorkers不得大于ServerLimit参数。  
+如果做5000并发的web，需要多少内存？   5000*2M/0.8/1024(转G)=12.2G 。  服务器大概需要14G -16G 内存。  
+ServerLimit的大小，取决于你系统的资源，每个apache进程默认大约占用2M内存，基本可以按照这个公式来计算：最大内存*80%/2M=ServerLimit。  
+
