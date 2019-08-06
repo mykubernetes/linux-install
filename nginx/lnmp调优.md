@@ -75,3 +75,22 @@ Accept-Ranges: bytes
 - --with-http_mp4_module              #启用支持（提供支持mp4视频文件支持，提供伪流媒体服务端支持）
 - --with-pcre   #需要注意，这里指的是源码,用#./configure --help |grep pcre查看帮助
 
+2隐藏版本信息  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+http{
+  server_tokens off;
+}
+
+# /usr/local/nginx/sbin/nginx -s reload
+# curl  -I  192.168.101.70
+HTTP/1.1 200 OK
+Server: web         #版本号以隐藏
+Date: Tue, 06 Aug 2019 06:46:04 GMT
+Content-Type: text/html
+Content-Length: 612
+Last-Modified: Tue, 06 Aug 2019 06:40:10 GMT
+Connection: keep-alive
+ETag: "5d4920ca-264"
+Accept-Ranges: bytes
+```  
