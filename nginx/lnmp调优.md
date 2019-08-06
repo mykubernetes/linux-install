@@ -207,3 +207,19 @@ KiB Swap:  2097148 total,  2097148 free,        0 used.  1203568 avail Mem
 
 RES为占用内存的大小，约14M左右
 ```  
+
+9、开启高效传输模式  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+Include mime.types;		媒体类型
+default_type  application/octet-stream;	默认媒体类型 足够
+
+http {
+    sendfile        on;   # 开启高效文件传输模式,sendfile指令指定nginx是否调用sendfile函数来输出文件，对于普通应用设为 on，如果用来进行下载等应用磁盘IO重负载应用，可设置为off，以平衡磁盘与网络I/O处理速度，降低系统的负载。注意：如果图片显示不正常把这个改成off
+    #tcp_nopush     on;   # 必须在sendfile开启模式才有效，防止网络阻塞，积极的减少网络报文段的数量
+}
+
+# vim /usr/local/nginx/conf/mime.types   支持的媒体类型
+```  
+
+10、
