@@ -445,7 +445,7 @@ KeepAlive On
 KeepAliveTimeout 5
 ```  
 
-- MaxKeepAliveRequests  
+- MaxKeepAliveRequests #这个值一般不需要配置。
 默认：100  
 一个建立好的Keep-Alive连接，允许发送的请求的个数。一旦建立连接，要么就是个数达到了断开，要么就是等KeepAliveTimeout时间到了断开连接。  
 MaxKeepAliveRequests指令限制了当启用KeepAlive时，每个连接允许的请求数量。如果将此值设为"0"，将不限制请求的数目。我们建议最好将此值设为一个比较大的值，以确保最优的服务器性能。"  
