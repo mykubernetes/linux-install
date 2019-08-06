@@ -159,3 +159,51 @@ Content-Type: text/html
 make -j 2
 make install
 ```  
+
+3、查看运行apache的默认用户  
+通过更改apache的默认用户，可以提升apache的安全性。这样，即使apache服务被攻破，黑客拿到apache普通用户也不会对系统和其他应用造成破坏。  
+```
+# lsof -i:80
+COMMAND   PID   USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+httpd   60596   root    4u  IPv6  50114      0t0  TCP *:http (LISTEN)
+httpd   60597 daemon    4u  IPv6  50114      0t0  TCP *:http (LISTEN)
+httpd   60598 daemon    4u  IPv6  50114      0t0  TCP *:http (LISTEN)
+httpd   60599 daemon    4u  IPv6  50114      0t0  TCP *:http (LISTEN)
+
+# id daemon
+uid=2(daemon) gid=2(daemon) groups=2(daemon)
+
+1、创建apache用户，没有家目录，非登录用户
+# useradd -M -s /sbin/nologin apache
+
+# vim /etc/httpd/httpd.conf
+User apache
+Group apache
+
+重启查看默认用户
+# systemctl restart httpd
+# lsof -i:80
+COMMAND   PID   USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+httpd   60869   root    4u  IPv6  53228      0t0  TCP *:http (LISTEN)
+httpd   60870 apache    4u  IPv6  53228      0t0  TCP *:http (LISTEN)
+httpd   60871 apache    4u  IPv6  53228      0t0  TCP *:http (LISTEN)
+httpd   60872 apache    4u  IPv6  53228      0t0  TCP *:http (LISTEN)
+
+2、修改apache的工作目录为普通用户权限
+# ll -sd /usr/local/apache/htdocs/
+0 drwxr-xr-x. 2 root root 24 Jul  6  2017 /usr/local/apache/htdocs/
+
+# chown apache. /usr/local/apache/htdocs/ -R
+
+# ll /usr/local/apache/htdocs/
+total 4
+-rw-r--r--. 1 apache apache 45 Jun 11  2007 index.html
+
+
+3、保护apache日志：设置好apache日志文件权限，所以不用修改
+# ll -sd /usr/local/apache/logs/*
+4 -rw-r--r--. 1 root root 1414 Aug  5 12:12 /usr/local/apache/logs/access_log
+4 -rw-r--r--. 1 root root 3180 Aug  5 22:29 /usr/local/apache/logs/error_log
+4 -rw-r--r--. 1 root root    6 Aug  5 22:29 /usr/local/apache/logs/httpd.pid
+注：由于apache日志的记录是由apache的主进程进行操作的，而apache的主进程又是root用户启动的，所以这样不影响日志的输出。这也是日志记录的最安全的方法。
+```  
