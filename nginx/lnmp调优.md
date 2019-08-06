@@ -373,5 +373,132 @@ b.网站升级对于js，css元素，一般可以改名，把css，js，推送�
 
 16、日志切割优化  
 ```
-
+# vim cut_nginx_log.sh		#每天日志分割脚本
+#!/bin/bash
+date=$(date +%F -d -1day)
+cd /usr/local/nginx/logs
+if [ ! -d cut ] ; then
+        mkdir cut
+fi
+mv access.log cut/access_$(date +%F -d -1day).log
+mv error.log cut/error_$(date +%F -d -1day).log
+/usr/local/nginx/sbin/nginx -s reload
+tar -jcvf cut/$date.tar.bz2 cut/*
+rm -rf cut/access* && rm -rf cut/error*
+cat >>/var/spool/cron/root<<eof
+00 00 * * * /bin/sh /usr/local/nginx/logs/cut_nginx_log.sh >/dev/null 2>&1
+eof
+find -type f -mtime +10 | xargs rm -rf
 ```  
+健康检查的日志，不用输入到log中，因为这些日志没有意义，我们分析的话只需要分析访问日志，看看一些页面链接，如200，301，404的状态吗，在SEO中很重要，而且我们统计PV是页面计算，这些都没有意义，反而消耗了磁盘IO，降低了服务器性能，我们可以屏蔽这些如图片，js，css这些不宜变化的内容  
+
+```
+# vim /usr/local/nginx/conf/nginx.conf
+       location ~ .*\.(js|jpg|jpeg|JPG|JPEG|css|bmp|gif|GIF)$ {
+            access_log off;       #匹配到的类型不记录日志
+        }
+```  
+
+日志目录权限优化  
+```
+# chown -R root.root logs/
+# chmod -R 700 logs/
+
+```
+
+17、日志格式优化  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  logs/access.log  main;
+```  
+1.$remote_addr 与$http_x_forwarded_for 用以记录客户端的ip地址；  
+2.$remote_user 用来记录客户端用户名称；  
+3.$time_local 用来记录访问时间与时区；  
+4.$request 用来记录请求的url与http协议；  
+5.$status 用来记录请求状态；成功是200，  
+6.$body_bytes_s ent 记录发送给客户端文件主体内容大小；  
+7.$http_referer 用来记录从那个页面链接访问过来的；  
+8.$http_user_agent 记录客户端浏览器的相关信息；  
+
+
+18、目录文件访问控制  
+主要用在禁止目录下指定文件被访问，当然也可以禁止所有文件被访问！一般什么情况下用？比如是有存储共享，这些文件本来都只是一些下载资源文件，那么这些资源文件就不允许被执行，如sh,py,pl,php等等  
+```
+例如：禁止访问images下面的php程序文件
+location ~ ^/images/.*\.(php|php5|.sh|.py|.pl)$ {
+            root   html;
+            index  index.html index.htm;
+            deny all;
+        }
+# /usr/local/nginx/sbin/nginx -s reload
+# mkdir /usr/local/nginx/html/images
+# echo "<?php phpinfo(); ?>" > /usr/local/nginx/html/images/index.php
+
+测试访问
+# curl http://192.168.101.70/images/index.php
+<html>
+<head><title>403 Forbidden</title></head>
+<body>
+<center><h1>403 Forbidden</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+```  
+
+多目录组合配置方法  
+```
+ location ~ ^/images/(attachment|avatar)/.*\.(php|php5|.sh|.py|.py)$ {
+            root   html;
+            index  index.html index.htm;
+            deny all;     #添加此项
+        }
+```  
+
+配置nginx禁止访问*.txt文件  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+   location ~* \.(txt|doc)$ {
+                if ( -f $request_filename) {
+                root /usr/local/nginx/html;
+         break; 
+        }
+		deny all;
+	}
+```  
+
+重定向到某一个URL  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+     location ~* \.(txt|doc)$ {
+                if ( -f $request_filename) {
+                root /usr/local/nginx/html;
+                rewrite ^/(.*)$ http://www.baidu.com last;
+                break;
+                }
+        }
+```  
+
+对目录进行限制的方法  
+```
+# mkdir -p /usr/local/nginx/html/{prod,gray}
+# echo xuegod > /usr/local/nginx/html/prod/index.html
+# echo god > /usr/local/nginx/html/gray/index.html
+# vim /usr/local/nginx/conf/nginx.conf
+    location /prod/       { return 404 ; }
+    location /gray/       { return 403 ; }
+
+或者403也可以使用以下方式
+# vim /usr/local/nginx/conf/nginx.conf
+        location ~ ^/(gray)/ {
+        deny all;
+        }
+# /usr/local/nginx/sbin/nginx -s reload
+```  
+
+19、来源访问控制  
+
+
