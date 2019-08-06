@@ -222,4 +222,90 @@ http {
 # vim /usr/local/nginx/conf/mime.types   支持的媒体类型
 ```  
 
-10、
+10、ServerName匹配和location  
+ServerName匹配  
+1：精确匹配：www.aa.com  
+2：左侧通配符匹配：*.aa.com  
+3：右侧通配符匹配：www.*  
+4：正则表达式：~ ^.*\.aa\.com$  
+5: default_server  
+6、服务IP地址   
+
+location匹配  
+= 绝对匹配  
+^~：URL前半部分匹配，不检查正则  
+~：正则匹配，区分大小写  
+~*“正则匹配”不区分大小写  
+\转义  
+* 配置任意个任意字符  
+$ 以什么结尾  
+
+11、连接超时时间  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+    keepalive_timeout  65;
+    tcp_nodelay on;
+    client_header_timeout 15;
+    client_body_timeout 15;
+    send_timeout 15;
+```  
+- keepalived_timeout  客户端连接保持会话超时时间，超过这个时间，服务器断开这个链接
+- tcp_nodelay；也是防止网络阻塞，不过要包涵在keepalived参数才有效
+- client_header_timeout  客户端请求头读取超时时间，如果超过设个时间没有发送任何数据，nginx将返回request time out的错误
+- client_body_timeout  客户端求主体超时时间，超过这个时间没有发送任何数据，和上面一样的错误提示
+- send_timeout  响应客户端超时时间，这个超时时间仅限于两个活动之间的时间，如果超过这个时间，客户端没有任何活动，nginx关闭连接
+
+12、文件上传大小限制  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+http {
+    client_max_body_size 10m;
+}
+```  
+
+13、Fastcgi调优  
+fastcgi cache资料：  
+官方文档：http://nginx.org/en/docs/http/ngx_http_fastcgi_module.html#fastcgi_cache  
+```
+http {
+    fastcgi_connect_timeout 300;
+    fastcgi_send_timeout 300;
+    fastcgi_read_timeout 300;
+    fastcgi_buffer_size 64k;
+    fastcgi_buffers 4 64k;
+    fastcgi_busy_buffers_size 128k;
+    fastcgi_temp_file_write_size 128k;
+    #fastcgi_temp_path /data/ngx_fcgi_tmp;
+    fastcgi_cache_path /data/ngx_fcgi_cache   levels=2:2   #缓存路径，levels目录层次2级
+    keys_zone=ngx_fcgi_cache:512m  #定义了一个存储区域名字，缓存大小
+    inactive=1d max_size=40g;      #不活动的数据在缓存中多长时间，目录总大小
+}
+
+在server location标签添加如下：
+      location ~ .*\.(php|php5)?$
+      {
+      fastcgi_pass 127.0.0.1:9000;
+      fastcgi_index index.php;
+      include fastcgi.conf;
+      fastcgi_cache ngx_fcgi_cache;
+      fastcgi_cache_valid 200 302 1h;
+      fastcgi_cache_valid 301 1d;
+      fastcgi_cache_valid any 1m;
+      fastcgi_cache_min_uses 1;
+      fastcgi_cache_use_stale error timeout invalid_header http_500;
+      fastcgi_cache_key http://$host$request_uri;
+      }
+```  
+- fastcgi_connect_timeout 300; #指定链接到后端FastCGI的超时时间。
+- fastcgi_send_timeout 300; #向FastCGI传送请求的超时时间，这个值是指已经完成两次握手后向FastCGI传送请求的超时时间。
+- fastcgi_read_timeout 300; #指定接收FastCGI应答的超时时间，这个值是指已经完成两次握手后接收FastCGI应答的超时时间。
+- fastcgi_buffer_size 64k; #指定读取FastCGI应答第一部分需要用多大的缓冲区，这个值表示将使用1个64KB的缓冲区读取应答的第一部分（应答头），可以设置为fastcgi_buffers选项指定的缓冲区大小。
+- fastcgi_buffers 4 64k; #指定本地需要用多少和多大的缓冲区来缓冲FastCGI的应答请求，如果一个php脚本所产生的页面大小为256KB，那么会分配4个64KB的缓冲区来缓存，如果页面大小大于256KB，那么大于256KB的部分会缓存到fastcgi_temp指定的路径中，但是这并不是好方法，因为内存中的数据处理速度要快于磁盘。一般这个值应该为站点中php脚本所产生的页面大小的中间值，如果站点大部分脚本所产生的页面大小为256KB，那么可以把这个值设置为“8 16K”、“4 64k”等。
+- fastcgi_busy_buffers_size 128k; #建议设置为fastcgi_buffer的两倍，繁忙时候的buffer
+- fastcgi_temp_file_write_size 128k; #在写入fastcgi_temp_path时将用多大的数据库，默认值是fastcgi_buffers的两倍，设置上述数值设置小时若负载上来时可能报502Bad Gateway
+- fastcgi_cache gnix; #表示开启FastCGI缓存并为其指定一个名称。开启缓存非常有用，可以有效降低CPU的负载，并且防止502的错误发生，但是开启缓存也可能会引起其他问题，要很据具体情况选择
+- fastcgi_cache_valid 200 302 1h; #用来指定应答代码的缓存时间，实例中的值表示将200和302应答缓存一小时，要和fastcgi_cache配合使用
+- fastcgi_cache_valid 301 1d; #将301应答缓存一天
+- fastcgi_cache_valid any 1m; #将其他应答缓存为1分钟
+- fastcgi_cache_min_uses 1; #请求的数量
+- fastcgi_cache_path #定义缓存的路径
