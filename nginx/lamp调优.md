@@ -287,4 +287,24 @@ b）DSO方式安装。
 ls /usr/local/src/httpd-2.4.27/modules/filters/ |grep mod_deflate
 # vim /etc/httpd/httpd.conf 
 #LoadModule deflate_module modules/mod_deflate.so
+开启此项
+Include /etc/httpd/extra/httpd-default.conf
+
+开始配置压缩功能，在全局模式下配置
+在Listen下配置，粘贴配置
+
+<ifmodule mod_deflate.c>
+   DeflateCompressionLevel 9   
+   SetOutputFilter DEFLATE  
+   DeflateFilterNote Input instream 
+   DeflateFilterNote Output outstream 
+   DeflateFilterNote Ratio ratio  
+   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript   
+</ifmodule>
 ```  
+- DeflateCompressionLevel 9 #压缩等级，越大效率越高，消耗CPU也越高。
+- SetOutputFilter DEFLATE #启用压缩
+- DeflateFilterNote Input instream #声明输入流的byte数量
+- DeflateFilterNote Output outstream #声明输出流的byte数量
+- DeflateFilterNote Ratio ratio #声明压缩的百分比
+
