@@ -547,3 +547,47 @@ MaxRequestsPerChild 1000
 - MinSpareServers 指令设置空闲子进程的最小数量  
 - MaxSpareServers 100 最大空闲进程  
 - MaxRequestsPerChild指令设置每个子进程在其生存期内允许处理的最大请求数量
+
+
+9、apache worker模拟性能优化  
+```
+# vim /etc/httpd/extra/httpd-mpm.conf
+将
+<IfModule mpm_worker_module>
+    StartServers             3
+    MinSpareThreads         75
+    MaxSpareThreads        250
+    ThreadsPerChild         25
+    MaxRequestWorkers      400
+    MaxConnectionsPerChild   0
+</IfModule>
+修改为
+<IfModule mpm_worker_module>
+    StartServers 2
+    MaxRequestWorkers 150000 
+    MinSpareThreads 25 
+    MaxSpareThreads 75 
+    ThreadsPerChild 25 
+    MaxRequestsPerChild 0 
+</IfModule>
+```  
+- StartServers 2 #最初建立的子进程
+- MaxRequestWorkers 150000   # apache同时最多能支持150000个并发访问，超过的要进入队列等待
+- MinSpareThreads 25    #基于整个服务器监视的最小空闲线程数
+- MaxSpareThreads 75    #基于整个服务器监视的最大空闲线程数
+- ThreadsPerChild 25    #每个子进程包含固定的线程数，此参数在worker模式中，是影响最大的参数，最大缺省值是64
+- MaxRequestsPerChild 0    #每个子进程可以支持的请求数，这要设置为0，因为一个进程关闭，所有的线程也都关了。 
+
+生产环境配置实例：
+```
+<IFModule mpm_worker_module>
+StartServers          5
+MaxRequestWorkers     9600
+ServerLimit           64
+MinSpareThreads       25
+MaxSpareThreads       500
+ThreadLimit           200
+ThreadsPerChild       150
+MaxRequestsPerChild   0
+</IFModule>
+```  
