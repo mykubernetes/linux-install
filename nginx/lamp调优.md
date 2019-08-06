@@ -341,6 +341,86 @@ LoadModule expires_module     modules/mod_expires.so
 再次检查是否安装模块
 # /usr/local/apache/bin/apachectl -M |grep expires
  expires_module (shared)
+
+
+缓存的用法有3种，分别问对全局，对目录，对虚拟主机。
+1、对全局
+对全局的配置就是在apache主配置文件httpd.conf的末尾加入如下参数即可
+# vim /etc/httpd/httpd.conf  #在最后添加以下内容：
+<IfModule mod_expires.c>  
+ExpiresActive on
+    ExpiresDefault "access plus 12 month"
+    ExpiresByType text/html "access plus 12 months"
+    ExpiresByType text/css "access plus 12 months"
+    ExpiresByType image/gif "access plus 12 months"
+    ExpiresByType image/jpeg "access plus  12 months"
+    ExpiresByType image/jpg "access plus 12 months"
+    ExpiresByType image/png "access plus 12 months"
+    EXpiresByType application/x-shockwave-flash "access plus 12 months"
+    EXpiresByType application/x-javascript "access plus 12 months"
+ExpiresByType video/x-flv "access plus 12 months"
+</IfModule>
+重启服务：
+# systemctl restart httpd
+
+2、对目录
+对目录的配置就是在apache主配置文件中<Directory></Directory>标签内，最后加入如下参数即可
+# vim /usr/local/apache2.2-xuegod/conf/httpd.conf
+<Directory "/usr/local/apache/htdocs">   
+    <IfModule mod_expires.c>  
+ExpiresActive on
+    ExpiresDefault "access plus 12 month"
+    ExpiresByType text/html "access plus 12 months"
+    ExpiresByType text/css "access plus 12 months"
+    ExpiresByType image/gif "access plus 12 months"
+    ExpiresByType image/jpeg "access plus  12 months"
+    ExpiresByType image/jpg "access plus 12 months"
+    ExpiresByType image/png "access plus 12 months"
+    EXpiresByType application/x-shockwave-flash "access plus 12 months"
+    EXpiresByType application/x-javascript "access plus 12 months"
+ExpiresByType video/x-flv "access plus 12 months"
+</IfModule>
+</Directory>
+
+3、对虚拟主机
+对虚拟主机的配置就是在apache的虚拟主机配置文件httpd-vhost.conf中添加如下参数即可
+# vim /etc/httpd/httpd.conf
+修改：
+DocumentRoot "/usr/local/apache/htdocs"
+改为：
+# DocumentRoot "/usr/local/apache/htdocs"
+
+修改：
+467 # Include /etc/httpd/extra/httpd-vhosts.conf
+改为：
+Include /etc/httpd/extra/httpd-vhosts.conf
+
+# vim /etc/httpd/extra/httpd-vhosts.conf
+<VirtualHost *:80>
+    ServerAdmin 888@qq.com
+    DocumentRoot "/www/html"
+    ServerName www.xuegod.cn
+    ServerAlias xuegod.cn
+    ErrorLog "logs/dummy-host.example.com-error_log"
+    CustomLog "logs/dummy-host.example.com-access_log" common
+<Directory "/www/html">
+        Options None
+        Require all granted
+  </Directory>
+<IfModule mod_expires.c>  
+ExpiresActive on
+    ExpiresDefault "access plus 12 month"
+    ExpiresByType text/html "access plus 12 months"
+    ExpiresByType text/css "access plus 12 months"
+    ExpiresByType image/gif "access plus 12 months"
+    ExpiresByType image/jpeg "access plus  12 months"
+    ExpiresByType image/jpg "access plus 12 months"
+    ExpiresByType image/png "access plus 12 months"
+    EXpiresByType application/x-shockwave-flash "access plus 12 months"
+    EXpiresByType application/x-javascript "access plus 12 months"
+ExpiresByType video/x-flv "access plus 12 months"
+</IfModule>
+</VirtualHost>
 ```  
 
 
