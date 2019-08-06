@@ -542,9 +542,8 @@ MaxRequestsPerChild 1000
 #systemctl restart httpd
 ```  
 - ServerLimit 是最大的进程数  
-- MaxRequestWorkers 是最大的请求并发。  
-注：所以他们的关系是MaxRequestWorkers=ServerLimit*进程的线程数。因为，在prefork模式下一个进程只有一个线程，并且一个进程对应一个连接。  
-所以这里配置成：MaxRequestWorkers=ServerLimit，MaxRequestWorkers不得大于ServerLimit参数。  
-如果做5000并发的web，需要多少内存？   5000*2M/0.8/1024(转G)=12.2G 。  服务器大概需要14G -16G 内存。  
-ServerLimit的大小，取决于你系统的资源，每个apache进程默认大约占用2M内存，基本可以按照这个公式来计算：最大内存*80%/2M=ServerLimit。  
-
+- MaxRequestWorkers 是最大的请求并发。    
+- StartServers 50 启动时默认启动的 进程数
+- MinSpareServers 指令设置空闲子进程的最小数量  
+- MaxSpareServers 100 最大空闲进程  
+- MaxRequestsPerChild指令设置每个子进程在其生存期内允许处理的最大请求数量
