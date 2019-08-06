@@ -54,6 +54,18 @@ nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful
 # /usr/local/nginx/sbin/nginx
 # netstat -antup|grep nginx
 tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      3988/nginx: master 
+
+测试版本是否修改
+# curl  -I  192.168.101.70
+HTTP/1.1 200 OK
+Server: web/8.8.8          # 以修改成功
+Date: Tue, 06 Aug 2019 06:42:13 GMT
+Content-Type: text/html
+Content-Length: 612
+Last-Modified: Tue, 06 Aug 2019 06:40:10 GMT
+Connection: keep-alive
+ETag: "5d4920ca-264"
+Accept-Ranges: bytes
 ```  
 - --with-http_dav_module          #启用支持（增加PUT,DELETE,MKCOL：创建集合，COPY和MOVE方法）默认关闭，需要编译开启
 - --with-http_stub_status_module  #启用支持（获取Nginx上次启动以来的工作状态）
