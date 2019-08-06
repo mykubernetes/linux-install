@@ -94,3 +94,84 @@ Connection: keep-alive
 ETag: "5d4920ca-264"
 Accept-Ranges: bytes
 ```  
+
+3、修改nginx运行用户  
+```
+创建没家目录，非登录用户
+# useradd -M -s /sbin/nologin nginx
+
+查看现有用户
+# ps -aux | grep nginx
+root       6639  0.0  0.0  20740  1364 ?        Ss   02:42   0:00 nginx: master process /usr/local/nginx/sbinnginx
+nobody     6645  0.0  0.1  21172  1688 ?        S    02:45   0:00 nginx: worker process
+root       6698  0.0  0.0 112712   988 pts/0    S+   02:54   0:00 grep --color=auto nginx
+
+修改启动用户
+# vim /usr/local/nginx/conf/nginx.conf
+user  nginx;
+
+重新加载配置
+# /usr/local/nginx/sbin/nginx -s reload
+
+# ps -aux | grep nginx
+root       6639  0.0  0.0  20644  1404 ?        Ss   02:42   0:00 nginx: master process /usr/local/nginx/sbinnginx
+nginx      6701  0.0  0.0  21072  1364 ?        S    02:55   0:00 nginx: worker process
+```  
+
+4、Nginx运行进程个数  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+将
+worker_processes  1;
+修改为
+worker_processes  4;
+
+重新加载配置
+# /usr/local/nginx/sbin/nginx -s reload
+
+查看nginx启动进程各数，发现启动了四个，之前是一个
+# ps -aux | grep nginx
+root       6639  0.0  0.0  20644  1408 ?        Ss   02:42   0:00 nginx: master process /usr/local/nginx/sbinnginx
+nginx      6707  0.0  0.0  21076  1460 ?        S    02:58   0:00 nginx: worker process
+nginx      6708  0.0  0.0  21076  1460 ?        S    02:58   0:00 nginx: worker process
+nginx      6709  0.0  0.0  21076  1460 ?        S    02:58   0:00 nginx: worker process
+nginx      6710  0.0  0.0  21076  1460 ?        S    02:58   0:00 nginx: worker process
+```  
+
+5、Nginx运行CPU亲和力  
+```
+查看cpu各数
+# cat /proc/cpuinfo
+# top 安1 查看
+
+# vim /usr/local/nginx/conf/nginx.conf
+4核4线程配置
+worker_processes  4;
+worker_cpu_affinity 0001 0010 0100 1000;
+
+8核8线程配置
+4  worker_processes  8;
+5  worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;
+
+如果是4线程的CPU，我只想跑两个进程
+worker_processes  2;
+worker_cpu_affinity 0101 1010;
+```  
+
+6、Nginx事件处理模型  
+```
+events {
+    use epoll;
+    worker_connections  1024;
+}
+```  
+select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一种机制，可以监视多个描述符，一旦某个描述符就绪（一般是读就绪或者写就绪），能够通知程序进行相应的读写操作。  
+Epoll 在Linux2.6内核中正式引入，和select相似，其实都I/O多路复用技术。  
+epoll优势：  
+1、Epoll没有最大并发连接的限制，上限是最大可以打开文件的数目，这个数字一般远大于2048, 一般来说这个数目和系统内存关系很大，具体数目可以cat /proc/sys/fs/file-max查看。  
+```
+# cat /proc/sys/fs/file-max
+148218
+```  
+2、 效率提升，Epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此在实际的网络环境中，Epoll的效率就会远远高于select和poll。  
+3、 内存拷贝，Epoll在这点上使用了“共享内存”，这个内存拷贝也省略了  
