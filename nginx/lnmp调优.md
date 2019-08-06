@@ -158,8 +158,15 @@ worker_processes  2;
 worker_cpu_affinity 0101 1010;
 ```  
 
-6、Nginx事件处理模型  
+6、Nginx最多可以打开文件数
 ```
+# vim /usr/local/nginx/conf/nginx.conf
+worker_rlimit_nofile 102400;
+```  
+
+7、Nginx事件处理模型  
+```
+# vim /usr/local/nginx/conf/nginx.conf
 events {
     use epoll;
     worker_connections  1024;
@@ -168,10 +175,20 @@ events {
 select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一种机制，可以监视多个描述符，一旦某个描述符就绪（一般是读就绪或者写就绪），能够通知程序进行相应的读写操作。  
 Epoll 在Linux2.6内核中正式引入，和select相似，其实都I/O多路复用技术。  
 epoll优势：  
-1、Epoll没有最大并发连接的限制，上限是最大可以打开文件的数目，这个数字一般远大于2048, 一般来说这个数目和系统内存关系很大，具体数目可以cat /proc/sys/fs/file-max查看。  
+1)Epoll没有最大并发连接的限制，上限是最大可以打开文件的数目，这个数字一般远大于2048, 一般来说这个数目和系统内存关系很大，具体数目可以cat /proc/sys/fs/file-max查看。  
 ```
 # cat /proc/sys/fs/file-max
 148218
 ```  
-2、 效率提升，Epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此在实际的网络环境中，Epoll的效率就会远远高于select和poll。  
-3、 内存拷贝，Epoll在这点上使用了“共享内存”，这个内存拷贝也省略了  
+2)效率提升，Epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此在实际的网络环境中，Epoll的效率就会远远高于select和poll。  
+3)内存拷贝，Epoll在这点上使用了“共享内存”，这个内存拷贝也省略了  
+
+8、单个进程允许客户端最大并发连接数  
+这个数值一般根据服务器性能和内存来制定，也就是单个进程最大连接数，实际最大并发值就是work进程数乘以这个数。  
+可以根据设置一个进程启动所占内存，top -u nginx，但是实际我们填入一个102400，足够了，这些都算并发值，一个网站的并发达到这么大的数量，也算一个大站了！  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+events {
+    worker_connections  102400;
+}
+```  
