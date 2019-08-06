@@ -243,7 +243,6 @@ mod_deflate模块检查及安装
 
 
 # /usr/local/apache/bin/apachectl -M 
-AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 192.168.101.71. Set the 'ServerName' directive globally to suppress this message
 Loaded Modules:
  core_module (static)
  so_module (static)
@@ -316,3 +315,32 @@ Include /etc/httpd/extra/httpd-default.conf
 扩展：AddOutputFilterByTypeDEFLATE后跟的所有的压缩文件类型，后期可以参照选择。
 text/plain text/html text/php text/xml text/css text/javascript
 application/xhtml+xml application/xml application/rss+xml application/atom_xml application/x-javascript application/x-httpd-php image/svg+xml image/gif image/png  image/jpe image/swf image/jpeg image/bmp
+
+
+
+5、mod_expires 设置网页缓存时间  
+```
+mod_expires模块检查及安装
+# /usr/local/apache/bin/apachectl -M |grep expires
+
+a）编译方式安装
+编译的时候跟上--enable-expires即可实现安装
+
+b）DSO方式安装，编译后，免编译安装模块
+# cd /usr/local/src/httpd-2.4.27/modules/metadata/  #切到apache源码包mod_expires所在的目录下
+# ls mod_expires.c 
+以dso的方式编译安装到apache中
+# /usr/local/apache/bin/apxs -c -i -a /usr/local/src/httpd-2.4.10/modules/metadata/mod_expires.c
+
+# vim /etc/httpd/conf/httpd.conf
+LoadModule expires_module     modules/mod_expires.so
+
+重新加载配置
+# systemctl restart httpd
+
+再次检查是否安装模块
+# /usr/local/apache/bin/apachectl -M |grep expires
+ expires_module (shared)
+```  
+
+
