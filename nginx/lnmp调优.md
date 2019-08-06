@@ -500,5 +500,88 @@ location ~ ^/images/.*\.(php|php5|.sh|.py|.pl)$ {
 ```  
 
 19、来源访问控制  
+这个需要ngx_http_access_module模块支持，不过，默认会安装  
+```
+# vim /usr/local/nginx/conf/nginx.conf		//写法类似Apache
+        location ~ ^/(gray)/ {
+        allow 192.168.1.0/24;
+        deny all;
+        }
 
 
+针对整个网站的写法，对/限制就OK
+  location / {
+        allow 192.168.1.0/24;
+        deny all;
+        }
+	
+也可以通过if语句控制，给以友好的错误提示
+        if ( $remote_addr = 192.168.1.38 ) {
+        return 404;
+        }
+```  
+
+20、IP和301优化  
+有时候，我们发现访问网站的时候，使用IP也是可以得，我们可以把这一层给屏蔽掉，让其直接反馈给403,也可以做跳转  
+```
+跳转的做法：
+server {
+        listen 80 default_server;
+        server_name        localhost;
+        rewrite ^ http://www.baidu.com$request_uri?;
+}
+
+403反馈的做法
+server {
+        listen 80 default_server;
+        server_name     localhost;
+        return 403；
+}
+
+301跳转的做法，如我们域名一般在解析的过程中，a.com一般会跳转到www.a.com
+server {
+    listen       80;
+    root        /usr/share/nginx/html/;
+    server_name  www.a.com a.com;
+                if ($host = 'a.com' ) {
+                        rewrite ^/(.*)$ http://www.a.com/$1 permanent;
+}
+```  
+
+21、错误页面的提示
+```
+对于自定义的错误页面，我们只需要将errorpage写入到配置文件
+server {
+ error_page   404  /404.html;
+}
+```  
+
+22、内部身份验证  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+location /ganglia/ {
+                auth_basic "ganglia_auth";
+                auth_basic_user_file /usr/local/nginx/conf/passwd;
+        }
+
+
+用户创建，如果没有htpasswd命令，需要手动安装httpd-tools程序包  
+# yum install httpd-tools
+# htpasswd -cb /usr/local/nginx/conf/passwd aaa 123
+# chmod 400 /usr/local/nginx/conf/passwd 
+# chown nginx /usr/local/nginx/conf/passwd
+# /usr/local/nginx/sbin/nginx -s reload
+```  
+
+23、防止DDOS攻击  
+通过使用limit_conn_zone进行控制单个IP或者域名的访问次数  
+```
+# vim /usr/local/nginx/conf/nginx.conf
+http字段中配置
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+server的location字段配置
+    location / {
+            root   html;
+            limit_conn addr 1;
+```  
