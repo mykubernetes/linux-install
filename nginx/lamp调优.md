@@ -207,3 +207,84 @@ total 4
 4 -rw-r--r--. 1 root root    6 Aug  5 22:29 /usr/local/apache/logs/httpd.pid
 注：由于apache日志的记录是由apache的主进程进行操作的，而apache的主进程又是root用户启动的，所以这样不影响日志的输出。这也是日志记录的最安全的方法。
 ```  
+
+4、设置错误页面-开启压缩和缓存功能
+```
+1、错误页面优雅化显示的实现方式主要有两种,下面我们主要以404错误为例：
+方法：
+# vim /etc/httpd/httpd.conf
+# 在http工作目录内添加
+<Directory "/usr/local/apache/htdocs">
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+    ErrorDocument 404 /404.html         #添加此行
+</Directory>
+
+追加404错误页面，跳转页面
+# echo "404 go to home" > /usr/local/apache/htdocs/404.html
+重启后访问web不存在页面测试
+# systemctl restart httpd
+# curl 192.168.101.71/123
+404 go to home
+
+总结：ErrorDocument的命令格式如下：
+ErrorDocument 错误代码 跳转到的页面或文件
+另外这里需要注意，你若设置跳转到文件，必须要有这个文件才行。另外文件必须在站点目录内，不然会报错。
+在跳转到文件的测试中，用全路径和别名路径进行测试，当把404错误页面跳转文件放到其他目录的时候，不报错，但是页面跳转不过去。
+
+
+
+2、启用压缩模块mod_deflate
+apache的压缩要用到mod_deflate模块，该模块提供了DEFLATE输出过滤器，允许服务器在将输出内容发送到客户端以前进行压缩，以节约带宽。它的核心思想就是把文件先在服务器进行压缩，然后再进行传输，这样可以显著减少文件传输的大小。当传输完毕后，客户端浏览器会重新对压缩过的内容进行解压缩。如果没特殊情况的话，所有的文本内容都应该能被gzip压缩，例如：html（php），js，css，xml，txt等。
+
+mod_deflate模块检查及安装
+# /usr/local/apache/bin/apachectl -M | grep deflate
+
+
+# /usr/local/apache/bin/apachectl -M 
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 192.168.101.71. Set the 'ServerName' directive globally to suppress this message
+Loaded Modules:
+ core_module (static)
+ so_module (static)
+ http_module (static)             #(static)弹出此种结果，则为编译安装时装的
+ authn_file_module (shared)
+ authn_core_module (shared)
+ authz_host_module (shared)       #(shared)弹出此种结果，则为DSO方式安装的
+ authz_groupfile_module (shared)
+ authz_user_module (shared)
+ authz_core_module (shared)
+ access_compat_module (shared)
+ auth_basic_module (shared)
+ reqtimeout_module (shared)
+ filter_module (shared)
+ mime_module (shared)
+ log_config_module (shared)
+ env_module (shared)
+ headers_module (shared)
+ setenvif_module (shared)
+ version_module (shared)
+ mpm_event_module (shared)
+ unixd_module (shared)
+ status_module (shared)
+ autoindex_module (shared)
+ dir_module (shared)
+ alias_module (shared)
+ 
+ 
+ 如果安装了，就可以直接进行压缩配置了，如果没有安装，下面为安装方法
+a）编译时安装方法
+编译的时候跟上--enable-deflate即可实现安装
+b）DSO方式安装。
+扩展：DSO： Dynamic shared object动态共享对象 。DSO模块可以在编译服务器之后编译，也可以用Apache扩展工具(apxs)编译并增加
+使用DSO方式安装，/usr/local/apache/bin/apxs后跟的参数详解
+-c  此选项表明需要执行编译操作。
+-i  此选项表示需要执行安装操作，以安装一个或多个动态共享对象到服务器的modules目录。
+-a  此选项自动增加一个LoadModule行到httpd.conf文件中，以激活此模块，或者，如果此行已经存在，则启用之。
+
+开启模块,取消注释
+查看该路径下是否有压缩模块，有直接开启
+ls /usr/local/src/httpd-2.4.27/modules/filters/ |grep mod_deflate
+# vim /etc/httpd/httpd.conf 
+#LoadModule deflate_module modules/mod_deflate.so
+```  
