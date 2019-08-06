@@ -191,4 +191,19 @@ epoll优势：
 events {
     worker_connections  102400;
 }
+
+
+
+# top -u nginx
+top - 03:15:38 up  1:57,  1 user,  load average: 0.00, 0.01, 0.05
+Tasks: 104 total,   1 running, 103 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.2 sy,  0.0 ni, 99.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1530152 total,   716104 free,   114144 used,   699904 buff/cache
+KiB Swap:  2097148 total,  2097148 free,        0 used.  1203568 avail Mem 
+
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                 
+  6740 nginx     20   0   21076   1460    524 S   0.0  0.1   0:00.00 nginx                                   
+  6741 nginx     20   0   21076   1460    524 S   0.0  0.1   0:00.00 nginx
+
+RES为占用内存的大小，约14M左右
 ```  
