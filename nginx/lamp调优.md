@@ -302,7 +302,7 @@ Include /etc/httpd/extra/httpd-default.conf
    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript   
 </ifmodule>
 ```  
-- DeflateCompressionLevel 9 #压缩等级，越大效率越高，消耗CPU也越高。
+- DeflateCompressionLevel 9 #压缩等级，越大效率越高，消耗CPU也越高。预设可以采用 6 这个数值，以维持耗用处理器效能与网页压缩质量的平衡。
 - SetOutputFilter DEFLATE #启用压缩
 - DeflateFilterNote Input instream #声明输入流的byte数量
 - DeflateFilterNote Output outstream #声明输出流的byte数量
