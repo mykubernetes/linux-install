@@ -307,14 +307,14 @@ Include /etc/httpd/extra/httpd-default.conf
 - DeflateFilterNote Output outstream #声明输出流的byte数量
 - DeflateFilterNote Ratio ratio #声明压缩的百分比
 
-1、如果是虚拟主机，需要在<VirtualHost*:80></VirtualHost>中添加配置即可实现压缩
-2、图片和视频本身就是压缩格式，一般不需要压缩的。有些小图片和视频压缩后还会变大。
+1、如果是虚拟主机，需要在<VirtualHost*:80></VirtualHost>中添加配置即可实现压缩  
+2、图片和视频本身就是压缩格式，一般不需要压缩的。有些小图片和视频压缩后还会变大。  
 
-总结：我们在企业生产环境中时，在启用mod_deflate时，一定要注意，对于太小的文件和某些格式的图片不要对它们进行压缩，有可能越压越大。
+总结：我们在企业生产环境中时，在启用mod_deflate时，一定要注意，对于太小的文件和某些格式的图片不要对它们进行压缩，有可能越压越大。  
 
-扩展：AddOutputFilterByTypeDEFLATE后跟的所有的压缩文件类型，后期可以参照选择。
-text/plain text/html text/php text/xml text/css text/javascript
-application/xhtml+xml application/xml application/rss+xml application/atom_xml application/x-javascript application/x-httpd-php image/svg+xml image/gif image/png  image/jpe image/swf image/jpeg image/bmp
+扩展：AddOutputFilterByTypeDEFLATE后跟的所有的压缩文件类型，后期可以参照选择。  
+text/plain text/html text/php text/xml text/css text/javascript  
+application/xhtml+xml application/xml application/rss+xml application/atom_xml application/x-javascript application/x-httpd-php image/svg+xml image/gif image/png  image/jpe image/swf image/jpeg image/bmp  
 
 
 
