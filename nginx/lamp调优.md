@@ -422,5 +422,33 @@ ExpiresByType video/x-flv "access plus 12 months"
 </IfModule>
 </VirtualHost>
 ```  
+扩展：expires模块的语法  
+expires模块用到了ExpiresDefault和EXpiresByType两个指令，下面是这两个指令的语法。  
+ExpiresDefault “<base> [plus] {<num><type>}*”  
+EXpiresByType type/encoding "<base> [plus] {<num><type>}"  
+其中<base>的参数有3个：access，now（等价于‘access’），modification  
+modification   [ˌmɒdɪfɪˈkeɪʃn]  改性，修正  
+plus关键字是可选的  
+plus [plʌs]  加上  
+<num>必须是整数，确保可以atoi（）所接收。（atoi可以把字符串转换成长整型数）  
+<type>参数类型：years，months，weeks，days，hours，minutes，seconds  
+
+
+6、开启长连接功能  
+```
+# vim /etc/httpd/httpd.conf
+改： #Include /etc/httpd/extra/httpd-default.conf
+为：Include /etc/httpd/extra/httpd-default.conf
+# vim /etc/httpd/extra/httpd-default.conf
+修改：
+KeepAlive On 
+KeepAliveTimeout 5
+```  
+
+- MaxKeepAliveRequests  
+默认：100  
+一个建立好的Keep-Alive连接，允许发送的请求的个数。一旦建立连接，要么就是个数达到了断开，要么就是等KeepAliveTimeout时间到了断开连接。  
+MaxKeepAliveRequests指令限制了当启用KeepAlive时，每个连接允许的请求数量。如果将此值设为"0"，将不限制请求的数目。我们建议最好将此值设为一个比较大的值，以确保最优的服务器性能。"  
+这个数字的设置，必须考虑在一个时间段内，同一个用户访问你的服务会发多少请求。要结合KeepAliveTimeout参数来考虑。  
 
 
