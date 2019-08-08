@@ -36,7 +36,6 @@ systemctl status target.service
 ```  
 
 3)进入targetcli  
-a)
 ```
 # targetcli
 targetcli shell version 2.1.fb34
