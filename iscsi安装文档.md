@@ -101,7 +101,6 @@ set attribute authentication=0
 initiator配置  
 一、安装客户端  
 ```
-```
 yum install –y iscsi-initiator-utils-devel
 ```  
 
