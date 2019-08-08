@@ -33,7 +33,7 @@ Haproxy配置
 # cat /etc/haproxy/haproxy.cfg
 global
       maxconn     5000
-      nbproc      16
+      nbproc      16            #工作进程数量(CPU数量) ，实际工作中，应该设置成和CPU核心数一样。 这样可以发挥出最大的性能。
       cpu-map   1    0
       cpu-map   2    1
       cpu-map   3    2
@@ -50,22 +50,22 @@ global
       cpu-map   14   13
       cpu-map   15   14
       cpu-map   16   15
-      daemon
+      daemon                    #以后台形式运行haproxy
       ssl-default-bind-options no-sslv3
       ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
-      log         127.0.0.1    local0
+      log         127.0.0.1    local0        #日志文件的输出定向。系统中local1-7，用户自己定义
       tune.ssl.default-dh-param 2048
        
 
 defaults
-      mode        http
-      option      httplog
+      mode        http                #工作模式，所处理的类别,默认采用http模式，可配置成tcp作4层消息转发
+      option      httplog             #日志类别，记载http日志
       log         global
       option      forceclose
-      timeout connect 60000ms
-      timeout client  60000ms
-      timeout server  60000ms
-      #maxconn 50000
+      timeout connect 60000ms         #连接超时时间。 单位：ms 毫秒
+      timeout client  60000ms         #客户端连接超时时间
+      timeout server  60000ms         #服务器端连接超时时间
+      #maxconn 50000                  #最大连接数
       #crt-base /etc/haproxy
 
 listen admin_status
@@ -79,8 +79,8 @@ listen admin_status
       stats auth admin:admin             #开启认证
       stats admin if TRUE                #启用管理功能，如果认证成功就开启
 
-frontend api_http
-      bind 192.169.101.69:80
+frontend api_http                        #前端配置，http名称可自定义
+      bind 192.169.101.69:80             #发起http请求80端口，会被转发到设置的ip及端口
 #      bind *:80
       backlog 8192
       reqadd X-Forwarded-Proto:\ http
@@ -88,9 +88,9 @@ frontend api_http
 #      acl is_post method POST
 #      acl is_put method PUT
 #      use_backend local_api if is_put or is_post
-      default_backend api_backend
+      default_backend api_backend       #转发到后端 写上后端名称
 
-      option forwardfor
+      option forwardfor                 #如果后端服务器需要获得客户端真实ip需要配置的参数，可以从Http Header中获得客户端ip
       option logasap
       option dontlognull
       log-format %ST\ %ts\ [%t]\ %ci:%cp\ %ft/%b/%s\ %Tq/%Tw/%Tc/%Tr/%Tt\ %ac/%fc/%bc/%sc/%rc\ %sq/%bq\ %B\ %hr\ %hs\ %{+Q}r
@@ -115,14 +115,14 @@ frontend api_https
       capture request header Content-Length len 60
       capture request  header Host len 40
 
-backend api_backend
+backend api_backend                    #后端配置，名称上下关联
       option allbackups
       mode        http
       hash-type   consistent
       balance     roundrobin
       #option      forwardfor
       server localhost  localhost:8080 check inter 1s rise 2 fall 5 
-      server node001  node001:8080 check inter 1s rise 2 fall 5 backup
+      server node001  node001:8080 check inter 1s rise 2 fall 5 backup         #后端的主机 
       server node002  node002:8080 check inter 1s rise 2 fall 5 backup 
       server node003  node003:8080 check inter 1s rise 2 fall 5 backup
       server node004  node004:8080 check inter 1s rise 2 fall 5 backup
