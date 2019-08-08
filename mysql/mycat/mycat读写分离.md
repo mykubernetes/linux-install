@@ -87,6 +87,7 @@ INSERT INTO member(mid,name,age,salary,birthday,note) VALUES ('guest','administr
 wget http://dl.mycat.io/1.6-RELEASE/Mycat-server-1.6-RELEASE-20161028204710-linux.tar.gz
 tar xvf Mycat-server-1.6-RELEASE-20161028204710-linux.tar.gz
 cd mycat
+mkdir logs
 ```  
 
 8、配置mycat  
