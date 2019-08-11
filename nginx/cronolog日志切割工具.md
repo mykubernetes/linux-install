@@ -3,7 +3,8 @@
 ```
 # vim /usr/local/apache2/conf/httpd.conf
 将默认日志： CustomLog "logs/access_log" combined
-修改为：CustomLog "|/usr/local/sbin/cronolog /log/www/access_%Y%m%d.log"combined 即可。其中%Y%m%d为日志文件分割方式，即为“年月日”。
+修改为：CustomLog "|/usr/sbin/cronolog logs/access_%Y-%m-%d.log"combined 即可。其中%Y%m%d为日志文件分割方式，即为"年月日"。
+ErrorLog "|/usr/sbin/cronolog logs/error_%Y-%m-%d.log"  错误日志
 ```
 
 2、nginx结合cronolog日志切割  
@@ -13,7 +14,7 @@
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
                       
-    access_log    "pipe:/usr/local/sbin/cronolog /var/log/nginx/%Y-%m-%d-H-access.log"  main;
+    access_log    "pipe:/usr/sbin/cronolog /var/log/nginx/%Y-%m-%d-H-access.log"  main;
 ```  
 
 
@@ -36,7 +37,7 @@
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start 2>&1\           #修改下边两行
-      | /usr/local/sbin/cronolog "$CATALINA_BASE"/logs/catalina.%Y-%m-%d.out >> /dev/null &
+      | /usr/sbin/cronolog "$CATALINA_BASE"/logs/catalina.%Y-%m-%d.out >> /dev/null &
  
   else
     eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
@@ -45,7 +46,7 @@
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start 2>&1\           #修改下边两行
-      | /usr/local/sbin/cronolog "$CATALINA_BASE"/logs/catalina.%Y-%m-%d.out >> /dev/null &
+      | /usr/sbin/cronolog "$CATALINA_BASE"/logs/catalina.%Y-%m-%d.out >> /dev/null &
  
   fi
  ```  
