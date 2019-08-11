@@ -97,9 +97,12 @@ Chrome/74.0.3729.169 Safari/537.36","Forward_Real_WebServer":"192.168.1.50"
 - $bytes_sent # 发送给客户端的字节数
 - $body_bytes_sent # 发送给客户端的响应体字节数
 - $connection_requests # 单个连接的并发请求数
-- $http_referer # 记录请求引用页面地址
+- $http_referer # url跳转来源
 - $http_user_agent # 记录用户代理信息（通常是浏览器信息
 - $http_x_forwarded_for # 当为了承受更大的负载使用反向代理时，web服务器不能获取真实的客户端IP，$remote_addr获取到的是反向代理服务器的ip，这种情况下，代理服务器通常会增加一个叫做x_forwarded_for的信息头，把连接它的真实客户端IP加到这个信息头里，这样就能保证网站的web服务器能获取到真实IP，获取不到则显示为 -
 - $connection # 连接序列号
 - $msec # 写入日志的时间（以秒为单位，携带毫秒的解决方案）
 - $pipe # 如果为管道请求则显示为p，否则显示为 .
+- $http_host # 请求地址，即浏览器中你输入的地址（IP或域名）格式www.tom.com/192.168.101.71
+- $upstream_addr # 后台upstream的地址，即真正提供服务的主机地址
+- $upstream_status # upstream状态
