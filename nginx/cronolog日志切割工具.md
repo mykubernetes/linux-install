@@ -13,7 +13,7 @@
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
                       
-    access_log    "pipe:/usr/local/sbin/cronolog /data/nginx/logs/%Y-%m-%d-H-access.log"  main;
+    access_log    "pipe:/usr/local/sbin/cronolog /var/log/nginx/%Y-%m-%d-H-access.log"  main;
 ```  
 
 
