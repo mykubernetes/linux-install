@@ -106,3 +106,6 @@ Chrome/74.0.3729.169 Safari/537.36","Forward_Real_WebServer":"192.168.1.50"
 - $http_host # 请求地址，即浏览器中你输入的地址（IP或域名）格式www.tom.com/192.168.101.71
 - $upstream_addr # 后台upstream的地址，即真正提供服务的主机地址
 - $upstream_status # upstream状态
+
+阿里官方提供日志格式
+https://help.aliyun.com/document_detail/28988.html?spm=a2c4g.11186623.6.744.68af49falEJ4wI
