@@ -9,12 +9,15 @@
 2、nginx结合cronolog日志切割  
 ```
 # vim /etc/nginx/nginx.conf
-access_log    "pipe:/usr/local/sbin/cronolog /data/nginx/logs/%Y-%m-%d-H-access.log"  proxyformat;
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+                      
+    access_log    "pipe:/usr/local/sbin/cronolog /data/nginx/logs/%Y-%m-%d-H-access.log"  main;
 ```  
 
 
-
-3、tomcat结合cronolog日志切割
+3、tomcat结合cronolog日志切割  
 修改Tomcat下bin/catalina.sh文件  
 ```
 修改为：
