@@ -7,7 +7,7 @@
 ErrorLog "|/usr/sbin/cronolog logs/error_%Y-%m-%d.log"  错误日志
 ```
 
-2、nginx结合cronolog日志切割  
+2、tengine结合cronolog日志切割  
 ```
 # vim /etc/nginx/nginx.conf
 error_log "pipe:/usr/sbin/cronolog /var/log/nginx/%Y-%m-%d-error.log" error;
