@@ -10,11 +10,8 @@ ErrorLog "|/usr/sbin/cronolog logs/error_%Y-%m-%d.log"  错误日志
 2、nginx结合cronolog日志切割  
 ```
 # vim /etc/nginx/nginx.conf
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
-                      
-    access_log    "pipe:/usr/sbin/cronolog /var/log/nginx/%Y-%m-%d-H-access.log"  main;
+error_log "pipe:/usr/sbin/cronolog /var/log/nginx/%Y-%m-%d-error.log" error;
+access_log "pipe:/usr/sbin/cronolog /var/log/nginx/%Y-%m-%d-%H-access.log" main;
 ```  
 
 
