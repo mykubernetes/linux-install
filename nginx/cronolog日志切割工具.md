@@ -15,12 +15,13 @@ ErrorLog "|/usr/sbin/cronolog logs/error_%Y-%m-%d.log"  错误日志
 2、nginx结合cronolog切割日志  
 ```
 创建命名管道，将日志写入管道文件
+mkdir -p /etc/nginx/log/workspace/
 mkfifo /etc/nginx/log/workspace/access.log
 mkfifo /etc/nginx/log/workspace/error.log
 修改nginx配置
 vi /etc/nginx/nginx.conf
 将 access_log 和 error_log 更改为管道文件路径                 
-access_log /etc/nginx/log/workspace/access.log;
+access_log /etc/nginx/log/workspace/access.log main;
 error_log /etc/nginx/log/workspace/error.log;
                        
 测试nginx配置文件 nginx -t -c /etc/nginx/nginx.conf
