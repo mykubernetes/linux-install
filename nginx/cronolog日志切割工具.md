@@ -1,3 +1,8 @@
+安装  
+```
+# yum install epel-release -y
+# yum install -y cronolog
+```  
 
 1、apache结合cronolog日志切割  
 ```
