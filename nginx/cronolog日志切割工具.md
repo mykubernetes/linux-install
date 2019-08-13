@@ -7,8 +7,28 @@
 ErrorLog "|/usr/sbin/cronolog logs/error_%Y-%m-%d.log"  错误日志
 ```
 
+2、nginx结合cronolog切割日志  
+```
+创建命名管道，将日志写入管道文件
+mkfifo /etc/nginx/log/workspace/access.log
+mkfifo /etc/nginx/log/workspace/error.log
+修改nginx配置
+vi /etc/nginx/nginx.conf
+将 access_log 和 error_log 更改为管道文件路径                 
+access_log /etc/nginx/log/workspace/access.log;
+error_log /etc/nginx/log/workspace/error.log;
+                       
+测试nginx配置文件 nginx -t -c /etc/nginx/nginx.conf
+                       
+配置cronolog
+nohup cat /etc/nginx/log/workspace/access.log | /usr/sbin/cronolog /etc/nginx/log/access_%Y-%m-%d.log &
+nohup cat /etc/nginx/log/workspace/error.log | /usr/sbin/cronolog /etc/nginx/log/error_%Y-%m-%d.log &
+重启nginx
+systemctl restart nginx
+注意:要先启动cronolog，再启动nginx。 
+```  
 
-2、tengine结合cronolog日志切割  
+3、tengine结合cronolog日志切割  
 ```
 # vim /etc/nginx/nginx.conf
 error_log "pipe:/usr/sbin/cronolog /var/log/nginx/%Y-%m-%d-error.log" error;
@@ -16,7 +36,7 @@ access_log "pipe:/usr/sbin/cronolog /var/log/nginx/%Y-%m-%d-%H-access.log" main;
 ```  
 
 
-3、tomcat结合cronolog日志切割  
+4、tomcat结合cronolog日志切割  
 修改Tomcat下bin/catalina.sh文件  
 ```
 修改为：
@@ -50,7 +70,7 @@ access_log "pipe:/usr/sbin/cronolog /var/log/nginx/%Y-%m-%d-%H-access.log" main;
  ```  
  
  
-4、删除30天以上的日志  
+5、删除30天以上的日志  
 ```
 # vim del-30-days-ago-logs.sh
 find /opt/soft/log/ -mtime +30 -name "*.log" -exec rm -rf {} \;
