@@ -163,3 +163,14 @@ Logout of [sid: 1, target: iqn.2019-08.cn.node03.www:target_san1, portal: 192.16
 ls: cannot access /dev/sdb: No such file or directory
 ```  
 
+10、重新加载之前的硬盘  
+```
+# iscsiadm -m node -T iqn.2019-08.cn.node03.www:target_san1 -l
+Logging in to [iface: default, target: iqn.2019-08.cn.node03.www:target_san1, portal: 192.168.101.68,3260] (multiple)
+Login to [iface: default, target: iqn.2019-08.cn.node03.www:target_san1, portal: 192.168.101.68,3260] successful.
+
+#查看是否加载成功
+# ls /dev/sdb
+/dev/sdb
+```  
+
