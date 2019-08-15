@@ -4,7 +4,7 @@ Target端配置
 一、检查操作系统是否加载iscsi模块。内核版本要求linux 2.6.38以上。  
 ```
 uname -r
-lismod |grep iscsi
+lsmod |grep iscsi
 ```
 
 二、安装targetcli  
