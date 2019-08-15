@@ -145,3 +145,21 @@ Target 1: iqn.2019-08.cn.node03.www:target_san1
 # ll /dev/sdb
 brw-rw----. 1 root disk 8, 16 Mar 22 05:47 /dev/sdb
 ```  
+
+8、关闭过程  
+```
+# systemctl stop iscsi 
+# systemctl stop iscsid 
+```  
+
+9、卸载硬盘  
+```
+# iscsiadm -m node -T iqn.2019-08.cn.node03.www:target_san1 -u
+Logging out of session [sid: 1, target: iqn.2019-08.cn.node03.www:target_san1, portal: 192.168.101.68,3260]
+Logout of [sid: 1, target: iqn.2019-08.cn.node03.www:target_san1, portal: 192.168.101.68,3260] successful.
+
+#查看是否卸载
+# ls /dev/sdb
+ls: cannot access /dev/sdb: No such file or directory
+```  
+
