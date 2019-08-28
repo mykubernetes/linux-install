@@ -1,0 +1,245 @@
+#!/bin/bash
+#date: 2018-11-06
+#已完成
+#1.检查是否存在空密码的帐户。
+#2.检查除root之外的UID为0的用户。
+#3.检查是否设置口令生存周期、最小长度、最小间隔天数、过期前警告天数。
+#4.检查是否设置文件与目录缺省的权限 umask。
+#5.6.检查root目录权限是否为700，保证仅有系统管理员拥有对其的访问控制权限；检查用户是否是最小授权。
+#7.检查字符交互界面超时时间。
+#8.远程登录取消telnet采用ssh。
+#9.配置当用户连续认证失败次数超过6次（不含6次），锁定该用户使用的账号。注意仅对自然人使用的帐号做此限制。
+#10.隐藏ssh信息Port。
+#
+#
+#未完成。
+#本地日志记录功能
+#远程日志记录功能
+#限制具备root权限的用户远程ssh登录。
+#禁止任何人su到root，添加wheel组用户。
+#不响应ICMP请求。
+#
+#
+
+
+PATH_SYS_CHECK=/root/sys_check.log
+PATH_LOGIN_DEFS=/etc/login.defs
+PATH_PROFILE=/etc/profile
+PATH_PROFILE_BAK=/etc/profile_bak
+PATH_LOGIN_DEFS_BAK=/etc/login.defs_bak
+PATH_TELNET=/etc/xinetd.d/telnet
+PATH_SSHD=/etc/ssh/sshd_config
+PATH_PAM_SYSTEMAUTH=/etc/pam.d/system-auth
+PATH_SHADOW=/etc/shadow
+PATH_PAM_LOGIN=/etc/pam.d/login
+PATH_SSHD_BAK=/etc/ssh/sshd_config_bak
+
+UserPassWord=ideal123
+
+
+#1.检查是否存在空密码的帐户。
+none_passwd_user_cnt=$(awk -F: '($2 == "") { print $1 }' /etc/shadow | wc -l);
+min=1
+if [ ${none_passwd_user_cnt} -eq 0 ]
+then
+        echo "成功----没有空密码账户存在" >> $PATH_SYS_CHECK
+fi
+while [ $min -le ${none_passwd_user_cnt} ]
+do
+        #查看密码用户名
+        none_passwd_user_name=$(awk -F: '($2 == "") { print $1 }' /etc/shadow | awk -v line=$min 'NR==line{print $1}');
+        #设置密码
+        echo $UserPassWord | passwd --stdin $none_passwd_user_name
+        echo "成功----" $none_passwd_user_name "设置密码成功" >> $PATH_SYS_CHECK
+        min=`expr $min + 1`
+done
+
+#2.检查除root之外的UID为0的用户。
+zero_user_user_cnt=$(awk -F: '($3 == 0) { print $1 }' /etc/passwd | grep -v root | wc -l )
+min=1
+if [ ${zero_user_user_cnt} -eq 0 ]
+then
+        echo "成功----没有UUID为0的账户存在" >> $PATH_SYS_CHECK
+fi
+while [ $min -le ${zero_user_user_cnt} ]
+do
+        #查看UUID为0的用户名
+        none_uuid_user_name=$(awk -F: '($3 == 0) { print $1 }' /etc/passwd | grep -v root | awk -v line=$min 'NR==line{print $1}');
+        #删除用户
+        userdel $none_uuid_user_name
+        echo "成功----用户" $none_uuid_user_name "删除成功" >> $PATH_SYS_CHECK
+        min=`expr $min + 1`
+done
+
+#3.1.备份login.defs文件。
+if [ -f $PATH_LOGIN_DEFS ];
+then
+        if [ ! -f $PATH_LOGIN_DEFS_BAK ];
+        then
+                cp $PATH_LOGIN_DEFS $PATH_LOGIN_DEFS_BAK
+                echo "成功----创建profile备份" >> $PATH_SYS_CHECK
+        else
+                echo "成功----profile备份已存在" >> $PATH_SYS_CHECK
+        fi
+else
+        echo "失败----未在指定目录找到profile文件" >> $PATH_SYS_CHECK
+fi
+
+
+#3.2.检查是否设置口令生存周期、最小长度、最小间隔天数、过期前警告天数。
+if [ -f $PATH_LOGIN_DEFS ];
+then
+        v_pass_max_days_cnt=$(cat $PATH_LOGIN_DEFS |grep ^PASS_MAX_DAYS | awk -F' ' '{print $2 }');
+        v_pass_min_len_cnt=$(cat $PATH_LOGIN_DEFS |grep ^PASS_MIN_LEN | awk -F' ' '{print $2 }');
+        v_pass_min_day_cnt=$(cat $PATH_LOGIN_DEFS |grep ^PASS_MIN_DAYS | awk -F' ' '{print $2 }');
+        v_pass_warn_age_cnt=$(cat $PATH_LOGIN_DEFS |grep ^PASS_WARN_AGE | awk -F' ' '{print $2 }');
+        if [ ${v_pass_max_days_cnt} -le 90 ]
+        then
+                echo "成功----login.defs参数PASS_MAX_DAYS已符合要求" >> $PATH_SYS_CHECK
+        else
+                sed -i '/^PASS_MAX_DAYS/cPASS_MAX_DAYS   90' $PATH_LOGIN_DEFS;
+                echo "成功----login.defs参数PASS_MAX_DAYS修改成功" >> $PATH_SYS_CHECK
+        fi
+
+        if [ ${v_pass_min_len_cnt} -ge 8 ]
+        then
+                echo "成功----login.defs参数PASS_MIN_LEN已符合要求" >> $PATH_SYS_CHECK
+        else
+                sed -i '/^PASS_MIN_LEN/cPASS_MIN_LEN    8' $PATH_LOGIN_DEFS;
+                echo "成功----login.defs参数PPASS_MIN_LEN修改成功" >> $PATH_SYS_CHECK
+ fi
+
+        if [ ${v_pass_min_day_cnt} -ge 1 ]
+        then
+                echo "成功----login.defs参数PASS_MIN_DAYS已符合要求" >> $PATH_SYS_CHECK
+        else
+                sed -i '/^PASS_MIN_DAYS/cPASS_MIN_DAYS   1' $PATH_LOGIN_DEFS;
+                echo "成功----login.defs参数^PASS_MIN_DAYS修改成功" >> $PATH_SYS_CHECK
+        fi
+
+        if [ ${v_pass_warn_age_cnt} -le 7 ]
+        then
+                echo "成功----login.defs参数PASS_WARN_AGE已符合要求" >> $PATH_SYS_CHECK
+        else
+                sed -i '/^PASS_WARN_AGE/cPASS_WARN_AGE   7' $PATH_LOGIN_DEFS;
+                echo "成功----login.defs参数PASS_WARN_AGE修改成功" >> $PATH_SYS_CHECK
+        fi
+else
+        echo "失败----未在指定目录找到login.defs文件,无法修改参数" >> $PATH_SYS_CHECK
+fi
+
+#4.检查是否设置文件与目录缺省的权限umask。
+if [ -f $PATH_PROFILE ];
+then
+        #统计有umask的行数        
+        v_umask_cnt=$(cat $PATH_PROFILE |grep umask | grep -v ^# | awk -F' ' '{print $2 }' | wc -l );
+        min=1
+        while [ $min -le ${v_umask_cnt} ]
+        do
+                #得到当前行中umask的值
+                v_umask=$(cat $PATH_PROFILE |grep umask | grep -v ^# | awk -v line=$min -F' ' 'NR==line{print $2 }' );
+                if [ ${v_umask} != '027' ]
+                then
+                        #输出有umask的行号
+                        v_line_number=$(awk '/^[[:space:]]*umask|^umask/{print NR}' $PATH_PROFILE |awk -v line=$min 'NR==line{print $1}');
+                        #更改当前行的umask值
+                        sed -i "${v_line_number}c    umask 027" $PATH_PROFILE
+                        echo "成功----profile参数umask修改成功" >> $PATH_SYS_CHECK
+                        #echo 1;
+                else
+                        echo "成功----profile参数umask已经是027了" >> $PATH_SYS_CHECK
+                fi
+                min=`expr $min + 1`
+                #echo $v_umask
+        done
+	else
+	echo "失败----未在指定目录找到profile文件，无法修改参数" >> $PATH_SYS_CHECK
+fi
+	
+#5.6.检查root目录权限是否为700，保证仅有系统管理员拥有对其的访问控制权限；检查用户是否是最小授权。
+dir_root_group=$(ls -lad /root | awk '{print $3}');
+dir_root_owner=$(ls -lad /root | awk '{print $4}');
+doc_root_access=$(ls -lad /root | awk '{print $1}' | cut -c 2-10);
+doc_shadow_access=$(ls -l /etc/shadow | awk '{print $1}' | cut -c 2-10);
+doc_group_access=$(ls -l /etc/group | awk '{print $1}' | cut -c 2-10);
+doc_passwd_access=$(ls -l /etc/passwd | awk '{print $1}' | cut -c 2-100);
+#更改root拥有者
+if [ ${dir_root_group} == 'root' ] && [ ${dir_root_owner} == 'root' ]
+then
+        echo "成功----/root的拥有者为root:root，无需更改" >> $PATH_SYS_CHECK
+else
+        chown root:root /root
+        echo "成功----/root的拥有者已更改root:root" >> $PATH_SYS_CHECK
+fi
+#更改/root权限
+if [ ${doc_root_access} != 'rwx------' ]
+then
+        chmod 0700 /root
+        echo "成功----/root的权限更改为700" >> $PATH_SYS_CHECK
+else
+        echo "成功----/root的权限为700，无须更改" >> $PATH_SYS_CHECK
+fi
+#更改/etc/shadow权限
+if [ ${doc_shadow_access} != 'r--------' ]
+then
+        chmod 400 /etc/shadow
+        echo "成功----/etc/shadow的权限更改为400" >> $PATH_SYS_CHECK
+else
+        echo "成功----/etc/shadow的权限为400，无须更改" >> $PATH_SYS_CHECK
+fi
+#更改/etc/group权限
+if [ ${doc_group_access} != 'rw-r--r--' ]
+then
+        chmod 644 /etc/group
+        echo "成功----/etc/group的权限更改为644" >> $PATH_SYS_CHECK
+else
+        echo "成功----/etc/group的权限为644，无须更改" >> $PATH_SYS_CHECK
+fi
+#更改/etc/passwd权限
+if [ ${doc_passwd_access} != 'rw-r--r--' ]
+then
+        chmod 644 /etc/passwd
+        echo "成功----/etc/passwd的权限更改为644" >> $PATH_SYS_CHECK
+else
+        echo "成功----/etc/passwd的权限为644，无须更改" >> $PATH_SYS_CHECK
+fi
+
+#7.检查字符交互界面超时时间。
+#!/bin/bash
+#创建profile备份、并修改TMOUT为300秒。
+if [ -f $PATH_PROFILE ];
+then
+        if [ ! -f $PATH_PROFILE_BAK ];
+        then
+                cp $PATH_PROFILE $PATH_PROFILE_BAK
+                echo "成功----创建profile备份" >> $PATH_SYS_CHECK
+        else
+                echo "成功----profile备份已存在" >> $PATH_SYS_CHECK
+        fi
+        sed -i '/TMOUT=/d' $PATH_PROFILE
+        echo "成功---删除TMOUT旧配置成功" >> $PATH_SYS_CHECK
+        echo "TMOUT=300" >> $PATH_PROFILE
+        echo "成功---插入TMOUT新配置成功" >> $PATH_SYS_CHECK
+        source $PATH_PROFILE
+else
+        echo "失败----未在指定目录找到profile文件" >> $PATH_SYS_CHECK
+fi
+
+
+#9.配置当用户连续认证失败次数超过6次（不含6次），锁定该用户使用的账号。注意仅对自然人使用的帐号做此>限制。
+#连续认证失败次数  auth required pam_tally2.so deny=6 unlock_time=300 even_deny_root root_unlock_time=30
+if [ -f $PATH_PAM_SYSTEMAUTH ];
+then
+        #是否存在auth required pam_tally2.so deny=6 unlock_time=300 even_deny_root root_unlock_time=30
+        v_system_cnt=$(cat $PATH_PAM_SYSTEMAUTH |grep ^[[:space:]]*auth[[:space:]]*required[[:space:]]*pam_tally2.so[[:space:]]*deny= | wc -l);
+        if [ ${v_system_cnt} -ge 1 ]
+        then
+                echo "成功----system-auth文件已设置连续认证失败次数" >> $PATH_SYS_CHECK
+        else
+                sed -i "1a auth required pam_tally2.so deny=6 unlock_time=300 even_deny_root root_unlock_time=30" $PATH_PAM_SYSTEMAUTH
+                echo "成功----system-auth文件连续认证失败次数修改成功" >> $PATH_SYS_CHECK
+        fi
+else
+        echo "失败----system-auth文件不存在,无法修改" >> $PATH_SYS_CHECK
+fi
+
