@@ -61,6 +61,9 @@ scrape_configs:
 
 4、promehteus配置后台启动  
 ```
+检查配置文件是否正确
+# promtool check config /opt/prometheus/prometheus-2.7.1.linux-amd64/prometheus.yml
+启动
 # cat up.sh
 /opt/prometheus/prometheus-2.7.1.linux-amd64/prometheus --web.listen-address="0.0.0.0:9090" --web.read-timeout=5m --web.max-connections=10 --storage.tsdb.retention=15d --storage.tsdb.path="/opt/prometheus/prometheus-2.7.1.linux-amd64/data" --query.max-concurrency=20 --query.timeout=2m
 
