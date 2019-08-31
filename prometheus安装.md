@@ -79,6 +79,7 @@ scrape_configs:
 - --storage.tsdb.path="/opt/prometheus/prometheus-2.7.1.linux-amd64/data"     #数据保存目录  
 - --query.max-concurrency=20                             #客户端并发执行的查询的最大数量   后边两条属于优化设置  
 - --query.timeout=2m                                           #客户端查询语句超时时间  
+- --config.file "/etc/prometheus/prometheus.yml"         #手动指定配置文件，默认使用当前路径的，此处为设置
 
 5、web展示  
 http://192.168.1.70:9090  
