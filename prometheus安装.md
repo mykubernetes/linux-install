@@ -80,6 +80,7 @@ scrape_configs:
 - --query.max-concurrency=20                             #客户端并发执行的查询的最大数量   后边两条属于优化设置  
 - --query.timeout=2m                                           #客户端查询语句超时时间  
 - --config.file "/etc/prometheus/prometheus.yml"         #手动指定配置文件，默认使用当前路径的，此处为设置
+- --web.enable-lifecycle #通过curl -X POST http://localdns:9090/-/reload 方式加载配置，2.0以后默认关闭
 
 5、web展示  
 http://192.168.1.70:9090  
