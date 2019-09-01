@@ -353,7 +353,7 @@ route:
   routes:
   - match:
       severity: critical
-    receiver: pager
+    receiver: email
   - match_re:
       severity: ^(warning|critical)$
     receiver: support_team
