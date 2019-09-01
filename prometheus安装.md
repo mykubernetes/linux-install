@@ -338,18 +338,42 @@ scrape_configs:
 # mkdir -pv /etc/alertmanager
 # cat /etc/alertmanager/alertmanager.yml
 global:
-smtp_smarthost: 'smtp.126.com:25'
-smtp_from: 'xxxxxx@126.com'
-smtp_auth_username: 'xxxxxx@126.com'
-smtp_auth_password: ‘xxxxxx'
-smtp_require_tls: false
+  smtp_smarthost: 'smtp.126.com:25'
+  smtp_from: 'xxxxxx@126.com'
+  smtp_auth_username: 'xxxxxx@126.com'
+  smtp_auth_password: ‘xxxxxx'
+  smtp_require_tls: false
+
 route:
-receiver: mail
+  group_by: ['instance']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 3h
+  receiver: email
+  routes:
+  - match:
+      severity: critical
+    receiver: pager
+  - match_re:
+      severity: ^(warning|critical)$
+    receiver: support_team
+
 receivers:
-- name: 'mail'
-email_configs:
-- to: '756686600@qq.com'
+- name: 'email'
+  email_configs:
+  - to: '756686600@qq.com'
+- name: 'support_team'
+  email_configs:
+  - to: '995595198@qq.com'
+- name: 'pager'
+  email_configs:
+  - to: 'alert-pager@example.com'
 ```  
+- group_by: 根据 labael(标签)进行匹配，如果是多个，就要多个都匹配
+- group_wait: 30s 等待该组的报警，看有没有一起合伙搭车的
+- group_interval: 5m 下一次报警开车时间
+- repeat_interval: 3h 重复报警时间
+
 
 3、启动alertmanager  
 ```
