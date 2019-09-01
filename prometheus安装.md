@@ -399,3 +399,5 @@ rule_files:
   - "rules/*_alerts.yml"
 ……
 ```  
+webhook告警参考官方文档  
+https://prometheus.io/docs/alerting/configuration/#webhook_config  
