@@ -3,6 +3,10 @@ prometheus安装
 prometheus官网  
 https://prometheus.io/  
 
+软件下载地址  
+https://prometheus.io/download/  
+https://github.com/prometheus  
+
 一、安装后台运行程序  
 1、daemonize安装
 ```
