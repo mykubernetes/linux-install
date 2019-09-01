@@ -377,16 +377,15 @@ alertmanagers:
 ```
 # vim /etc/prometheus/rules/node_alerts.yml
 groups:
-  - name: node_alerts
-    rules:
-    - alert: HighNodeCPU
-      expr: instance:node_cpu:avg_rate5m > 4
-      for: 2m
-      labels:
-        severity: warning
-      annotations:
-        summary: High Node CPU for 1 hour
-        console: Thank you Test
+- name: node_alerts
+  rules:
+  - alert: HighNodeCPU
+    expr: instance:node_cpu:avg_rate5m > 4
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: High Node CPU for 1 hour       console: Thank you Test
 ```  
 
 7、把告警规则加入prometheus配置文件  
