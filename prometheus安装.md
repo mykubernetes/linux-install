@@ -400,6 +400,24 @@ groups:
       severity: critical
     annotations:
       summary: Host {{ $labels.instance }} of {{ $labels.job }} is Down!
+
+#prometheus重载配置告警，和altertmanagers服务宕机告警
+- name: prometheus_alerts
+  rules:
+  - alert: PrometheusConfigReloadFailed
+    expr: prometheus_config_last_reload_successful == 0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      description: Reloading Prometheus configuration has failed on {{ $labels.instance }}.
+  - alert: PrometheusNotConnectedToAlertmanagers
+    expr: prometheus_notifications_alertmanagers_discovered < 2
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      description: Prometheus {{ $labels.instance }} is not connected to any Alertmanagers
 ```  
 - {{ $labels.instance }} 获取告警信息的标签instance的标签
 - {{ $labels.job }} 获取告警信息的标签job的标签
