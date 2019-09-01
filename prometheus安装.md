@@ -317,3 +317,81 @@ scrape_configs:
 • 我们的第一个relabel通过将__address__标签(当前目标地址)写入__param_target标签来创建一个参数。  
 • 第二个relabel将__param_target标签写为实例标签。  
 • 最后，我们使用我们的出口商的主机名(和端口)重新标记__address__标签，在我们的例子中是node02  
+
+
+
+六、安装配置Alertmanager  
+1、安装Alertmanager  
+```
+# wget https://github.com/prometheus/alertmanager/releases/download/v0.15.2/alertmanager-0.15.2.linux-amd64.tar.gz
+# tar xf alertmanager-0.15.2.linux-amd64.tar.gz
+# cp alertmanager-0.15.2.linux-amd64/{alertmanager,amtool} /usr/local/bin/
+# alertmanager --version
+```  
+
+2、配置Alertmanager  
+```
+# mkdir -pv /etc/alertmanager
+# cat /etc/alertmanager/alertmanager.yml
+global:
+smtp_smarthost: 'smtp.126.com:25'
+smtp_from: 'xxxxxx@126.com'
+smtp_auth_username: 'xxxxxx@126.com'
+smtp_auth_password: ‘xxxxxx'
+smtp_require_tls: false
+route:
+receiver: mail
+receivers:
+- name: 'mail'
+email_configs:
+- to: '756686600@qq.com'
+```  
+
+3、启动alertmanager  
+```
+# alertmanager --config.file alertmanager.yml
+```  
+打开浏览器 http://192.168.101.69:9093
+
+4、配置prometheus配置文件添加告警  
+```
+alerting:
+alertmanagers:
+- static_configs:
+- targets:
+- 192.168.101.69:9093
+```  
+
+5、在prometheus上添加对alertmanager的监控  
+```
+  - job_name: 'alertmanager'
+    static_configs:
+    - targets: ['192.168.101.69:9093']
+```  
+
+6、在prometheus添加告警规则  
+```
+# vim /etc/prometheus/rules/node_alerts.yml
+groups:
+  - name: node_alerts
+    rules:
+    - alert: HighNodeCPU
+      expr: instance:node_cpu:avg_rate5m > 4
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: High Node CPU for 1 hour
+        console: Thank you Test
+```  
+
+7、把告警规则加入prometheus配置文件  
+```
+# cd /etc/prometheus/rules
+# vim node_alertes.yml
+……
+rule_files:
+  - "rules/*_rules.yml"
+  - "rules/*_alerts.yml"
+……
+```  
