@@ -418,6 +418,18 @@ groups:
       severity: warning
     annotations:
       description: Prometheus {{ $labels.instance }} is not connected to any Alertmanagers
+
+#添加systemd服务告警
+- name: service_alerts
+  rules:
+  - alert: NodeServiceDown
+    expr: node_systemd_unit_state{state="active"} != 1
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: Service {{ $labels.name }} on {{ $labels.instance }} is no longer active!
+      description: 监控中心向您报告：- " 挨踢的，您的服务挂了？"
 ```  
 - {{ $labels.instance }} 获取告警信息的标签instance的标签
 - {{ $labels.job }} 获取告警信息的标签job的标签
