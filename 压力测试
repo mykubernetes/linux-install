@@ -1,0 +1,9 @@
+cpu压力测试工具  
+https://patrickmn.com/projects/cpuburn/
+```
+wget https://cdn.pmylund.com/files/tools/cpuburn/linux/cpuburn-1.0-amd64.tar.gz
+tar xvf cpuburn-1.0-amd64.tar.gz
+cd cpuburn
+运行
+./cpuburn
+```  
