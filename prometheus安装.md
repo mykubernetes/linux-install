@@ -386,7 +386,23 @@ groups:
       severity: warning
     annotations:
       summary: High Node CPU for 1 hour       console: Thank you Test
+  - alert: DiskWillFillIn4Hours
+    expr: predict_linear(node_filesystem_free_bytes{mountpoint="/"}[1h], 4*3600) < 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: Disk on {{ $labels.instance }} will fill in approximately 4 hours.
+  - alert: InstanceDown
+    expr: up{job="node"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: Host {{ $labels.instance }} of {{ $labels.job }} is Down!
 ```  
+- {{ $labels.instance }} 获取告警信息的标签instance的标签
+- {{ $labels.job }} 获取告警信息的标签job的标签
 
 7、把告警规则加入prometheus配置文件  
 ```
