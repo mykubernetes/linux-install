@@ -250,10 +250,10 @@ https://grafana.com/grafana/download
 admin/admin  
 
 
-五、安装配置 black exporter  
+五、安装配置 blackbox exporter  
 Prometheus探测工作是通过运行一个blackbox exporter——来探测远程目标，并公开在本地端点上收集的任何时间序列。  
 
-1、安装black exporter  
+1、安装blackbox exporter  
 ``` 
 # wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz
 # tar xf blackbox_exporter-0.12.0.linux-amd64.tar.gz
@@ -261,7 +261,7 @@ Prometheus探测工作是通过运行一个blackbox exporter——来探测远�
 # blackbox_exporter --version
 ```  
 
-2、配置black exporter  
+2、配置blackbox exporter  
 ```
 # mkdir -pv /etc/prober
 # cat /etc/prober/prober.yml
