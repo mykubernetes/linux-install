@@ -113,7 +113,7 @@ killasgroup=true
 node_prometheus 启动的例子
 ---
 ```
-# cat node_exporter.conf 
+# cat /etc/supervisor.d/node_exporter.conf 
 [program:node_exporter]
 command=/usr/local/bin/node_exporter
 stdout_logfile=/usr/local/prometheus/prometheus.log
