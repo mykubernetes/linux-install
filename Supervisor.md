@@ -6,6 +6,15 @@ https://github.com/Supervisor/supervisor
 官网  
 http://supervisord.org/  
 
+安装  
+---
+```
+yum install python-setuptools
+easy_install supervisor 或者使用 pip install supervisor
+```  
+
+
+
 配置
 ---
 输出supervisor配置，可以使用echo_supervisord_conf重定向到文件中  
@@ -104,7 +113,7 @@ killasgroup=true
 node_prometheus 启动的例子
 ---
 ```
-[root@localhost supervisord.d]# cat node_exporter.conf 
+# cat node_exporter.conf 
 [program:node_exporter]
 command=/usr/local/bin/node_exporter
 stdout_logfile=/usr/local/prometheus/prometheus.log
@@ -143,6 +152,7 @@ supervisor>
 ---
 1、配置systemctl服务
 ```
+# vim /lib/systemd/system/supervisor.service
 [Unit]
 Description=supervisor
 After=network.target
@@ -168,7 +178,7 @@ $ systemctl daemon-reload
 
 3、修改文件权限为766  
 ```
-$ chmod 766 supervisor.service
+$ chmod 766 /lib/systemd/system/supervisor.service 
 ```  
 
 4、启动supervisor  
