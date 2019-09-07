@@ -2,6 +2,27 @@ https://blog.csdn.net/chinawangfei/article/details/81912372
 
 https://github.com/Supervisor/supervisor
 
+配置
+---
+输出supervisor配置，可以使用echo_supervisord_conf重定向到文件中  
+运行supervisord服务的时候，需要指定supervisor配置文件，如果没有显示指定，默认在以下目录查找  
+```
+###$CWD表示运行supervisord程序的目录。
+$CWD/supervisord.conf 
+$CWD/etc/supervisord.conf
+/etc/supervisord.conf
+/etc/supervisor/supervisord.conf (since Supervisor 3.3.0)
+../etc/supervisord.conf (Relative to the executable)
+../supervisord.conf (Relative to the executable)
+```  
+
+重定向配置文件到/etc/目录下面  
+```
+mkdir /etc/supervisor.d
+echo_supervisord_conf > /etc/supervisord.conf
+```  
+
+
 
 配置文件参数说明
 ---
@@ -49,7 +70,7 @@ killasgroup=false     ;默认为false，向进程组发送kill信号，包括子
  
 ;包含其它配置文件
 [include]
-files = relative/directory/*.ini    ;可以指定一个或多个以.ini结束的配置文件
+files = /etc/supervisor.d/*.conf   ;可以指定一个或多个以.conf结束的配置文件
 ```  
 
 服务配置模板
