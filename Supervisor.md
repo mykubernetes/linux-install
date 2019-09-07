@@ -1,6 +1,8 @@
 https://blog.csdn.net/chinawangfei/article/details/81912372  
-
-https://github.com/Supervisor/supervisor
+github托管代码  
+https://github.com/Supervisor/supervisor  
+官网  
+http://supervisord.org/  
 
 配置
 ---
@@ -27,6 +29,7 @@ echo_supervisord_conf > /etc/supervisord.conf
 配置文件参数说明
 ---
 ```
+# vim /etc/supervisord.conf
 [unix_http_server]
 file=/tmp/supervisor.sock   ;UNIX socket 文件，supervisorctl会使用其与supervisord通信
 ;chmod=0700                 ;socket文件的mode，默认是0700
@@ -76,6 +79,7 @@ files = /etc/supervisor.d/*.conf   ;可以指定一个或多个以.conf结束的
 服务配置模板
 ---
 ```
+# vim /etc/supervisor.d/usercenter.conf
 [program:usercenter] 
 directory = /home/leon/projects/usercenter ; 程序的启动目录
 command = gunicorn -w 8 -b 0.0.0.0:17510 wsgi:app  ; 启动命令
@@ -163,4 +167,9 @@ $ systemctl daemon-reload
 3、修改文件权限为766  
 ```
 $ chmod 766 supervisor.service
+```  
+
+4、启动supervisor  
+```
+systemctl start supervisor.service
 ```  
