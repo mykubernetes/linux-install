@@ -6,14 +6,19 @@ https://github.com/Supervisor/supervisor
 官网  
 http://supervisord.org/  
 
-安装  
+python安装  
 ---
 ```
 yum install python-setuptools
 easy_install supervisor 或者使用 pip install supervisor
 ```  
 
-
+epel源安装
+---
+```
+$ yum install epel-release
+$ yum install -y supervisor
+```  
 
 配置
 ---
@@ -185,3 +190,81 @@ $ chmod 766 /lib/systemd/system/supervisor.service
 ```
 systemctl start supervisor.service
 ```  
+
+
+
+配置service类型服务
+---
+```
+# vim /etc/rc.d/init.d/supervisor
+#!/bin/bash
+#
+# supervisord   This scripts turns supervisord on
+#
+# Author:       Mike McGrath <mmcgrath@redhat.com> (based off yumupdatesd)
+#
+# chkconfig:    - 95 04
+#
+# description:  supervisor is a process control utility.  It has a web based
+#               xmlrpc interface as well as a few other nifty features.
+# processname:  supervisord
+# config: /etc/supervisor/supervisord.conf
+# pidfile: /var/run/supervisord.pid
+#
+ 
+# source function library
+. /etc/rc.d/init.d/functions
+ 
+RETVAL=0
+ 
+start() {
+    echo -n $"Starting supervisord: "
+    daemon "supervisord -c /home/jack/Python/etc/supervisord.conf"
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/supervisord
+}
+ 
+stop() {
+    echo -n $"Stopping supervisord: "
+    killproc supervisord
+    echo
+    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/supervisord
+}
+ 
+restart() {
+    stop
+    start
+}
+ 
+case "$1" in
+  start)
+    start
+    ;;
+  stop) 
+    stop
+    ;;
+  restart|force-reload|reload)
+    restart
+    ;;
+  condrestart)
+    [ -f /var/lock/subsys/supervisord ] && restart
+    ;;
+  status)
+    status supervisord
+    RETVAL=$?
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|status|restart|reload|force-reload|condrestart}"
+    exit 1
+esac
+ 
+exit $RETVAL
+```  
+
+修改文件权限为755，并设置开机启动
+```
+$ chmod 755 /etc/rc.d/init.d/supervisor
+$ chkconfig supervisor on
+```  
+
