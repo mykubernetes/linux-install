@@ -52,6 +52,45 @@ killasgroup=false     ;默认为false，向进程组发送kill信号，包括子
 files = relative/directory/*.ini    ;可以指定一个或多个以.ini结束的配置文件
 ```  
 
+服务配置模板
+---
+```
+[program:usercenter] 
+directory = /home/leon/projects/usercenter ; 程序的启动目录
+command = gunicorn -w 8 -b 0.0.0.0:17510 wsgi:app  ; 启动命令
+autostart = true     ; 在 supervisord 启动的时候也自动启动
+startsecs = 5        ; 启动 5 秒后没有异常退出，就当作已经正常启动了
+autorestart = true   ; 程序异常退出后自动重启
+startretries = 3     ; 启动失败自动重试次数，默认是 3
+user = leon          ; 用哪个用户启动
+redirect_stderr = true  ; 把 stderr 重定向到 stdout，默认 false
+stdout_logfile_maxbytes = 20MB  ; stdout 日志文件大小，默认 50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数
+; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）
+stdout_logfile = /data/logs/usercenter_stdout.log
+如果只杀死主进程，子进程就可能变成孤儿进程。通过这下面两项配置来确保所有子进程都能正确停止
+stopasgroup=true
+killasgroup=true
+```  
+- Supervisor 只能管理在前台运行的程序，所以如果应用程序有后台运行的选项，需要关闭。
+
+node_prometheus 启动的例子
+---
+```
+[root@localhost supervisord.d]# cat node_exporter.conf 
+[program:node_exporter]
+command=/usr/local/bin/node_exporter
+stdout_logfile=/usr/local/prometheus/prometheus.log
+autostart=true
+autorestart=true
+startsecs=5
+priority=1
+user=root
+stopasgroup=true
+killasgroup=true
+```  
+
+
 管理supervisor下的服务
 ---
 ```
