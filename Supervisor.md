@@ -4,6 +4,9 @@ https://github.com/Supervisor/supervisor
 官方不同系统的开机启动脚本  
 https://github.com/Supervisor/initscripts  
 
+其他博客  
+https://www.cnblogs.com/heyongboke/p/9188125.html  
+
 官网  
 http://supervisord.org/  
 
@@ -20,6 +23,8 @@ epel源安装
 $ yum install epel-release
 $ yum install -y supervisor
 ```  
+
+
 
 配置
 ---
