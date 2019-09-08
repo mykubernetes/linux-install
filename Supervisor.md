@@ -1,8 +1,9 @@
-https://blog.csdn.net/chinawangfei/article/details/81912372  
-https://blog.csdn.net/qq_25934401/article/details/82225289  
-
 github托管代码  
 https://github.com/Supervisor/supervisor  
+
+官方不同系统的开机启动脚本  
+https://github.com/Supervisor/initscripts  
+
 官网  
 http://supervisord.org/  
 
