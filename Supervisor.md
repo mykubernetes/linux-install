@@ -152,6 +152,17 @@ node_exporter                    RUNNING   pid 26950, uptime 0:23:25
 supervisor> 
 ```  
 
+指定配置文件方式
+---
+```
+supervisorctl -c etc/supervisord.conf status
+supervisorctl -c etc/supervisord.conf start tomcat
+supervisorctl -c etc/supervisord.conf stop tomcat
+supervisorctl -c etc/supervisord.conf restart tomcat
+supervisorctl -c etc/supervisord.conf udpate
+supervisorctl -c etc/supervisord.conf reread
+```  
+
 
 开机启动Supervisor服务
 ---
