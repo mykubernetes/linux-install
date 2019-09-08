@@ -90,13 +90,13 @@ killasgroup=false     ;默认为false，向进程组发送kill信号，包括子
  
 ;包含其它配置文件
 [include]
-files = /etc/supervisor.d/*.ini   ;可以指定一个或多个以.ini结束的配置文件
+files = /etc/supervisord.d/*.ini   ;可以指定一个或多个以.ini结束的配置文件
 ```  
 
 服务配置模板
 ---
 ```
-# vim /etc/supervisor.d/usercenter.ini
+# vim /etc/supervisord.d/usercenter.ini
 [program:usercenter] 
 directory = /home/leon/projects/usercenter ; 程序的启动目录
 command = gunicorn -w 8 -b 0.0.0.0:17510 wsgi:app  ; 启动命令
@@ -119,7 +119,7 @@ killasgroup=true
 node_prometheus 启动的例子
 ---
 ```
-# cat /etc/supervisor.d/node_exporter.ini
+# cat /etc/supervisord.d/node_exporter.ini
 [program:node_exporter]
 command=/usr/local/bin/node_exporter
 stdout_logfile=/usr/local/prometheus/prometheus.log
