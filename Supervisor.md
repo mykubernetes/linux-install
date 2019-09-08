@@ -110,7 +110,7 @@ stdout_logfile_maxbytes = 20MB  ; stdout 日志文件大小，默认 50MB
 stdout_logfile_backups = 20     ; stdout 日志文件备份数
 ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）
 stdout_logfile = /data/logs/usercenter_stdout.log
-如果只杀死主进程，子进程就可能变成孤儿进程。通过这下面两项配置来确保所有子进程都能正确停止
+用 Supervisor 托管的程序还会有子进程,如果只杀死主进程，子进程就可能变成孤儿进程。通过这下面两项配置来确保所有子进程都能正确停止
 stopasgroup=true
 killasgroup=true
 ```  
