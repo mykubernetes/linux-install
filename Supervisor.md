@@ -127,11 +127,13 @@ node_prometheus 启动的例子
 # cat /etc/supervisord.d/node_exporter.ini
 [program:node_exporter]
 command=/usr/local/bin/node_exporter
-stdout_logfile=/usr/local/prometheus/prometheus.log
+##stdout_logfile=/usr/local/prometheus/prometheus.log
+directory=/usr/local/bin/
 autostart=true
 autorestart=true
 startsecs=5
 priority=1
+startretries=3
 user=root
 stopasgroup=true
 killasgroup=true
