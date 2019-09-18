@@ -4,8 +4,8 @@ Master节点配置keepalived
 # vim /etc/keepalived/keepalived.conf
 ! Configuration File for keepalived
 
-global_defs {
-   notification_email {
+global_defs {                      #全局配置
+   notification_email {            #定义报警邮件地址
      # acassen@firewall.loc
      # failover@firewall.loc
      # sysadmin@firewall.loc
@@ -13,7 +13,7 @@ global_defs {
    notification_email_from Alexandre.Cassen@firewall.loc
    # smtp_server 192.168.200.1
    # smtp_connect_timeout 30
-   router_id LVS_DEVEL
+   router_id LVS_DEVEL             #定义路由标识信息，相同局域网唯一
    vrrp_skip_check_adv_addr
    vrrp_strict
    vrrp_garp_interval 0
