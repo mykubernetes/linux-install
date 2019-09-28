@@ -127,7 +127,7 @@ node_prometheus 启动的例子
 [program:node_exporter]
 command=/usr/local/bin/node_exporter
 ##stdout_logfile=/usr/local/prometheus/prometheus.log
-directory=/usr/local/bin/
+directory=/usr/local/bin/               ；执行命令是切换到的目录
 autostart=true
 autorestart=true
 startsecs=5
@@ -166,7 +166,7 @@ supervisorctl -c etc/supervisord.conf status
 supervisorctl -c etc/supervisord.conf start tomcat
 supervisorctl -c etc/supervisord.conf stop tomcat
 supervisorctl -c etc/supervisord.conf restart tomcat
-supervisorctl -c etc/supervisord.conf udpate
+supervisorctl -c etc/supervisord.conf udpate         #重新加载配置文件
 supervisorctl -c etc/supervisord.conf reread
 ```  
 
