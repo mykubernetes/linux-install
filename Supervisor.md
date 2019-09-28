@@ -166,8 +166,8 @@ supervisorctl -c etc/supervisord.conf status
 supervisorctl -c etc/supervisord.conf start tomcat
 supervisorctl -c etc/supervisord.conf stop tomcat
 supervisorctl -c etc/supervisord.conf restart tomcat
-supervisorctl -c etc/supervisord.conf udpate         #重新加载配置文件
-supervisorctl -c etc/supervisord.conf reread
+supervisorctl -c etc/supervisord.conf udpate          #重载配置文件并重启受影响的program
+supervisorctl -c etc/supervisord.conf reread          #读取当前运行配置和program配置文件的差异
 ```  
 
 
