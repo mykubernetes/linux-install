@@ -202,3 +202,29 @@ wget http://nchc.dl.sourceforge.net/project/amoeba/Amoeba%20for%20mysql/2.x/amoe
                 <property name="needParse">true</property>
         </queryRouter>
 ```  
+
+四、访问列表配置  
+```
+# vim access_list.conf
+
+#ÅäÖÃIP·ÃÎÊ¿ØÖÆ
+#
+# ÓÅÏÈ¼¶±ð´ÓÉÏÍùÏÂ£¬Ç°ÃæµÄÓÅÏÈ¼¶±ð¸ß£¬Ã¿ÌõÒ»ÐÐ
+
+#192.*.1.236-239:yes 
+#±ÈÈç192.34.1.238Ôò¿ÉÒÔ·ÃÎÊ£¬·ñÔò½«²»ÄÜ·ÃÎÊ¡£
+
+#218.85.*.*:no
+#127.0.0.1:yes
+192.168.101.*:yes
+*:no
+```  
+
+五、启动  
+```
+# vim bin/amoeba
+DEFAULT_OPTS="-server -Xms256m -Xmx256m -Xss128k"
+DEFAULT_OPTS="-server -Xms256m -Xmx256m -Xss2048k"
+
+# ./amoeba start 
+```  
