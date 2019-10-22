@@ -17,6 +17,7 @@ wget http://nchc.dl.sourceforge.net/project/amoeba/Amoeba%20for%20mysql/2.x/amoe
 
 三、配置  
 ```
+# vim dbServers.xml
  <!-- 数据库连接配置的公共部分 -->
         <dbServer name="abstractServer" abstractive="true">
                 <factoryConfig class="com.meidusa.amoeba.mysql.net.MysqlServerConnectionFactory">
@@ -54,14 +55,14 @@ wget http://nchc.dl.sourceforge.net/project/amoeba/Amoeba%20for%20mysql/2.x/amoe
         <dbServer name="master"  parent="abstractServer">
                 <factoryConfig>
                         <!-- mysql ip -->
-                        <property name="ipAddress">centos-node6</property>
+                        <property name="ipAddress">192.168.101.69</property>
                 </factoryConfig>
         </dbServer>
         <!-- Slave 的独立部分，也就只有 IP 了这里 写了主机名 ,如果有多个Slave服务器，可以配置多个dbServer -->
         <dbServer name="slave"  parent="abstractServer">
                 <factoryConfig>
                         <!-- mysql ip -->
-                        <property name="ipAddress">centos-node7</property>
+                        <property name="ipAddress">192.168.101.70</property>
                 </factoryConfig>
         </dbServer>
 
