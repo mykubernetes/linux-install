@@ -15,6 +15,16 @@ wget http://nchc.dl.sourceforge.net/project/amoeba/Amoeba%20for%20mysql/2.x/amoe
 # tar xvf amoeba-mysql-binary-2.1.0-RC5.tar.gz -C amoeba
 ```  
 
+Amoeba主要配置文件
+```
+dbServers.xml		#主机IP,端口,Amoeba的用户名密码
+rule.xml	        #切分规则相关
+functionMap.xml		#描述了函数名和函数处理的关系
+ruleFunctionMap.xml	#自定义函数
+access_list.conf	#可以访问和拒绝访问的列表
+log4j.xml	        #日志文件相关配置
+```  
+
 三、配置  
 ```
 # vim dbServers.xml
