@@ -88,3 +88,29 @@ CONFIG_NF_CONNTRACK_IPV4=m
 /usr/share/man/man8/ipvsadm.8.gz
 ```  
 
+4、ipvs规则的保存和重载  
+```
+保存
+ipvsadm -S > /etc/ipvs/ipvs   #地址自定
+ipvsadm-save > /etc/ipvs/ipvs
+
+重载
+ipvsadm -R < /etc/ipvs/ipvs
+ipvsadm-restore > /etc/ipvs/ipvs
+```  
+
+5、查看
+```
+ipvsadm -L
+  -n #显示数值
+  --exact #精确值
+  -c #显示IPVS连接
+  --stats #统计数据
+  --reate #速率
+
+清空规则
+ipvsadm -C      #clear意思
+
+清空计数器
+ipvsadm -Z
+```  
