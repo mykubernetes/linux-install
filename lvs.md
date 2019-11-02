@@ -91,12 +91,12 @@ CONFIG_NF_CONNTRACK_IPV4=m
 4、ipvs规则的保存和重载  
 ```
 保存
-ipvsadm -S > /etc/ipvs/ipvs   #地址自定
-ipvsadm-save > /etc/ipvs/ipvs
+ipvsadm -S > /etc/ipvs/ipvsadm-config   #地址自定
+ipvsadm-save > /etc/ipvs/ipvsadm-config
 
 重载
-ipvsadm -R < /etc/ipvs/ipvs
-ipvsadm-restore > /etc/ipvs/ipvs
+ipvsadm -R < /etc/ipvs/ipvsadm-config
+ipvsadm-restore > /etc/ipvs/ipvsadm-config
 ```  
 
 5、查看
@@ -127,7 +127,18 @@ TCP  192.168.101.70:80 rr
   -> 192.168.101.69:80            Masq    1      0          0
 ```  
 - -A 添加规则 -t tcp -u udp -f 防火墙规则 -s 调度方法
-- -a 添加后端真是服务器 -r 真实服务器地址 -g dr模型  -l tun模型 -m nat模型 -w 权重
+- -a 添加后端服务器 -r 真实服务器地址 -g dr模型  -l tun模型 -m nat模型 -w 权重
 
-
-
+7、修改  
+```
+# ipvsadm -E -t 192.168.101.70:80 -s wrr
+# ipvsadm -e -t 192.168.101.70:80 -r 192.168.101.69 -m -w 3
+# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -> RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.101.70:80 wrr
+  -> 192.168.101.69:80            Masq    3      0          0    
+```  
+- -E 修改规则
+- -e 修改后端服务器
