@@ -91,12 +91,12 @@ CONFIG_NF_CONNTRACK_IPV4=m
 4、ipvs规则的保存和重载  
 ```
 保存
-ipvsadm -S > /etc/ipvs/ipvsadm-config   #地址自定
-ipvsadm-save > /etc/ipvs/ipvsadm-config
+ipvsadm -S > /etc/sysconfig/ipvsadm
+ipvsadm-save > /etc/sysconfig/ipvsadm
 
 重载
-ipvsadm -R < /etc/ipvs/ipvsadm-config
-ipvsadm-restore > /etc/ipvs/ipvsadm-config
+ipvsadm -R < /etc/sysconfig/ipvsadm
+ipvsadm-restore > /etc/sysconfig/ipvsadm
 ```  
 
 5、查看
