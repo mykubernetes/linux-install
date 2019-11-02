@@ -114,3 +114,20 @@ ipvsadm -C      #clear意思
 清空计数器
 ipvsadm -Z
 ```  
+
+6、使用方法
+```
+# ipvsadm -A -t 192.168.101.70:80 -s rr
+# ipvsadm -a -t 192.168.101.70:80 -r 192.168.101.69 -m -w 1
+# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -> RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.101.70:80 rr
+  -> 192.168.101.69:80            Masq    1      0          0
+```  
+- -A 添加规则 -t tcp -u udp -f 防火墙规则 -s 调度方法
+- -a 添加后端真是服务器 -r 真实服务器地址 -g dr模型  -l tun模型 -m nat模型 -w 权重
+
+
+
