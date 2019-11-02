@@ -142,3 +142,18 @@ TCP  192.168.101.70:80 wrr
 ```  
 - -E 修改规则
 - -e 修改后端服务器
+
+8、nat模型部署  
+```
+1、打开核心转发功能
+# vim /etc/sysctl.conf
+net.ipv4.ip_forward = 1
+
+# sysctl -p
+net.ipv4.ip_forward = 1
+
+2、添加规则即可
+ipvsadm -A -t 192.168.101.70:80 -s rr
+ipvsadm -a -t 192.168.101.70:80 -r 192.168.101.71:80 -m
+ipvsadm -a -t 192.168.101.70:80 -r 192.168.101.72:80 -m
+```  
