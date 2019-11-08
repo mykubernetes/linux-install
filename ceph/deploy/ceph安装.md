@@ -126,7 +126,7 @@ cluster network = 192.168.101.0/24
 如果速度慢可以知道阿里源
 # ceph-deploy install node01 node02 node03  --repo-url http://mirrors.aliyun.com/ceph/rpm-jewel/el7/
 可以使用下面命令代替ceph-deploy命令，因为ceph-deploy命令会下载官方yum源并覆盖本地yum源速度慢
-每天ceph节点执行
+或者每台ceph节点执行三种人选其一
 # yum install -y ceph ceph-radosgw 
 ```  
 # 配置初始 monitor(s)、并收集所有密钥：  
