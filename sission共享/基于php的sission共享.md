@@ -33,16 +33,14 @@
 # yum install openssl openssl-devel -y
 ```
 
-
-
-# 配置php
+3) 配置php
 ```
 # cp php.ini-production /usr/local/php/etc/php.ini
 # vi /usr/local/php/etc/php.ini
 date.timezone = Asia/Shanghai
 ```
 
-3）配置php-fpm
+4）配置php-fpm
 ```
 # cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
 # vim /usr/local/php/etc/php-fpm.conf
@@ -55,7 +53,7 @@ pid = run/php-fpm.pid
 # service php-fpm start
 ```
 
-2.1.2 PHP基于Redis实现Seesion共享  
+PHP基于Redis实现Seesion共享  
 PHP安装Redis扩展模块：  
 https://github.com/phpredis/phpredis  
 https://github.com/phpredis/phpredis/releases  
