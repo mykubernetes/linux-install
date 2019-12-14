@@ -94,7 +94,8 @@ pid = run/php-fpm.pid
 # service php-fpm start
 ```
 
-PHP基于Redis实现Seesion共享  
+PHP基于Redis实现Seesion共享
+---
 PHP安装Redis扩展模块：  
 https://github.com/phpredis/phpredis  
 https://github.com/phpredis/phpredis/releases  
