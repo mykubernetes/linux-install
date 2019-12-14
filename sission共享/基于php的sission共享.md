@@ -1,0 +1,60 @@
+1）安装php依赖的第三方库
+```
+# yum install gd-devel libxml2-devel libcurl-devel libjpeg-devel libpng-devel gcc -y
+```
+
+2）编译安装php
+```
+# wget http://docs.php.net/get/php-5.6.34.tar.gz/from/this/mirror
+# tar zxvf php-5.6.34.tar.gz
+# cd php-5.6.34
+# ./configure --prefix=/usr/local/php \
+--with-config-file-path=/usr/local/php/etc \
+--with-mysql --with-mysqli \
+--with-openssl --with-zlib --with-curl --with-gd \
+--with-jpeg-dir --with-png-dir --with-iconv \
+--enable-fpm --enable-zip --enable-mbstring
+
+# make -j 4 && make install
+```
+
+# 配置php
+```
+# cp php.ini-production /usr/local/php/etc/php.ini
+# vi /usr/local/php/etc/php.ini
+date.timezone = Asia/Shanghai
+```
+
+3）配置php-fpm
+```
+#cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+# vi /usr/local/php/etc/php-fpm.conf
+user = nginx
+group = nginx
+pid = run/php-fpm.pid
+#
+cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+# chmod +x /etc/rc.d/init.d/php-fpm
+# service php-fpm start
+```
+
+2.1.2 PHP基于Redis实现Seesion共享  
+PHP安装Redis扩展模块：  
+https://github.com/phpredis/phpredis  
+https://github.com/phpredis/phpredis/releases  
+
+```
+# yum install autoconf
+# wget https://github.com/phpredis/phpredis/archive/3.1.6.tar.gz
+# tar zxvf 3.1.6.tar.gz
+# cd phpredis-3.1.6/
+# /usr/local/php/bin/phpize
+# ./configure --with-php-config=/usr/local/php/bin/php-config
+# make && make install
+# /usr/local/php/bin/php -m |grep redis
+# vi /usr/local/php/etc/php.ini
+extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20131226/redis.so
+session.save_handler = redis
+session.save_path = "tcp://192.168.0.219:6379?auth=123456"
+# /etc/init.d/php-fpm restart
+```
