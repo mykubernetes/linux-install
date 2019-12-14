@@ -2,7 +2,7 @@
 部署nginx和redis
 ```
 # yum install epel-release -y  
-# yum install nginx redis -y
+# yum install nginx -y
 ```
 
 配置nginx代理php
@@ -35,6 +35,16 @@ location / {
 }
 ```
 
+部署redis
+```
+# yum install redis –y
+# vi /etc/redis.conf
+bind 0.0.0.0
+requirepass 123456
+
+# systemctl start redis
+# systemctl enable redis
+```
 
 1）安装php依赖的第三方库
 ```
