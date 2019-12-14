@@ -34,13 +34,13 @@ date.timezone = Asia/Shanghai
 
 3）配置php-fpm
 ```
-#cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
-# vi /usr/local/php/etc/php-fpm.conf
+# cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+# vim /usr/local/php/etc/php-fpm.conf
 user = nginx
 group = nginx
 pid = run/php-fpm.pid
-#
-cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+
+# cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
 # chmod +x /etc/rc.d/init.d/php-fpm
 # service php-fpm start
 ```
