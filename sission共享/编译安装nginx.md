@@ -1,4 +1,5 @@
 编译安装及编译参数
+---
 ```
 # useradd -M -s /sbin/nologin nginx  
 # yum install gcc pcre-devel openssl-devel -y
@@ -11,6 +12,8 @@
 # make && make install
 ```
 
+常用编译参数：
+---
 | 参数 | 描述 |
 | :------: | :--------: | 
 | --prefix=PATH	| 安装目录
@@ -68,4 +71,22 @@ http://nginx.org/en/docs/
 
 gzip压缩体积越小，对CPU消耗越大  
 第三方模块地址：https://www.nginx.com/resources/wiki/modules/
+
+
+命令行参数
+---
+nginx命令行参数：
+```
+# /usr/local/nginx/sbin/nginx –h
+```
+- -c file 指定配置文件
+- -g directives 设置全局配置指令，例如nginx -g“pid /var/run/nginx.pid”
+- -t 检查配置文件语法
+- -v 打印nginx版本
+- -V 打印nginx版本，编译器版本和配置
+- -s 向master进程发送信号 
+  - stop 快速关闭
+  - quit 正常关闭，等待工作进程完成当前请求后停止nginx进程
+  - reload 重新加载配置文件
+  - reopen 重新打开日志文件
 
