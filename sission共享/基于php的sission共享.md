@@ -18,7 +18,7 @@ upstream dynamic.wp {
 }
 server {
     listen       80;
-    server_name  test.test.com;
+    server_name  www.test.com;
     access_log  logs/wp.access.log  main;
 
 # location ~ \.php$ {      
