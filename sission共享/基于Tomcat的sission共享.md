@@ -1,4 +1,5 @@
 部署nginx
+---
 ```
 # yum install epel-release -y  
 # yum install nginx -y
@@ -33,6 +34,7 @@ server {
 ```
 
 部署redis
+---
 ```
 # yum install redis –y
 # vi /etc/redis.conf
@@ -43,7 +45,8 @@ requirepass 123456
 # systemctl enable redis
 ```
 
-
+部署JAVA项目
+---
 1、配置JDK和Maven环境变量
 ```
 # tar zxvf jdk-8u45-linux-x64.tar.gz
@@ -71,7 +74,8 @@ https://github.com/b3log/solo
 # ../bin/startup.sh
 ```
 
-3、Tomcat基于Redis实现Session共享
+Tomcat基于Redis实现Session共享
+---
 ```
 # git clone https://github.com/chexagon/redis-session-manager
 # cd redis-session-manager
