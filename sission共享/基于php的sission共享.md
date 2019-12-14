@@ -26,7 +26,7 @@ server {
 location / {
         fastcgi_pass   dynamic.wp;
         fastcgi_index  index.php;
-        fastcgi_param  SCRIPT_FILENAME  /var/www/html$fastcgi_script_name;
+        fastcgi_param  SCRIPT_FILENAME  /var/www/html$fastcgi_script_name;   #此路径必须在php服务器上真实存在
         include        fastcgi_params;
 }
     location ~ \.(html|css|js|jpg|png|gif)$ {
