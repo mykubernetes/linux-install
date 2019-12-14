@@ -1,3 +1,16 @@
+编译安装及编译参数
+```
+# useradd -M -s /sbin/nologin nginx  
+# yum install gcc pcre-devel openssl-devel -y
+
+# curl -o nginx-1.12.2.tar.gz http://nginx.org/download/nginx-1.12.2.tar.gz
+# tar zxvf nginx-1.12.2.tar.gz
+# cd nginx-1.12.2
+# ./configure --prefix=/usr/local/nginx --user=nginx --group=nginx --with-http_ssl_module --with-http_stub_status_module --with-stream=dynamic
+
+# make && make install
+```
+
 | 参数 | 描述 |
 | :------: | :--------: | 
 | --prefix=PATH	| 安装目录
@@ -33,3 +46,26 @@
 | --with-pcre=DIR	| 指定PCRE库路径
 | --with-zlib=DIR	| 指定zlib库路径，gzip模块依赖
 | --with-openssl=DIR | 指定openssl库路径，ssl模块依赖
+
+- --with 这些模块在编译时默认没启用
+- --without  默认启用的模块
+
+dynamic  1.9.11版本后支持nginx运行时动态加载模块，像以前需要在编译时指定才会加载此模块，现在不主动加载模块，当使用时才会加载。在安装目录会创建一个目录modules，里面存放着动态加载的模块。
+
+暂时支持这几个模块动态加载
+```
+# ./configure --help |grep dynamic
+```
+
+同时也增加了一个指令：load_module modules/ngx_http_geoip_module.so；# 要放到nginx.conf最上面要想第三方模块为动态加载，需要再编译时指定：
+```
+./configure --add-dynamic-module=PATH
+```
+
+这样动态模块的共享文件会被安装到modules目录下，可以再通过load_module指令动态加载这个模块。tengine早些版本已经实现动态加载模块了。
+
+http://nginx.org/en/docs/
+
+gzip压缩体积越小，对CPU消耗越大  
+第三方模块地址：https://www.nginx.com/resources/wiki/modules/
+
