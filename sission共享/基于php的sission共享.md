@@ -1,3 +1,13 @@
+
+部署nginx和redis
+```
+# yum install epel-release -y  
+# yum install nginx redis -y
+
+```
+
+
+
 1）安装php依赖的第三方库
 ```
 # yum install gd-devel libxml2-devel libcurl-devel libjpeg-devel libpng-devel gcc -y
