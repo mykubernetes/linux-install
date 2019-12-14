@@ -1,5 +1,5 @@
-
-部署nginx和redis
+部署nginx
+---
 ```
 # yum install epel-release -y  
 # yum install nginx -y
@@ -36,6 +36,7 @@ location / {
 ```
 
 部署redis
+---
 ```
 # yum install redis –y
 # vi /etc/redis.conf
@@ -46,6 +47,8 @@ requirepass 123456
 # systemctl enable redis
 ```
 
+编译安装php
+---
 1）安装php依赖的第三方库
 ```
 # yum install gd-devel libxml2-devel libcurl-devel libjpeg-devel libpng-devel gcc -y
