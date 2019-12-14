@@ -3,9 +3,37 @@
 ```
 # yum install epel-release -y  
 # yum install nginx redis -y
-
 ```
 
+配置nginx代理php
+```
+# vi /etc/nginix/conf.d/www.test.conf
+upstream static.wp {
+   server 192.168.0.217:80;
+   server 192.168.0.218:80;
+}
+upstream dynamic.wp {
+   server 192.168.0.215:9000;
+   server 192.168.0.216:9000;
+}
+server {
+    listen       80;
+    server_name  test.aliangedu.com;
+    access_log  logs/wp.access.log  main;
+
+# location ~ \.php$ {      
+# 不能这么写，因为首页访问没有具体传递index.php，与JAVA隐藏后缀类似
+location / {
+        fastcgi_pass   dynamic.wp;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  /var/www/html$fastcgi_script_name;
+        include        fastcgi_params;
+}
+    location ~ \.(html|css|js|jpg|png|gif)$ {
+        proxy_pass http://static.wp; 
+    }
+}
+```
 
 
 1）安装php依赖的第三方库
