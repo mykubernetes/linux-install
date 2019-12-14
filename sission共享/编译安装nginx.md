@@ -1,3 +1,23 @@
+网络源安装
+---
+```
+# vim /etc/yum.repos.d/nginx.repo
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/centos/7/$basearch/
+gpgcheck=0
+enabled=1
+
+# yum install nginx
+# nginx -v
+# nginx -V
+# rpm -ql nginx  # 查看已安装包在系统安装了哪些文件
+# systemctl start nginx
+# ps -ef |grep nginx
+```
+替换OS为rhel或centos，OSRELEASE为6或7
+
+
 编译安装及编译参数
 ---
 ```
