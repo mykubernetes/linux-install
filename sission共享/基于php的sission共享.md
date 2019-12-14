@@ -18,6 +18,13 @@
 # make -j 4 && make install
 ```
 
+注意： 如果在编译的时候报此错误configure: error: Cannot find OpenSSL's <evp.h> 需要安装如下软件
+```
+# yum install openssl openssl-devel -y
+```
+
+
+
 # 配置php
 ```
 # cp php.ini-production /usr/local/php/etc/php.ini
