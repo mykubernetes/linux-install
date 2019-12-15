@@ -90,7 +90,7 @@ vrrp_instance VI_1 {
     #     IP                 # 接收VRRP单播的IP地址
     # }
     virtual_router_id 51     # VRRP路由ID实例，每个实例是唯一的
-    priority 100             # 优先级，备服务器设置90
+    priority 90             # 优先级，备服务器设置90
     advert_int 1             # 指定VRRP心跳包通告间隔时间，默认1秒
     # VRRP验证块
     authentication {
