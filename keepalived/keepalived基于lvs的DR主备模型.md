@@ -61,3 +61,52 @@ virtual_server 192.168.0.200 80 {
 }
 
 ```
+
+LVS DR RS配置
+```
+#!/bin/bash
+
+VIP=192.168.0.200
+
+NIC="lo:0"
+
+case $1 in
+    start)
+        echo 1 > /proc/sys/net/ipv4/conf/all/arp_ignore
+        echo 2 > /proc/sys/net/ipv4/conf/all/arp_announce
+        echo 1 > /proc/sys/net/ipv4/conf/lo/arp_ignore
+        echo 2 > /proc/sys/net/ipv4/conf/lo/arp_announce
+
+        ifconfig $NIC $VIP netmask 255.255.255.255 broadcast $VIP up  # 只有在即在这个网段内
+
+        route add -host $VIP dev $NIC
+    	;;
+    stop)
+        echo 0 > /proc/sys/net/ipv4/conf/all/arp_ignore
+        echo 0 > /proc/sys/net/ipv4/conf/all/arp_announce
+        echo 0 > /proc/sys/net/ipv4/conf/lo/arp_ignore
+        echo 0 > /proc/sys/net/ipv4/conf/lo/arp_announce
+      
+        ifconfig $NIC down
+
+        route del $VIP 
+    	;;
+    status)
+        if ifconfig $NIC |grep $VIP &> /dev/null; then
+            echo "$NIC is configured."
+        else
+            echo "$NIC not configured."
+        fi
+
+        if ifconfig $NIC |grep $VIP &> /dev/null; then
+            echo "$NIC is configured."
+        else 
+            echo "$NIC not configured."
+        fi   
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status}"
+        exit 0
+esac
+
+```
