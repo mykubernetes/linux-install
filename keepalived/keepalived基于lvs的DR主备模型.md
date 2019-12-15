@@ -87,11 +87,11 @@ vrrp_instance VI_1 {
     # mcast_src_ip 192.168.1.149   # 指定VRRP多播（组播）源IP地址
     # unicast_src_ip IP            # 指定VRRP单播源IP地址
     # unicast_peer {
-    #     IP                 # 接收VRRP单播的IP地址
+    #     IP                       # 接收VRRP单播的IP地址
     # }
-    virtual_router_id 51     # VRRP路由ID实例，每个实例是唯一的
-    priority 90             # 优先级，备服务器设置90
-    advert_int 1             # 指定VRRP心跳包通告间隔时间，默认1秒
+    virtual_router_id 51           # VRRP路由ID实例，每个实例是唯一的
+    priority 90                    # 优先级，备服务器设置90
+    advert_int 1                   # 指定VRRP心跳包通告间隔时间，默认1秒
     # VRRP验证块
     authentication {
         auth_type PASS
