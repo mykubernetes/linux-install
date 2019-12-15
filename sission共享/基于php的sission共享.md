@@ -114,4 +114,8 @@ extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20131226/redis.so
 session.save_handler = redis
 session.save_path = "tcp://192.168.0.219:6379?auth=123456"
 # /etc/init.d/php-fpm restart
+
+# /usr/local/php/bin/php -m |grep redis
+redis
+
 ```
