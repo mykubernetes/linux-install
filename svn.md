@@ -1,6 +1,7 @@
 小乌龟svn下载地址  
 https://tortoisesvn.net/downloads.html  
-
+使用说明  
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/Tortoisesvn.png)
 
 1、安装
 ```
