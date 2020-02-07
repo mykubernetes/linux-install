@@ -118,7 +118,7 @@ node03
 $ ansible-playbook site.yml
 ```  
 
-7、验证  
+7、验证,因为配置文件里设置的集群名称为back,默认为ceph,所以修改为back测试，否则命令不可以执行成功
 ```
 $ export CEPH_ARGS="--cluster back"
 $ ceph -s
