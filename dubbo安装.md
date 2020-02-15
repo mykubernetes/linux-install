@@ -1,4 +1,5 @@
 1、安装java
+---
 ```
 1、解压缩jdk
 # tar xvf jdk-8u141-linux-x64.tar.gz
@@ -14,6 +15,7 @@ export PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
 ```
 
 2、安装maven
+---
 ```
 1、下载
 # wget http://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
@@ -39,6 +41,7 @@ OS name: "linux", version: "3.10.0-693.el7.x86_64", arch: "amd64", family: "unix
 
 
 3、安装zookeeper
+---
 ```
 1、下载zookeeper
 # wget http://mirror.bit.edu.cn/apache/zookeeper/zookeeper-3.4.9/zookeeper-3.4.9.tar.gz
@@ -97,6 +100,7 @@ server.3=node03:2881:3881
 ```
 
 4、安装dubbo
+---
 ```
 1、下载dubbo项目
 # git clone https://github.com/apache/dubbo.git
@@ -147,3 +151,36 @@ dubbo.admin.guest.password=guest
 打开地址：http://192.168.101.66:8080/  
 用户名为：root   
 密码：root  
+
+5、安装dubbo监控
+---
+```
+1、进入目录解压
+# tar -zxf dubbo-monitor-simple-2.8.4-assembly.tar.gz
+
+2、进入目录修改配置文件
+# cd /data/software/dubbo-monitor-simple-2.8.4/conf
+# vim dubbo.properties
+dubbo.container=log4j,spring,registry,jetty
+dubbo.application.name=simple-monitor
+dubbo.application.owner=
+#dubbo.registry.address=multicast://224.5.6.7:1234
+dubbo.registry.address=zookeeper://192.168.101.66:2181?backup=192.168.101.67:2181,192.168.101.68:2181  #zk地址
+#dubbo.registry.address=redis://127.0.0.1:6379
+#dubbo.registry.address=dubbo://127.0.0.1:9090
+dubbo.protocol.port=7070
+dubbo.jetty.port=9080        #http访问端口
+dubbo.jetty.directory=${user.home}/monitor
+dubbo.charts.directory=${dubbo.jetty.directory}/charts
+dubbo.statistics.directory=${user.home}/monitor/statistics
+dubbo.log4j.file=logs/dubbo-monitor-simple.log
+dubbo.log4j.level=WARN
+
+3、启动
+./start.sh 
+Starting the simple-monitor .....OK!
+PID: 3262
+STDOUT: logs/stdout.log
+```
+
+http://192.168.101.66:9080/
