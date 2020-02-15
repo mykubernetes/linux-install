@@ -216,6 +216,36 @@ bind 192.168.1.70
       - tomcat-webapps
       - tomcat-admin-webapps
 ```  
+
+```
+- name: with_list
+  debug:
+    msg: "{{ item }}"
+  with_list:
+    - one
+    - two
+
+- name: with_list -> loop
+  debug:
+    msg: "{{ item }}"
+  loop:
+    - 1
+    - 2
+
+- name: with_items
+  user: name={{itme.name}} groups={{item.groups}} state=present
+  with_items:
+    - {name: 'zhangsan', groups: nginx}
+    - {name: 'lisi', groups: nginx}
+
+#通过变量传递的方式
+- name: with_items -> loop
+  debug:
+    msg: "{{ item }}"
+  loop: "{{ items|flatten(levels=1) }}"
+
+```
+
 15)roles  
 ```
 mkdir /etc/ansible/roles/nginx/{tasks,vars,templates,files,handlers,meta,default} -pv
