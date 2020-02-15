@@ -292,8 +292,7 @@ hosts: webservers
       yum: name=java-1.8.0-openjdk state=present
  
     - name: Download tomcat
-      get_url: url=http://mirrors.hust.edu.cn/apache/tomcat/tomcat-8/v{{ tomcat_version }}/bin/
-                   apache-tomcat-{{ tomcat_version }}.tar.gz dest=/tmp
+      get_url: url=http://mirrors.hust.edu.cn/apache/tomcat/tomcat-8/v{{ tomcat_version }}/bin/apache-tomcat-{{ tomcat_version }}.tar.gz dest=/tmp
  
     - name: Unarchive tomcat-{{ tomcat_version }}.tar.gz
       unarchive:
