@@ -282,7 +282,51 @@ import*（静态）：在Playbook解析时预先导入
 -	不能与循环一起使用
 -	将变量用于目标文件或角色名称时，不能使用inventory（主机/主机组等）中的变量
 
+1.import
+```
+# cat main.yml
+---
+- import_playbook: webservers.yml
+- import_playbook: databases.yml
 
+# cat webservers.yml
+---
+- hosts: webservers
+  tasks:
+    - debug: msg="test webserver"
+
+
+# cat database.yml
+---
+- hosts: webservers
+  tasks:
+    - debug: msg="test database"
+```
+
+2.include
+```
+# cat main.yml
+---
+- hosts: webservers
+  gather_facts: no
+  tasks:
+  - include_tasks: task1.yml
+    vars:
+      user: zhangsan
+  - import_tasks: task2.yml
+    vars:
+      user: lisi
+
+# cat task1.yml
+---
+- name: task1
+  debug: msg="hello {{user}}"
+
+# cat task2.yml
+---
+- name: task2
+  debug: msg="hello {{user}}"
+```
 
 自动部署Nginx
 ```
