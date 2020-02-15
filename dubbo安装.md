@@ -123,10 +123,15 @@ server.3=node03:2881:3881
 然后进入到dubbox目录下执行
 # mvn deploy -Dmaven.test.skip=true
 
-5、安装tomcat
+需要用到的war包
+# ls dubbo-admin/target/dubbo-admin-2.8.4.war
+# ls dubbo-simple/target/dubbo-monitor-simple-2.8.4-assembly.tar.gz
 
+5、安装tomcat
+# tar -zxvf  apache-tomcat-7.0.81.tar.gz  
 
 6、移动war包到tomcat目录
+# ls dubbo-admin/target/dubbo-admin-2.8.4.war
 # mv dubbo-admin-2.8.4.war /data/software/apache-tomcat-7.0.81/webapps
 
 7、重命名
@@ -156,6 +161,7 @@ dubbo.admin.guest.password=guest
 ---
 ```
 1、进入目录解压
+# ls dubbo-simple/target/dubbo-monitor-simple-2.8.4-assembly.tar.gz
 # tar -zxf dubbo-monitor-simple-2.8.4-assembly.tar.gz
 
 2、进入目录修改配置文件
