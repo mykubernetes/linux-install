@@ -232,6 +232,50 @@ server {
 ngxroot: /ngxdata/vhost1
 ```  
 
+自动部署Nginx
+```
+- hosts: webservers
+  vars:
+    hello: Ansible
+ 
+  tasks:
+  - name: Add repo 
+    yum_repository:
+      name: nginx
+      description: nginx repo
+      baseurl: http://nginx.org/packages/centos/7/$basearch/
+      gpgcheck: no
+      enabled: 1
+  - name: Install nginx
+    yum:
+      name: nginx
+      state: latest
+  - name: Copy nginx configuration file
+    copy:
+      src: ./site.conf
+      dest: /etc/nginx/conf.d/site.conf
+  - name: Start nginx
+    service:
+      name: nginx
+      state: started
+  - name: Create wwwroot directory
+    file:
+      dest: /var/www/html
+      state: directory
+  - name: Create test page index.html
+    shell: echo "hello {{hello}}" > /var/www/html/index.html
+
+
+# site.conf
+server {
+    listen 80;
+    server_name www.ctnrs.com;
+    location / {
+        root   /var/www/html;
+        index  index.html;
+    }
+}
+```
 
 自动部署Tomcat
 ```
