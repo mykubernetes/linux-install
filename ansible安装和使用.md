@@ -1,8 +1,15 @@
 ansible安装和使用
 ===========
-1、安装ansible  
-``` yum install -y ansible ```  
-2、配置ansible可以获取的主机  
+
+最佳实践：https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html  
+示例参考：https://github.com/ansible/ansible-examples  
+
+1、安装ansible
+--
+``` # yum install -y ansible ```  
+
+2、配置ansible可以获取的主机
+---
 ```
 vim /etc/ansible/hosts
 [webserver]
@@ -11,7 +18,36 @@ node02
 [dbserver]
 192.168.1.[1:3]
 ```  
+
 3、常用命令  
+---
+
+```
+-a MODULE_ARGS, --args=MODULE_ARGS                  模块参数
+-C, --check                                         运行检查，不执行任何操作
+-e EXTRA_VARS, --extra-vars=EXTRA_VARS              设置附加变量 key=value
+-f FORKS, --forks=FORKS                             指定并行进程数量，默认5
+-i INVENTORY, --inventory=INVENTORY                 指定主机清单文件路径
+--list-hosts                                        输出匹配的主机列表，不执行任何操作
+-m MODULE_NAME, --module-name=MODULE_NAME           执行的模块名，默认command
+--syntax-check                                      语法检查playbook文件，不执行任何操作
+-t TREE, --tree=TREE                                将日志输出到此目录
+-v, --verbose                                       详细信息，-vvv更多, -vvvv debug
+--version                                           查看程序版本
+
+连接选项：控制谁连接主机和如何连接
+-k, --ask-pass                                      请求连接密码
+--private-key=PRIVATE_KEY_FILE, --key-file=PRIVATE_KEY_FILE      私钥文件
+-u REMOTE_USER, --user=REMOTE_USER                  连接用户，默认None
+-T TIMEOUT, --timeout=TIMEOUT                       覆盖连接超时时间，默认10秒
+
+提权选项：控制在目标主机以什么用户身份运行
+-b, --become                                        以另一个用户身份操作
+--become-method=BECOME_METHOD                       提权方法，默认sudo
+--become-user=BECOME_USER                           提权后的用户身份，默认root
+-K, --ask-become-pass                               提权密码
+```
+
 0)查看模块帮助
 ``` ansible-doc -s file ```  
 1)ping测试  
