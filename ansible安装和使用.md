@@ -39,15 +39,23 @@ node02
 11)script 本地脚本拷贝到目标主机执行  
 ``` ansible all -m script -a "/opt/script_file.sh" ```  
 
-4、ansible playbook  
-1)检查语法是否正确  
-``` ansible-playbook --syntax-checak first.yaml ```  
-2)不实际运行测试  
-``` ansible-playbook -C first.yaml ```   
-3)检查运行的主机  
-``` ansible-playbook --list-host first.yaml ```  
-4)基本语法  
+ansible playbook
+===
 
+1)检查语法是否正确  
+---
+``` ansible-playbook --syntax-checak first.yaml ```  
+
+2)不实际运行测试  
+---
+``` ansible-playbook -C first.yaml ```   
+
+3)检查运行的主机  
+---
+``` ansible-playbook --list-host first.yaml ```  
+
+4)基本语法  
+---
 在变更时执行操作（handlers）  
 notify：在任务结束时触发  
 handlers：由特定条件触发Tasks  
@@ -72,7 +80,9 @@ handlers：由特定条件触发Tasks
 ansible-playbook first.yaml                #运行playbook
 ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```  
+
 5)ansible查看变量  
+---
 ``` ansible node01 -m setup ```  
 ```
 - hosts: node01
@@ -83,6 +93,7 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```   
 
 6)命令行传递变量  
+---
 ```  
 #  ansible-playbook -e pkgname=memcached  test.yaml
 # cat test.yaml
@@ -94,6 +105,7 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```  
 
 7)在Playbook中定义变量
+---
 ```
 - hosts: webservers
     gather_facts: no
@@ -105,7 +117,8 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
         shell: "echo {{var_name}}"
 ```
 
-9）注册变量（register）
+8）注册变量（register）
+---
 ```
 - hosts: webservers 
     gather_facts: no
@@ -117,7 +130,8 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
         command: touch /tmp/{{date_output.stdout}}
 ```
 
-10)系统信息变量（facts）
+9)系统信息变量（facts）
+---
 ```
 - hosts: webservers 
     gather_facts: no
@@ -130,7 +144,8 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
 
 ```
 
-11)invertory参数变量  
+10)invertory参数变量  
+---
 ansible_ssh_host  
 ansible_ssh_port  
 ansible_ssh_user  
@@ -157,7 +172,9 @@ ansible_ssh_sudo_pass
    192.168.1.71 | SUCCESS | rc=0 >>
  hadoop
 ```  
-12)playbook变量  
+
+11)playbook变量  
+---
 ```
 # cat test.yaml
 - hosts: node01
@@ -168,7 +185,9 @@ ansible_ssh_sudo_pass
    - name: host playbook var
      copy: content={{ pbvar }} dest=/tmp/playbook.var
 ```  
+
 12)template文件
+---
 ```
 # cat /opt/src/redis.conf |grep ^bind
 bind {{ ansible_enp0s3.ipv4.address }}
@@ -192,7 +211,9 @@ bind {{ ansible_enp0s3.ipv4.address }}
 # cat /etc/redis.conf |grep ^bind
 bind 192.168.1.70
 ```  
+
 13)when判断
+---
 ```
 - hosts: web
   remote_user: root
@@ -204,7 +225,9 @@ bind 192.168.1.70
      when: ansible_os_family == "Debian"
      apt: name=apache2 state=latest
 ```  
+
 14)with_items迭代   
+---
 ```
 - hosts: web
   remote_user: root
@@ -247,6 +270,7 @@ bind 192.168.1.70
 ```
 
 15)Playbook模板（jinja2）
+---
 条件和循环
 ```
 # cat test.yml 
@@ -315,7 +339,35 @@ server {
 }
 ```
 
-16)roles  
+16)roles
+---
+Roles目录结构
+```
+site.yml 
+webservers.yml   
+fooservers.yml   
+roles/ 
+   common/ 
+     tasks/ 
+     handlers/ 
+     files/ 
+     templates/ 
+     vars/ 
+     defaults/ 
+     meta/ 
+   webservers/ 
+     tasks/ 
+     defaults/ 
+     meta/
+```
+-	tasks - 包含角色要执行的主要任务列表
+-	handlers - 包含角色使用的处理程序
+-	defaults - 角色默认的变量
+-	vars - 角色其他的变量
+-	files - 角色部署时用到的文件
+-	templates - 角色部署时用到的模板
+-	meta - 角色定义的一些元数据
+
 ```
 mkdir /etc/ansible/roles/nginx/{tasks,vars,templates,files,handlers,meta,default} -pv
 # cat /opt/playbook/httpd.yaml
