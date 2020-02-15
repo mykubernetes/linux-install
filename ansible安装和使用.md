@@ -48,9 +48,10 @@ node02
 ``` ansible-playbook --list-host first.yaml ```  
 4)基本语法  
 
-在变更时执行操作（handlers）
+在变更时执行操作（handlers）  
 notify：在任务结束时触发  
 handlers：由特定条件触发Tasks  
+任务控制（tags）  
 ```
 - hosts: node01
   remote_user: root
@@ -68,7 +69,7 @@ handlers：由特定条件触发Tasks
      service: name=redis state=restarted
 ```  
 ```
-ansible-playbook first.yaml                    #运行playbook
+ansible-playbook first.yaml                #运行playbook
 ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```  
 5)ansible查看变量  
