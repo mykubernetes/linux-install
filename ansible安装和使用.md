@@ -157,7 +157,7 @@ ansible_ssh_sudo_pass
    192.168.1.71 | SUCCESS | rc=0 >>
  hadoop
 ```  
-8)playbook变量  
+12)playbook变量  
 ```
 # cat test.yaml
 - hosts: node01
@@ -168,7 +168,7 @@ ansible_ssh_sudo_pass
    - name: host playbook var
      copy: content={{ pbvar }} dest=/tmp/playbook.var
 ```  
-9)template文件
+12)template文件
 ```
 # cat /opt/src/redis.conf |grep ^bind
 bind {{ ansible_enp0s3.ipv4.address }}
@@ -192,7 +192,7 @@ bind {{ ansible_enp0s3.ipv4.address }}
 # cat /etc/redis.conf |grep ^bind
 bind 192.168.1.70
 ```  
-10)when判断
+13)when判断
 ```
 - hosts: web
   remote_user: root
@@ -204,7 +204,7 @@ bind 192.168.1.70
      when: ansible_os_family == "Debian"
      apt: name=apache2 state=latest
 ```  
-11)with_items迭代   
+14)with_items迭代   
 ```
 - hosts: web
   remote_user: root
@@ -216,7 +216,7 @@ bind 192.168.1.70
       - tomcat-webapps
       - tomcat-admin-webapps
 ```  
-12)roles  
+15)roles  
 ```
 mkdir /etc/ansible/roles/nginx/{tasks,vars,templates,files,handlers,meta,default} -pv
 # cat /opt/playbook/httpd.yaml
@@ -271,6 +271,18 @@ server {
 # cat nginx/vars/main.yaml
 ngxroot: /ngxdata/vhost1
 ```  
+
+include & import 区别
+---
+include*（动态）：在运行时导入
+-	--list-tags，--list-tasks不会显示到输出
+-	不能使用notify触发来自include*内处理程序名称（handlers）
+
+import*（静态）：在Playbook解析时预先导入
+-	不能与循环一起使用
+-	将变量用于目标文件或角色名称时，不能使用inventory（主机/主机组等）中的变量
+
+
 
 自动部署Nginx
 ```
