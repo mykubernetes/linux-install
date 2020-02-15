@@ -282,10 +282,10 @@ server {
 ```
 ---
 hosts: webservers 
-   gather_facts: no
-   vars:
-     tomcat_version: 8.5.34
-     tomcat_install_dir: /usr/local
+  gather_facts: no
+  vars:
+    tomcat_version: 8.5.34
+    tomcat_install_dir: /usr/local
   
   tasks:
     - name: Install jdk1.8
