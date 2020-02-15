@@ -425,6 +425,36 @@ roles/
 -	templates - 角色部署时用到的模板
 -	meta - 角色定义的一些元数据
 
+role变量
+```
+- hosts: webservers
+  roles:
+     - common
+     - nginx
+     - php
+---
+- hosts: webservers
+  roles:
+    - common
+    - role: nginx              #不同角色变量
+      vars:
+         dir: '/opt/a'
+         app_port: 5000
+    - role: php
+      vars:
+         dir: '/opt/b'
+         app_port: 5001
+---
+- hosts: webservers
+  roles:
+    - role: common
+      tags: ["common"]
+    - role: nginx
+      tags: ["nginx"]
+    - role: php
+      tags: ["php"]
+```
+
 ```
 mkdir /etc/ansible/roles/nginx/{tasks,vars,templates,files,handlers,meta,default} -pv
 # cat /opt/playbook/httpd.yaml
