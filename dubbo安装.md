@@ -105,7 +105,45 @@ server.3=node03:2881:3881
 # cd dubbo
 
 3、编译dubbo
-# 
+# mvn install -Dmaven.test.skip=true
+
+4、修改pom.xml文件，将jar上传到nexus
+在dubbox目录下，修改pom.xml文件，添加如下代码：
+    <distributionManagement>
+       <repository>
+         <id>nexus-releases</id>
+         <url>http://10.211.55.7:8081/repository/maven-releases/</url>
+       </repository> 
+    </distributionManagement>
+
+然后进入到dubbox目录下执行
+# mvn deploy -Dmaven.test.skip=true
+
+5、安装tomcat
+
+
+6、移动war包到tomcat目录
+# mv dubbo-admin-2.8.4.war /data/software/apache-tomcat-7.0.81/webapps
+
+7、重命名
+# cd /data/software/apache-tomcat-7.0.81/webapps
+# mv dubbo-admin-2.8.4.war ROOT.war
+
+8、启动tomcat
+# /data/software/apache-tomcat-7.0.81/bin/startup.sh
+
+9、设置dubbo.registry.address
+# cd /data/software/apache-tomcat-7.0.81/webapps/ROOT/WEB-INF
+# vim dubbo.registry.address
+dubbo.registry.address=zookeeper://192.168.101.66:2181?backup=192.168.101.67:2181,192.168.101.68:2181
+dubbo.admin.root.password=root
+dubbo.admin.guest.password=guest
+
+10、重启tomcat
+# /data/software/apache-tomcat-7.0.81/bin/stop.sh
+# /data/software/apache-tomcat-7.0.81/bin/startup.sh
 ```
 
-```
+打开地址：http://192.168.101.66:8080/  
+用户名为：root   
+密码：root  
