@@ -3,6 +3,7 @@ ansible安装和使用
 
 最佳实践：https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html  
 示例参考：https://github.com/ansible/ansible-examples  
+http://www.zsythink.net/archives/category/%e8%bf%90%e7%bb%b4%e7%9b%b8%e5%85%b3/ansible/
 
 1、安装ansible
 --
