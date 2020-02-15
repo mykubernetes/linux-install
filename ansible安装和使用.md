@@ -227,3 +227,33 @@ server {
 # cat nginx/vars/main.yaml
 ngxroot: /ngxdata/vhost1
 ```  
+
+
+自动部署Tomcat
+```
+---
+hosts: webservers 
+   gather_facts: no
+   vars:
+     tomcat_version: 8.5.34
+     tomcat_install_dir: /usr/local
+  
+  tasks:
+    - name: Install jdk1.8
+      yum: name=java-1.8.0-openjdk state=present
+ 
+    - name: Download tomcat
+      get_url: url=http://mirrors.hust.edu.cn/apache/tomcat/tomcat-8/v{{ tomcat_version }}/bin/
+                   apache-tomcat-{{ tomcat_version }}.tar.gz dest=/tmp
+ 
+    - name: Unarchive tomcat-{{ tomcat_version }}.tar.gz
+      unarchive:
+        src: /tmp/apache-tomcat-{{ tomcat_version }}.tar.gz 
+        dest: "{{ tomcat_install_dir }}"
+        copy: no 
+ 
+    - name: Start tomcat 
+      shell: cd {{ tomcat_install_dir }} &&
+             mv apache-tomcat-{{ tomcat_version }} tomcat8 &&
+             cd tomcat8/bin && nohup ./startup.sh &
+```
