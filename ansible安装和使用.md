@@ -246,7 +246,76 @@ bind 192.168.1.70
 
 ```
 
-15)roles  
+15)Playbook模板（jinja2）
+条件和循环
+```
+# cat test.yml 
+---
+- hosts: webservers
+  vars:
+   hello: Ansible
+ 
+  tasks:
+    - template: src=f.j2 dest=/tmp/f.j2
+
+
+# cat f.j2 
+{% set list=['one', 'two', 'three'] %}
+ 
+{% for i in list %}
+   {% if i == 'two' %}
+       -> two
+   {% elif loop.index == 3 %}
+       -> 3
+   {% else %}
+       {{i}}
+   {% endif %}
+{% endfor %} 
+ 
+{{ hello }}
+{% set dict={'zhangsan': '26', 'lisi': '25'} %}
+{% for key, value in dict.iteritems() %}
+    {{key}} -> {{value}}
+{% endfor %}
+```
+
+管理Nginx配置文件
+```
+# cat main.yml 
+---
+- hosts: webservers
+  gather_facts: no
+  vars:
+    http_port: 80
+    server_name: www.ctnrs.com
+ 
+  tasks:
+    - name: Copy nginx configuration file 
+      template: src=site.conf.j2 dest=/etc/nginx/conf.d/www.ctnrs.com.conf
+      notify: reload nginx
+ 
+  handlers:
+    - name: reload nginx
+      service: name=nginx state=reloaded
+ 
+# cat site.conf.j2 
+{% set list=[10, 12, 13, 25, 31] %}
+upstream {{server_name}} {
+    {% for i in list %}
+       server 192.168.1.{{i}}:80;
+    {% endfor %}
+}
+server {
+    listen       {{ http_port }};
+    server_name  {{ server_name }};
+ 
+    location / {
+        proxy_pass http://{{server_name}};
+    } 
+}
+```
+
+16)roles  
 ```
 mkdir /etc/ansible/roles/nginx/{tasks,vars,templates,files,handlers,meta,default} -pv
 # cat /opt/playbook/httpd.yaml
