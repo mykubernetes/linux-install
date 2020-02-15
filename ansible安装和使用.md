@@ -81,6 +81,7 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
    - name: copy file
      copy: content={{ ansible_env }} dest=/tmp/ansible.env
 ```   
+
 6)命令行传递变量  
 ```  
 #  ansible-playbook -e pkgname=memcached  test.yaml
@@ -91,7 +92,45 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
    - name: install package {{ pkgname }}
      yum: name={{ pkgname }} state=latest
 ```  
-7)invertory参数变量  
+
+7)在Playbook中定义变量
+```
+- hosts: webservers
+    gather_facts: no
+    vars:
+      var_name: value
+      var_name: value
+    tasks:
+      - name: hello
+        shell: "echo {{var_name}}"
+```
+
+9）注册变量（register）
+```
+- hosts: webservers 
+    gather_facts: no
+    tasks:
+      - name: Get date 
+        command: date +"%F_%T"
+        register: date_output
+      - name: Echo date_output
+        command: touch /tmp/{{date_output.stdout}}
+```
+
+10)系统信息变量（facts）
+```
+- hosts: webservers 
+    gather_facts: no
+    tasks:
+      - name: Get date 
+        command: date +"%F_%T"
+        register: date_output
+      - name: Echo date_output
+        command: touch /tmp/{{date_output.stdout}}
+
+```
+
+11)invertory参数变量  
 ansible_ssh_host  
 ansible_ssh_port  
 ansible_ssh_user  
