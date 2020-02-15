@@ -6,7 +6,28 @@ ansible安装和使用
 
 1、安装ansible
 --
-``` # yum install -y ansible ```  
+```
+# yum install -y ansible
+
+# vim /etc/ansible/ansible.cfg 
+[defaults]
+
+inventory = /etc/ansible/hosts
+
+forks = 5
+
+become = root
+
+remote_port  = 22
+
+host_key_checking = False
+
+timeout = 10
+
+log_path = /var/log/ansible.log
+
+private_key_file = /root/.ssh/id_rsa
+```  
 
 2、配置ansible可以获取的主机
 ---
