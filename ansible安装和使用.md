@@ -47,6 +47,10 @@ node02
 3)检查运行的主机  
 ``` ansible-playbook --list-host first.yaml ```  
 4)基本语法  
+
+在变更时执行操作（handlers）
+notify：在任务结束时触发  
+handlers：由特定条件触发Tasks  
 ```
 - hosts: node01
   remote_user: root
