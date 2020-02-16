@@ -150,7 +150,7 @@ dubbo.admin.root.password=root
 dubbo.admin.guest.password=guest
 
 10、重启tomcat
-# /data/software/apache-tomcat-7.0.81/bin/stop.sh
+# /data/software/apache-tomcat-7.0.81/bin/shutdown.sh
 # /data/software/apache-tomcat-7.0.81/bin/startup.sh
 ```
 
