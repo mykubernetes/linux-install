@@ -44,7 +44,7 @@ OS name: "linux", version: "3.10.0-693.el7.x86_64", arch: "amd64", family: "unix
 ---
 ```
 1、下载zookeeper
-# wget http://mirror.bit.edu.cn/apache/zookeeper/zookeeper-3.4.9/zookeeper-3.4.9.tar.gz
+# wget http://archive.apache.org/dist/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz
 
 2解压
 # tar -zxvf zookeeper-3.4.9.tar.gz
