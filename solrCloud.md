@@ -6,71 +6,88 @@ http://archive.apache.org/dist/
 https://www.apache.org/dist/lucene/  
 搭建solrcloud集群  
 
-一、zookeeper部署  
-1、下载zk  
+1、安装java
+---
 ```
-mkdir -p /apps/soft
-cd /apps/soft
-wget https://www.apache.org/dist/zookeeper/zookeeper-3.5.5/apache-zookeeper-3.5.5.tar.gz
-tar zxvf apache-zookeeper-3.5.5.tar.gz
-mv apache-zookeeper-3.5.5 /opt/zookeeper
-```  
+1、解压缩jdk
 
-2、	新建zookeeper的数据存储目录和日志文件目录
-```
-mkdir -p /opt/zookeeper/logs
-mkdir -p /opt/zookeeper/data
-```  
+# tar xvf jdk-8u141-linux-x64.tar.gz
 
-3、修改zk配置文件  
+2、配置环境变量
+# vim /etc/profile
+export JAVA_HOME=/data/software/java8
+export JRE_HOME=/data/software/java8/jre
+export CLASSPATH=.:$CLASSPATH:$JAVA_HOME/lib:$JRE_HOME/lib 
+export PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
+
+# source /etc/profile
 ```
-# cd /opt/zookeeper/conf
-# cp -av zoo_sample.cfg zoo.cfg
-# vim zoo.cfg
-tickTime=2000
-initLimit=10
-syncLimit=5
-dataDir=/opt/zookeeper/data
-dataLogDir=/opt/zookeeper/logs
+2、安装zookeeper
+---
+```
+1、下载zookeeper
+# wget http://archive.apache.org/dist/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz
+
+2解压
+# tar -zxvf zookeeper-3.4.9.tar.gz
+
+服务器1：
+#mv zookeeper-3.4.9 zookeeper
+服务器2：
+#mv zookeeper-3.4.9 zookeeper
+服务器3：
+#mv zookeeper-3.4.9 zookeeper
+
+3、在zookeeper的各个节点下 创建数据和日志目录
+# cd zookeeper
+# mkdir data
+# mkdir logs
+
+4、重命名配置文件
+# cd conf
+# cp zoo_sample.cfg zoo.cfg
+
+5、修改配置文件
 clientPort=2181
- #maxClientCnxns=60
- #minSessionTimeout=4000
- #maxSessionTimeout=40000
-server.1=node01:2888:3888
-server.2=node02:2888:3888
-server.3=node03:2888:3888
-```  
+dataDir=/data/software/zookeeper/data
+dataLogDir=/data/software/zookeeper/logs
 
+server.1=node01:2881:3881
+server.2=node02:2881:3881
+server.3=node03:2881:3881
 
-4	同步至其余4台服务器  
+6、创建myid文件
+# cd /data/software/zookeeper/data
+服务器1：
+# echo 1 > myid
+服务器2：
+# echo 2 > myid
+服务器3：
+# echo 3 > myid
+
+7、启动测试zookeeper
+进入/bin目录下执行：
+服务器1：
+# /zkServer.sh start
+服务器2：
+# /zkServer.sh start
+服务器3：
+# /zkServer.sh start
+
+8、jps命令查看进程
+# jps
+
+9、查看状态
+# /zkServer.sh status
 ```
-scp -r /opt/zookeeper node02:/opt
-scp -r /opt/zookeeper node03:/opt
-```  
 
-5、分别在每台机器上创建myid文件存储该机器的标识码  
+
+3、安装tomcat  
+--- 
 ```
-echo "1" > /opt/zookeeper/data/myid
-echo "2" > /opt/zookeeper/data/myid
-echo "3" > /opt/zookeeper/data/myid
-```  
-
-3.	启动zookeeper  
-```
-cd /opt/zookeeper/bin && ./zkServer.sh start
-./zkServer.sh status
-mode: follower or mode: Leader
-```  
-
-
-
-二、安装tomcat  
-1、下载tomcat  
-```
-cd /opt/
-wget http://dl.mycat.io/apache-tomcat-7.0.62.tar.gz
-mv apache-tomcat-7.0.62.tar.gz tomcat
-
+5、安装tomcat
+# wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.92/bin/apache-tomcat-7.0.92.tar.gz
+# tar -zxvf  apache-tomcat-7.0.92.tar.gz  
 ```  
 
 
