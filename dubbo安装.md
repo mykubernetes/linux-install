@@ -128,7 +128,8 @@ server.3=node03:2881:3881
 # ls dubbo-simple/target/dubbo-monitor-simple-2.8.4-assembly.tar.gz
 
 5、安装tomcat
-# tar -zxvf  apache-tomcat-7.0.81.tar.gz  
+# wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.92/bin/apache-tomcat-7.0.92.tar.gz
+# tar -zxvf  apache-tomcat-7.0.92.tar.gz  
 
 6、移动war包到tomcat目录
 # ls dubbo-admin/target/dubbo-admin-2.8.4.war
