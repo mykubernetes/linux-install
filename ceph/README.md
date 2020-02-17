@@ -5,11 +5,11 @@
 
 | 版本名称 | 版本号 | 发布时间 |
 | ------ | ------ | ------ |
-| Argonaut | 0.48版本(LTS) | 　　2012年6月3日 |
+| Argonaut | 0.48版本(LTS) | 　2012年6月3日 |
 | Bobtail | 0.56版本(LTS) | 　2013年5月7日 |
 | Cuttlefish | 0.61版本 | 　2013年1月1日 |
 | Dumpling | 0.67版本(LTS) | 　2013年8月14日 |
-| Emperor | 0.72版本 | 　　　 2013年11月9 |
+| Emperor | 0.72版本 | 　2013年11月9 |
 | Firefly | 0.80版本(LTS) | 　2014年5月 |
 | Giant | Giant | 　October 2014 - April 2015 |
 | Hammer | Hammer | 　April 2015 - November 2016|
