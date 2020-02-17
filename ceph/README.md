@@ -252,12 +252,12 @@ ceph-deploy osd create --data /dev/sdd cephnode03
 4、ceph.conf详细参数
 ```
 [global]#全局设置
-fsid = xxxxxxxxxxxxxxx                           #集群标识ID 
-mon host = 10.0.1.1,10.0.1.2,10.0.1.3            #monitor IP 地址
-auth cluster required = cephx                    #集群认证
+fsid = xxxxxxxxxxxxxxx                                  #集群标识ID 
+mon host = 10.0.1.1,10.0.1.2,10.0.1.3                   #monitor IP 地址
+auth cluster required = cephx                           #集群认证
 auth service required = cephx                           #服务认证
 auth client required = cephx                            #客户端认证
-osd pool default size = 3                             #最小副本数 默认是3
+osd pool default size = 3                               #最小副本数 默认是3
 osd pool default min size = 1                           #PG 处于 degraded 状态不影响其 IO 能力,min_size是一个PG能接受IO的最小副本数
 public network = 10.0.1.0/24                            #公共网络(monitorIP段) 
 cluster network = 10.0.2.0/24                           #集群网络
@@ -268,38 +268,38 @@ mon initial members = node1, node2, node3               #初始monitor (由创�
 mon data = /var/lib/ceph/mon/ceph-$id
 mon clock drift allowed = 1                             #默认值0.05#monitor间的clock drift
 mon osd min down reporters = 13                         #默认值1#向monitor报告down的最小OSD数
-mon osd down out interval = 600      #默认值300      #标记一个OSD状态为down和out之前ceph等待的秒数
+mon osd down out interval = 600            #默认值300    #标记一个OSD状态为down和out之前ceph等待的秒数
 ##############################################################
 [osd]
 osd data = /var/lib/ceph/osd/ceph-$id
-osd mkfs type = xfs                                     #格式化系统类型
-osd max write size = 512 #默认值90                   #OSD一次可写入的最大值(MB)
-osd client message size cap = 2147483648 #默认值100    #客户端允许在内存中的最大数据(bytes)
-osd deep scrub stride = 131072 #默认值524288         #在Deep Scrub时候允许读取的字节数(bytes)
-osd op threads = 16 #默认值2                         #并发文件系统操作数
-osd disk threads = 4 #默认值1                        #OSD密集型操作例如恢复和Scrubbing时的线程
-osd map cache size = 1024 #默认值500                 #保留OSD Map的缓存(MB)
-osd map cache bl size = 128 #默认值50                #OSD进程在内存中的OSD Map缓存(MB)
-osd mount options xfs = "rw,noexec,nodev,noatime,nodiratime,nobarrier" #默认值rw,noatime,inode64  #Ceph OSD xfs Mount选项
-osd recovery op priority = 2 #默认值10              #恢复操作优先级，取值1-63，值越高占用资源越高
-osd recovery max active = 10 #默认值15              #同一时间内活跃的恢复请求数 
-osd max backfills = 4  #默认值10                  #一个OSD允许的最大backfills数
-osd min pg log entries = 30000 #默认值3000           #修建PGLog是保留的最大PGLog数
-osd max pg log entries = 100000 #默认值10000         #修建PGLog是保留的最大PGLog数
-osd mon heartbeat interval = 40 #默认值30            #OSD ping一个monitor的时间间隔（默认30s）
-ms dispatch throttle bytes = 1048576000 #默认值 104857600 #等待派遣的最大消息数
-objecter inflight ops = 819200 #默认值1024           #客户端流控，允许的最大未发送io请求数，超过阀值会堵塞应用io，为0表示不受限
-osd op log threshold = 50 #默认值5                  #一次显示多少操作的log
-osd crush chooseleaf type = 0 #默认值为1              #CRUSH规则用到chooseleaf时的bucket的类型
+osd mkfs type = xfs                                        #格式化系统类型
+osd max write size = 512                   #默认值90        #OSD一次可写入的最大值(MB)
+osd client message size cap = 2147483648   #默认值100       #客户端允许在内存中的最大数据(bytes)
+osd deep scrub stride = 131072             #默认值524288    #在Deep Scrub时候允许读取的字节数(bytes)
+osd op threads = 16                        #默认值2         #并发文件系统操作数
+osd disk threads = 4                       #默认值1         #OSD密集型操作例如恢复和Scrubbing时的线程
+osd map cache size = 1024                  #默认值500       #保留OSD Map的缓存(MB)
+osd map cache bl size = 128                #默认值50        #OSD进程在内存中的OSD Map缓存(MB)
+osd mount options xfs = "rw,noexec,nodev,noatime,nodiratime,nobarrier"   #默认值rw,noatime,inode64  #Ceph OSD xfs Mount选项
+osd recovery op priority = 2               #默认值10        #恢复操作优先级，取值1-63，值越高占用资源越高
+osd recovery max active = 10               #默认值15        #同一时间内活跃的恢复请求数 
+osd max backfills = 4                      #默认值10        #一个OSD允许的最大backfills数
+osd min pg log entries = 30000             #默认值3000      #修建PGLog是保留的最大PGLog数
+osd max pg log entries = 100000            #默认值10000     #修建PGLog是保留的最大PGLog数
+osd mon heartbeat interval = 40            #默认值30        #OSD ping一个monitor的时间间隔（默认30s）
+ms dispatch throttle bytes = 1048576000    #默认值 104857600     #等待派遣的最大消息数
+objecter inflight ops = 819200             #默认值1024      #客户端流控，允许的最大未发送io请求数，超过阀值会堵塞应用io，为0表示不受限
+osd op log threshold = 50                  #默认值5         #一次显示多少操作的log
+osd crush chooseleaf type = 0              #默认值为1       #CRUSH规则用到chooseleaf时的bucket的类型
 ##############################################################
 [client]
-rbd cache = true #默认值 true      #RBD缓存
-rbd cache size = 335544320 #默认值33554432           #RBD缓存大小(bytes)
-rbd cache max dirty = 134217728 #默认值25165824      #缓存为write-back时允许的最大dirty字节数(bytes)，如果为0，使用write-through
-rbd cache max dirty age = 30 #默认值1                #在被刷新到存储盘前dirty数据存在缓存的时间(seconds)
+rbd cache = true                     #默认值 true     #RBD缓存
+rbd cache size = 335544320           #默认值33554432           #RBD缓存大小(bytes)
+rbd cache max dirty = 134217728      #默认值25165824      #缓存为write-back时允许的最大dirty字节数(bytes)，如果为0，使用write-through
+rbd cache max dirty age = 30         #默认值1                #在被刷新到存储盘前dirty数据存在缓存的时间(seconds)
 rbd cache writethrough until flush = false #默认值true  #该选项是为了兼容linux-2.6.32之前的virtio驱动，避免因为不发送flush请求，数据不回写
               #设置该参数后，librbd会以writethrough的方式执行io，直到收到第一个flush请求，才切换为writeback方式。
-rbd cache max dirty object = 2 #默认值0              #最大的Object对象数，默认为0，表示通过rbd cache size计算得到，librbd默认以4MB为单位对磁盘Image进行逻辑切分
+rbd cache max dirty object = 2       #默认值0              #最大的Object对象数，默认为0，表示通过rbd cache size计算得到，librbd默认以4MB为单位对磁盘Image进行逻辑切分
       #每个chunk对象抽象为一个Object；librbd中以Object为单位来管理缓存，增大该值可以提升性能
-rbd cache target dirty = 235544320 #默认值16777216    #开始执行回写过程的脏数据大小，不能超过 rbd_cache_max_dirty
+rbd cache target dirty = 235544320   #默认值16777216    #开始执行回写过程的脏数据大小，不能超过 rbd_cache_max_dirty
 ```
