@@ -194,26 +194,26 @@ yum --downloadonly --downloaddir=/var/www/html/ceph/rpm-nautilus/el7/x86_64/ ins
 4、下载Ceph依赖文件
 ```
 wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/ceph-14.2.4-0.el7.src.rpm 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/ceph-deploy-2.0.1-0.src.rpm
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-deploy-2.0.1-0.noarch.rpm
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-grafana-dashboards-14.2.4-0.el7.noarch.rpm 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-dashboard-14.2.4-0.el7.noarch.rpm
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-diskprediction-cloud-14.2.4-0.el7.noarch.rpm
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-diskprediction-local-14.2.4-0.el7.noarch.rpm
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-rook-14.2.4-0.el7.noarch.rpm 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-ssh-14.2.4-0.el7.noarch.rpm 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-release-1-1.el7.noarch.rpm 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/ceph-release-1-1.el7.src.rpm 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/ceph-medic-1.0.4-16.g60cf7e9.el7.src.rpm
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/repomd.xml 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/repodata/repomd.xml
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/a4bf0ee38cd4e64fae2d2c493e5b5eeeab6cf758beb7af4eec0bc4046b595faf-filelists.sqlite
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/a4bf0ee38cd4e64fae2d2c493e5b5eeeab6cf758beb7af4eec0bc4046b595faf-filelists.sqlite.bz2
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/183278bb826f5b8853656a306258643384a1547c497dd8b601ed6af73907bb22-other.sqlite.bz2 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/repodata/52bf459e39c76b2ea2cff2c5340ac1d7b5e17a105270f5f01b454d5a058adbd2-filelists.sqlite.bz2
- wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/repodata/4f3141aec1132a9187ff5d1b4a017685e2f83a761880884d451a288fcedb154e-primary.sqlite.bz2
- wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/repodata/0c554884aa5600b1311cd8f616aa40d036c1dfc0922e36bcce7fd84e297c5357-other.sqlite.bz2 
- wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/597468b64cddfc386937869f88c2930c8e5fda3dd54977c052bab068d7438fcb-primary.sqlite.bz2
+wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/ceph-deploy-2.0.1-0.src.rpm
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-deploy-2.0.1-0.noarch.rpm
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-grafana-dashboards-14.2.4-0.el7.noarch.rpm 
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-dashboard-14.2.4-0.el7.noarch.rpm
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-diskprediction-cloud-14.2.4-0.el7.noarch.rpm
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-diskprediction-local-14.2.4-0.el7.noarch.rpm
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-rook-14.2.4-0.el7.noarch.rpm 
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-mgr-ssh-14.2.4-0.el7.noarch.rpm 
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/ceph-release-1-1.el7.noarch.rpm 
+wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/ceph-release-1-1.el7.src.rpm 
+wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/ceph-medic-1.0.4-16.g60cf7e9.el7.src.rpm
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/repomd.xml 
+wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/repodata/repomd.xml
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/a4bf0ee38cd4e64fae2d2c493e5b5eeeab6cf758beb7af4eec0bc4046b595faf-filelists.sqlite
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/a4bf0ee38cd4e64fae2d2c493e5b5eeeab6cf758beb7af4eec0bc4046b595faf-filelists.sqlite.bz2
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/183278bb826f5b8853656a306258643384a1547c497dd8b601ed6af73907bb22-other.sqlite.bz2 
+wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/repodata/52bf459e39c76b2ea2cff2c5340ac1d7b5e17a105270f5f01b454d5a058adbd2-filelists.sqlite.bz2
+wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/repodata/4f3141aec1132a9187ff5d1b4a017685e2f83a761880884d451a288fcedb154e-primary.sqlite.bz2
+wget mirrors.163.com/ceph/rpm-nautilus/el7/SRPMS/repodata/0c554884aa5600b1311cd8f616aa40d036c1dfc0922e36bcce7fd84e297c5357-other.sqlite.bz2 
+wget mirrors.163.com/ceph/rpm-nautilus/el7/noarch/repodata/597468b64cddfc386937869f88c2930c8e5fda3dd54977c052bab068d7438fcb-primary.sqlite.bz2
 ```
 5、更新yum源
 ```
