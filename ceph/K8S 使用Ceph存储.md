@@ -1,6 +1,6 @@
 # POD使用RBD做为持久数据卷
 ### 安装与配置
-RBD支持ReadWriteOnce，ReadOnlyMany两种模式
+RBD支持ReadWriteOnce，ReadOnlyMany两种模式  
 1、配置rbd-provisioner
 ```
 cat >external-storage-rbd-provisioner.yaml<<EOF
