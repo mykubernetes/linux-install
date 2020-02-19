@@ -1,3 +1,7 @@
+社区版  
+https://dev.mysql.com/downloads/mysql/
+
+
 YUM或APT安装或更新MySQL是最方面的方法。  
 https://dev.mysql.com/downloads/repo/yum/  
 https://dev.mysql.com/doc/mysql-yum-repo-quick-guide/en/  
