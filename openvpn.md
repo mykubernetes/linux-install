@@ -255,7 +255,15 @@ ca.crt  client  dh.pem  server  server.conf  server.crt  server.key
 # systemctl -f enable openvpn@server.service    #设置启动文件
 # systemctl start openvpn@server.service        #启动openvpn服务
 # systemctl status openvpn@server.service       #查看是否启动
+# systemctl enabled openvpn@server.service      #设置开机启动
 ```  
+
+6、检查服务
+```
+$ netstat -lntup|grep 1194
+tcp        0      0 0.0.0.0:1194            0.0.0.0:*               LISTEN      48091/openvpn       
+```
+
 
 客户端连接  
 -------
