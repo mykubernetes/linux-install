@@ -101,8 +101,18 @@ saved_caches_directory: /opt/data2/saved_caches
 listen_address: 192.168.1.76
 start_rpc: true
 rpc_address: 192.168.1.76
+```
+- cluster_name: 'MyCluster' 集群的名字，同一个集群的名字要相同
+- authenticator: PasswordAuthenticator 生产环境都要用户名密码认证，默认的用户名/密码是cassandra/cassandra
+- seeds: 192.168.0.101 种子节点的IP
+- broadcast_address: 192.168.0.101 节点的IP
+- broadcast_rpc_address: 192.168.0.101 节点的IP
+- listen_address: 200.1.1.11 节点容器的IP。
+- auto_snapshot: false 尽管官方建议是true，但实际使用时，太消耗磁盘，所以建议改为false
+- endpoint_snitch: GossipingPropertyFileSnitch 生产环境标配
 
-
+八、启动
+```
 然后重启启动，先启动seed
 /opt/cassandra/bin/cassandra
 
@@ -119,5 +129,4 @@ UN  192.168.1.74  189.2 KiB  256          68.9%             98436d32-5d5d-4e5e-a
 UN  192.168.1.75  161.43 KiB  256          64.7%             2f52f14c-acbb-4241-9eff-6ed13b2827e5  rack1
 UN  192.168.1.76  120.67 KiB  256          66.4%             450b02db-90a1-4b76-831a-9b0b9aa42c27  rack1
 ```
-
 
