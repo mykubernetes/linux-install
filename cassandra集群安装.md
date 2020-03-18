@@ -104,10 +104,10 @@ rpc_address: 192.168.1.76
 ```
 - cluster_name: 'MyCluster' 集群的名字，同一个集群的名字要相同
 - authenticator: PasswordAuthenticator 生产环境都要用户名密码认证，默认的用户名/密码是cassandra/cassandra
-- seeds: 192.168.0.101 种子节点的IP
-- broadcast_address: 192.168.0.101 节点的IP
-- broadcast_rpc_address: 192.168.0.101 节点的IP
-- listen_address: 200.1.1.11 节点容器的IP。
+- seeds: 192.168.1.74 种子节点的IP
+- broadcast_address: 192.168.1.74 节点的IP
+- broadcast_rpc_address: 192.168.1.74 节点的IP
+- listen_address: 192.168.1.74 节点的IP。
 - auto_snapshot: false 尽管官方建议是true，但实际使用时，太消耗磁盘，所以建议改为false
 - endpoint_snitch: GossipingPropertyFileSnitch 生产环境标配
 
