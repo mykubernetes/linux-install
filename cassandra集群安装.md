@@ -1,7 +1,7 @@
 
 一、安装java 8
 ```
-[root@ca ~]# java -version
+# java -version
 java version "1.8.0_111"
 Java(TM) SE Runtime Environment (build 1.8.0_111-b14)
 Java HotSpot(TM) 64-Bit Server VM (build 25.111-b14, mixed mode)
@@ -9,7 +9,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.111-b14, mixed mode)
 
 二、安装python 2
 ```
-[root@ca ~]# python -V
+# python -V
 Python 2.7.5
 ```
 
@@ -66,16 +66,16 @@ mkdir /opt/data2/saved_caches
 cd /opt/cassandra/conf/
 修改 cassandra.yaml 配置文件，配置第一台为seeds。
 第一台配置：
-cluster_name: 'prod Cluster'
-data_file_directories:
+cluster_name: 'prod Cluster'                       #集群的名字，同一个集群的名字要相同
+data_file_directories:                             #数据文件存放路径
      -  /opt/data1/data1file
      -  /opt/data2/data2file
-commitlog_directory: /opt/data1/commitlog
-saved_caches_directory: /opt/data2/saved_caches
-- seeds: "192.168.1.74"
-listen_address: 192.168.1.74
+commitlog_directory: /opt/data1/commitlog          #操作日志文件存放路径
+saved_caches_directory: /opt/data2/saved_caches    #缓存文件存放路径
+- seeds: "192.168.1.74"                            #集群种子节点ip,新加入集群的节点从种子节点中同步数据。可配置多个，中间用逗号隔开。
+listen_address: 192.168.1.74                       #需要监听的IP或主机名
 start_rpc: true
-rpc_address: 192.168.1.74
+rpc_address: 192.168.1.74                          #用于监听客户端连接的地址
 
 
 第二台配置：
@@ -102,12 +102,7 @@ listen_address: 192.168.1.76
 start_rpc: true
 rpc_address: 192.168.1.76
 ```
-- cluster_name: 'MyCluster' 集群的名字，同一个集群的名字要相同
 - authenticator: PasswordAuthenticator 生产环境都要用户名密码认证，默认的用户名/密码是cassandra/cassandra
-- seeds: 192.168.1.74 种子节点的IP
-- broadcast_address: 192.168.1.74 节点的IP
-- broadcast_rpc_address: 192.168.1.74 节点的IP
-- listen_address: 192.168.1.74 节点的IP。
 - auto_snapshot: false 尽管官方建议是true，但实际使用时，太消耗磁盘，所以建议改为false
 - endpoint_snitch: GossipingPropertyFileSnitch 生产环境标配
 
@@ -119,7 +114,7 @@ rpc_address: 192.168.1.76
 启动完成后，可使用
 /opt/cassandra/bin/nodetool status
 查看集群状态
-[cassandra@harbor conf]$ /opt/cassandra/bin/nodetool status
+# /opt/cassandra/bin/nodetool status
 Datacenter: datacenter1
 =======================
 Status=Up/Down
@@ -128,5 +123,35 @@ Status=Up/Down
 UN  192.168.1.74  189.2 KiB  256          68.9%             98436d32-5d5d-4e5e-afe2-84550e56daa9  rack1
 UN  192.168.1.75  161.43 KiB  256          64.7%             2f52f14c-acbb-4241-9eff-6ed13b2827e5  rack1
 UN  192.168.1.76  120.67 KiB  256          66.4%             450b02db-90a1-4b76-831a-9b0b9aa42c27  rack1
+```
+
+九、开启用户名密码认证
+1、编辑配置文件添加认证
+```
+# vim cassandra.yaml
+authenticator: PasswordAuthenticator
+```
+
+2、重新启动cassandra并且根据默认用户登录cqlsh，用户名密码都是cassandra
+```
+# ./cassandra
+# ./cqlsh -ucassandra -pcassandra
+```
+
+3、修改默认用户，进入cqlsh后
+```
+1 超级用户可以更改用户的密码或超级用户身份。为了防止禁用所有超级,超级用户不能改变自己的超级用户身份。普通用户只能改变自己的密码。附上用户名在单引号如果它包含非字母数字字符。附上密码在单引号。
+2 CREATE USER test WITH PASSWORD '123456' SUPERUSER;  #创建一个超级用户
+3 CREATE USER test1 WITH PASSWORD '123456' NOSUPERUSER;  #创建一个普通用户
+4 ALTER USER test WITH PASSWORD '654321' ( NOSUPERUSER | SUPERUSER ) #修改用户
+5 DROP USER cassandra #删除默认用户
+```
+
+4、无密码登录Cqlsh
+```
+vi ~/.cassandra/cqlshrc  #添加下面内容
+[authentication]
+username = test
+password = 654321
 ```
 
