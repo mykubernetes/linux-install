@@ -107,6 +107,67 @@ mc config host add gcs  https://storage.googleapis.com BKIKJAA5BMMU2RHO6IBB V8f1
 ```
 注意：Google云存储只支持旧版签名版本V2，所以你需要选择S3v2
 
+mc配置文件路径，在家目录下的一个隐藏文件夹
+---
+```
+tree ~/.mc
+/home/supernova/.mc
+├── config.json
+├── session
+└── share
+
+# ll
+total 8
+drwx------. 3 root root  17 Mar 18 22:16 certs
+-rw-------. 1 root root 856 Mar 18 22:18 config.json
+-rw-------. 1 root root 700 Mar 18 22:18 config.json.old
+drwx------. 2 root root   6 Mar 18 22:16 session
+drwx------. 2 root root  48 Mar 18 22:16 share
+
+通过mc config host添加的所有凭证，endpoint信息都存储在这里
+# cat config.json
+{
+	"version": "9",
+	"hosts": {
+		"gcs": {
+			"url": "https://storage.googleapis.com",
+			"accessKey": "YOUR-ACCESS-KEY-HERE",
+			"secretKey": "YOUR-SECRET-KEY-HERE",
+			"api": "S3v2",
+			"lookup": "dns"
+		},
+		"local": {
+			"url": "http://localhost:9000",
+			"accessKey": "",
+			"secretKey": "",
+			"api": "S3v4",
+			"lookup": "auto"
+		},
+		"minio": {
+			"url": "http://192.168.101.70:9000",
+			"accessKey": "minioadmin",
+			"secretKey": "minioadmin",
+			"api": "s3v4",
+			"lookup": "auto"
+		},
+		"play": {
+			"url": "https://play.min.io",
+			"accessKey": "Q3AM3UQ867SPQQA43P2F",
+			"secretKey": "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG",
+			"api": "S3v4",
+			"lookup": "auto"
+		},
+		"s3": {
+			"url": "https://s3.amazonaws.com",
+			"accessKey": "YOUR-ACCESS-KEY-HERE",
+			"secretKey": "YOUR-SECRET-KEY-HERE",
+			"api": "S3v4",
+			"lookup": "dns"
+		}
+	}
+}
+```
+
 全局参数
 
 ### 参数 [--debug]
@@ -718,3 +779,109 @@ Version: 2016-04-01T00:22:11Z
 Release-tag: RELEASE.2016-04-01T00-22-11Z
 Commit-id: 12adf3be326f5b6610cdd1438f72dfd861597fce
 ```
+
+mc admin 命令详解
+---
+```
+service     restart and stop all MinIO servers
+update      update all MinIO servers
+info        display MinIO server information
+user        manage users
+group       manage groups
+policy      manage policies defined in the MinIO server
+config      manage MinIO server configuration
+heal        heal disks, buckets and objects on MinIO server
+profile     generate profile data for debugging purposes
+top         provide top like statistics for MinIO
+trace       show http trace for MinIO server
+console     show console logs for MinIO server
+prometheus  manages prometheus config
+kms         perform KMS management operations
+```
+
+获取配置的别名的MinIO服务器信息
+```
+# mc admin info minio
+●  192.168.101.70:9000
+   Uptime: 2 hours 
+   Version: 2020-03-14T02:21:58Z
+   Network: 1/1 OK 
+```
+
+MinIO服务器信息
+```
+# mc admin --json info play
+{
+    "status": "success",
+    "info": {
+        "mode": "online",
+        "deploymentID": "96fa3866-7ee6-4546-87d9-4283e3def6c3",
+        "buckets": {
+            "count": 950
+        },
+        "objects": {
+            "count": 18709
+        },
+        "usage": {
+            "size": 5590444001
+        },
+        "services": {
+            "vault": {
+                "status": "KMS configured using master key"
+            },
+            "ldap": {}
+        },
+        "backend": {
+            "backendType": "Erasure",
+            "onlineDisks": 4,
+            "rrSCData": 2,
+            "rrSCParity": 2,
+            "standardSCData": 2,
+            "standardSCParity": 2
+        },
+        "servers": [
+            {
+                "state": "ok",
+                "endpoint": "play.min.io",
+                "uptime": 126497,
+                "version": "2020-03-14T11:26:28Z",
+                "commitID": "d2c7ea993ed484343d37615ae1a9e5677a0cbcb9",
+                "network": {
+                    "play.min.io": "online"
+                },
+                "disks": [
+                    {
+                        "path": "/home/play/data1",
+                        "state": "ok",
+                        "uuid": "01b41712-e65d-4dba-b40f-80cb8715f2d9",
+                        "totalspace": 8378122240,
+                        "usedspace": 3055427584
+                    },
+                    {
+                        "path": "/home/play/data2",
+                        "state": "ok",
+                        "uuid": "24720fca-5c6b-415b-a2f5-b1dd7218e68c",
+                        "totalspace": 8378122240,
+                        "usedspace": 3055460352
+                    },
+                    {
+                        "path": "/home/play/data3",
+                        "state": "ok",
+                        "uuid": "23d4963e-b07c-4796-9c88-0342e7727528",
+                        "totalspace": 8378122240,
+                        "usedspace": 3055362048
+                    },
+                    {
+                        "path": "/home/play/data4",
+                        "state": "ok",
+                        "uuid": "76844146-bd6c-4ded-a08e-3b991f352601",
+                        "totalspace": 8378122240,
+                        "usedspace": 3055394816
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
