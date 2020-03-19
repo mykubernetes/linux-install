@@ -4,6 +4,11 @@ github网址： https://github.com/minio/minio/blob/master/docs/zh_CN/distribute
 
 中文文档： https://www.bookstack.cn/read/MinioCookbookZH/17.md
 
+kubernetes部署
+```
+https://github.com/minio/minio-operator/blob/master/minio-operator.yaml
+```
+
 单机运行
 ===
 ```
