@@ -2,6 +2,8 @@
 
 github网址： https://github.com/minio/minio/blob/master/docs/zh_CN/distributed/README.md
 
+中文文档： https://www.bookstack.cn/read/MinioCookbookZH/17.md
+
 单机运行
 ===
 ```
