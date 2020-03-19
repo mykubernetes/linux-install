@@ -105,6 +105,67 @@ mc config host add gcs  https://storage.googleapis.com BKIKJAA5BMMU2RHO6IBB V8f1
 ```
 注意：Google云存储只支持旧版签名版本V2，所以你需要选择S3v2
 
+全局参数
+
+### 参数 [--debug]
+Debug参数开启控制台输出debug信息。
+
+*示例：输出`ls`命令的详细debug信息。*
+
+```
+mc --debug ls play
+mc: <DEBUG> GET / HTTP/1.1
+Host: play.min.io
+User-Agent: MinIO (darwin; amd64) minio-go/1.0.1 mc/2016-04-01T00:22:11Z
+Authorization: AWS4-HMAC-SHA256 Credential=**REDACTED**/20160408/us-east-1/s3/aws4_request, SignedHeaders=expect;host;x-amz-content-sha256;x-amz-date, Signature=**REDACTED**
+Expect: 100-continue
+X-Amz-Content-Sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+X-Amz-Date: 20160408T145236Z
+Accept-Encoding: gzip
+
+mc: <DEBUG> HTTP/1.1 200 OK
+Transfer-Encoding: chunked
+Accept-Ranges: bytes
+Content-Type: text/xml; charset=utf-8
+Date: Fri, 08 Apr 2016 14:54:55 GMT
+Server: MinIO/DEVELOPMENT.2016-04-07T18-53-27Z (linux; amd64)
+Vary: Origin
+X-Amz-Request-Id: HP30I0W2U49BDBIO
+
+mc: <DEBUG> Response Time:  1.220112837s
+
+[...]
+
+[2016-04-08 03:56:14 IST]     0B albums/
+[2016-04-04 16:11:45 IST]     0B backup/
+[2016-04-01 20:10:53 IST]     0B deebucket/
+[2016-03-28 21:53:49 IST]     0B guestbucket/
+```
+
+### 参数 [--json]
+JSON参数启用JSON格式的输出。
+
+*示例：列出MinIO play服务的所有存储桶。*
+
+```
+mc --json ls play
+{"status":"success","type":"folder","lastModified":"2016-04-08T03:56:14.577+05:30","size":0,"key":"albums/"}
+{"status":"success","type":"folder","lastModified":"2016-04-04T16:11:45.349+05:30","size":0,"key":"backup/"}
+{"status":"success","type":"folder","lastModified":"2016-04-01T20:10:53.941+05:30","size":0,"key":"deebucket/"}
+{"status":"success","type":"folder","lastModified":"2016-03-28T21:53:49.217+05:30","size":0,"key":"guestbucket/"}
+```
+
+### 参数 [--no-color]
+这个参数禁用颜色主题。对于一些比较老的终端有用。
+
+### 参数 [--quiet]
+这个参数关闭控制台日志输出。
+
+### 参数 [--config-dir]
+这个参数参数自定义的配置文件路径。
+
+### 参数 [ --insecure]
+跳过SSL证书验证。
 
 
 mc命令使用
