@@ -888,22 +888,21 @@ MinIO服务器信息
 
 
 命令
-
-| 命令|
-|：------------------------------------------------ ----------------------- :|
-| [** service **-重新启动和停止所有MinIO服务器]（＃service）|
-| [**更新**-更新所有MinIO服务器]（＃update）|
-| [** info **-显示MinIO服务器信息]（＃info）|
-| [**用户**-管理用户]（＃user）|
-| [** group **-管理组]（＃group）|
-| [**政策**-管理固定政策]（＃policy）|
-| [** config **-管理服务器配置文件]（＃config）|
-| [** heal **-修复MinIO服务器上的磁盘，存储桶和对象]（＃heal）|
-| [** profile **-生成用于调试目的的配置文件数据]（＃profile）|
-| [** top **-为MinIO提供类似顶部的统计信息]（＃top）|
-| [**跟踪**-显示MinIO服务器的http跟踪]（＃trace）|
-| [**控制台**-显示MinIO服务器的控制台日志]（＃console）|
-| [** prometheus **-管理prometheus配置设置]（＃prometheus）|
+| Commands                                                               |
+|:-----------------------------------------------------------------------|
+| [**service** - restart and stop all MinIO servers](#service)           |
+| [**update** - updates all MinIO servers](#update)                      |
+| [**info** - display MinIO server information](#info)                   |
+| [**user** - manage users](#user)                                       |
+| [**group** - manage groups](#group)                                    |
+| [**policy** - manage canned policies](#policy)                         |
+| [**config** - manage server configuration file](#config)               |
+| [**heal** - heal disks, buckets and objects on MinIO server](#heal)    |
+| [**profile** - generate profile data for debugging purposes](#profile) |
+| [**top** - provide top like statistics for MinIO](#top)                |
+| [**trace** - show http trace for MinIO server](#trace)                 |
+| [**console** - show console logs for MinIO server](#console)           |
+| [**prometheus** - manages prometheus config settings](#prometheus)     |
 
 <a name="update"> </a>
 ###命令`update`-更新所有MinIO服务器
