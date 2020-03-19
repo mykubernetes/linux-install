@@ -2,7 +2,8 @@
 
 github网址： https://github.com/minio/minio/blob/master/docs/zh_CN/distributed/README.md
 
-单机启动
+单机运行
+---
 ```
 wget https://dl.min.io/server/minio/release/linux-amd64/minio
 chmod +x minio
@@ -70,11 +71,21 @@ minio server http://host{1...32}/export{1...32} http://host{33...64}/export{1...
 
 mc命令介绍
 ---
+
+mc命令下载安装
 ```
 wget https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x mc
 ./mc --help
 
+shell自动补全
+下载autocomplete/bash_autocomplete到/etc/bash_completion.d/，将其重命名为mc。运行source命令让其生效
+wget https://raw.githubusercontent.com/minio/mc/master/autocomplete/bash_autocomplete -O /etc/bash_completion.d/mc
+source /etc/bash_completion.d/mc
+```
+
+mc命令使用
+```
 ls       列出文件和文件夹。
 mb       创建一个存储桶或一个文件夹。
 cat      显示文件和对象内容。
