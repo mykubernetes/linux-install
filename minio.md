@@ -2,9 +2,9 @@
 
 github网址： https://github.com/minio/minio/blob/master/docs/zh_CN/distributed/README.md
 
+
 分布式运行命令
-
-
+---
 ```
 export MINIO_ACCESS_KEY=<ACCESS_KEY>
 export MINIO_SECRET_KEY=<SECRET_KEY>
@@ -31,8 +31,15 @@ minio server http://192.168.1.11/export1 http://192.168.1.11/export2 \
 
 ![分布式Minio,4节点，每节点4块盘](https://github.com/minio/minio/blob/master/docs/screenshots/Architecture-diagram_distributed_16.jpg?raw=true)
 
+扩展现有的分布式集群
+```
+export MINIO_ACCESS_KEY=<ACCESS_KEY>
+export MINIO_SECRET_KEY=<SECRET_KEY>
+minio server http://host{1...32}/export{1...32} http://host{33...64}/export{1...32}
+```
 
 mc命令介绍
+---
 ```
 ls       列出文件和文件夹。
 mb       创建一个存储桶或一个文件夹。
