@@ -2,6 +2,36 @@
 
 github网址： https://github.com/minio/minio/blob/master/docs/zh_CN/distributed/README.md
 
+单机启动
+```
+wget https://dl.min.io/server/minio/release/linux-amd64/minio
+chmod +x minio
+./minio server /data
+Endpoint:  http://192.168.101.70:9000  http://127.0.0.1:9000    #登录地址
+AccessKey: minioadmin                                           #登录的key
+SecretKey: minioadmin                                           #加密的key
+
+Browser Access:
+   http://192.168.101.70:9000  http://127.0.0.1:9000    
+
+Command-line Access: https://docs.min.io/docs/minio-client-quickstart-guide
+   $ mc config host add myminio http://192.168.101.70:9000 minioadmin minioadmin
+
+Object API (Amazon S3 compatible):
+   Go:         https://docs.min.io/docs/golang-client-quickstart-guide
+   Java:       https://docs.min.io/docs/java-client-quickstart-guide
+   Python:     https://docs.min.io/docs/python-client-quickstart-guide
+   JavaScript: https://docs.min.io/docs/javascript-client-quickstart-guide
+   .NET:       https://docs.min.io/docs/dotnet-client-quickstart-guide
+Detected default credentials 'minioadmin:minioadmin', please change the credentials immediately using 'MINIO_ACCESS_KEY' and 'MINIO_SECRET_KEY'
+
+二进制安装配置文件地址
+/data/.minio.sys/config
+
+```
+
+
+
 
 分布式运行命令
 ---
@@ -41,6 +71,10 @@ minio server http://host{1...32}/export{1...32} http://host{33...64}/export{1...
 mc命令介绍
 ---
 ```
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+./mc --help
+
 ls       列出文件和文件夹。
 mb       创建一个存储桶或一个文件夹。
 cat      显示文件和对象内容。
