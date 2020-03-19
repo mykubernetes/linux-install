@@ -905,8 +905,8 @@ MinIO服务器信息
 | [**prometheus** - 管理prometheus配置设置](#prometheus)                  |
 
 <a name="update"> </a>
-### 命令`update`-更新所有MinIO服务器
-update命令提供了一种更新集群中所有MinIO服务器的方法。您还可以使用带有`update`命令的私有镜像服务器来更新MinIO集群。如果MinIO在无法访问Internet的环境中运行，这很有用。
+### 命令`update` - 更新所有MinIO服务器
+`update`命令提供了一种更新集群中所有MinIO服务器的方法。您还可以使用带有`update`命令的私有镜像服务器来更新MinIO集群。如果MinIO在无法访问Internet的环境中运行，这很有用。
 
 *示例：更新所有MinIO服务器。*
 ```
@@ -928,8 +928,8 @@ Server `myminio` updated successfully from RELEASE.2019-08-14T20-49-49Z to RELEA
 > - 建议在更新成功完成后执行重新启动。
 
 <a name="service"> </a>
-### 命令`service`-重新启动并停止所有MinIO服务器
-服务命令提供了一种重新启动和停止所有MinIO服务器的方法。
+### 命令`service` - 重新启动并停止所有MinIO服务器
+`service`命令提供了一种重新启动和停止所有MinIO服务器的方法。
 
 > 注意：
 > - 指向分布式设置的别名，此命令将在所有服务器上自动执行相同的操作。
@@ -954,8 +954,8 @@ Restarted `play` successfully.
 ```
 
 <a name="info"> </a>
-### 命令`info`-显示MinIO服务器信息
-“ info”命令显示一台或多台MinIO服务器的服务器信息（在分布式集群下）
+### 命令`info` - 显示MinIO服务器信息
+`info`命令显示一台或多台MinIO服务器的服务器信息（在分布式集群下）
 
 ```
 NAME:
@@ -980,8 +980,8 @@ mc admin info play
 ```
 
 <a name="policy"> </a>
-### 命令`policy`-管理固定策略
-使用policy命令在MinIO服务器上添加，删除，列出策略。
+### 命令`policy` - 管理固定策略
+使用`policy`命令在MinIO服务器上添加，删除，列出策略。
 
 ```
 NAME:
@@ -1031,8 +1031,8 @@ mc admin policy set myminio writeonly group=somegroup
 ```
 
 <a name="user"> </a>
-### 命令`user`-管理用户
-用户命令，用于添加，删除，启用，禁用MinIO服务器上的用户。
+### 命令`user` - 管理用户
+`user`命令，用于添加，删除，启用，禁用MinIO服务器上的用户。
 
 ```
 NAME:
@@ -1096,8 +1096,8 @@ mc admin user info myminio someuser
 ```
 
 <a name="group"> </a>
-### 命令`group`-管理组
-使用group命令在MinIO服务器上添加，删除，信息，列出，启用，禁用组。
+### 命令`group` - 管理组
+使用`group`命令在MinIO服务器上添加，删除，信息，列出，启用，禁用组。
 
 ```
 NAME:
@@ -1162,8 +1162,8 @@ mc admin group disable myminio somegroup
 ```
 
 <a name="config"> </a>
-### 命令`config`-管理服务器配置
-config命令用于管理MinIO服务器配置。
+### 命令`config` - 管理服务器配置
+`config`命令用于管理MinIO服务器配置。
 
 ```
 NAME:
@@ -1193,8 +1193,8 @@ mc admin config set myminio < /tmp/my-serverconfig
 ```
 
 <a name="heal"> </a>
-### 命令`heal`-修复MinIO服务器上的磁盘，存储桶和对象
-使用heal命令修复MinIO服务器上的磁盘，丢失的存储桶和对象。注意：此命令仅适用于MinIO擦除编码设置（独立和分布式）。
+### 命令`heal` - 修复MinIO服务器上的磁盘，存储桶和对象
+使用`heal`命令修复MinIO服务器上的磁盘，丢失的存储桶和对象。注意：此命令仅适用于MinIO擦除编码设置（独立和分布式）。
 
 服务器已经有一个浅色的后台进程，可以在必要时修复磁盘，存储桶和对象。但是，它不会检测某些类型的数据损坏，尤其是很少发生的数据损坏，例如静默数据损坏。在这种情况下，您需要隔一段时间手动运行提供以下标志的heal命令：--scan deep。
 
@@ -1241,7 +1241,7 @@ mc admin heal myminio/
 ```
 
 <a name="profile"> </a>
-### 命令`profile`-生成配置文件数据以进行调试
+### 命令`profile` - 生成配置文件数据以进行调试
 
 ```
 NAME:
@@ -1258,7 +1258,7 @@ mc admin profile start --type cpu myminio/
 ```
 
 <a name="top"> </a>
-### 命令`top`-为MinIO提供类似top的统计信息
+### 命令`top` - 为MinIO提供类似top的统计信息
 注意：此命令仅适用于分布式MinIO设置。单节点和网关部署不支持此功能。
 
 ```
@@ -1276,8 +1276,8 @@ mc admin top locks myminio
 ```
 
 <a name="trace"> </a>
-### 命令`trace`-显示MinIO服务器的http跟踪
-trace命令显示一台或所有MinIO服务器（在分布式集群下）的服务器http跟踪
+### 命令`trace` - 显示MinIO服务器的http跟踪
+`trace`命令显示一台或所有MinIO服务器（在分布式集群下）的服务器http跟踪
 
 ```
 NAME:
@@ -1317,8 +1317,8 @@ mc admin trace myminio
 ```
 
 <a name="console"> </a>
-### 命令`console`-显示MinIO服务器的控制台日志
-“ console”命令显示一台或所有MinIO服务器的服务器日志（在分布式集群下）
+### 命令`console` - 显示MinIO服务器的控制台日志
+`console`命令显示一台或所有MinIO服务器的服务器日志（在分布式集群下）
 
 ```
 NAME:
@@ -1349,9 +1349,9 @@ mc admin console myminio
 
 <a name="prometheus"> </a>
 
-### 命令`prometheus`-管理prometheus配置设置
+### 命令`prometheus` - 管理prometheus配置设置
 
-generate”命令生成prometheus配置（要粘贴到prometheus.yml中）
+`generate`命令生成prometheus配置（要粘贴到prometheus.yml中）
 
 ```
 NAME:
@@ -1379,9 +1379,9 @@ mc admin prometheus generate <alias>
 
 <a name="kms"> </a>
 
-### 命令`kms`-执行KMS管理操作
+### 命令`kms` - 执行KMS管理操作
 
-kms命令可用于执行KMS管理操作。
+`kms`命令可用于执行KMS管理操作。
 
 ```
 NAME:
