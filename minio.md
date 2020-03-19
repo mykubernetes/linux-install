@@ -922,18 +922,18 @@ mc admin update myminio https://myfavorite-mirror.com/minio-server/linux-amd64/m
 Server `myminio` updated successfully from RELEASE.2019-08-14T20-49-49Z to RELEASE.2019-08-21T19-59-10Z
 ```
 
->注意：
->-指向分布式安装程序的别名，此命令将自动更新群集中的所有MinIO服务器。
->-`update`是您的MinIO服务的破坏性操作，任何正在进行的API操作都将被强制取消。因此，仅在计划为部署进行MinIO升级时才应使用它。
->-建议在更新成功完成后执行重新启动。
+> 注意：
+> - 指向分布式安装程序的别名，此命令将自动更新群集中的所有MinIO服务器。
+> - `update`是您的MinIO服务的破坏性操作，任何正在进行的API操作都将被强制取消。因此，仅在计划为部署进行MinIO升级时才应使用它。
+> - 建议在更新成功完成后执行重新启动。
 
 <a name="service"> </a>
 ### 命令`service`-重新启动并停止所有MinIO服务器
 服务命令提供了一种重新启动和停止所有MinIO服务器的方法。
 
->注意：
->-指向分布式设置的别名，此命令将在所有服务器上自动执行相同的操作。
->-`restart`和`stop`子命令是MinIO服务的破坏性操作，任何正在进行的API操作都将被强制取消。因此，仅应在管理环境下使用。请谨慎使用。
+> 注意：
+> - 指向分布式设置的别名，此命令将在所有服务器上自动执行相同的操作。
+> - `restart`和`stop`子命令是MinIO服务的破坏性操作，任何正在进行的API操作都将被强制取消。因此，仅应在管理环境下使用。请谨慎使用。
 
 ```
 NAME:
@@ -1365,7 +1365,7 @@ COMMANDS:
 
 ```
 
-_示例：为<alias>生成prometheus配置。
+示例：为<alias>生成prometheus配置。
 
 ```
 mc admin prometheus generate <alias>
