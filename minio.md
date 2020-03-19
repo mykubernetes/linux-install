@@ -6,7 +6,7 @@ github网址： https://github.com/minio/minio/blob/master/docs/zh_CN/distribute
 
 kubernetes部署
 ```
-https://github.com/minio/minio-operator/blob/master/minio-operator.yaml
+kubectl apply -f https://raw.githubusercontent.com/minio/minio-operator/master/minio-operator.yaml
 ```
 
 单机运行
