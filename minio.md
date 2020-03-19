@@ -190,6 +190,28 @@ update   检查软件更新。
 version  输出版本信息。
 ```
 
+```
+#列出文件和文件夹
+mc ls minio
+
+#创建一个bucket
+mc mb minio/test
+
+#将本地文件拷贝到object
+mc cp /etc/fstab minio/test/
+/etc/fstab:         465 B / 465 B ┃▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓┃ 73.92 KiB/s 0s
+
+#精确查找文件
+mc find minio/test --name fstab
+minio/test/fstab
+
+#查看bucket大小
+# mc du   minio/test/
+10MiB	test
+
+
+```
+
 命令
 
 |                                      |                                                    |                                        |
