@@ -76,6 +76,49 @@ export MINIO_SECRET_KEY=<SECRET_KEY>
 minio server http://host{1...32}/export{1...32} http://host{33...64}/export{1...32}
 ```
 
+minio做成服务
+---
+1、编写集群启动脚本（所有节点配置文件相同）
+```
+vim /opt/minio/run.sh
+#!/bin/bash
+export MINIO_ACCESS_KEY=Minio
+export MINIO_SECRET_KEY=Test123456
+
+/opt/minio/minio server --config-dir /etc/minio \
+http://192.168.0.101/minio/data1 http://192.168.0.101/minio/data2 \
+http://192.168.0.102/minio/data1 http://192.168.0.102/minio/data2 \
+```
+
+2、编写服务脚本（所有节点）
+```
+vim /usr/lib/systemd/system/minio.service
+[Unit]
+Description=Minio service
+Documentation=https://docs.minio.io/
+
+[Service]
+WorkingDirectory=/opt/minio/
+ExecStart=/opt/minio/run.sh
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3、启动测试
+```
+chmod +x minio
+mv minio /opt/minio/
+chmod +x /opt/minio/run.sh
+
+systemctl daemon-reload
+systemctl start minio
+systemctl enable minio
+```
+
 mc命令介绍
 ===
 
