@@ -781,7 +781,7 @@ Commit-id: 12adf3be326f5b6610cdd1438f72dfd861597fce
 ```
 
 mc admin 命令详解
----
+===
 ```
 service     restart and stop all MinIO servers
 update      update all MinIO servers
@@ -885,3 +885,538 @@ MinIO服务器信息
 }
 ```
 
+
+
+命令
+
+| 命令|
+|：------------------------------------------------ ----------------------- |
+| [** service **-重新启动和停止所有MinIO服务器]（＃service）|
+| [**更新**-更新所有MinIO服务器]（＃update）|
+| [** info **-显示MinIO服务器信息]（＃info）|
+| [**用户**-管理用户]（＃user）|
+| [** group **-管理组]（＃group）|
+| [**政策**-管理固定政策]（＃policy）|
+| [** config **-管理服务器配置文件]（＃config）|
+| [** heal **-修复MinIO服务器上的磁盘，存储桶和对象]（＃heal）|
+| [** profile **-生成用于调试目的的配置文件数据]（＃profile）|
+| [** top **-为MinIO提供类似顶部的统计信息]（＃top）|
+| [**跟踪**-显示MinIO服务器的http跟踪]（＃trace）|
+| [**控制台**-显示MinIO服务器的控制台日志]（＃console）|
+| [** prometheus **-管理prometheus配置设置]（＃prometheus）|
+
+<a name="update"> </a>
+###命令`update`-更新所有MinIO服务器
+update命令提供了一种更新集群中所有MinIO服务器的方法。您还可以使用带有`update`命令的私有镜像服务器来更新MinIO集群。如果MinIO在无法访问Internet的环境中运行，这很有用。
+
+*示例：更新所有MinIO服务器。*
+```
+mc管理员更新播放
+服务器`play`已成功从RELEASE.2019-08-14T20-49-49Z更新到RELEASE.2019-08-21T19-59-10Z
+```
+
+####使用私有镜像更新MinIO的步骤 
+为了在私有镜像服务器上使用`update`命令，您需要在私有镜像服务器上的https://dl.minio.io/server/minio/release/linux-amd64/上镜像目录结构，然后提供：
+
+```
+mc管理员更新myminio https://myfavorite-mirror.com/minio-server/linux-amd64/minio.sha256sum
+服务器`myminio`已成功从RELEASE.2019-08-14T20-49-49Z更新到RELEASE.2019-08-21T19-59-10Z
+```
+
+>注意：
+>-指向分布式安装程序的别名，此命令将自动更新群集中的所有MinIO服务器。
+>-`update`是您的MinIO服务的破坏性操作，任何正在进行的API操作都将被强制取消。因此，仅在计划为部署进行MinIO升级时才应使用它。
+>-建议在更新成功完成后执行重新启动。
+
+<a name="service"> </a>
+###命令`service`-重新启动并停止所有MinIO服务器
+服务命令提供了一种重新启动和停止所有MinIO服务器的方法。
+
+>注意：
+>-指向分布式设置的别名，此命令将在所有服务器上自动执行相同的操作。
+>-`restart`和`stop`子命令是MinIO服务的破坏性操作，任何正在进行的API操作都将被强制取消。因此，仅应在管理环境下使用。请谨慎使用。
+
+```
+名称：
+  mc admin service-重新启动并停止所有MinIO服务器
+
+旗帜：
+  --help，-h显示帮助
+
+指令：
+  重新启动重新启动所有MinIO服务器
+  停止停止所有MinIO服务器
+```
+
+*示例：重新启动所有MinIO服务器。*
+```
+mc admin服务重启播放
+成功重新启动了“ play”。
+```
+
+<a name="info"> </a>
+###命令`info`-显示MinIO服务器信息
+“ info”命令显示一台或多台MinIO服务器的服务器信息（在分布式集群下）
+
+```
+名称：
+  mc管理员信息-获取MinIO服务器信息
+
+旗帜：
+  --help，-h显示帮助
+```
+
+*示例：显示MinIO服务器信息。*
+
+```
+mc管理员信息播放
+●play.minio.io
+   正常运行时间：11小时
+   版本：2020-01-17T22：08：02Z
+   网络：1/1 OK
+   驱动器：4/4 OK
+
+2.1使用的GiB，158个存储桶，12,092个对象
+4硬盘在线，0硬盘离线
+```
+
+<a name="policy"> </a>
+###命令`policy`-管理固定策略
+使用policy命令在MinIO服务器上添加，删除，列出策略。
+
+```
+名称：
+  mc管理员政策-管理政策
+
+旗帜：
+  --help，-h显示帮助
+
+指令：
+  添加添加新策略
+  删除删除政策
+  列出所有政策
+  信息显示政策信息
+  在用户或组上设置IAM策略
+```
+
+*示例：在MinIO上添加新策略'newpolicy'，其中的策略来自/tmp/newpolicy.json。*
+
+```
+mc admin policy add myminio / newpolicy /tmp/newpolicy.json
+```
+
+*例如：在MinIO上删除政策“ newpolicy”。*
+
+```
+mc admin policy remove myminio / newpolicy
+```
+
+*示例：列出MinIO上的所有策略。*
+
+```
+mc管理员政策清单--json myminio /
+{“状态”：“成功”，“策略”：“新策略”}
+```
+
+*示例：显示政策信息*
+
+```
+mc管理员政策信息myminio / writeonly
+```
+
+*示例：针对用户或组设置策略*
+
+```
+mc admin policy set myminio writeonly user = someuser
+mc admin policy set myminio writeonly group = somegroup
+```
+
+<a name="user"> </a>
+###命令`user`-管理用户
+用户命令，用于添加，删除，启用，禁用MinIO服务器上的用户。
+
+```
+名称：
+  mc admin用户-管理用户
+
+旗帜：
+  --help，-h显示帮助
+
+指令：
+  添加添加新用户
+  禁用禁用用户
+  启用启用用户
+  删除删除用户
+  列出所有用户
+  信息显示用户的信息
+```
+
+*例如：在MinIO上添加新用户'newuser'。*
+
+```
+mc管理员用户添加myminio / newuser newuser123
+```
+
+*示例：使用标准输入在MinIO上添加新用户'newuser'。*
+
+```
+mc管理员用户添加myminio /
+输入访问密钥：newuser
+输入密钥：newuser123
+```
+
+*例如：在MinIO上禁用用户“ newuser”。*
+
+```
+mc admin用户禁用myminio / newuser
+```
+
+*例如：在MinIO上启用用户“ newuser”。*
+
+```
+mc admin用户启用myminio / newuser
+```
+
+*例如：在MinIO上删除用户'newuser'。*
+
+```
+mc admin用户删除myminio / newuser
+```
+
+*示例：列出MinIO上的所有用户。*
+
+```
+mc管理员用户列表--json myminio /
+{“状态”：“成功”，“ accessKey”：“新用户”，“ userStatus”：“已启用”}
+```
+
+*示例：显示用户信息*
+
+```
+mc管理员用户信息myminio someuser
+```
+
+<a name="group"> </a>
+###命令`group`-管理组
+使用group命令在MinIO服务器上添加，删除，信息，列出，启用，禁用组。
+
+```
+名称：
+  mc管理员组-管理组
+
+用法：
+  mc admin group COMMAND [命令标记| -h] [ARGUMENTS ...]
+
+指令：
+  添加将用户添加到新组或现有组
+  从组中删除组或成员
+  信息显示组信息
+  列表显示组列表
+  启用群组
+  禁用禁用组
+```
+
+*示例：将一对用户添加到MinIO上的“ somegroup”组中。*
+
+如果组不存在，则会创建该组。
+
+```
+mc admin组添加myminio somegroup someuser1 someuser2
+```
+
+*示例：从MinIO的“ somegroup”组中删除一对用户。*
+
+```
+mc admin组删除myminio somegroup someuser1 someuser2
+```
+
+*例如：在MinIO上删除组“ somegroup”。*
+
+仅在给定组为空时有效。
+
+```
+mc admin group移除myminio somegroup
+```
+
+*示例：在MinIO上获取有关“ somegroup”组的信息。*
+
+```
+mc管理员群组资讯myminio somegroup
+```
+
+*示例：列出MinIO上的所有组。*
+
+```
+mc管理员群组清单myminio
+```
+
+*示例：在MinIO上启用组“ somegroup”。*
+
+```
+mc admin组启用myminio somegroup
+```
+
+*例如：在MinIO上禁用组“ somegroup”。*
+
+```
+mc admin group禁用myminio somegroup
+```
+
+<a name="config"> </a>
+###命令`config`-管理服务器配置
+config命令用于管理MinIO服务器配置。
+
+```
+名称：
+  mc admin config-管理配置文件
+
+用法：
+  mc admin config COMMAND [命令标记| -h] [ARGUMENTS ...]
+
+指令：
+  获取MinIO服务器/群集的配置。
+  将新的配置文件设置为MinIO服务器/群集。
+
+旗帜：
+  --help，-h显示帮助。
+```
+
+*示例：获取MinIO服务器/集群的服务器配置。*
+
+```
+mc admin config get myminio> / tmp / my-serverconfig
+```
+
+*示例：设置MinIO服务器/集群的服务器配置。*
+
+```
+mc admin config set myminio </ tmp / my-serverconfig
+```
+
+<a name="heal"> </a>
+###命令`heal`-修复MinIO服务器上的磁盘，存储桶和对象
+使用heal命令修复MinIO服务器上的磁盘，丢失的存储桶和对象。注意：此命令仅适用于MinIO擦除编码设置（独立和分布式）。
+
+服务器已经有一个浅色的后台进程，可以在必要时修复磁盘，存储桶和对象。但是，它不会检测某些类型的数据损坏，尤其是很少发生的数据损坏，例如静默数据损坏。在这种情况下，您需要隔一段时间手动运行提供以下标志的heal命令：--scan deep。
+
+要显示后台恢复过程的状态，只需键入以下命令：`mc admin heal your-alias`。
+
+要扫描和修复所有内容，请输入：`mc admin heal -r your-alias`。
+
+```
+名称：
+  mc admin heal-修复MinIO服务器上的磁盘，存储桶和对象
+
+旗帜：
+  --scan值选择恢复扫描模式（正常/深度）（默认值：“正常”）
+  --recursive，-r递归治愈
+  --dry-run，-n仅检查数据，但不进行突变
+  --force-start，-f强制启动新的治疗序列
+  --force-stop，-s强制停止正在运行的治疗序列
+  --remove按修复顺序删除悬空的对象
+  --help，-h显示帮助
+```
+
+*示例：更换新磁盘后修复MinIO集群，递归修复所有存储桶和对象，其中'myminio'是MinIO服务器别名。*
+
+```
+mc admin heal -r myminio
+```
+
+*示例：递归修复特定存储桶上的MinIO集群，其中“ myminio”是MinIO服务器别名。*
+
+```
+mc admin heal -r myminio / mybucket
+```
+
+*示例：递归修复特定对象前缀上的MinIO集群，其中“ myminio”是MinIO服务器别名。*
+
+```
+mc admin heal -r myminio / mybucket / myobjectprefix
+```
+
+*示例：显示MinIO集群中自我修复过程的状态。*
+
+```
+mc管理员治愈myminio /
+```
+
+<a name="profile"> </a>
+###命令`profile`-生成配置文件数据以进行调试
+
+```
+名称：
+  mc管理员配置文件-生成配置文件数据以进行调试
+
+指令：
+  开始开始记录配置文件数据
+  停止停止并下载配置文件数据
+```
+
+开始进行CPU分析
+```
+mc管理员个人资料开始-输入cpu myminio /
+```
+
+<a name="top"> </a>
+###命令`top`-为MinIO提供类似top的统计信息
+注意：此命令仅适用于分布式MinIO设置。单节点和网关部署不支持此功能。
+
+```
+名称：
+  mc admin top-为MinIO提供顶部统计信息
+
+指令：
+  锁获取MinIO群集上10个最旧的锁的列表。
+```
+
+*示例：获取分布式MinIO群集上10个最旧锁的列表，其中'myminio'是MinIO群集别名。*
+
+```
+mc管理员顶部锁定myminio
+```
+
+<a name="trace"> </a>
+###命令`trace`-显示MinIO服务器的http跟踪
+trace命令显示一台或所有MinIO服务器（在分布式集群下）的服务器http跟踪
+
+```sh
+名称：
+  mc管理员跟踪-显示MinIO服务器的http跟踪
+
+旗帜：
+  --verbose，-v打印详细跟踪
+  --all，-a跟踪所有流量（包括MinIO服务器之间的节点间流量）
+  --errors，-e仅跟踪失败的请求
+  --help，-h显示帮助
+```
+
+*示例：显示MinIO服务器http跟踪。*
+
+```sh
+mc管理员追踪myminio
+172.16.238.1 [REQUEST（objectAPIHandlers）.ListBucketsHandler-fm] [154828542.525557] [2019-01-23 23:17:05 +0000]
+172.16.238.1 GET /
+172.16.238.1主机：172.16.238.3:9000
+172.16.238.1 X-Amz-日期：20190123T231705Z
+172.16.238.1授权：AWS4-HMAC-SHA256凭据= minio / 20190123 / us-east-1 / s3 / aws4_request，SignedHeaders = host; x-amz-content-sha256; x-amz-date，Signature = 8385097f264efaf1b71a9b56514b8166bb0a03af8552f83e7764
+172.16.238.1用户代理：MinIO（Linux; amd64）minio-go / v6.0.8 mc / 2019-01-23T23：15：38Z
+172.16.238.1 X-Amz-Content-Sha256：e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+172.16.238.1
+172.16.238.1 <BODY>
+172.16.238.1 [响应] [154828542.525557] [2019-01-23 23:17:05 +0000]
+172.16.238.1 200 OK
+172.16.238.1 X-Amz-Request-Id：157C9D641F42E547
+172.16.238.1 X-Minio-Deployment-Id：5f20fd91-6880-455f-a26d-07804b6821ca
+172.16.238.1 X-Xss-Protection：1；模式=阻止
+172.16.238.1接受范围：字节
+172.16.238.1内容安全策略：阻止所有混合内容
+172.16.238.1内容类型：application / xml
+172.16.238.1服务器：MinIO / RELEASE.2019-09-05T23-24-38Z
+172.16.238.1变化：起源
+...
+```
+
+<a name="console"> </a>
+###命令`console`-显示MinIO服务器的控制台日志
+“ console”命令显示一台或所有MinIO服务器的服务器日志（在分布式集群下）
+
+```sh
+名称：
+  mc管理控制台-显示MinIO服务器的控制台日志
+
+旗帜：
+  --limit值，-l值显示最后n个日志条目（默认值：10）
+  --help，-h显示帮助
+```
+
+*示例：显示MinIO服务器http跟踪。*
+
+```sh
+mc管理控制台myminio
+
+ API：SYSTEM（bucket = images）
+ 时间：22:48:06 PDT 09/05/2019
+ 部署ID：6faeded5-5cf3-4133-8a37-07c5d500207c
+ RequestID：<无>
+ RemoteHost：<无>
+ UserAgent：<无>
+ 错误：找不到ARN'arn：minio：sqs：us-east-1：1：webhook'
+        4：cmd / notification.go：1189：cmd.readNotificationConfig（）
+        3：cmd / notification.go：780：cmd。（* NotificationSys）.refresh（）
+        2：cmd / notification.go：815：cmd。（* NotificationSys）.Init（）
+        1：cmd / server-main.go：375：cmd.serverMain（）
+```
+
+<a name="prometheus"> </a>
+
+###命令`prometheus`-管理prometheus配置设置
+
+“ generate”命令生成prometheus配置（要粘贴到“ prometheus.yml”中）
+
+```sh
+名称：
+  mc admin prometheus-管理prometheus配置
+
+用法：
+  mc admin prometheus COMMAND [命令标记| -h] [ARGUMENTS ...]
+
+指令：
+  生成生成prometheus配置
+
+```
+
+_示例：为<alias>生成prometheus配置。
+
+```sh
+mc admin prometheus生成<alias>
+-job_name：minio-job
+  bearer_token：<令牌>
+  metrics_path：/ minio / prometheus / metrics
+  方案：http
+  static_configs：
+  -目标：['localhost：9000']
+```
+
+<a name="kms"> </a>
+
+###命令`kms`-执行KMS管理操作
+
+kms命令可用于执行KMS管理操作。
+
+```sh
+名称：
+  mc admin kms-执行KMS管理操作
+
+用法：
+  mc admin kms COMMAND [命令标记| -h] [ARGUMENTS ...]
+```
+
+key子命令可用于执行主密钥管理操作。
+
+```sh
+名称：
+  mc admin kms key-管理KMS密钥
+
+用法：
+  mc admin kms key COMMAND [命令标记| -h] [ARGUMENTS ...]
+```
+
+
+*示例：显示默认主键的状态信息*
+
+```sh
+mc admin kms键状态播放
+密钥：my-minio-key
+ 	 •加密✔
+ 	 •解密✔
+```
+
+*示例：显示一个特定主键的状态信息*
+
+```sh
+mc admin kms键状态播放test-key-1
+按键：test-key-1
+ 	 •加密✔
+ 	 •解密✔
+```
