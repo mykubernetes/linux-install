@@ -1,5 +1,5 @@
+https://blog.imdst.com/centos-7-an-zhuang-bu-shu-cassandra/
 
-https://blog.csdn.net/qq_32523587/article/details/53982900
 ```
 disk_access_mode: standard
 cluster_name: 'mycluster'                                      #集群的名称
@@ -132,3 +132,5 @@ back_pressure_strategy:
           factor: 5
           flow: FAST
 ```
+
+
