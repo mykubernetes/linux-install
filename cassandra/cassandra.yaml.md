@@ -1,3 +1,5 @@
+
+https://blog.csdn.net/qq_32523587/article/details/53982900
 ```
 disk_access_mode: standard
 cluster_name: 'mycluster'                                      #集群的名称
@@ -60,11 +62,11 @@ rpc_address:192.168.101.74                     #对外提供服务的地址
 broadcast_rpc_address: 192.168.101.74
 rpc_port: 9160                                 #对外提供服务的端口号
 rpc_keepalive: true                            #对外提供服务连接是否一直保持
-rpc_server_type: sync
+rpc_server_type: sync                          #默认: sync,Cassandra提供了三种RPC服务器的选择sync,hsha
 thrift_framed_transport_size_in_mb: 15
 incremental_backups: false
 snapshot_before_compaction: false
-auto_snapshot: true
+auto_snapshot: true                            #默认: true,在清空keyspace或者删除tables之前要拍摄快照
 tombstone_warn_threshold: 10000
 tombstone_failure_threshold: 100000
 column_index_size_in_kb: 64
