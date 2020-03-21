@@ -1,25 +1,25 @@
 ```
 disk_access_mode: standard
-cluster_name: 'cassandra-default-cluster'
+cluster_name: 'mycluster'                                     #集群的名称
 num_tokens: 32
-hinted_handoff_enabled: true
+hinted_handoff_enabled: true                                  #是否开启当前Cassandra服务器的HINT操作
 hinted_handoff_throttle_in_kb: 1024
 max_hints_delivery_threads: 2
 hints_directory: /cassandra_data/hints
 hints_flush_period_in_ms: 10000
 max_hints_file_size_in_mb: 128
 batchlog_replay_throttle_in_kb: 1024
-authenticator: PasswordAuthenticator
-authorizer: CassandraAuthorizer
+authenticator: PasswordAuthenticator                           #验证使用Cassandra的用户是否合法,这是安全认证的第一步
+authorizer: CassandraAuthorizer                                #验证该用户是否具备操作某一个Column Family的权限，这是安全认证的第一步
 role_manager: CassandraRoleManager
 roles_validity_in_ms: 2000
 permissions_validity_in_ms: 2000
 credentials_validity_in_ms: 2000
-partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+partitioner: org.apache.cassandra.dht.Murmur3Partitioner       #集群中数据分区的策略
 cdc_enabled: false
-data_file_directories:
-    - /mnt/locals/cassandras/volume1
-commitlog_directory: /cassandra_data/commitlog
+data_file_directories:                                         #SSTable文件在磁盘中的存储位置
+    - /opt/cassandras/data
+commitlog_directory: /opt/cassandras/commitlog                 #commitlog文件在磁盘中的存储位置
 disk_failure_policy: best_effort
 commit_failure_policy: stop_commit
 key_cache_size_in_mb: 5120
@@ -30,9 +30,9 @@ row_cache_size_in_mb: 0
 row_cache_save_period: 0
 counter_cache_size_in_mb:
 counter_cache_save_period: 7200
-saved_caches_directory: /cassandra_data/saved_caches            #数据缓存文件在磁盘中的存储位置
+saved_caches_directory: /opt/cassandras/saved_caches            #数据缓存文件在磁盘中的存储位置
 commitlog_sync: periodic                     #记录commitlog的方式,periodic每一次有数据更新都将操作commitlog,batch批量记录commitlog,每一段时间内数据的更新将批量一次操作commitlog。
-commitlog_sync_period_in_ms: 1000
+commitlog_sync_period_in_ms: 1000            #周期记录commitlog时，刷新commitlog文件的时间间隔,在commitlog_sync= periodic时才能设置
 commitlog_segment_size_in_mb: 32
 seed_provider:
     - class_name: org.apache.cassandra.locator.SimpleSeedProvider
