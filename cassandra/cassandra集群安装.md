@@ -77,9 +77,10 @@ seed_provider:
       parameters:
           # seeds is actually a comma-delimited list of addresses.
           # Ex: "<ip1>,<ip2>,<ip3>"
-          - seeds: "192.168.1.74"                   #集群种子节点ip,新加入集群的节点从种子节点中同步数据。可配置多个，中间用逗号隔开。
+          - seeds: "192.168.1.74"                  #集群种子节点ip,新加入集群的节点从种子节点中同步数据。可配置多个，中间用逗号隔开。
 listen_address: 192.168.1.74                       #需要监听的IP或主机名
 start_rpc: true
+storage_port: 7000                                 #集群中服务器与服务器之间相互通信的端口号
 native_transport_port: 9042                        #客户端通信端口
 rpc_address: 192.168.1.74                          #用于监听客户端连接的地址
 
@@ -99,6 +100,7 @@ seed_provider:
           - seeds: "192.168.1.74"                  #集群种子节点ip,新加入集群的节点从种子节点中同步数据。可配置多个，中间用逗号隔开。
 listen_address: 192.168.1.75                       #需要监听的IP或主机名
 start_rpc: true
+storage_port: 7000                                 #集群中服务器与服务器之间相互通信的端口号
 native_transport_port: 9042                        #客户端通信端口
 rpc_address: 192.168.1.75                          #用于监听客户端连接的地址
 
@@ -118,12 +120,11 @@ seed_provider:
           - seeds: "192.168.1.74"                  #集群种子节点ip,新加入集群的节点从种子节点中同步数据。可配置多个，中间用逗号隔开。
 listen_address: 192.168.1.76                       #需要监听的IP或主机名
 start_rpc: true
+storage_port: 7000                                 #集群中服务器与服务器之间相互通信的端口号
 native_transport_port: 9042                        #客户端通信端口
 rpc_address: 192.168.1.76                          #用于监听客户端连接的地址
 ```
-- authenticator: PasswordAuthenticator 生产环境都要用户名密码认证，默认的用户名/密码是cassandra/cassandra
-- auto_snapshot: false 尽管官方建议是true，但实际使用时，太消耗磁盘，所以建议改为false
-- endpoint_snitch: GossipingPropertyFileSnitch 生产环境标配
+
 
 八、启动
 ```
