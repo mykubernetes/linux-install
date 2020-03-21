@@ -30,14 +30,14 @@ row_cache_size_in_mb: 0
 row_cache_save_period: 0
 counter_cache_size_in_mb:
 counter_cache_save_period: 7200
-saved_caches_directory: /cassandra_data/saved_caches
-commitlog_sync: periodic
+saved_caches_directory: /cassandra_data/saved_caches            #数据缓存文件在磁盘中的存储位置
+commitlog_sync: periodic                     #记录commitlog的方式,periodic每一次有数据更新都将操作commitlog,batch批量记录commitlog,每一段时间内数据的更新将批量一次操作commitlog。
 commitlog_sync_period_in_ms: 1000
 commitlog_segment_size_in_mb: 32
 seed_provider:
     - class_name: org.apache.cassandra.locator.SimpleSeedProvider
       parameters:
-        - seeds: "cassandra-default-0.cassandra-default.component.svc.cluster.local"
+        - seeds: "192.168.101.74"            #集群种子节点ip
 concurrent_reads: 16
 concurrent_writes: 32
 concurrent_counter_writes: 16
@@ -50,16 +50,16 @@ index_summary_capacity_in_mb:
 index_summary_resize_interval_in_minutes: 60
 trickle_fsync: false
 trickle_fsync_interval_in_kb: 10240
-storage_port: 7000
-ssl_storage_port: 7001
-listen_address: 10.224.0.217
+storage_port: 7000                             #Cassandra集群中服务器与服务器之间相互通信的端口号
+ssl_storage_port: 7001                         #https的Cassandra集群中服务器与服务器之间相互通信的端口号
+listen_address: 192.168.101.74                 #集群中服务器与服务器之间相互通信的地址
 start_native_transport: true
 native_transport_port: 9042
 start_rpc: True
-rpc_address: 10.224.0.217
-broadcast_rpc_address: 10.224.0.217
-rpc_port: 9160
-rpc_keepalive: true
+rpc_address:192.168.101.74                     #对外提供服务的地址
+broadcast_rpc_address: 192.168.101.74
+rpc_port: 9160                                 #对外提供服务的端口号
+rpc_keepalive: true                            #对外提供服务连接是否一直保持
 rpc_server_type: sync
 thrift_framed_transport_size_in_mb: 15
 incremental_backups: false
