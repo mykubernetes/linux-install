@@ -1,11 +1,11 @@
 ```
 disk_access_mode: standard
-cluster_name: 'mycluster'                                     #集群的名称
-num_tokens: 32
-hinted_handoff_enabled: true                                  #是否开启当前Cassandra服务器的HINT操作
+cluster_name: 'mycluster'                                      #集群的名称
+num_tokens: 64
+hinted_handoff_enabled: true                                   #是否开启当前Cassandra服务器的HINT操作
 hinted_handoff_throttle_in_kb: 1024
 max_hints_delivery_threads: 2
-hints_directory: /cassandra_data/hints
+hints_directory: /opt/cassandra/hints                          #存储提示目录
 hints_flush_period_in_ms: 10000
 max_hints_file_size_in_mb: 128
 batchlog_replay_throttle_in_kb: 1024
@@ -54,7 +54,7 @@ storage_port: 7000                             #Cassandra集群中服务器与�
 ssl_storage_port: 7001                         #https的Cassandra集群中服务器与服务器之间相互通信的端口号
 listen_address: 192.168.101.74                 #集群中服务器与服务器之间相互通信的地址
 start_native_transport: true
-native_transport_port: 9042
+native_transport_port: 9042                    #默认的CQL本地服务端口
 start_rpc: True
 rpc_address:192.168.101.74                     #对外提供服务的地址
 broadcast_rpc_address: 192.168.101.74
