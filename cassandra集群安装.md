@@ -77,9 +77,10 @@ seed_provider:
       parameters:
           # seeds is actually a comma-delimited list of addresses.
           # Ex: "<ip1>,<ip2>,<ip3>"
-          - seeds: "172.16.0.10"                   #集群种子节点ip,新加入集群的节点从种子节点中同步数据。可配置多个，中间用逗号隔开。
+          - seeds: "192.168.1.74"                   #集群种子节点ip,新加入集群的节点从种子节点中同步数据。可配置多个，中间用逗号隔开。
 listen_address: 192.168.1.74                       #需要监听的IP或主机名
 start_rpc: true
+native_transport_port: 9042                        #客户端通信端口
 rpc_address: 192.168.1.74                          #用于监听客户端连接的地址
 
 
