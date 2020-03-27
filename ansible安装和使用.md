@@ -23,6 +23,8 @@ remote_port  = 22
 
 host_key_checking = False
 
+roles_path = /etc/ansible/roles:/usr/share/ansible/roles
+
 timeout = 10
 
 log_path = /var/log/ansible.log
