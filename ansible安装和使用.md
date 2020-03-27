@@ -12,18 +12,19 @@ http://www.zsythink.net/archives/category/%e8%bf%90%e7%bb%b4%e7%9b%b8%e5%85%b3/a
 
 # vim /etc/ansible/ansible.cfg 
 [defaults]
+inventory = /etc/ansible/hosts                          #ansible inventory文件路径
 
-inventory = /etc/ansible/hosts
+remote_tmp = /tmp/.ansible/tmp                          #远程主机脚本临时存放目录 
 
-forks = 5
+forks = 5                                               #并发数
 
 become = root
 
 remote_port  = 22
 
-host_key_checking = False
+host_key_checking = False                               #避免ssh的时候输入yes
 
-roles_path = /etc/ansible/roles:/usr/share/ansible/roles
+roles_path = /etc/ansible/roles:/usr/share/ansible/roles   #role路径
 
 timeout = 10
 
