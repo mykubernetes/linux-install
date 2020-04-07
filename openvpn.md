@@ -214,19 +214,24 @@ Certificate created at: /opt/easy-rsa/pki/issued/client.crt          #生成公�
 port 1194                               #端口
 proto udp                               #协议
 dev tun                                 #采用路由隧道模式tun
+
 ca ca.crt                               #ca证书文件位置
 cert server.crt                         #服务端公钥名称
 key server.key                          #服务端私钥名称
 dh dh.pem                               #交换证书
+
 server 10.8.0.0 255.255.255.0           #给客户端分配地址池，注意：不能和VPN服务器内网网段有相同
 push "route 172.16.1.0 255.255.255.0"   #允许客户端访问内网172.16.1.0网段
 ifconfig-pool-persist ipp.txt           #地址池记录文件位置
+
 keepalive 10 120                        #存活时间，10秒ping一次,120 如未收到响应则视为断线
 max-clients 100                         #最多允许100个客户端连接
-status openvpn-status.log               #日志记录位置
-verb 3                                  #openvpn版本
-client-to-client                        #客户端与客户端之间支持通信
-log /var/log/openvpn.log                #openvpn日志记录位置
+client-to-client                        #如果客户端都是用一个证书和密钥连接VPN，需要打开这个选项
+
+status openvpn-status.log               #状态日志路径
+verb 3                                  #调试信息级别
+log /var/log/openvpn.log                #运行日志
+
 persist-key     #通过keepalive检测超时后，重新启动VPN，不重新读取keys，保留第一次使用的keys。
 persist-tun     #检测超时后，重新启动VPN，一直保持tun是linkup的。否则网络会先linkdown然后再linkup
 duplicate-cn
