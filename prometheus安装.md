@@ -2,7 +2,7 @@ prometheus安装
 =============
 prometheus官网  
 https://prometheus.io/  
-
+https://prometheus.io/docs/instrumenting/exporters/#software-exposing-prometheus-metrics  
 软件下载地址  
 https://prometheus.io/download/  
 https://github.com/prometheus  
