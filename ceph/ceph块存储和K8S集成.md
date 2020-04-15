@@ -269,3 +269,4 @@ pvc-bc3eb914-acd6-47c1-8ffd-82f87ea0520b   1Gi        RWO            Delete     
 $ rbd ls -p kube
 kubernetes-dynamic-pvc-4e4eb4b3-7ed1-11ea-b851-5a530ae333ee
 ```
+https://blog.csdn.net/u012720518/article/details/105489771/
