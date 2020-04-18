@@ -117,21 +117,21 @@ vi tengine.spec
 ### 0.define section               #自定义宏段，这个不是必须的 
 ### %define nginx_user nginx       #这是我们自定义了一个宏，名字为nginx_user值为nginx，%{nginx_user}引用 
      
-### 1.The introduction section      #介绍区域段 
+### 1.The introduction section                     #介绍区域段 
      
-Name:           tengine            #名字为tar包的名字 
-Version:        1.4.2              #版本号，一定要与tar包的一致哦 
-Release:        1%{?dist}          #释出号，也就是第几次制作rpm 
-Summary:        tengine from TaoBao  #软件包简介，最好不要超过50字符 
+Name:           tengine                            #名字为tar包的名字 
+Version:        1.4.2                              #版本号，一定要与tar包的一致哦 
+Release:        1%{?dist}                          #释出号，也就是第几次制作rpm 
+Summary:        tengine from TaoBao                #软件包简介，最好不要超过50字符 
      
 Group:          System Environment/Daemons  #组名，可以通过less /usr/share/doc/rpm-4.8.0/GROUPS 选择合适组 
-License:        GPLv2                       #许可，GPL还是BSD等  
-URL:            http://laoguang.blog.51cto.com   #可以写一个网址 
-Packager:       Laoguang <ibuler@qq.com> 
-Vendor:         TaoBao.com 
+License:        GPLv2                              #许可，GPL还是BSD等  
+URL:            http://laoguang.blog.51cto.com     #可以写一个网址 
+Packager:       Laoguang <ibuler@qq.com>           #制作者<邮箱>
+Vendor:         TaoBao.com                         #提供商
 Source0:        %{name}-%{version}.tar.gz   
 #定义用到的source，也就是你收集的，可以用宏来表示，也可以直接写名字，上面定义的内容都可以像上面那样引用 
-#patch0:            a.patch                 #如果需要补丁，依次写 
+#patch0:            a.patch                        #如果需要补丁，依次写 
 BuildRoot:      %_topdir/BUILDROOT         
 #这个是软件make install 的测试安装目录，也就是测试中的根，我们不用默认的，我们自定义，
 #我们可以来观察生成了哪此文件，方便写file区域 
