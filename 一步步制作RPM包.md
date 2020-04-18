@@ -1,8 +1,4 @@
-https://blog.51cto.com/mageedu/1205205
-
 https://www.jianshu.com/p/dd8183937106
-
-https://blog.stanley.wang/2017/01/15/RPM%E5%8C%85%E5%88%B6%E4%BD%9C/
 
 本文根据马哥教育视频总结而来。
 
@@ -200,7 +196,11 @@ rm -rf %{buildroot}
 /etc/           #下面的内容要根据你在%{rootbuild}下生成的来写     
 /usr/ 
 /var/ 
-         
+# %doc API CHANGES COPYING CREDITS README axelrc.examlpe 文档
+# %config(noreplace) %{_sysconfdir}/axelrc 配置文件，noreplace不替换原来的
+# /usr/local/bin/axel 包含的所有文件，可以直接写目录
+# %attr (0755,root,root) /etc/rc.d/init.d/nginx 定义自定义资源的属性，不指定则继承%defattr
+
 ###  7.chagelog section  改变日志段 
 %changelog 
 *  Fri Dec 29 2012 laoguang <ibuler@qq.com> - 1.0.14-1 
