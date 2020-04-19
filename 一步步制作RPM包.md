@@ -169,7 +169,13 @@ BuildRoot:      %_topdir/BUILDROOT
 #我们可以来观察生成了哪此文件，方便写file区域 
 BuildRequires:  gcc,make                           #制作过程中用到的软件包
 # BuildRequires: libfastcommon-devel >= 1.0.43     #示例
-Requires:       pcre,pcre-devel,openssl,chkconfig  #软件运行需要的软件包，也可以指定最低版本如 bash >= 1.1.1 
+Requires:       pcre,pcre-devel,openssl,chkconfig  #软件运行需要的软件包，也可以指定最低版本如 bash >= 1.1.1
+#Requires(pre):     shadow-utils                   #执行%pre脚本段的时候依赖的软件包
+#Requires(post):    chkconfig                      #执行%post脚本段的时候依赖的软件包
+#Requires(preun):   chkconfig,initscripts          #执行preun脚本段的时候依赖的软件包
+#Requires(postun):  initscripts                    #执行postun脚本段的时候依赖的软件包
+#Provides:          webserver                      #通过了什么功能，可省略，内容自定义
+
 %description                                       #软件包描述，尽情的写吧 
 It is a Nginx from Taobao.                         #描述内容 
      
