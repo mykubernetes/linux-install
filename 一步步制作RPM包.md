@@ -167,7 +167,8 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %_topdir/BUILDROOT         
 #这个是软件make install 的测试安装目录，也就是测试中的根，我们不用默认的，我们自定义，
 #我们可以来观察生成了哪此文件，方便写file区域 
-BuildRequires:  gcc,make                           #制作过程中用到的软件包 
+BuildRequires:  gcc,make                           #制作过程中用到的软件包
+# BuildRequires: libfastcommon-devel >= 1.0.43     #示例
 Requires:       pcre,pcre-devel,openssl,chkconfig  #软件运行需要的软件包，也可以指定最低版本如 bash >= 1.1.1 
 %description                                       #软件包描述，尽情的写吧 
 It is a Nginx from Taobao.                         #描述内容 
