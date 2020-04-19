@@ -159,7 +159,8 @@ License:        GPLv2                              #许可，GPL还是BSD等
 URL:            http://laoguang.blog.51cto.com     #可以写一个网址 
 Packager:       Laoguang <ibuler@qq.com>           #制作者<邮箱>
 Vendor:         TaoBao.com                         #提供商
-Source0:        %{name}-%{version}.tar.gz   
+Source0:        %{name}-%{version}.tar.gz
+#Source1:        nginx.ini                         #在install步引入此文件
 #定义用到的source，也就是你收集的，可以用宏来表示，也可以直接写名字，上面定义的内容都可以像上面那样引用 
 #patch0:            a.patch                        #如果需要补丁，依次写 
 BuildRoot:      %_topdir/BUILDROOT         
@@ -212,7 +213,8 @@ make %{?_smp_mflags}          #make后面的意思是：如果就多处理器的
 rm -rf %{buildroot}                #先删除原来的安装的，如果你不是第一次安装的话 
 make install DESTDIR=%{buildroot} 
 #DESTDIR指定安装的目录，而不是真实的安装目录，%{buildroot}你应该知道是指的什么了 
-# {__install} -p -d -m 0755 %{buildroot}/var/log/nginx    #创建目录
+# %{__install} -p -d -m 0755 %{buildroot}/var/log/nginx    #创建空目录
+# %{__install} -p -D -m 0755 %{SOURCE1} %{buildroot}/etc/rc.d/init.d/nginx      #将文件拷贝到路径下
 
 ###  4.1 scripts section #没必要可以不写 
 %pre        #rpm安装前制行的脚本 
@@ -248,14 +250,14 @@ rm -rf %{buildroot}
 %defattr (-,root,root,0755)   #设定默认权限，如果下面没有指定权限，则继承默认 
 /etc/           #下面的内容要根据你在%{rootbuild}下生成的来写     
 /usr/ 
-/var/ 
+/var/
 # %dir /var/run/nginx  #生成空目录
 # %dir /var/log/nginx  #生成空目录
 # %dir /etc/nginx      #生成空目录
 # %doc API CHANGES COPYING CREDITS README axelrc.examlpe 文档文件会被安装到 /usr/share/doc/生成当前软件包名+版本号名
 # %config(noreplace) %{_sysconfdir}/axelrc 配置文件，noreplace不替换原来的
 # /usr/local/bin/axel 包含的所有文件，可以直接写目录
-# %attr (0755,root,root) /etc/rc.d/init.d/nginx 定义自定义资源的属性，不指定则继承%defattr
+# %attr (0755,root,root) /etc/rc.d/init.d/nginx 定义自定义资源的属性，不指定则继承%defattr #包含SOURCE1步骤在install步骤中拷贝的文件
 
 ###  7.chagelog section  改变日志段 
 %changelog 
