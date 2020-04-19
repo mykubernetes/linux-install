@@ -219,16 +219,25 @@ make install DESTDIR=%{buildroot}
 if [ $1 == 1 ];then    #$1==1 代表的是第一次安装，2代表是升级，0代表是卸载 
         /usr/sbin/useradd -r nginx 2> /dev/null  ##其实这个脚本写的不完整
 fi 
+
 %post       #安装后执行的脚本 
-     
+if [ $1 == 1]; then
+        /sbin/chkconfig --add %{name}
+fi
+
 %preun      #卸载前执行的脚本 
 if [ $1 == 0 ];then 
         /usr/sbin/userdel -r nginx 2> /dev/null 
 fi 
+
 %postun     #卸载后执行的脚本 
-     
+if [ $1 == 0 ]; then
+        /sbin/service %{name} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}
+fi
+
 ###  5.clean section 清理段,删除buildroot 
-     
+
 %clean 
 rm -rf %{buildroot} 
          
