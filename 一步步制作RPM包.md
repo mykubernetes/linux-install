@@ -212,7 +212,8 @@ make %{?_smp_mflags}          #make后面的意思是：如果就多处理器的
 rm -rf %{buildroot}                #先删除原来的安装的，如果你不是第一次安装的话 
 make install DESTDIR=%{buildroot} 
 #DESTDIR指定安装的目录，而不是真实的安装目录，%{buildroot}你应该知道是指的什么了 
-     
+# {__install} -p -d -m 0755 %{buildroot}/var/log/nginx    #创建目录
+
 ###  4.1 scripts section #没必要可以不写 
 %pre        #rpm安装前制行的脚本 
 if [ $1 == 1 ];then    #$1==1 代表的是第一次安装，2代表是升级，0代表是卸载 
