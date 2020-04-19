@@ -249,6 +249,9 @@ rm -rf %{buildroot}
 /etc/           #下面的内容要根据你在%{rootbuild}下生成的来写     
 /usr/ 
 /var/ 
+# %dir /var/run/nginx  #生成空目录
+# %dir /var/log/nginx  #生成空目录
+# %dir /etc/nginx      #生成空目录
 # %doc API CHANGES COPYING CREDITS README axelrc.examlpe 文档文件会被安装到 /usr/share/doc/生成当前软件包名+版本号名
 # %config(noreplace) %{_sysconfdir}/axelrc 配置文件，noreplace不替换原来的
 # /usr/local/bin/axel 包含的所有文件，可以直接写目录
