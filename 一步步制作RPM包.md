@@ -230,11 +230,13 @@ if [ $1 == 0 ];then
         /usr/sbin/userdel -r nginx 2> /dev/null 
 fi 
 
-%postun     #卸载后执行的脚本 
 if [ $1 == 0 ]; then
         /sbin/service %{name} stop > /dev/null 2>&1
         /sbin/chkconfig --del %{name}
 fi
+
+%postun     #卸载后执行的脚本 
+
 
 ###  5.clean section 清理段,删除buildroot 
 
