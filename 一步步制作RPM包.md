@@ -1,7 +1,5 @@
 https://www.jianshu.com/p/dd8183937106
 
-本文根据马哥教育视频总结而来。
-
 一.RPM制作步骤
 
 我们在企业中有的软件基本都是编译的，我们每次安装都得编译，那怎么办呢？那就根据我们的需求制作RPM安装包吧。先来说说基本布骤:
@@ -174,7 +172,7 @@ Requires:       pcre,pcre-devel,openssl,chkconfig  #软件运行需要的软件�
 #Requires(post):    chkconfig                      #执行%post脚本段的时候依赖的软件包
 #Requires(preun):   chkconfig,initscripts          #执行preun脚本段的时候依赖的软件包
 #Requires(postun):  initscripts                    #执行postun脚本段的时候依赖的软件包
-#Provides:          webserver                      #通过了什么功能，可省略，内容自定义
+#Provides:          webserver                      #提供的功能，可省略，内容自定义
 
 %description                                       #软件包描述，尽情的写吧 
 It is a Nginx from Taobao.                         #描述内容 
