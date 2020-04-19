@@ -109,7 +109,38 @@ cp /home/ibuler/rpmbuild/RPMS/x86_64/tengine-1.4.2-1.el6.x86_64.rpm /tmp
 rpm -ivh tengine-1.4.2-1.el6.x86_64.rpm  ##测试安装 
 rpm -e tengine                           ##测试卸载，如果版本号比原来的高，升级测试 
 ```
-8.如果没问题为rpm包签名吧，防止有人恶意更改    ##这个先不写了，有点晚了，以后补上
+
+8.查看一个制作好的rpm包信息
+```
+# rpm -qi rrdtool
+Name        : rrdtool
+Version     : 1.4.8
+Release     : 9.el7
+Architecture: x86_64
+Install Date: Sat 18 Apr 2020 10:56:29 PM EDT
+Group       : Applications/Databases
+Size        : 2966501
+License     : GPLv2+ with exceptions
+Signature   : RSA/SHA256, Wed 25 Nov 2015 10:37:07 AM EST, Key ID 24c6a8a7f4a80eb5
+Source RPM  : rrdtool-1.4.8-9.el7.src.rpm
+Build Date  : Fri 20 Nov 2015 02:24:01 PM EST
+Build Host  : worker1.bsys.centos.org
+Relocations : (not relocatable)
+Packager    : CentOS BuildSystem <http://bugs.centos.org>
+Vendor      : CentOS
+URL         : http://oss.oetiker.ch/rrdtool/
+Summary     : Round Robin Database Tool to store and display time-series data
+Description :
+RRD is the Acronym for Round Robin Database. RRD is a system to store and
+display time-series data (i.e. network bandwidth, machine-room temperature,
+server load average). It stores the data in a very compact way that will not
+expand over time, and it presents useful graphs by processing the data to
+enforce a certain data density. It can be used either via simple wrapper
+scripts (from shell or Perl) or via frontends that poll network devices and
+put a friendly user interface on it.
+```
+
+9.如果没问题为rpm包签名吧，防止有人恶意更改    ##这个先不写了，有点晚了，以后补上
 
 到此整个流程完毕。下面来说说其中最最重要的spec的格式，先说最简单的,最容易实现的
 ```
