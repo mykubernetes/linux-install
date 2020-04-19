@@ -233,7 +233,7 @@ rm -rf %{buildroot}
 /etc/           #下面的内容要根据你在%{rootbuild}下生成的来写     
 /usr/ 
 /var/ 
-# %doc API CHANGES COPYING CREDITS README axelrc.examlpe 文档
+# %doc API CHANGES COPYING CREDITS README axelrc.examlpe 文档文件会被安装到 /usr/share/doc/生成当前软件包名+版本号名
 # %config(noreplace) %{_sysconfdir}/axelrc 配置文件，noreplace不替换原来的
 # /usr/local/bin/axel 包含的所有文件，可以直接写目录
 # %attr (0755,root,root) /etc/rc.d/init.d/nginx 定义自定义资源的属性，不指定则继承%defattr
