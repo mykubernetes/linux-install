@@ -245,6 +245,10 @@ rm -rf %{buildroot}
 ```
 到此一个简单的tengine RPM包制作好了。
 
+https://github.com/happyfish100/libfastcommon/blob/master/libfastcommon.spec
+
+https://github.com/happyfish100/fastdfs/blob/master/fastdfs.spec
+
 三.RPM包制作拓展
 
 下面我们来拓展一下，比如：我们想为tengine增加控制脚本，可以通过start|stop控制，我们还想更换一下默认的首页index.html，默认的fastcgi_params是不能直接连接php的，所以我们替换为新的配置文件，我们也可以用设置好的nginx.conf替换原来的nginx.conf。基于上述步骤下面继续
