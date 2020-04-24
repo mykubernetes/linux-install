@@ -21,3 +21,5 @@ https://www.cnblogs.com/kevingrace/
 https://jeremy-xu.oschina.io/
 
 https://blog.51cto.com/moerjinrong?type=1
+
+https://www.jenkins.io/zh/doc/book/getting-started/
