@@ -3,6 +3,10 @@
 书https://github.com/mykubernetes/gitbook-ceph/blob/master/SUMMARY.md  
 ---
 
+书https://lihaijing.gitbooks.io/ceph-handbook/content/
+---
+https://github.com/lihaijing/ceph-handbook
+
 # Ceph核心概念
 ## RADOS
 >全称Reliable Autonomic Distributed Object Store，即可靠的、自动化的、分布式对象存储系统。RADOS是Ceph集群的精华，用户实现数据分配、Failover等集群操作。
