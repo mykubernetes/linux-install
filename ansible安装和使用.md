@@ -590,7 +590,7 @@ import*（静态）：在Playbook解析时预先导入
 -	不能与循环一起使用
 -	将变量用于目标文件或角色名称时，不能使用inventory（主机/主机组等）中的变量
 
-1.import
+1.import_playbook
 ```
 # cat main.yml
 ---
@@ -611,7 +611,7 @@ import*（静态）：在Playbook解析时预先导入
     - debug: msg="test database"
 ```
 
-2.include
+2.include_tasks和import_tasks
 ```
 # cat main.yml
 ---
