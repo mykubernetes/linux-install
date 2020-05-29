@@ -115,7 +115,45 @@ ansible playbook
 ---
 ``` ansible-playbook --list-host first.yaml ```  
 
-4)基本语法  
+4)任务控制（tags）
+---
+```
+#加密playbook文件时提示输入密码
+ansible-playbook --ask-vault-pass example.yaml
+
+#指定要读取的Inventory清单文件
+ansible-playbook example.yaml -i inventory
+ansible-playbook example.yaml --inventory-file=inventory
+
+#列出执行匹配到的主机，但并不会执行任何动作。
+ansible-playbook example.yaml --list-hosts
+
+#列出所有tags
+ansible-playbook example.yaml --list-tags
+
+#列出所有即将被执行的任务
+ansible-playbook example.yaml --list-tasks  
+
+
+#指定tags
+ansible-playbook example.yaml --tags "configuration,install"
+
+#跳过tags
+ansible-playbook example.yaml --skip-tags "install"
+
+#并行任务数。FORKS被指定为一个整数,默认是5
+ansible-playbook example.yaml -f 5
+ansible-playbook example.yaml --forks=5
+```
+
+5)指定主机
+---
+```
+ansible-playbook example.yaml --limit node01
+```
+
+
+5)基本语法  
 ---
 在变更时执行操作（handlers）  
 notify：在任务结束时触发  
