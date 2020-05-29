@@ -229,6 +229,25 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
         command: touch /tmp/{{date_output.stdout}}
 ```
 
+set_fact变量在tasks中定义
+```
+---
+- hosts: test
+  remote_user: root
+  vars:
+    testvar1: test1_string
+  tasks:
+  - shell: "echo test2_string"
+    register: shellreturn
+  - set_fact:
+      testsf1: "{{testvar1}}"
+      testsf2: "{{shellreturn.stdout}}"
+  - debug:
+      msg: "{{testsf1}} {{testsf2}}"
+      #var: shellreturn
+```
+
+
 11)系统信息变量（facts）
 ---
 ```
