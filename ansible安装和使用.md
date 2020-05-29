@@ -418,11 +418,13 @@ bind 192.168.1.70
    {% elif loop.index == 3 %}
        -> 3
    {% else %}
-       {{i}}
+       {{i}}                                    #打印所有变量
    {% endif %}
 {% endfor %} 
  
 {{ hello }}
+
+#便利一个字典
 {% set dict={'zhangsan': '26', 'lisi': '25'} %}
 {% for key, value in dict.iteritems() %}
     {{key}} -> {{value}}
