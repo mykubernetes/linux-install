@@ -467,6 +467,30 @@ roles/
 -	templates - 角色部署时用到的模板
 -	meta - 角色定义的一些元数据
 
+all.yml中定义变量
+```
+vim group_vars/all.yml
+ansible_user: 'vagrant'
+ansible_ssh_private_key_file: '/home/haibin/.vagrant.d/insecure_private_key'
+
+elk_version: '6.7.0'
+timezone: 'Asia/Shanghai'
+apt_mirror: 'mirrors.aliyun.com'
+```
+
+inventory中定义变量
+```
+node01 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
+node0q ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
+
+[lamp]
+node01
+
+[monitor]
+node01
+node02
+```
+
 role变量
 ```
 - hosts: webservers
