@@ -410,7 +410,7 @@ bind 192.168.1.70
 
 
 # cat f.j2 
-{% set list=['one', 'two', 'three'] %}
+{% set list=['one', 'two', 'three'] %}          #定义一个列表
  
 {% for i in list %}
    {% if i == 'two' %}
