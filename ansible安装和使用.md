@@ -352,7 +352,7 @@ bind 192.168.1.70
      apt: name=apache2 state=latest
 ```  
 
-14)with_items迭代   
+14)with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 ---
 ```
 - hosts: web
