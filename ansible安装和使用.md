@@ -252,13 +252,16 @@ ansible_ssh_pass
 ansible_ssh_sudo_pass  
 ```
 # cat /etc/ansible/hosts
-   [test]
-   node01 ansible_ssh_port=5678 ansible_ssh_user=hadoop ansible_ssh_pass=123456
-   [web]
-   node01 http_port=80
-   node02 http_port=8080
-[test:vars]                  #组变量
+[test]
+node01 ansible_ssh_port=5678 ansible_ssh_user=hadoop ansible_ssh_pass=123456
+
+[web]
+node01 http_port=80              #分别为每个主机定义变量
+node02 http_port=8080
+
+[web:vars]                      #组变量,为web下的主机全部添加变量
    http_port=9090
+
 
 #cat test.yaml
 - hosts: web
@@ -266,11 +269,35 @@ ansible_ssh_sudo_pass
   tasks:
    - name: http_port
      copy: content={{ http_port }} dest=/opt/test_http_port
-
-# ansible test  -m shell -a "whoami"
-   192.168.1.71 | SUCCESS | rc=0 >>
- hadoop
 ```  
+
+inventory中定义变量
+---
+```
+node01 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
+node02 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
+
+[lamp]
+node01
+
+[monitor]
+node01
+node02
+```
+
+all.yml中定义变量
+---
+```
+vim group_vars/all.yml
+ansible_user: 'vagrant'
+ansible_ssh_private_key_file: '/home/haibin/.vagrant.d/insecure_private_key'
+
+elk_version: '6.7.0'
+timezone: 'Asia/Shanghai'
+apt_mirror: 'mirrors.aliyun.com'
+```
+
+
 
 11)playbook变量  
 ---
@@ -278,7 +305,7 @@ ansible_ssh_sudo_pass
 # cat test.yaml
 - hosts: node01
   remote_user: root
-  vars:
+  vars:                            #定义变量
   - pbvar: plabook_variable_testing
   tasks:
    - name: host playbook var
@@ -467,31 +494,8 @@ roles/
 -	templates - 角色部署时用到的模板
 -	meta - 角色定义的一些元数据
 
-all.yml中定义变量
-```
-vim group_vars/all.yml
-ansible_user: 'vagrant'
-ansible_ssh_private_key_file: '/home/haibin/.vagrant.d/insecure_private_key'
 
-elk_version: '6.7.0'
-timezone: 'Asia/Shanghai'
-apt_mirror: 'mirrors.aliyun.com'
-```
-
-inventory中定义变量
-```
-node01 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
-node0q ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
-
-[lamp]
-node01
-
-[monitor]
-node01
-node02
-```
-
-role变量
+role中定定义变量变量
 ```
 - hosts: webservers
   roles:
@@ -502,8 +506,8 @@ role变量
 - hosts: webservers
   roles:
     - common
-    - role: nginx              #不同角色变量
-      vars:
+    - role: nginx              #指定角色
+      vars:                    #定义变量
          dir: '/opt/a'
          app_port: 5000
     - role: php
