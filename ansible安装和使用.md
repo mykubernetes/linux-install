@@ -146,14 +146,14 @@ ansible-playbook example.yaml -f 5
 ansible-playbook example.yaml --forks=5
 ```
 
-5)指定主机
+5）指定主机
 ---
 ```
 ansible-playbook example.yaml --limit node01
 ```
 
 
-5)基本语法  
+6)基本语法  
 ---
 在变更时执行操作（handlers）  
 notify：在任务结束时触发  
@@ -180,7 +180,7 @@ ansible-playbook first.yaml                #运行playbook
 ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```  
 
-5)ansible查看变量  
+7)ansible查看变量  
 ---
 ``` ansible node01 -m setup ```  
 ```
@@ -191,7 +191,7 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
      copy: content={{ ansible_env }} dest=/tmp/ansible.env
 ```   
 
-6)命令行传递变量  
+8)命令行传递变量  
 ---
 ```  
 #  ansible-playbook -e pkgname=memcached  test.yaml
@@ -203,7 +203,7 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
      yum: name={{ pkgname }} state=latest
 ```  
 
-7)在Playbook中定义变量
+9)在Playbook中定义变量
 ---
 ```
 - hosts: webservers
@@ -216,7 +216,7 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
         shell: "echo {{var_name}}"
 ```
 
-8）注册变量（register）
+10）注册变量（register）
 ---
 ```
 - hosts: webservers 
@@ -229,7 +229,7 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
         command: touch /tmp/{{date_output.stdout}}
 ```
 
-9)系统信息变量（facts）
+11)系统信息变量（facts）
 ---
 ```
 - hosts: webservers 
@@ -243,7 +243,7 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
 
 ```
 
-10)invertory参数变量  
+12)invertory参数变量  
 ---
 ansible_ssh_host  
 ansible_ssh_port  
@@ -299,7 +299,7 @@ apt_mirror: 'mirrors.aliyun.com'
 
 
 
-11)playbook变量  
+13)playbook变量  
 ---
 ```
 # cat test.yaml
@@ -312,7 +312,7 @@ apt_mirror: 'mirrors.aliyun.com'
      copy: content={{ pbvar }} dest=/tmp/playbook.var
 ```  
 
-12)template文件
+14)template文件
 ---
 ```
 # cat /opt/src/redis.conf |grep ^bind
@@ -338,7 +338,7 @@ bind {{ ansible_enp0s3.ipv4.address }}
 bind 192.168.1.70
 ```  
 
-13)when判断
+15)when判断
 ---
 ```
 - hosts: web
@@ -352,7 +352,7 @@ bind 192.168.1.70
      apt: name=apache2 state=latest
 ```  
 
-14)with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
+16)with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 ---
 ```
 - hosts: web
@@ -395,7 +395,7 @@ bind 192.168.1.70
 
 ```
 
-15)Playbook模板（jinja2）
+17)Playbook模板（jinja2）
 ---
 条件和循环
 ```
@@ -467,7 +467,7 @@ server {
 }
 ```
 
-16)roles
+18)roles
 ---
 Roles目录结构
 ```
