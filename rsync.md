@@ -39,7 +39,13 @@ uid = root
 gid = root
 auth user = backup
 secrets file = /etc/server.pass
-```  
+```
+
+3、配置密码文件
+```
+# vim /etc/server.pass 
+root:123456
+```
 
 启动  
 ```
@@ -48,7 +54,7 @@ secrets file = /etc/server.pass
 root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
 ```  
 
-3、客户端配置  
+4、客户端配置  
 
 ```
 # rsync -vzrtopg --delete --progress root@192.168.101.69::/ixdba /ixdba.net --password-file=/etc/server.pass
