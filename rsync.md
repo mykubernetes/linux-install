@@ -45,17 +45,8 @@ root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
 3、客户端配置  
 
 ```
-# rsync -vzrtopg --delete --progress root@192.168.101.69:/ixdba /ixdba.net --password-file=/etc/server.pass
-# rsync -avzPL --timeout=600  root@192.168.101.69:/ixdba /test
-
-#推文件
-# rsync -av /etc/passwd 192.168.101.70:/tmp/cc.txt
-
-#拉文件
-# rsync -avP 192.168.101.70:/tmp/cc.txt /tmp/123.txt
-
-#指定端口号
-# rsync -avzP -e "ssh -p 22" /etc/passwd 192.168.101.70:/tmp/cc.txt
+# rsync -vzrtopg --delete --progress root@192.168.101.69::/ixdba /ixdba.net --password-file=/etc/server.pass
+# rsync -avzPL --timeout=600  root@192.168.101.69::/ixdba /test
 ```
 - -vzrtopg 详细信息
 - -z 传输时压缩
@@ -74,3 +65,14 @@ root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
 - -a 归档模式，以归档方式传输，并保持所有文件属性
   - -a 包含-rtplgoD
   
+手动命令方式
+```
+#推文件
+# rsync -av /etc/passwd 192.168.101.70:/tmp/cc.txt
+
+#拉文件
+# rsync -avP 192.168.101.70:/tmp/cc.txt /tmp/123.txt
+
+#指定端口号
+# rsync -avzP -e "ssh -p 22" /etc/passwd 192.168.101.70:/tmp/cc.txt
+```
