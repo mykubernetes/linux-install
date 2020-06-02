@@ -1,6 +1,12 @@
 官网
 https://rsync.samba.org/  
 
+sync和scp的区别
+---
+Remote Sync ：简称rsync，是一种远程同步，高效的数据备份的工具。第一次备份完全备份，以后备份就是差异备份。
+
+scp：secure copy 同样是用来进行远程复制的命令，但是每次备份数据都是完全备份
+
 1、安装  
 ```
 yum install gcc -y
