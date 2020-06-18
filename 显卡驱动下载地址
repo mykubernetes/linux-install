@@ -7,7 +7,14 @@ https://www.nvidia.com/Download/index.aspx?lang=en-us
 cuda下载地址
 
 https://developer.nvidia.com/cuda-toolkit-archive
+nvidia与cuda的对应关系: https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html
+
+
 
 cudnn下载地址
 
 https://developer.nvidia.com/rdp/cudnn-archive
+
+
+安装方法
+https://blog.csdn.net/happyfreeangel/article/details/86529165
