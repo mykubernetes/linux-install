@@ -1,5 +1,5 @@
 一、概述
-
+---
 1、etcd 简介
 
 etcd 是 CoreOS 团队于 2013 年 6月发起的开源项目，它的目标是构建一个高可用的分布式键值(key-value)数据库。etcd 内部采用raft协议作为一致性算法，etcd 基于 Go 语言实现。
@@ -48,8 +48,366 @@ etcd 认为写入请求被 Leader 节点处理并分发给了多数节点后，�
 所以在集群中推荐的最少节点数量是3个，因为1和2个节点的容错节点数都是0，一旦有一个节点宕掉整个集群就不能正常工作了。
 
 
+三、简单使用
+---
+
+1）增加
+
+1、set
+
+指定某个键的值。例如:
+
+```
+$ etcdctl set /testdir/testkey "Hello world"
+Hello world
+```
+#支持的选项包括：
+- --ttl '0' 该键值的超时时间(单位为秒)，不配置(默认为0)则永不超时
+- --swap-with-value value 若该键现在的值是value，则进行设置操作
+- --swap-with-index '0'   若该键现在的索引值是指定索引，则进行设置操作
+
+2、mk
+
+如果给定的键不存在，则创建一个新的键值。例如:
+
+```
+$ etcdctl mk /testdir/testkey "Hello world"
+Hello world
+```
+#当键存在的时候，执行该命令会报错，例如:
+```
+$ etcdctl mk /testdir/testkey "Hello world"
+Error: 105: Key already exists (/testdir/testkey) [8]
+```
+#支持的选项为:
+- --ttl '0' 超时时间(单位为秒），不配置(默认为 0)。则永不超时
 
 
+3、mkdir
+
+如果给定的键目录不存在，则创建一个新的键目录。例如：
+
+```
+$ etcdctl mkdir testdir2
+```
+#支持的选项为：
+- --ttl '0' 超时时间(单位为秒)，不配置(默认为0)则永不超时。
 
 
+4、setdir
 
+创建一个键目录。如果目录不存在就创建，如果目录存在更新目录TTL。
+```
+$ etcdctl setdir testdir3
+```
+#支持的选项为:
+- --ttl '0' 超时时间(单位为秒)，不配置(默认为0)则永不超时。
+
+
+2）删除
+
+1、rm
+
+删除某个键值。例如:
+```
+$ etcdctl rm /testdir/testkey
+PrevNode.Value: Hello
+```
+#当键不存在时，则会报错。例如:
+```
+$ etcdctl rm /testdir/testkey
+Error: 100: Key not found (/testdir/testkey) [7]
+```
+#支持的选项为：
+- --dir 如果键是个空目录或者键值对则删除
+- --recursive 删除目录和所有子键
+- --with-value 检查现有的值是否匹配
+- --with-index '0'检查现有的index是否匹配
+
+
+2、rmdir
+
+删除一个空目录，或者键值对。
+```
+$ etcdctl setdir dir1
+$ etcdctl rmdir dir1
+```
+#若目录不空，会报错:
+```
+$ etcdctl set /dir/testkey hi
+hi
+$ etcdctl rmdir /dir
+Error: 108: Directory not empty (/dir) [17]
+```
+
+3）更新
+
+1、update
+
+当键存在时，更新值内容。例如：
+```
+$ etcdctl update /testdir/testkey "Hello"
+Hello
+```
+#当键不存在时，则会报错。例如:
+```
+$ etcdctl update /testdir/testkey2 "Hello"
+Error: 100: Key not found (/testdir/testkey2) [6]
+```
+#支持的选项为:
+- --ttl '0' 超时时间(单位为秒)，不配置(默认为 0)则永不超时。
+
+
+2、updatedir
+
+更新一个已经存在的目录。
+```
+$ etcdctl updatedir testdir2
+```
+#支持的选项为:
+- --ttl '0' 超时时间(单位为秒)，不配置(默认为0)则永不超时。
+
+
+4)查询
+
+1、get
+
+获取指定键的值。例如：
+```
+$ etcdctl get /testdir/testkey
+Hello world
+```
+#当键不存在时，则会报错。例如：
+```
+$ etcdctl get /testdir/testkey2
+Error: 100: Key not found (/testdir/testkey2) [5]
+```
+#支持的选项为:
+- --sort 对结果进行排序
+- --consistent 将请求发给主节点，保证获取内容的一致性。
+
+
+2、ls
+
+列出目录(默认为根目录)下的键或者子目录，默认不显示子目录中内容。
+```
+$ etcdctl ls
+/testdir
+/testdir2
+/dir
+
+$ etcdctl ls dir
+/dir/testkey
+```
+#支持的选项包括:
+- --sort 将输出结果排序
+- --recursive 如果目录下有子目录，则递归输出其中的内容
+- -p 对于输出为目录，在最后添加/进行区分
+
+
+5)watch
+
+1、watch
+
+监测一个键值的变化，一旦键值发生更新，就会输出最新的值并退出。
+
+例如:用户更新testkey键值为Hello watch。
+```
+$ etcdctl get /testdir/testkey
+Hello world
+$ etcdctl set /testdir/testkey "Hello watch"
+Hello watch
+$ etcdctl watch testdir/testkey
+Hello watch
+```
+复制代码支持的选项包括:
+- --forever  一直监测直到用户按CTRL+C退出
+- --after-index '0' 在指定index之前一直监测
+- --recursive 返回所有的键值和子键值
+
+2、exec-watch
+
+监测一个键值的变化，一旦键值发生更新，就执行给定命令。
+
+例如：用户更新testkey键值。
+```
+$ etcdctl exec-watch testdir/testkey -- sh -c 'ls'
+config Documentation etcd etcdctl README-etcdctl.md README.md READMEv2-etcdctl.md
+```
+支持的选项包括:
+- --after-index '0' 在指定 index 之前一直监测
+- --recursive 返回所有的键值和子键值
+
+6)备份
+
+备份etcd的数据。
+```
+$ etcdctl backup --data-dir /var/lib/etcd --backup-dir /home/etcd_backup
+```
+支持的选项包括:
+- --data-dir  etcd的数据目录
+- --backup-dir 备份到指定路径
+
+7)member
+
+通过list、add、remove命令列出、添加、删除 etcd 实例到 etcd 集群中。
+
+查看集群中存在的节点
+```
+$ etcdctl member list
+8e9e05c52164694d: name=dev-master-01 peerURLs=http://localhost:2380 clientURLs=http://localhost:2379 isLeader=true
+```
+
+删除集群中存在的节点
+```
+$ etcdctl member remove 8e9e05c52164694d
+Removed member 8e9e05c52164694d from cluster
+```
+
+向集群中新加节点
+```
+$ etcdctl member add etcd3 http://192.168.1.100:2380
+Added member named etcd3 with ID 8e9e05c52164694d to cluster
+```
+
+示例
+```
+# 设置一个key值
+[root@etcd-0-8 ~]# etcdctl set /msg "hello k8s"
+hello k8s
+
+# 获取key的值
+[root@etcd-0-8 ~]# etcdctl get /msg
+hello k8s
+
+# 获取key值的详细信息
+[root@etcd-0-8 ~]# etcdctl -o extended get /msg
+Key: /msg
+Created-Index: 12
+Modified-Index: 12
+TTL: 0
+Index: 12
+
+hello k8s
+
+# 获取不存在的key回报错
+[root@etcd-0-8 ~]# etcdctl get /xxzx
+Error: 100: Key not found (/xxzx) [12]
+
+# 设置key的ttl，过期后会被自动删除
+[root@etcd-0-8 ~]# etcdctl set /testkey "tmp key test" --ttl 5
+tmp key test
+[root@etcd-0-8 ~]# etcdctl get /testkey
+Error: 100: Key not found (/testkey) [14]
+
+# key 替换操作
+[root@etcd-0-8 ~]# etcdctl get /msg
+hello k8s
+[root@etcd-0-8 ~]# etcdctl set --swap-with-value "hello k8s" /msg "goodbye"
+goodbye
+[root@etcd-0-8 ~]# etcdctl get /msg
+goodbye
+
+# mk 仅当key不存在时创建(set对同一个key会覆盖)
+[root@etcd-0-8 ~]# etcdctl get /msg
+goodbye
+[root@etcd-0-8 ~]# etcdctl mk /msg "mktest"
+Error: 105: Key already exists (/msg) [18]
+[root@etcd-0-8 ~]# etcdctl mk /msg1 "mktest"
+mktest
+
+# 创建自排序的key
+[root@etcd-0-8 ~]# etcdctl mk --in-order /queue s1
+s1
+[root@etcd-0-8 ~]# etcdctl mk --in-order /queue s2
+s2
+[root@etcd-0-8 ~]# etcdctl ls --sort /queue
+/queue/00000000000000000021
+/queue/00000000000000000022
+[root@etcd-0-8 ~]# etcdctl get /queue/00000000000000000021
+s1
+
+# 更新key值
+[root@etcd-0-8 ~]# etcdctl update /msg1 "update test"
+update test
+[root@etcd-0-8 ~]# etcdctl get /msg1
+update test
+
+# 更新key的ttl及值
+[root@etcd-0-8 ~]# etcdctl update --ttl 5 /msg "aaa"
+aaa
+
+# 创建目录
+[root@etcd-0-8 ~]# etcdctl mkdir /testdir
+
+# 删除空目录
+[root@etcd-0-8 ~]# etcdctl mkdir /test1
+[root@etcd-0-8 ~]# etcdctl rmdir /test1
+
+# 删除非空目录
+[root@etcd-0-8 ~]# etcdctl get /testdir
+/testdir: is a directory
+[root@etcd-0-8 ~]#
+[root@etcd-0-8 ~]# etcdctl rm --recursive /testdir
+
+# 列出目录内容
+[root@etcd-0-8 ~]# etcdctl ls /
+/tmp
+/msg1
+/queue
+[root@etcd-0-8 ~]# etcdctl ls /tmp
+/tmp/a
+/tmp/b
+
+# 递归列出目录的内容
+[root@etcd-0-8 ~]# etcdctl ls --recursive /
+/msg1
+/queue
+/queue/00000000000000000021
+/queue/00000000000000000022
+/tmp
+/tmp/b
+/tmp/a
+
+# 监听key，当key发生改变的时候打印出变化
+[root@etcd-0-8 ~]# etcdctl watch /msg1
+xxx
+
+[root@VM_0_17_centos ~]# etcdctl update /msg1 "xxx"
+xxx
+
+# 监听某个目录，当目录中任何 node 改变的时候，都会打印出来
+[root@etcd-0-8 ~]# etcdctl watch --recursive /
+[update] /msg1
+xxx
+
+[root@VM_0_17_centos ~]# etcdctl update /msg1 "xxx"
+xxx
+
+# 一直监听，除非 `CTL + C` 导致退出监听
+[root@etcd-0-8 ~]# etcdctl watch --forever /
+
+# 监听目录，当发生变化时执行一条命令
+[root@etcd-0-8 ~]# etcdctl exec-watch --recursive / -- sh -c "echo change"
+change
+
+# backup
+[root@etcd-0-14 ~]# etcdctl backup --data-dir /data/app/etcd --backup-dir /root/etcd_backup
+2019-12-04 10:25:16.113237 I | ignoring EntryConfChange raft entry
+2019-12-04 10:25:16.113268 I | ignoring EntryConfChange raft entry
+2019-12-04 10:25:16.113272 I | ignoring EntryConfChange raft entry
+2019-12-04 10:25:16.113293 I | ignoring member attribute update on /0/members/2d2e457c6a1a76cb/attributes
+2019-12-04 10:25:16.113299 I | ignoring member attribute update on /0/members/d2d2e9fc758e6790/attributes
+2019-12-04 10:25:16.113305 I | ignoring member attribute update on /0/members/56e0b6dad4c53d42/attributes
+2019-12-04 10:25:16.113310 I | ignoring member attribute update on /0/members/56e0b6dad4c53d42/attributes
+2019-12-04 10:25:16.113314 I | ignoring member attribute update on /0/members/2d2e457c6a1a76cb/attributes
+2019-12-04 10:25:16.113319 I | ignoring member attribute update on /0/members/d2d2e9fc758e6790/attributes
+2019-12-04 10:25:16.113384 I | ignoring member attribute update on /0/members/56e0b6dad4c53d42/attributes
+
+# 使用v3版本
+[root@etcd-0-14 ~]# export ETCDCTL_API=3
+[root@etcd-0-14 ~]# etcdctl --endpoints="http://172.16.0.8:2379,http://172.16.0.14:2379,http://172.16.0.17:2379" snapshot save mysnapshot.db
+Snapshot saved at mysnapshot.db
+[root@etcd-0-14 ~]# etcdctl snapshot status mysnapshot.db -w json
+{"hash":928285884,"revision":0,"totalKey":5,"totalSize":20480}
+```
