@@ -1,6 +1,6 @@
 一、概述
 ===
-https://mp.weixin.qq.com/s?__biz=MzAwNTM5Njk3Mw==&mid=2247488082&idx=1&sn=b64aaaadb4b2cbcbc0fe012e4caf2492&chksm=9b1c12d0ac6b9bc62ec7b705321452b2a7a00f79c9599d77af5275c53136dfb7da4cc7ad53c6&mpshare=1&scene=1&srcid=&sharer_sharetime=1593429622040&sharer_shareid=130da8cc0333fa403f8f62c7873e0f92&key=18058b8dfa27500b75d3c0a7c1854321d12c4a5e3c5a878fd7903ee7950baac452aa3ef14c63f9b3e9d7595c6cca64738fffbe043cd368119cc7489dfc2945229e1e4c34599a73b6df84ef1dd9dd773d&ascene=1&uin=MTU5NzY5MzI2MA%3D%3D&devicetype=Windows+10+x64&version=62090523&lang=zh_CN&exportkey=AYgQU2SyptDdKtBD0V%2FzILY%3D&pass_ticket=ozRh6FmshdU6BjaIllsZ5iCIJi9bvDPnu0ds5kqjoSwVtBKsMUTmIVP%2FtgqkkfEa
+http://www.xuyasong.com/?p=1983
 
 1、etcd 简介
 
