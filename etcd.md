@@ -47,6 +47,135 @@ etcd 认为写入请求被 Leader 节点处理并分发给了多数节点后，�
 
 所以在集群中推荐的最少节点数量是3个，因为1和2个节点的容错节点数都是0，一旦有一个节点宕掉整个集群就不能正常工作了。
 
+二、安装
+===
+集群部署最好部署奇数位，此能达到最好的集群容错
+
+1、host 配置
+
+在此示例用三个节点来部署 etcd 集群，各节点修改 hosts
+
+```
+cat >> /etc/hosts << EOF
+172.16.0.8 etcd-0-8
+172.16.0.14 etcd-0-14
+172.16.0.17 etcd-0-17
+EOF
+```
+
+2、etcd 安装
+
+三个节点均安装 etcd
+```
+wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+rpm -ivh epel-release-latest-7.noarch.rpm
+yum -y install etcd
+systemctl enable etcd
+mkdir -p /data/app/etcd/
+chown etcd:etcd /data/app/etcd/
+```
+
+3、etcd 配置
+
+etcd-0-8配置：
+```
+[root@etcd-server ~]# hostnamectl set-hostname etcd-0-8
+[root@etcd-0-8 ~]# egrep "^#|^$" /etc/etcd/etcd.conf -v
+ETCD_DATA_DIR="/data/app/etcd/"
+ETCD_LISTEN_PEER_URLS="http://172.16.0.8:2380"
+ETCD_LISTEN_CLIENT_URLS="http://127.0.0.1:2379,http://172.16.0.8:2379"
+ETCD_NAME="etcd-0-8"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://172.16.0.8:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://127.0.0.1:2379,http://172.16.0.8:2379"
+ETCD_INITIAL_CLUSTER="etcd-0-8=http://172.16.0.8:2380,etcd-0-17=http://172.16.0.17:2380,etcd-0-14=http://172.16.0.14:2380"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-token"
+ETCD_INITIAL_CLUSTER_STATE="new"
+```
+
+etcd-0-14配置：
+```
+[root@etcd-server ~]# hostnamectl set-hostname etcd-0-14
+[root@etcd-server ~]# mkdir -p /data/app/etcd/
+[root@etcd-0.14 ~]# egrep "^#|^$" /etc/etcd/etcd.conf -v
+ETCD_DATA_DIR="/data/app/etcd/"
+ETCD_LISTEN_PEER_URLS="http://172.16.0.14:2380"
+ETCD_LISTEN_CLIENT_URLS="http://127.0.0.1:2379,http://172.16.0.14:2379"
+ETCD_NAME="etcd-0-14"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://172.16.0.14:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://127.0.0.1:2379,http://172.16.0.14:2379"
+ETCD_INITIAL_CLUSTER="etcd-0-8=http://172.16.0.8:2380,etcd-0-17=http://172.16.0.17:2380,etcd-0-14=http://172.16.0.14:2380"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-token"
+ETCD_INITIAL_CLUSTER_STATE="new"
+```
+
+etcd-0-7配置:
+```
+[root@etcd-server ~]# hostnamectl set-hostname etcd-0-17
+[root@etcd-server ~]# mkdir -p /data/app/etcd/
+[root@etcd-0-17 ~]# egrep "^#|^$" /etc/etcd/etcd.conf -v
+ETCD_DATA_DIR="/data/app/etcd/"
+ETCD_LISTEN_PEER_URLS="http://172.16.0.17:2380"
+ETCD_LISTEN_CLIENT_URLS="http://127.0.0.1:2379,http://172.16.0.17:2379"
+ETCD_NAME="etcd-0-17"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://172.16.0.17:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://127.0.0.1:2379,http://172.16.0.17:2379"
+ETCD_INITIAL_CLUSTER="etcd-0-8=http://172.16.0.8:2380,etcd-0-17=http://172.16.0.17:2380,etcd-0-14=http://172.16.0.14:2380"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-token"
+ETCD_INITIAL_CLUSTER_STATE="new"
+```
+
+4、配置完成后启动服务
+```
+systemctl start etcd
+```
+
+5、查看集群状态
+
+查看 etcd 状态
+```
+[root@etcd-0-8 default.etcd]# systemctl status etcd
+● etcd.service - Etcd Server
+   Loaded: loaded (/usr/lib/systemd/system/etcd.service; enabled; vendor preset: disabled)
+   Active: active (running) since 二 2019-12-03 15:55:28 CST; 8s ago
+ Main PID: 24510 (etcd)
+   CGroup: /system.slice/etcd.service
+           └─24510 /usr/bin/etcd --name=etcd-0-8 --data-dir=/data/app/etcd/ --listen-client-urls=http://172.16.0.8:2379
+
+12月 03 15:55:28 etcd-0-8 etcd[24510]: set the initial cluster version to 3.0
+12月 03 15:55:28 etcd-0-8 etcd[24510]: enabled capabilities for version 3.0
+12月 03 15:55:30 etcd-0-8 etcd[24510]: peer 56e0b6dad4c53d42 became active
+12月 03 15:55:30 etcd-0-8 etcd[24510]: established a TCP streaming connection with peer 56e0b6dad4c53d42 (stream Message reader)
+12月 03 15:55:30 etcd-0-8 etcd[24510]: established a TCP streaming connection with peer 56e0b6dad4c53d42 (stream Message writer)
+12月 03 15:55:30 etcd-0-8 etcd[24510]: established a TCP streaming connection with peer 56e0b6dad4c53d42 (stream MsgApp v2 reader)
+12月 03 15:55:30 etcd-0-8 etcd[24510]: established a TCP streaming connection with peer 56e0b6dad4c53d42 (stream MsgApp v2 writer)
+12月 03 15:55:32 etcd-0-8 etcd[24510]: updating the cluster version from 3.0 to 3.3
+12月 03 15:55:32 etcd-0-8 etcd[24510]: updated the cluster version from 3.0 to 3.3
+12月 03 15:55:32 etcd-0-8 etcd[24510]: enabled capabilities for version 3.3
+```
+
+
+查看端口监听(如果未在本地监听环回地址，那么在本地使用etcdctl不能正常连入进去)
+```
+[root@etcd-0-8 default.etcd]# netstat -lntup |grep etcd
+tcp 0      0 172.16.0.8:2379   0.0.0.0:*     LISTEN 25167/etcd
+tcp 0      0 127.0.0.1:2379    0.0.0.0:*     LISTEN 25167/etcd
+tcp 0      0 172.16.0.8:2380   0.0.0.0:*     LISTEN 25167/etcd
+```
+
+
+查看集群状态(可以看到etcd-0-17)
+```
+[root@etcd-0-8 default.etcd]# etcdctl member list
+2d2e457c6a1a76cb: name=etcd-0-8 peerURLs=http://172.16.0.8:2380 clientURLs=http://127.0.0.1:2379,http://172.16.0.8:2379 isLeader=false
+56e0b6dad4c53d42: name=etcd-0-14 peerURLs=http://172.16.0.14:2380 clientURLs=http://127.0.0.1:2379,http://172.16.0.14:2379 isLeader=true
+d2d2e9fc758e6790: name=etcd-0-17 peerURLs=http://172.16.0.17:2380 clientURLs=http://127.0.0.1:2379,http://172.16.0.17:2379 isLeader=false
+
+[root@etcd-0-8 ~]# etcdctl cluster-health
+member 2d2e457c6a1a76cb is healthy: got healthy result from http://127.0.0.1:2379
+member 56e0b6dad4c53d42 is healthy: got healthy result from http://127.0.0.1:2379
+member d2d2e9fc758e6790 is healthy: got healthy result from http://127.0.0.1:2379
+cluster is healthy
+```
 
 三、简单使用
 ===
@@ -271,6 +400,7 @@ Added member named etcd3 with ID 8e9e05c52164694d to cluster
 ```
 
 示例
+---
 ```
 # 设置一个key值
 [root@etcd-0-8 ~]# etcdctl set /msg "hello k8s"
@@ -411,3 +541,10 @@ Snapshot saved at mysnapshot.db
 [root@etcd-0-14 ~]# etcdctl snapshot status mysnapshot.db -w json
 {"hash":928285884,"revision":0,"totalKey":5,"totalSize":20480}
 ```
+
+总结
+===
+- etcd 默认只保存 1000 个历史事件，所以不适合有大量更新操作的场景，这样会导致数据的丢失。etcd 典型的应用场景是配置管理和服务发现，这些场景都是读多写少的。
+- 相比于 zookeeper，etcd 使用起来要简单很多。不过要实现真正的服务发现功能，etcd 还需要和其他工具（比如 registrator、confd 等）一起使用来实现服务的自动注册和更新。
+- 目前 etcd 还没有图形化的工具。
+
