@@ -51,6 +51,7 @@ etcd 认为写入请求被 Leader 节点处理并分发给了多数节点后，�
 二、etcd 架构及解析
 ===
 1、架构图
+
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd001.png)
 
 2、架构解析
@@ -71,27 +72,31 @@ etcd 认为写入请求被 Leader 节点处理并分发给了多数节点后，�
 
 etcd 可以用于服务的注册与发现
 - 前后端业务注册发现
+
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd002.png)
 
 中间价已经后端服务在 etcd 中注册，前端和中间价可以很轻松的从 etcd 中发现相关服务器然后服务器之间根据调用关系相关绑定调用
 
 - 多组后端服务器注册发现
+
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd003.png)
 
 后端多个无状态相同副本的 app 可以同事注册到 etcd 中，前端可以通过 haproxy 从etcd 中获取到后端的 ip 和端口组，然后进行请求转发，可以用来故障转移屏蔽后端端口已经后端多组app实例。
 
 2、消息发布与订阅
-![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd004.png)
 
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd004.png)
 
 etcd 可以充当消息中间件，生产者可以往 etcd 中注册 topic 并发送消息，消费者从etcd 中订阅 topic，来获取生产者发送至 etcd 中的消息。
 
 3、负载均衡
+
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd005.png)
 
 后端多组相同的服务提供者可以经自己服务注册到 etcd 中，etcd 并且会与注册的服务进行监控检查，服务请求这首先从 etcd 中获取到可用的服务提供者真正的 ip:port，然后对此多组服务发送请求，etcd 在其中充当了负载均衡的功能
 
 4、分部署通知与协调
+
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd006.png)
 
 - 当 etcd watch 服务发现丢失，会通知服务检查
@@ -100,22 +105,25 @@ etcd 可以充当消息中间件，生产者可以往 etcd 中注册 topic 并�
 
 
 5、分布式锁
+
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd007.png)
 
 当有多个竞争者 node 节点，etcd 作为总控，在分布式集群中与一个节点成功分配 lock
 
 6、分布式队列
+
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd008.png)
 
 有对个 node，etcd 根据每个 node 来创建对应 node 的队列，根据不同的队列可以在etcd 中找到对应的 competitor
 
 7、集群与监控与 Leader 选举
+
 ![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd009.png)
 
 etcd 可以根据 raft 算法在多个 node 节点来选举出 leader。
 
 
-二、安装
+四、安装
 ===
 集群部署最好部署奇数位，此能达到最好的集群容错
 
@@ -245,7 +253,7 @@ member d2d2e9fc758e6790 is healthy: got healthy result from http://127.0.0.1:237
 cluster is healthy
 ```
 
-三、简单使用
+五、简单使用
 ===
 
 1）增加
