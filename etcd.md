@@ -47,6 +47,74 @@ etcd 认为写入请求被 Leader 节点处理并分发给了多数节点后，�
 
 所以在集群中推荐的最少节点数量是3个，因为1和2个节点的容错节点数都是0，一旦有一个节点宕掉整个集群就不能正常工作了。
 
+
+二、etcd 架构及解析
+===
+1、架构图
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd001.png)
+
+2、架构解析
+
+从 etcd 的架构图中我们可以看到，etcd 主要分为四个部分。
+- HTTP Server：用于处理用户发送的 API 请求以及其它 etcd 节点的同步与心跳信息请求。
+- Store：用于处理 etcd 支持的各类功能的事务，包括数据索引、节点状态变更、监控与反馈、事件处理与执行等等，是 etcd 对用户提供的大多数 API 功能的具体实现。
+- Raft：Raft 强一致性算法的具体实现，是 etcd 的核心。
+- WAL：Write Ahead Log（预写式日志），是 etcd 的数据存储方式。除了在内存中存有所有数据的状态以及节点的索引以外，etcd 就通过 WAL 进行持久化存储。WAL 中，所有的数据提交前都会事先记录日志。
+- Snapshot 是为了防止数据过多而进行的状态快照；
+- Entry 表示存储的具体日志内容。
+
+通常，一个用户的请求发送过来，会经由 HTTP Server 转发给 Store 进行具体的事务处理，如果涉及到节点的修改，则交给 Raft 模块进行状态的变更、日志的记录，然后再同步给别的 etcd 节点以确认数据提交，最后进行数据的提交，再次同步。
+
+三、应用场景
+
+1、服务注册与发现
+
+etcd 可以用于服务的注册与发现
+- 前后端业务注册发现
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd002.png)
+
+中间价已经后端服务在 etcd 中注册，前端和中间价可以很轻松的从 etcd 中发现相关服务器然后服务器之间根据调用关系相关绑定调用
+
+- 多组后端服务器注册发现
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd003.png)
+
+后端多个无状态相同副本的 app 可以同事注册到 etcd 中，前端可以通过 haproxy 从etcd 中获取到后端的 ip 和端口组，然后进行请求转发，可以用来故障转移屏蔽后端端口已经后端多组app实例。
+
+2、消息发布与订阅
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd004.png)
+
+
+etcd 可以充当消息中间件，生产者可以往 etcd 中注册 topic 并发送消息，消费者从etcd 中订阅 topic，来获取生产者发送至 etcd 中的消息。
+
+3、负载均衡
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd005.png)
+
+后端多组相同的服务提供者可以经自己服务注册到 etcd 中，etcd 并且会与注册的服务进行监控检查，服务请求这首先从 etcd 中获取到可用的服务提供者真正的 ip:port，然后对此多组服务发送请求，etcd 在其中充当了负载均衡的功能
+
+4、分部署通知与协调
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd006.png)
+
+- 当 etcd watch 服务发现丢失，会通知服务检查
+- 控制器向 etcd 发送启动服务，etcd通知服务进行相应操作
+- 当服务完成 work 会讲状态更新至 etcd，etcd 对应会通知用户
+
+
+5、分布式锁
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd007.png)
+
+当有多个竞争者 node 节点，etcd 作为总控，在分布式集群中与一个节点成功分配 lock
+
+6、分布式队列
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd008.png)
+
+有对个 node，etcd 根据每个 node 来创建对应 node 的队列，根据不同的队列可以在etcd 中找到对应的 competitor
+
+7、集群与监控与 Leader 选举
+![image](https://github.com/mykubernetes/linux-install/blob/master/image/etcd/etcd009.png)
+
+etcd 可以根据 raft 算法在多个 node 节点来选举出 leader。
+
+
 二、安装
 ===
 集群部署最好部署奇数位，此能达到最好的集群容错
