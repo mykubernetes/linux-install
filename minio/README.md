@@ -47,8 +47,18 @@ firewall-cmd --permanent --zone=public --add-port=9000/tcp
 firewall-cmd --reload
 ```
 
-
-
+使用
+---
+在客户端下载mc可执行程序并配置存储桶
+```
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+mc config host add minio http://localhost:9000 minioadmin minioadmin
+mc mb minio/pictures                   #创建一个桶
+mc ls minio/pictures                   #目前这个桶是空的
+mc cp ~/Downloads/xxxx minio/pictures  #拷贝文件到桶
+mc ls minio/pictures                   #查看桶
+```
 
 分布式运行命令
 ===
