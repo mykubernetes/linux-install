@@ -60,6 +60,12 @@ mc cp ~/Downloads/xxxx minio/pictures  #拷贝文件到桶
 mc ls minio/pictures                   #查看桶
 ```
 
+登陆web页面查看
+---
+http://IP:9000
+账号密码：accessCode secretCode
+
+
 分布式运行命令
 ===
 ```
