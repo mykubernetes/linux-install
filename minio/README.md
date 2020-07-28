@@ -12,12 +12,18 @@ kubectl apply -f https://raw.githubusercontent.com/minio/minio-operator/master/m
 单机运行
 ===
 ```
+#下载二进制文件
 wget https://dl.min.io/server/minio/release/linux-amd64/minio
 chmod +x minio
+
+#创建数据目录
+mkdir /data
+
+#启动minio
 ./minio server /data
 Endpoint:  http://192.168.101.70:9000  http://127.0.0.1:9000    #登录地址
-AccessKey: minioadmin                                           #登录的key
-SecretKey: minioadmin                                           #加密的key
+AccessKey: minioadmin                                           #需要记住，登录的key
+SecretKey: minioadmin                                           #需要记住，加密的key
 
 Browser Access:
    http://192.168.101.70:9000  http://127.0.0.1:9000    
@@ -33,9 +39,12 @@ Object API (Amazon S3 compatible):
    .NET:       https://docs.min.io/docs/dotnet-client-quickstart-guide
 Detected default credentials 'minioadmin:minioadmin', please change the credentials immediately using 'MINIO_ACCESS_KEY' and 'MINIO_SECRET_KEY'
 
-二进制安装配置文件地址
+#二进制安装配置文件存放位置
 /data/.minio.sys/config
 
+#打开防火墙
+firewall-cmd --permanent --zone=public --add-port=9000/tcp
+firewall-cmd --reload
 ```
 
 
