@@ -68,6 +68,40 @@ http://IP:9000
 
 分布式运行命令
 ===
+
+前期准备
+---
+
+1、打开防火墙
+```
+firewall-cmd --permanent --zone=public --add-port=9000/tcp
+firewall-cmd --reload
+```
+
+2、修改houst文件
+```
+vim /etc/hosts
+```
+
+3、修改系统最大文件数
+```
+echo "* soft   nofile  65535" >> /etc/security/limits.conf
+echo "* hard   nofile  65535" >> /etc/security/limits.conf
+```
+
+4、每台服务器上创建数据目录
+```
+mkdir export1
+...
+```
+
+5、配置自定义访问密钥
+```
+export MINIO_ACCESS_KEY=minio2020
+export MINIO_SECRET_KEY=test12345
+```
+
+6、运行
 ```
 export MINIO_ACCESS_KEY=<ACCESS_KEY>
 export MINIO_SECRET_KEY=<SECRET_KEY>
