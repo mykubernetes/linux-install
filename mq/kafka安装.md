@@ -204,7 +204,7 @@ $ bin/kafka-console-consumer.sh --zookeeper node001:2181 --from-beginning --topi
 $ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic first
 $ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic first
 ```
-- --from-beginning 读取主题中所有的数据
+- --from-beginning 读取主题中所有的数据  
 注意： --zookeeper已经被弃用 改为 --bootstrap-server参数  
 
 6）查看某个Topic的详情  
