@@ -130,8 +130,10 @@ rpc_address: 192.168.1.76
 
 八、启动
 ```
-然后重启启动，先启动seed
+然后启动，先启动seed
 /opt/cassandra/bin/cassandra
+
+/opt/cassandra/bin/cassandra -f              #将日志输出到前台
 
 启动完成后，可使用
 /opt/cassandra/bin/nodetool status
