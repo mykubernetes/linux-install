@@ -217,6 +217,18 @@ JAVA_OPT="${JAVA_OPT}  -server  -Xms1g  -Xmx1g  -Xmn512m  -XX:PermSize=128m  -XX
 #  tail -f -n 500 /usr/local/rocketmq/logs/rocketmqlogs/namesrv.log
 ```  
 
+
+```
+# sh bin/mqadmin clusterList -n "192.168.101.68:9876;192.168.101.70:9876"
+RocketMQLog:WARN No appenders could be found for logger (io.netty.util.internal.PlatformDependent0).
+RocketMQLog:WARN Please initialize the logger system properly.
+#Cluster Name     #Broker Name            #BID  #Addr                  #Version                #InTPS(LOAD)       #OutTPS(LOAD) #PCWait(ms) #Hour #SPACE
+rocketmq-cluster  broker-a                0     192.168.101.68:10911   V4_7_0                   0.00(0,0ms)         0.00(0,0ms)          0 441917.21 -1.0000
+rocketmq-cluster  broker-a                1     192.168.101.69:11011   V4_7_0                   0.00(0,0ms)         0.00(0,0ms)          0 441917.21 0.1308
+rocketmq-cluster  broker-b                0     192.168.101.70:10911   V4_7_0                   0.00(0,0ms)         0.00(0,0ms)          0 441917.21 -1.0000
+rocketmq-cluster  broker-b                1     192.168.101.71:11011   V4_7_0  
+```
+
 14、服务停止（首先关闭4个BrokerServer，再关闭4个NameServer）：  
 ```
 #  cd /usr/local/rocketmq/bin
@@ -224,4 +236,48 @@ JAVA_OPT="${JAVA_OPT}  -server  -Xms1g  -Xmx1g  -Xmn512m  -XX:PermSize=128m  -XX
 #  sh mqshutdown namesrv
 ```  
 
-15. 控制台rocketmq-console.war进行修改config.properties配置文件  
+安装rocketmq-console
+---
+rocketmq-console是RocketMQ项目的扩展插件，是一个图形化管理控制台，提供Broker集群状态查看，Topic管理，Producer、Consumer状态展示，消息查询等常用功能，这个功能在安装好RocketMQ后需要额外单独安装、运行。
+
+在本地有git+maven的开发环境可以自行在https://github.com/apache/rocketmq-externals克隆下载项目后，再通过maven打包rocketmq-console，或者可以在服务器上参考如下步骤进行。
+
+
+1、安装maven
+```
+# wget http://mirrors.cnnic.cn/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
+# tar zxvf apache-maven-3.5.4-bin.tar.gz
+
+# vi /etc/profile
+export MAVEN_HOME=/data/apache-maven-3.5.4
+export PATH=$MAVEN_HOME/bin:$PATH
+
+# source /etc/profile
+# mvn -v
+```
+
+2、下载打包rocketmq-console  
+在https://github.com/apache/rocketmq-externals页面下载zip包上传至任意一个服务器上。
+
+```
+解压
+# unzip rocketmq-externals-master.zip
+进入rocketmq-console目录
+# cd rocketmq-externals-master/rocketmq-console/
+打包
+# mvn clean package -Dmaven.test.skip=true
+```
+
+3、启动rocketmq-console
+```
+# java -jar target/rocketmq-console-ng-1.0.1.jar --rocketmq.config.namesrvAddr='192.168.101.68:9876;192.168.101.70:9876'
+```
+
+4、验证
+
+http://192.168.101.68:8080
+
+
+http://rocketmq.apache.org/docs/quick-start/
+https://github.com/apache/rocketmq/tree/master/docs/cn
+https://github.com/apache/rocketmq-externals/tree/master/rocketmq-console
