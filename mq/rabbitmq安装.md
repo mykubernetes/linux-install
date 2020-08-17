@@ -1,6 +1,9 @@
 官网  
 https://www.rabbitmq.com/  
 
+配置文件地址  
+http://www.rabbitmq.com/configure.html#configuration-file
+
 安装
 --
 1、首先需要安装erlang
@@ -313,9 +316,56 @@ listen rabbitmq_cluster 192.168.101.200:5673
 service haproxy start
 ```
 
-通过vip访问HAProxy管理页面
+通过vip访问HAProxy管理页面  
 http://192.168.101.200:1080/haproxy?stats
 
 
-通过vip访问rabbitmq管理页面
+通过vip访问rabbitmq管理页面  
 http://192.168.101.200:15673
+
+
+
+集群配置文件
+---
+1、创建目录
+```
+mkdir /etc/rabbitmq
+```
+
+2、环境变量配置文件
+```
+# vim rabbitmq-env.conf 
+```
+
+3、配置文件rabbitmq.config（可以不创建和配置，修改）
+```
+# vim rabbitmq-env.conf
+RABBITMQ_NODE_IP_ADDRESS=本机IP地址
+RABBITMQ_NODE_PORT=5672
+RABBITMQ_LOG_BASE=/var/lib/rabbitmq/log
+RABBITMQ_MNESIA_BASE=/var/lib/rabbitmq/mnesia
+```
+配置参考参数如下：
+- RABBITMQ_NODENAME=FZTEC-240088 节点名称
+- RABBITMQ_NODE_IP_ADDRESS=127.0.0.1 监听IP
+- RABBITMQ_NODE_PORT=5672 监听端口
+- RABBITMQ_LOG_BASE=/data/rabbitmq/log 日志目录
+- RABBITMQ_PLUGINS_DIR=/data/rabbitmq/plugins 插件目录
+- RABBITMQ_MNESIA_BASE=/data/rabbitmq/mnesia 后端存储目录  
+
+http://www.rabbitmq.com/configure.html#configuration-file
+
+配置文件信息修改：
+```
+/usr/lib/rabbitmq/lib/rabbitmq_server-3.6.4/ebin/rabbit.app和rabbitmq.config配置文件配置任意一个即可，我们进行配置如下：
+vim /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.4/ebin/rabbit.app
+-------------------------------------关键参数配置----------------------------------------
+tcp_listerners 设置rabbimq的监听端口，默认为[5672]。
+disk_free_limit 磁盘低水位线，若磁盘容量低于指定值则停止接收数据，默认值为{mem_relative, 1.0},即与内存相关联1：1，也可定制为多少byte.
+vm_memory_high_watermark，设置内存低水位线，若低于该水位线，则开启流控机制，默认值是0.4，即内存总量的40%。
+hipe_compile 将部分rabbimq代码用High Performance Erlang compiler编译，可提升性能，该参数是实验性，若出现erlang vm segfaults，应关掉。
+force_fine_statistics， 该参数属于rabbimq_management，若为true则进行精细化的统计，但会影响性能
+------------------------------------------------------------------------------------------
+```
+
+http://www.rabbitmq.com/configure.html
