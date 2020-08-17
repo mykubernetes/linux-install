@@ -257,12 +257,13 @@ listen http_front
  
 #####################RabbitMQ的管理界面###############################
 listen rabbitmq_admin
-    bind 10.64.16.254:15673
-    server l-rabbitmq1 10.64.16.123:15672
-    server l-rabbitmq2 10.64.17.11:15672
+    bind 192.168.101.200:15673
+    server rabbitmq1 192.168.101.66:15672
+    server rabbitmq2 192.168.101.67:15672
+    server rabbitmq3 192.168.101.68:15672
  
 #####################RabbitMQ服务代理###########################################
-listen rabbitmq_cluster 10.64.16.254:5673
+listen rabbitmq_cluster 192.168.101.200:5673
     mode tcp
     stats enable
     balance roundrobin
