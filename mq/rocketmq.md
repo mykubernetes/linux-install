@@ -1,3 +1,6 @@
+https://mp.weixin.qq.com/s?__biz=MzAxMTkwODIyNA==&mid=2247500363&idx=1&sn=9dd25a93e26f3d988fa25efa41e8f43f&chksm=9bbb67a4accceeb26f85ef34b6ec32743cbd38880660b17f745b178c2a7e53f95aeae999e13a&scene=126&sessionid=1597669980&key=a9ac97d80b28f5050a90aec13ceca517b73b647cabe9e9640114cf0a24afed66e60409e72eee5f2a80448f172e1952b6a9b458039e39936d1eb70774625c300474dc5471b7d9dad019520a728097d14eb56c3b494149c6ffb4c6b89be2d10b23961123ee460af204afa695174d37c135c9f39e8ba7413da5a382c75e70f9062c&ascene=1&uin=MTU5NzY5MzI2MA%3D%3D&devicetype=Windows+10&version=62080079&lang=zh_CN&exportkey=AdWNjv41MOxLIWbXVnpmVvc%3D&pass_ticket=pJ9JeVmJ9ts7nDxlUAo7F6N3pZM0vBvhQSsJ77LipPL7oNDm5hDWQrVk0H%2F6BnoA
+
+
 一、RocketMQ集群方式  
 1、单个 Master模式  
 这种方式风险较大，一旦Broker重启或者宕机时，会导致整个服务不可用，不建议线上环境使用  
