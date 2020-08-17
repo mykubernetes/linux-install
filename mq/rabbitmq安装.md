@@ -99,7 +99,199 @@ http://192.168.101.66:15672
 
 7、配置镜像队列
 ```
-rabbitmqctl set_policy ha-all "^" '{"ha-mode":"all"}'
+rabbitmqctl set_policy ha-all "^ha\." '{"ha-mode":"all","ha-sync-mode":"automatic"}'
 ```
 将所有队列设置为镜像队列，即队列会被复制到各个节点，各个节点状态一致，RabbitMQ高可用集群就已经搭建好了
 
+安装KeepAlived 
+---
+
+1、安装keepalived
+```
+yum -y install keepalived
+```
+
+2、主 master
+```
+vim  /etc/keepalived/keepalived.conf
+! Configuration File for keepalived
+global_defs {
+notification_email {
+acassen@firewall.loc
+failover@firewall.loc
+sysadmin@firewall.loc
+}
+notification_email_from Alexandre.Cassen@firewall.loc
+smtp_server 192.168.200.1
+smtp_connect_timeout 30
+router_id LVS_DEVEL
+vrrp_skip_check_adv_addr
+#vrrp_strict                         #要注释掉
+vrrp_garp_interval 0
+vrrp_gna_interval 0
+}
+ 
+vrrp_script chk_haproxy {
+    script "service haproxy status"  # 服务探测，返回0说明服务是正常的
+    interval 1                       # 每隔1秒探测一次
+    weight -2                        # 不正常时，权重-1，即haproxy上线，权重加2；下线，权重减2
+}
+ 
+vrrp_instance haproxy {
+    state MASTER                 # 主机为MASTER，备机为BACKUP
+    interface eth0               # 监测网络端口，用ifconfig查看
+    virtual_router_id 108        # 虚拟路由标识，同一个VRRP实例要使用同一个标识，主备机必须相同
+    priority 100                 # 主备机取不同的优先级，确保主节点的优先级高过备用节点
+    advert_int 1                 # VRRP Multicast广播周期秒数  用于设定主备节点间同步检查时间间隔
+    authentication {
+        auth_type PASS           # VRRP认证方式
+        auth_pass 1234           # VRRP口令 主备机密码必须相同
+    }
+    track_script {               # 调用haproxy进程检测脚本，备节点不配置
+        chk_haproxy
+    }
+    virtual_ipaddress {
+        192.168.101.200             #vip
+    }
+    notify_master "/etc/keepalived/notify.sh master"      # 当前节点成为master时，通知脚本执行任务，一般用于启动某服务
+    notify_backup "/etc/keepalived/notify.sh backup"      # 当前节点成为backup时，通知脚本执行任务，一般用于关闭某服务
+}
+
+```
+
+3、备 slave
+```
+! Configuration File for keepalived
+ 
+global_defs {
+   notification_email {
+     acassen@firewall.loc
+     failover@firewall.loc
+     sysadmin@firewall.loc
+   }
+   notification_email_from Alexandre.Cassen@firewall.loc
+   smtp_server 192.168.200.1
+   smtp_connect_timeout 30
+   router_id LVS_DEVEL
+   vrrp_skip_check_adv_addr
+   # vrrp_strict                    #要注释掉
+   vrrp_garp_interval 0
+   vrrp_gna_interval 0
+}
+ 
+ 
+vrrp_script chk_haproxy {
+    script "service haproxy status" # 服务探测，返回0说明服务是正常的
+    interval 1                      # 每隔1秒探测一次
+    weight -2                       # 不正常时，权重-1，即haproxy上线，权重加2；下线，权重减2
+}
+ 
+vrrp_instance haproxy {
+    state BACKUP            # 主机为MASTER，备机为BACKUP
+    interface eth0         # 监测网络端口，用ifconfig查看
+    virtual_router_id 108   # 虚拟路由标识，同一个VRRP实例要使用同一个标识，主备机必须相同
+    priority 99            # 主备机取不同的优先级，确保主节点的优先级高过备用节点
+    advert_int 1            # VRRP Multicast广播周期秒数  用于设定主备节点间同步检查时间间隔
+    authentication {
+        auth_type PASS      # VRRP认证方式
+        auth_pass 1234      # VRRP口令 主备机密码必须相同
+    }
+ 
+    virtual_ipaddress {     # VIP 漂移地址 即集群IP地址
+        192.168.101.200
+    }
+}
+```
+
+4、编辑notify.sh脚本
+```
+# cd /etc/keepalived/
+
+vim notify.sh
+
+#!/bin/bash
+ 
+case "$1" in
+    master)
+        notify master
+        service haproxy start
+        exit 0
+    ;;
+    backup)
+        notify backup
+        service haproxy stop
+        exit 0
+    ;;
+    fault)
+        notify fault
+        service haproxy stop
+        exit 0
+    ;;
+    *)
+        echo 'Usage: `basename $0` {master|backup|fault}'
+        exit 1
+    ;;
+esac
+```
+
+Haproxy负载代理
+---
+
+1、安装haproxy
+```
+yum install haproxy
+```
+
+2、编辑配置文件
+```
+vim  /etc/haproxy/haproxy.cfg
+
+#######################HAproxy监控页面#########################
+listen http_front
+        bind 0.0.0.0:1080           #监听端口
+        stats refresh 30s           #统计页面自动刷新时间
+        stats uri /haproxy?stats    #统计页面url
+        stats realm Haproxy Manager #统计页面密码框上提示文本
+        stats auth admin:1234      #统计页面用户名和密码设置
+        #stats hide-version         #隐藏统计页面上HAProxy的版本信息
+ 
+#####################RabbitMQ的管理界面###############################
+listen rabbitmq_admin
+    bind 10.64.16.254:15673
+    server l-rabbitmq1 10.64.16.123:15672
+    server l-rabbitmq2 10.64.17.11:15672
+ 
+#####################RabbitMQ服务代理###########################################
+listen rabbitmq_cluster 10.64.16.254:5673
+    mode tcp
+    stats enable
+    balance roundrobin
+    option tcpka
+    option tcplog
+    timeout client 3h
+    timeout server 3h
+    timeout connect 3h
+    #balance url_param userid
+    #balance url_param session_id check_post 64
+    #balance hdr(User-Agent)
+    #balance hdr(host)
+    #balance hdr(Host) use_domain_only
+    #balance rdp-cookie
+    #balance leastconn
+    #balance source //ip
+    server   rabbitmq1 192.168.101.66:5672 check inter 5s rise 2 fall 3   #check inter 2000 是检测心跳频率，rise 2是2次正确认为服务器可用，fall 3是3次失败认为服务器不可用
+    server   rabbitmq2 192.168.101.67:5672 check inter 5s rise 2 fall 3
+    server   rabbitmq2 192.168.101.68:5672 check inter 5s rise 2 fall 3
+```
+
+启动
+```
+service haproxy start
+```
+
+通过vip访问HAProxy管理页面
+http://192.168.101.200:1080/haproxy?stats
+
+
+通过vip访问rabbitmq管理页面
+http://192.168.101.200:15673
