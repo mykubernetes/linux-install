@@ -203,12 +203,31 @@ vrrp_instance haproxy {
 }
 ```
 
-4、编辑notify.sh脚本
+4、编辑haproxy_check.sh脚本
+```
+# cd /etc/keepalived/
+
+#vim haproxy_check.sh
+#!/bin/bash
+COUNT=`ps -C haproxy --no-header |wc -l`
+if [ $COUNT -eq 0 ];then
+    /usr/local/haproxy/sbin/haproxy -f /etc/haproxy/haproxy.cfg
+    sleep 2
+    if [ `ps -C haproxy --no-header |wc -l` -eq 0 ];then
+        killall keepalived
+    fi
+fi
+```
+
+```
+chmod +x /etc/keepalived/haproxy_check.sh
+```
+
+5、编辑notify.sh脚本
 ```
 # cd /etc/keepalived/
 
 vim notify.sh
-
 #!/bin/bash
  
 case "$1" in
@@ -232,6 +251,10 @@ case "$1" in
         exit 1
     ;;
 esac
+```
+
+```
+chmod +x /etc/keepalived/notify.sh
 ```
 
 Haproxy负载代理
