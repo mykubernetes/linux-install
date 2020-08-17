@@ -97,4 +97,9 @@ rabbitmqctl cluster_status
 
 http://192.168.101.66:15672
 
+7、配置镜像队列
+```
+rabbitmqctl set_policy ha-all "^" '{"ha-mode":"all"}'
+```
+将所有队列设置为镜像队列，即队列会被复制到各个节点，各个节点状态一致，RabbitMQ高可用集群就已经搭建好了
 
