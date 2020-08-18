@@ -315,3 +315,20 @@ Threads fairness:
 ```
 # sysbench cpu --threads=40 --events=10000 --cpu-max-prime=20000 run
 ```
+
+mysql性能测试
+
+1.准备数据
+```
+sysbench ./tests/include/oltp_legacy/oltp.lua --mysql-host=192.168.10.10 --mysql-port=3306 --mysql-user=root --mysql-password=123456 --oltp-test-mode=complex --oltp-tables-count=10 --oltp-table-size=100000 --threads=10 --time=120 --report-interval=10 prepare
+```
+
+
+2.执行测试 将测试结果导出到文件中，便于后续分析。
+```
+sysbench ./tests/include/oltp_legacy/oltp.lua --mysql-host=192.168.10.10 --mysql-port=3306 --mysql-user=root --mysql-password=123456 --oltp-test-mode=complex --oltp-tables-count=10 --oltp-table-size=100000 --threads=10 --time=120 --report-interval=10 run >> /home/test/mysysbench.log
+```
+3.清理数据 执行完测试后，清理数据，否则后面的测试会受到影响。
+```
+sysbench ./tests/include/oltp_legacy/oltp.lua --mysql-host=192.168.10.10 --mysql-port=3306 --mysql-user=root --mysql-password=123456 cleanup
+```
