@@ -1,3 +1,5 @@
+mysqldump
+---
 1、备份所有数据库  
 ```
 mysqldump -u root -p123456 --all-databases > /opt/mysqlbak/20190804.sql
@@ -22,6 +24,8 @@ source /opt/mysqlbak/20190804.sql
 ```  
 
 
+二进制文件恢复
+---
 查看二进制命令
 ```
 mysqlbinlog binlog.0000001
@@ -49,7 +53,7 @@ mysql -u root -p123 < /tmp/caozuo.sql
 ```
 
 
-
+mysql主从错误修复
 
 I/O错误修复方法
 ```
