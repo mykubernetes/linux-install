@@ -54,7 +54,7 @@ mysql -u root -p123 < /tmp/caozuo.sql
 
 
 mysql主从错误修复
-
+---
 I/O错误修复方法
 ```
 show slave status\G
