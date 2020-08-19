@@ -270,3 +270,31 @@ redis自带测试命令进行测试
 100.00% <= 30 milliseconds
 50761.42 requests per second
 ```  
+
+新增集群节点
+---
+启动一个实例的端口为6386
+
+```
+执行脚本：
+./redis-trib.rb add-node 192.168.101.69:6386 192.168.101.69:6379
+
+查看集群信息，新添加的机器没有分配插槽
+redis-cli 
+127.0.0.1:6379> cluster nodes
+
+
+./redis-trib.rb reshard 192.168.101.69:6379
+How many slots do you want to move (for 1 to 16384)? 1000     #输入要转移的插槽数
+What is the receiving node ID? 82ed0d63cfa6d19956dca833930977a87d6ddf74     #输入接受节点的ID
+Plesse enter all the source node IDs.
+  Type 'all' to use all the node as source nodes for the hash slots.    #all表示从所有的master重新分配
+  Type 'done' once you entered all the source nodes IDs.    或者书籍要提前slot的master节点的id,最后用done结束
+Source node #1:all                             #输入all
+
+
+查看集群信息，是否分配插槽
+redis-cli 
+127.0.0.1:6379> cluster nodes
+```
+
