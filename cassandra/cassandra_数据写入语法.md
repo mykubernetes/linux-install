@@ -128,19 +128,12 @@ DELETE FROM <identifier> WHERE <condition>;
 ```
 示例
 
-让我们假设Cassandra中有一个名为emp的具有以下数据的表：
-emp_id	emp_name	emp_city	emp_phone	emp_sal
-1	ram	Hyderabad	9848022338	50000
-2	robin	Hyderabad	9848022339	40000
-3	rahman	Chennai	9848022330	45000
-
-以下语句删除最后一行的emp_sal列：
+删除emp_sal列：
 ```
 cqlsh:tutorialspoint> DELETE emp_sal FROM emp WHERE emp_id=3;
 ```
-验证
 
-使用SELECT语句验证数据是否已删除。如果使用SELECT验证emp表，它将产生以下输出：
+验证
 ```
 cqlsh:tutorialspoint> select * from emp;
 
@@ -152,15 +145,15 @@ cqlsh:tutorialspoint> select * from emp;
 (3 rows)
 ```
 由于我们删除了Rahman的薪资，你将看到一个空值代替薪资。
-删除整行
+
+五、删除整行
 
 以下命令从表中删除整个行。
 ```
 cqlsh:tutorialspoint> DELETE FROM emp WHERE emp_id=3;
 ```
-验证
 
-使用SELECT语句验证数据是否已删除。如果使用SELECT验证emp表，它将产生以下输出：
+验证
 ```
 cqlsh:tutorialspoint> select * from emp;
 
