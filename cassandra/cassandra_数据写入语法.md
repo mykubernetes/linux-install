@@ -61,7 +61,7 @@ cqlsh:tutorialspoint> select * from emp;
       3 |   Chennai |   rahman | 9848022330 | 45000
       
 (3 rows)
-·```
+```
 
 
 三、读取数据
