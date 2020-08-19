@@ -1,6 +1,9 @@
-一、Cassandra 创建键空间
-
+Cassandra 
+===
+一、创建keyspace
+---
 语法: CREATE KEYSPACE <identifier> WITH <properties>
+
 ```
 CREATE KEYSPACE "KeySpace Name"
 WITH replication = {'class': 'Strategy name', 'replication_factor' : 'No.Of   replicas'};
@@ -47,3 +50,62 @@ cqlsh> SELECT * FROM system.schema_keyspaces;
 cqlsh> USE tutorialspoint;
 cqlsh:tutorialspoint>
 ```
+
+二、修改修改Keyspace
+---
+语句: ALTER KEYSPACE <identifier> WITH <properties>
+
+```
+ALTER KEYSPACE “KeySpace Name”
+WITH replication = {'class': ‘Strategy name’, 'replication_factor' : ‘No.Of  replicas’};
+```
+
+示例
+```
+cqlsh.> ALTER KEYSPACE tutorialspoint
+WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};
+```
+
+```
+ALTER KEYSPACE test
+WITH REPLICATION = {'class' : 'NetworkTopologyStrategy', 'datacenter1' : 3}
+AND DURABLE_WRITES = true;
+```
+
+验证
+```
+SELECT * FROM system.schema_keyspaces;
+  keyspace_name | durable_writes |                                       strategy_class | strategy_options
+----------------+----------------+------------------------------------------------------+----------------------------
+           test |           True | org.apache.cassandra.locator.NetworkTopologyStrategy | {"datacenter1":"3"}
+
+ tutorialspoint |           True |          org.apache.cassandra.locator.SimpleStrategy | {"replication_factor":"4"}
+
+         system |           True |           org.apache.cassandra.locator.LocalStrategy | { }
+
+  system_traces |           True |          org.apache.cassandra.locator.SimpleStrategy | {"replication_factor":"2"}
+
+(4 rows)
+```
+
+三、删除keyspace
+---
+语句:DROP KEYSPACE <identifier>
+
+```
+DROP KEYSPACE “KeySpace name”
+```
+
+示例
+```
+cqlsh> DROP KEYSPACE tutorialspoint;
+```
+
+验证
+```
+cqlsh> DESCRIBE keyspaces;
+
+system system_traces
+```
+
+
