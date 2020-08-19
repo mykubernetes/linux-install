@@ -155,3 +155,37 @@ select class，count（class） from T1 group by class having count（class）>=
 #统计函数:count sum avg max min
 select avg（shuxue） from T1；
 ```
+
+```
+创建用户：
+create user 用户名
+用户名组成：'name'@'host'    name 相当于'name'@'%'
+
+删除匿名用户：
+delete from mysql.user where user='';
+
+权限管理
+show grants for user1;
+GRANT ALL PRIVILEGES ON *.* TO 'user1'@'%';
+
+GRANT 权限 ON 库.表 TO '用户名称'@'host';
+grant create on db2.* to 'user3'@'10.1.1.11';
+
+回收：
+revoke create on db2.* from 'user3'@'10.1.1.11';
+
+删除用户
+drop user user1；
+
+查看用户
+select user，password，host from mysql.user;
+```
+
+```
+mysql_secure_installation
+1，设置密码
+2，删除匿名用户
+3，禁止root远程登录
+4，删除测试数据库
+5，是否重载设置
+```
