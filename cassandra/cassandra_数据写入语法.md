@@ -147,7 +147,7 @@ cqlsh:tutorialspoint> select * from emp;
 由于我们删除了Rahman的薪资，你将看到一个空值代替薪资。
 
 五、删除整行
-
+---
 以下命令从表中删除整个行。
 ```
 cqlsh:tutorialspoint> DELETE FROM emp WHERE emp_id=3;
