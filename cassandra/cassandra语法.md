@@ -41,3 +41,9 @@ cqlsh> SELECT * FROM system.schema_keyspaces;
 
 (4 rows)
 ```
+
+使用Keyspace
+```
+cqlsh> USE tutorialspoint;
+cqlsh:tutorialspoint>
+```
