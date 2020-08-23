@@ -27,6 +27,11 @@ redis-cli -h 192.168.101.66
 id=3 addr=127.0.0.1:53154 fd=5 name= age=149 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=0 qbuf-free=32768 obl=0 oll=0 omem=0 events=r cmd=client
 ```
 
+清空数据库
+```
+flushdb            #清空当前库
+flushall           #清空所有库
+```
 3、选择数据库
 ```
 127.0.0.1:6379> SELECT 1
