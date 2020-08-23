@@ -139,4 +139,36 @@ WriteResult({ "nInserted" : 1 })
 { "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
 > 
 
+> db.studens.find({age:{$in: ["23","40"]}})
+{ "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibzhang" }
+
+> db.studens.find({age:{$nin: ["23","40"]}})
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+
+> db.studens.find({$or: [{age: {$nin: ["23","40"]}},{age: {$in: ["23","40"]}}]})  
+{ "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
 ```
+比较查询
+- $gt 大于 语法格式{filed: {$gt: VALUE}}
+- $gte 大于等于
+- $lt 小于
+- $lte 小于等于
+- $ne 不等于
+- $in 语法格式{filed: {$in: [<value>]}}
+- $nin 语法格式{filed: {$nin: [<value>]}}
+组合运算符
+- $or 或运算，语法格式{$or: [{expression1>},......]}
+- $and 与运算
+- $not 非运算
+- $nor 反运算，返回不符合指定条件的所有文档
+
