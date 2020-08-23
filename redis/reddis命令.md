@@ -175,3 +175,33 @@ OK
 - zrnge
 - zcard
 - zrank
+
+8、hash使用
+```
+127.0.0.1:6379> HSET h1 a  mon                    #设置一个hash a是mon
+(integer) 1
+127.0.0.1:6379> HGET h1 a                         #获取a的值
+"mon"
+
+127.0.0.1:6379> HSET h1 b tue                     #设置一个hash b是mon
+(integer) 1
+127.0.0.1:6379> HGET h1 b                         #获取a的值    h1为外键 a和b是内键
+"tue"
+
+127.0.0.1:6379> HKEYS h1                          #获取所有键
+1) "a"
+2) "b"
+
+127.0.0.1:6379> HVALS h1                          #获取所有值
+1) "mon"
+2) "tue"
+
+127.0.0.1:6379> HLEN h1                           #获取元素个数
+(integer) 2
+```
+- hset
+- hsetnx
+- hget
+- hkeys
+- hvals
+- hdel
