@@ -32,7 +32,6 @@ systemctl enable mongod.service
 > rs.help()
 > sh.help() 
 > db.collection.find().help()
-> help misc
 ```
 
 ```
@@ -47,6 +46,7 @@ systemctl enable mongod.service
 ```
 > db.serverStatus()                                查看mongod运行状态信息
 > db.stats()                                       查看db元数据
+> db.mycoll.help()                                 对数据库进行管理和操作的基本命令
 > db.collection.stats()                            查看集合元数据
 > db.collection.insert() / update / remove / find  对集合增删改查
 > db.collection.createIndex()                      创建索引
