@@ -79,5 +79,33 @@ MongoDB server version: 4.0.20
 	"getmore" : 0,
 	"command" : 36
 }
+```
 
+使用
+```
+> db.studens.insert({name:"tom",age:"23"})           #插入一个表
+WriteResult({ "nInserted" : 1 })
+> show collections                                   #查看连接
+studens
+> show dbs                                           #查看数据库
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+test    0.000GB
+db.studens.stats()                                   #查看连接信息
+{
+	"ns" : "test.studens",
+	"size" : 48,
+	"count" : 1,
+	"avgObjSize" : 48,
+	"storageSize" : 16384,
+	"capped" : false,
+	"wiredTiger" : {
+		"metadata" : {
+			"formatVersion" : 1
+		},
+......
+
+> db.getCollectionNames()
+[ "studens" ]
 ```
