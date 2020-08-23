@@ -27,21 +27,21 @@ systemctl enable mongod.service
 ```
 
 ```
-* help
-* db.help()
-* rs.help()
-* sh.help() 
-* db.collection.find().help()
-* help misc
+> help
+> db.help()
+> rs.help()
+> sh.help() 
+> db.collection.find().help()
+> help misc
 ```
 
 ```
-show dbs     列出所有DB
-use dbname   切换当前DB
-show tables  或 show collections  列出当前DB的所有表/集合
-show users   列出当前DB的所有用户
-show profile 列出当前DB的所有慢查询
-show logs     列出运行日志
+> show dbs     列出所有DB
+> use dbname   切换当前DB
+> show tables  或 show collections  列出当前DB的所有表/集合
+> show users   列出当前DB的所有用户
+> show profile 列出当前DB的所有慢查询
+> show logs     列出运行日志
 ```
 
 ```
