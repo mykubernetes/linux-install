@@ -207,9 +207,89 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
 
+
+> db.studens.remove({age:21})
+WriteResult({ "nRemoved" : 1 })
+
+> db.studens.find()
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
 ```
 更新操作  
 db.mycoll.update()
 - $set: 修改字段的值为新指定的值，语法格式（{filed: value},{$set: {filed: new_value}})
 - $unset: 删除指定字段，语法格式（{field: value},{$unset: {field1,filed2,...}}）
 - $rename: 更改字段名，语法格式（{$rename: {oldname: newname}}）
+- $inc
+
+删除操作  
+db.mycoll.remove({},1)   #数值代码删除符合添加的个数
+
+删除collection  
+db.mycoll.drop()
+
+删除database
+db.dropDatabase()
+
+```
+> db.studens.find({age: {$in: ["20","40"]}})
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+> db.studens.find({age: {$in: ["20","40"]}}).count()
+3
+> db.studens.find({age: {$in: ["20","40"]}}).limit(1)
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+> db.studens.find({age: {$in: ["20","40"]}}).skip(1)
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
+> db.studens.find({age: {$gt: "10"}})
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
+> db.studens.findOne({age: {$gt: "10"}})
+{
+	"_id" : ObjectId("5f427690925a6e6d33fe2873"),
+	"name" : "jerry",
+	"age" : "40",
+	"gender" : "M"
+}
+
+> db.studens.drop()
+true
+
+> show collections
+
+> db.stats()
+{
+	"db" : "test",
+	"collections" : 0,
+	"views" : 0,
+	"objects" : 0,
+	"avgObjSize" : 0,
+	"dataSize" : 0,
+	"storageSize" : 0,
+	"numExtents" : 0,
+	"indexes" : 0,
+	"indexSize" : 0,
+	"fsUsedSize" : 1782595584,
+	"fsTotalSize" : 18238930944,
+	"ok" : 1
+}
+
+> db.dropDatabase()
+{ "dropped" : "test", "ok" : 1 }
+
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+```
