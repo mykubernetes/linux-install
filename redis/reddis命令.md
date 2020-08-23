@@ -257,3 +257,55 @@ QUEUED
 OK
 127.0.0.1:6379> get ip
 "172.16.100.1"
+```
+
+发布订阅
+```
+订阅
+127.0.0.1:6379> SUBSCRIBE news
+Reading messages... (press Ctrl-C to quit)
+1) "subscribe"
+2) "news"
+3) (integer) 1
+1) "message"
+2) "news"
+3) "hello"
+1) "message"
+2) "news"
+3) "redis"
+
+发布
+127.0.0.1:6379> PUBLISH news hello
+(integer) 1
+127.0.0.1:6379> PUBLISH news redis
+(integer) 1
+
+
+退订之前的订阅
+127.0.0.1:6379> UNSUBSCRIBE news
+1) "unsubscribe"
+2) "news"
+3) (integer) 0
+
+
+订阅多个消息，模式订阅支持正则表达式
+127.0.0.1:6379> PSUBSCRIBE "news.i[to]"
+Reading messages... (press Ctrl-C to quit)
+1) "psubscribe"
+2) "news.i[to]"
+3) (integer) 1
+1) "pmessage"
+2) "news.i[to]"
+3) "news.io"
+4) "hello"
+1) "pmessage"
+2) "news.i[to]"
+3) "news.it"
+4) "redis"
+
+127.0.0.1:6379> PUBLISH news.io hello
+(integer) 1
+127.0.0.1:6379> PUBLISH news.it redis
+(integer) 1
+
+```
