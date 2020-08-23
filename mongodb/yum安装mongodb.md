@@ -186,3 +186,30 @@ WriteResult({ "nInserted" : 1 })
 - $mod:
 - $type: 返回指定字段的值的类型为指定类型的文档，语法格式{field: {$type: <BSON type>}}
 	double,string,object,array,binary data,undefined,boolean,data,null,regular expression,javascript,timestamp
+
+```
+> db.studens.find()
+{ "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
+> db.studens.update({name: "tom"},{$set: {age: 21}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+> db.studens.find()
+{ "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : 21 }
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
+```
+更新操作  
+db.mycoll.update()
+- $set: 修改字段的值为新指定的值，语法格式（{filed: value},{$set: {filed: new_value}})
+- $unset: 删除指定字段，语法格式（{field: value},{$unset: {field1,filed2,...}}）
+- $rename: 更改字段名，语法格式（{$rename: {oldname: newname}}）
