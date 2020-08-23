@@ -31,6 +31,7 @@ id=3 addr=127.0.0.1:53154 fd=5 name= age=149 idle=0 flags=N db=0 sub=0 psub=0 mu
 ```
 flushdb            #清空当前库
 flushall           #清空所有库
+keys *             #列出所有key
 ```
 3、选择数据库
 ```
