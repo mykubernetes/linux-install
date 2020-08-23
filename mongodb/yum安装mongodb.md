@@ -108,4 +108,35 @@ db.studens.stats()                                   #查看连接信息
 
 > db.getCollectionNames()
 [ "studens" ]
+
+> db.studens.insert({name:"jerry",age:"40",gender:"M"})
+WriteResult({ "nInserted" : 1 })
+
+> db.studens.find()                     #查看数据
+{ "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+
+> db.studens.count()                    #查看数据个数
+2
+
+
+> db.studens.find()
+{ "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
+
+> db.studens.find({age:{$gt: "30"}})
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+> db.studens.find({age:{$lt: "30"}})
+{ "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+> 
+
 ```
