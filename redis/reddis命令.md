@@ -260,6 +260,7 @@ OK
 ```
 
 发布订阅
+---
 ```
 订阅
 127.0.0.1:6379> SUBSCRIBE news
@@ -307,5 +308,4 @@ Reading messages... (press Ctrl-C to quit)
 (integer) 1
 127.0.0.1:6379> PUBLISH news.it redis
 (integer) 1
-
 ```
