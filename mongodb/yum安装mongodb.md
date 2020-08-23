@@ -157,6 +157,16 @@ WriteResult({ "nInserted" : 1 })
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
 
+> db.studens.find({gender: {$exists: true}})
+{ "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+
+> db.studens.find({gender: {$exists: false}})
+{ "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
+{ "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
+{ "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
+{ "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
 ```
 比较查询
 - $gt 大于 语法格式{filed: {$gt: VALUE}}
@@ -171,4 +181,8 @@ WriteResult({ "nInserted" : 1 })
 - $and 与运算
 - $not 非运算
 - $nor 反运算，返回不符合指定条件的所有文档
-
+元素查询：根据文档中是否存在指定的字段进行查询
+- $exists: 语法格式 {$filed: {$exists: <boolean>}}
+- $mod:
+- $type: 返回指定字段的值的类型为指定类型的文档，语法格式{field: {$type: <BSON type>}}
+	double,string,object,array,binary data,undefined,boolean,data,null,regular expression,javascript,timestamp
