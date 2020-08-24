@@ -1,0 +1,14 @@
+
+```
+fork {true|false}: mongod是否允许在后台
+bind_ip: 指定监听的地址
+port: 指定的端口
+maxConns: 最大并发连接数
+logpath: 日志文件位置
+logappend: 日志滚动
+pidfilepath: pid文件存放位置
+keyFile: 私钥文件位置
+setParameter:
+httpinterface: 是否启动http接口
+auth: mongo_shell连接是否认证
+```
