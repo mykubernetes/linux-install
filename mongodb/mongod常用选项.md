@@ -12,4 +12,6 @@ setParameter:
 httpinterface: 是否启动http接口
 auth: mongo_shell连接是否认证
 repair: 数据库异常断电后，使用此选项修复数据库的数据文件
+slowms: 超出指定时长的查询都是慢查询
+profile: 剖析性能
 ```
