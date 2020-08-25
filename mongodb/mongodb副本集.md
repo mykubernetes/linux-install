@@ -390,3 +390,8 @@ db.isMaster()
 ```
 rs.conf()
 ```
+
+oplog时间
+```
+db.printReplicationInfo()
+```
