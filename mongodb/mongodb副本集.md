@@ -380,3 +380,8 @@ rs.addArb("192.168.101.72:27017")
 查看集群状态
 goumin:PRIMARY> rs.status()
 ```  
+
+查看当前节点是否为主节点
+```
+db.isMaster()
+```
