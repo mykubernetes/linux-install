@@ -385,3 +385,8 @@ goumin:PRIMARY> rs.status()
 ```
 db.isMaster()
 ```
+
+查看当前节点配置
+```
+rs.conf()
+```
