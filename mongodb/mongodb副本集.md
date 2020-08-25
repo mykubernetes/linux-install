@@ -142,23 +142,23 @@ goumin:PRIMARY> rs.status()
 			"t" : NumberLong(1)
 		}
 	},
-	"members" : [
+	"members" : [                                                       # 成员信息
 		{
-			"_id" : 0,
-			"name" : "192.168.101.69:27017",
-			"health" : 1,
-			"state" : 1,
-			"stateStr" : "PRIMARY",
-			"uptime" : 281,
-			"optime" : {
+			"_id" : 0,                                          # 节点标识符
+			"name" : "192.168.101.69:27017",                    # 节点名称
+			"health" : 1,                                       # 节点监控状态
+			"state" : 1,                                        # 有无状态信息
+			"stateStr" : "PRIMARY",                             # PRIMARY代表主节点
+			"uptime" : 281,                                     # 运行时间
+			"optime" : {                                        # oplog最后一次的操作时间戳
 				"ts" : Timestamp(1564823485, 1),
 				"t" : NumberLong(1)
 			},
-			"optimeDate" : ISODate("2019-08-03T09:11:25Z"),
-			"electionTime" : Timestamp(1564823364, 1),
-			"electionDate" : ISODate("2019-08-03T09:09:24Z"),
+			"optimeDate" : ISODate("2019-08-03T09:11:25Z"),     # oplog最后一次的操作时间
+			"electionTime" : Timestamp(1564823364, 1),          # 选举时间
+			"electionDate" : ISODate("2019-08-03T09:09:24Z"),   # 选举日期
 			"configVersion" : 1,
-			"self" : true
+			"self" : true                                       # 是否是当前节点
 		},
 		{
 			"_id" : 1,
