@@ -391,7 +391,7 @@ db.isMaster()
 rs.conf()
 ```
 
-oplog时间
+oplog的大小及时间范围
 ```
 db.printReplicationInfo()
 ```
