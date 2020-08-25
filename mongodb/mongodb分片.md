@@ -139,8 +139,8 @@ sharding:
 /usr/local/mongodb/bin/mongod -f /data/mongodb/29020/mongodb.conf
 ```
 
-数据角色shjiangedata1
 ```
+数据角色shjiangedata1
 config = { _id:"shijiangedata1", 
   members:[
     {_id:0,host:"127.0.0.1:29017"},
