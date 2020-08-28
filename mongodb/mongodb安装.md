@@ -200,6 +200,11 @@ security:                          #认证
 6、启动mongodb数据库
 # mongo 127.0.0.1:27017 -u admin -p
 ```  
+- user: 用户名
+- pwd: 密码
+- roles:
+   - role: 角色
+   - db: 作用的对象
 - role 有三种root,redWrite,read
 
 
