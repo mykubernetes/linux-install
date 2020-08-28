@@ -49,3 +49,10 @@ read:1 write:1
 13509 ops/sec 52 MB/sec
 7854 ops/sec 30 MB/sec
 ```  
+
+4、mongodb监控之serverStatus
+- serverStatus可用来获取mongodb的状态信息
+- db.serverStatus()   #查看所有的监控信息
+- db.serverStatus().network #单独查看网络流量信息
+- db.serverStatus().opcounters #统计增、删、改、查的次数
+- db.serverStatus().connections#连接
