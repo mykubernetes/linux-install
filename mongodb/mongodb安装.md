@@ -261,6 +261,24 @@ Implicit session: session { "id" : UUID("377f5810-d203-4b6e-b1fe-996a3bc3398a") 
 MongoDB server version: 4.0.20
 >
 
+
+# 创建app数据库读写权限的用户并对test数据库有读权限
+> use app
+switched to db app
+> db.createUser({user: "apps",pwd: "123456",roles:[ { role: "readWrite", db:"app"},{ role: "read", db: "test"}]})
+Successfully added user: {
+	"user" : "apps",
+	"roles" : [
+		{
+			"role" : "readWrite",
+			"db" : "app"
+		},
+		{
+			"role" : "read",
+			"db" : "test"
+		}
+	]
+}
 ```
 
 
