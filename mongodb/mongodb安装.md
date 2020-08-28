@@ -206,31 +206,54 @@ security:                          #认证
    - role: 角色
    - db: 作用的对象
 - role 有多种角色root,redWrite,read，dbAdmin
-  - root 管理员
-  - dbAdmin 数据库管理员，很少用
-  - redWrite 库级别读写权限
-  - read 库级别读权限
+```
+# 数据库用户角色
+read：授予User只读数据的权限
+readWrite：授予User读写数据的权限
+
+# 数据库管理角色
+dbAdmin：在当前dB中执行管理操作
+dbOwner：在当前DB中执行任意操作
+userAdmin：在当前DB中管理User
+
+# 备份和还原角色
+backup
+restore
+
+# 跨库角色
+readAnyDatabase：授予在所有数据库上读取数据的权限
+readWriteAnyDatabase：授予在所有数据库上读写数据的权限
+userAdminAnyDatabase：授予在所有数据库上管理User的权限
+dbAdminAnyDatabase：授予管理所有数据库的权限
+
+集群管理角色
+clusterAdmin：授予管理集群的最高权限
+clusterManager：授予管理和监控集群的权限，A user with this role can access the config and local databases, which are used in sharding and replication, respectively.
+clusterMonitor：授予监控集群的权限，对监控工具具有readonly的权限
+hostManager：管理Server
+```
 
 mong使用use 后对这个库设置账户即对当前库拥有权限
 ```
-> use app
-switched to db app
+> use applcation                 # 在哪个库下创建用户就该用户就属于哪个库下
+switched to db applcation
 
-> db.createUser({user: "app",pwd: "123456",roles:[ { role: "dbAdmin", db:"app"}]})
+> db.createUser({user: "applcation",pwd: "123456",roles:[ { role: "readWrite", db:"applcation"}]})
 Successfully added user: {
-	"user" : "app",
+	"user" : "applcation",
 	"roles" : [
 		{
-			"role" : "dbAdmin",
-			"db" : "app"
+			"role" : "readWrite",
+			"db" : "applcation"
 		}
 	]
 }
 > 
 
 
+
 客户端远程连接需要加上库名，才可以进入
-# mongo 192.168.101.70/app -u app -p
+# mongo 192.168.101.70/applcation -u applcation -p
 MongoDB shell version v4.0.20
 Enter password: 
 connecting to: mongodb://192.168.101.70:27017/app?gssapiServiceName=mongodb
