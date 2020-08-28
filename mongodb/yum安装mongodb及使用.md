@@ -38,7 +38,12 @@ systemctl enable mongod.service
 > db.shutdownServer()
 ```
 
-7、mongo常用命令
+7、mongodb有慢查询的概念，默认是超过100ms会记录慢日志mongodb.log
+```
+db.getProfilingStatus()
+```
+
+8、mongo常用命令
 ```
 > help
 > db.help()
@@ -78,7 +83,7 @@ systemctl enable mongod.service
 > sh.status()                                      查看sharding状态信息
 ```
 
-8、mongo shell 除了支持交互式的调用方式，执行完后自动退出
+9、mongo shell 除了支持交互式的调用方式，执行完后自动退出
 ```
 # mongo --host localhost:27017 --eval "printjson( db.serverStatus().opcounters )"
 MongoDB shell version v4.0.20
@@ -331,7 +336,7 @@ db.dropDatabase()
 > db.studens.find( {"name":{$regex:"(zhangsan)"}} )       #支持分组正则
 
 
-
+#查看第一个
 > db.studens.findOne({age: {$gt: "10"}})
 {
 	"_id" : ObjectId("5f427690925a6e6d33fe2873"),
@@ -340,11 +345,13 @@ db.dropDatabase()
 	"gender" : "M"
 }
 
+#删除表
 > db.studens.drop()
 true
 
 > show collections
 
+查看数据库状态
 > db.stats()
 {
 	"db" : "test",
@@ -362,6 +369,7 @@ true
 	"ok" : 1
 }
 
+删除数据库
 > db.dropDatabase()
 { "dropped" : "test", "ok" : 1 }
 
