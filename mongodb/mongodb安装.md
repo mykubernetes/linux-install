@@ -226,7 +226,7 @@ mong使用use 后对这个库设置账户即对当前库拥有权限
 ]
 
 
-客户端连接需要加上库名，才可以进入
+客户端远程连接需要加上库名，才可以进入
 # mongo 192.168.101.70/testmongo -u mongo -p
 MongoDB shell version v4.0.20
 Enter password: 
