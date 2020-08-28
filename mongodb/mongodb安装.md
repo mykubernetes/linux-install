@@ -200,6 +200,8 @@ security:                          #认证
 6、启动mongodb数据库
 # mongo 127.0.0.1:27017 -u admin -p
 ```  
+- role 有三种root,redWrite,read
+
 
 mong使用use 后对这个库设置账户即对当前库拥有权限
 ```
