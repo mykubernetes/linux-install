@@ -289,25 +289,48 @@ db.mycoll.drop()
 db.dropDatabase()
 ```
 
+
 ```
+#pretty易读的方式
+> db.studens.find().pretty()
+
+# 查找年龄是20或40的
 > db.studens.find({age: {$in: ["20","40"]}})
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
 { "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
+# count查看总数
 > db.studens.find({age: {$in: ["20","40"]}}).count()
 3
+
+# limit限制条数查询
 > db.studens.find({age: {$in: ["20","40"]}}).limit(1)
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
+
+#使用skip跳过记录
 > db.studens.find({age: {$in: ["20","40"]}}).skip(1)
 { "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
 
+#查找年龄大于10的
 > db.studens.find({age: {$gt: "10"}})
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
 { "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
+#使用sort进行排序
+> db.studens.find().sort({ age: 1 })    #按age升序
+> db.studens.find().sort({ age: -1 })   #按age降序
+
+
+#mongodb正则查询，支持普通正则和扩展正则
+> db.studens.find({ name: {$regex: "shijiange[1-9]"} })   #普通正则过滤
+> db.studens.find( {"name":{$regex:"(zhangsan)"}} )       #支持分组正则
+
+
 
 > db.studens.findOne({age: {$gt: "10"}})
 {
