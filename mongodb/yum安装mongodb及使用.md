@@ -26,6 +26,19 @@ systemctl start mongod.service
 systemctl enable mongod.service
 ```
 
+5、mongodb的基础概念
+- database  #数据库
+- collection  #集合，类似于mysql中的表
+- filed   #类似于mysql中字段
+- document #每行的记录
+
+6、mongo客户端提供一个正确关闭mongodb服务器的方法
+```
+> use admin
+> db.shutdownServer()
+```
+
+7、mongo常用命令
 ```
 > help
 > db.help()
@@ -36,6 +49,7 @@ systemctl enable mongod.service
 
 ```
 > show dbs      列出所有DB
+> show databases 列出所有DB
 > use dbname    切换当前DB
 > show tables   或 show collections  列出当前DB的所有表/集合
 > show users    列出当前DB的所有用户
@@ -64,7 +78,7 @@ systemctl enable mongod.service
 > sh.status()                                      查看sharding状态信息
 ```
 
-mongo shell 除了支持交互式的调用方式，执行完后自动退出
+8、mongo shell 除了支持交互式的调用方式，执行完后自动退出
 ```
 # mongo --host localhost:27017 --eval "printjson( db.serverStatus().opcounters )"
 MongoDB shell version v4.0.20
