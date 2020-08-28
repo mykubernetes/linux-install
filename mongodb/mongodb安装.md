@@ -205,55 +205,35 @@ security:                          #认证
 - roles:
    - role: 角色
    - db: 作用的对象
-- role 有三种root,redWrite,read
+- role 有多种角色root,redWrite,read，dbAdmin
 
 
 mong使用use 后对这个库设置账户即对当前库拥有权限
 ```
-> use testmongo
-> db.createUser({user: "mongo",pwd: "123456",roles:[ { role: "root", db:"admin"}]})
-> db.getUsers()
-[
-	{
-		"_id" : "testmongo.mongo",
-		"userId" : UUID("ac843c76-aada-4370-a276-a44049607215"),
-		"user" : "mongo",
-		"db" : "testmongo",
-		"roles" : [
-			{
-				"role" : "root",
-				"db" : "admin"
-			}
-		],
-		"mechanisms" : [
-			"SCRAM-SHA-1",
-			"SCRAM-SHA-256"
-		]
-	}
-]
+> use app
+switched to db app
+
+> db.createUser({user: "app",pwd: "123456",roles:[ { role: "dbAdmin", db:"app"}]})
+Successfully added user: {
+	"user" : "app",
+	"roles" : [
+		{
+			"role" : "dbAdmin",
+			"db" : "app"
+		}
+	]
+}
+> 
 
 
 客户端远程连接需要加上库名，才可以进入
-# mongo 192.168.101.70/testmongo -u mongo -p
+# mongo 192.168.101.70/app -u app -p
 MongoDB shell version v4.0.20
 Enter password: 
-connecting to: mongodb://192.168.101.70:27017/testmongo?gssapiServiceName=mongodb
-Implicit session: session { "id" : UUID("6366763a-af43-4af0-aa1a-5a6a1e411f02") }
+connecting to: mongodb://192.168.101.70:27017/app?gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("377f5810-d203-4b6e-b1fe-996a3bc3398a") }
 MongoDB server version: 4.0.20
-Server has startup warnings: 
----
-Enable MongoDB's free cloud-based monitoring service, which will then receive and display
-metrics about your deployment (disk utilization, CPU, operation statistics, etc).
-
-The monitoring data will be available on a MongoDB website with a unique URL accessible to you
-and anyone you share the URL with. MongoDB may use this information to make product
-improvements and to suggest MongoDB products and deployment options to you.
-
-To enable free monitoring, run the following command: db.enableFreeMonitoring()
-To permanently disable this reminder, run the following command: db.disableFreeMonitoring()
----
-
-> 
+>
 
 ```
 
