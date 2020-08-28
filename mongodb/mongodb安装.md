@@ -206,7 +206,10 @@ security:                          #认证
    - role: 角色
    - db: 作用的对象
 - role 有多种角色root,redWrite,read，dbAdmin
-
+  - root 管理员
+  - dbAdmin 数据库管理员，很少用
+  - redWrite 库级别读写权限
+  - read 库级别读权限
 
 mong使用use 后对这个库设置账户即对当前库拥有权限
 ```
