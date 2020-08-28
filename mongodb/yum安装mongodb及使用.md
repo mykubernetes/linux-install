@@ -114,16 +114,23 @@ bye
 
 使用
 ```
-> db.studens.insert({name:"tom",age:"23"})           #插入一个表
+#插入一个表
+> db.studens.insert({name:"tom",age:"23"})
 WriteResult({ "nInserted" : 1 })
-> show collections                                   #查看连接
+
+#查看表
+> show collections                                   
 studens
-> show dbs                                           #查看数据库
+
+#查看数据库
+> show dbs
 admin   0.000GB
 config  0.000GB
 local   0.000GB
 test    0.000GB
-db.studens.stats()                                   #查看连接信息
+
+#查看连接信息
+db.studens.stats()
 {
 	"ns" : "test.studens",
 	"size" : 48,
@@ -137,20 +144,24 @@ db.studens.stats()                                   #查看连接信息
 		},
 ......
 
+#获取所有的表
 > db.getCollectionNames()
 [ "studens" ]
 
+#插入数据
 > db.studens.insert({name:"jerry",age:"40",gender:"M"})
 WriteResult({ "nInserted" : 1 })
 
-> db.studens.find()                     #查看数据
+#查看数据
+> db.studens.find()
 { "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
 
-> db.studens.count()                    #查看数据个数
+#查看数据个数
+> db.studens.count()
 2
 
-
+#查看所有表数据
 > db.studens.find()
 { "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
@@ -159,27 +170,31 @@ WriteResult({ "nInserted" : 1 })
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
 
-
+#查找年龄大于30的
 > db.studens.find({age:{$gt: "30"}})
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
 { "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
+
+#查找年龄小于30的
 > db.studens.find({age:{$lt: "30"}})
 { "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
 { "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
-> 
-
+ 
+#查找年龄是23或40的
 > db.studens.find({age:{$in: ["23","40"]}})
 { "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibzhang" }
 
+#查找年龄不是23或40的
 > db.studens.find({age:{$nin: ["23","40"]}})
 { "_id" : ObjectId("5f4277a3925a6e6d33fe2874"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 
+#或关系
 > db.studens.find({$or: [{age: {$nin: ["23","40"]}},{age: {$in: ["23","40"]}}]})  
 { "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
@@ -188,6 +203,7 @@ WriteResult({ "nInserted" : 1 })
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
 
+#表中的字段是否存在
 > db.studens.find({gender: {$exists: true}})
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
 
