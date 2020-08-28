@@ -213,7 +213,6 @@ WriteResult({ "nInserted" : 1 })
 { "_id" : ObjectId("5f4277bf925a6e6d33fe2875"), "name" : "Yang Guo", "age" : "20", "Coures" : "Meinv Quan" }
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
-
 ```
 比较查询
 - $gt 大于 语法格式{filed: {$gt: VALUE}}
@@ -234,6 +233,7 @@ WriteResult({ "nInserted" : 1 })
 - $type: 返回指定字段的值的类型为指定类型的文档，语法格式{field: {$type: <BSON type>}}
 	double,string,object,array,binary data,undefined,boolean,data,null,regular expression,javascript,timestamp
 
+
 ```
 > db.studens.find()
 { "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
@@ -243,6 +243,7 @@ WriteResult({ "nInserted" : 1 })
 { "_id" : ObjectId("5f4277c2925a6e6d33fe2876"), "name" : "Ou Yangfeng", "age" : "90", "Coures" : "HaMogong" }
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
 
+#更新
 > db.studens.update({name: "tom"},{$set: {age: 21}})
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
@@ -255,6 +256,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 { "_id" : ObjectId("5f427819925a6e6d33fe2877"), "name" : "Gou Jing", "age" : "40", "Coures" : "Xianglong Shibazhang" }
 
 
+#删除
 > db.studens.remove({age:21})
 WriteResult({ "nRemoved" : 1 })
 
@@ -273,14 +275,19 @@ db.mycoll.update()
 - $rename: 更改字段名，语法格式（{$rename: {oldname: newname}}）
 - $inc
 
-删除操作  
+删除操作
+```
+有条件删除数据
+db.myuser.remove({ name: 'xiaoming' })
 db.mycoll.remove({},1)   #数值代码删除符合添加的个数
+db.mycoll.remove({})
 
-删除collection  
+#删除collection  
 db.mycoll.drop()
 
-删除database
+#删除database
 db.dropDatabase()
+```
 
 ```
 > db.studens.find({age: {$in: ["20","40"]}})
