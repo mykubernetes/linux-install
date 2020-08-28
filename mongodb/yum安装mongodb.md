@@ -79,6 +79,23 @@ MongoDB server version: 4.0.20
 	"getmore" : 0,
 	"command" : 36
 }
+
+
+# echo 'db.serverStatus().opcounters' | mongo 
+MongoDB shell version v4.0.20
+connecting to: mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("83bebff7-1f28-42f8-a504-a9cfad2f3189") }
+MongoDB server version: 4.0.20
+{
+	"insert" : 0,
+	"query" : 10,
+	"update" : 0,
+	"delete" : 2,
+	"getmore" : 0,
+	"command" : 209
+}
+bye
+
 ```
 
 使用
