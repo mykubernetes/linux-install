@@ -162,6 +162,10 @@ WriteResult({ "nInserted" : 1 })
 { "_id" : ObjectId("5f4274d6925a6e6d33fe2872"), "name" : "tom", "age" : "23" }
 { "_id" : ObjectId("5f427690925a6e6d33fe2873"), "name" : "jerry", "age" : "40", "gender" : "M" }
 
+#使用explain可以查看是否全表扫描
+> db.studens.find().explain(true)
+
+
 #查看数据个数
 > db.studens.count()
 2
