@@ -110,3 +110,46 @@ nodetool -u cassandra -pw cassandra clearsnapshot         #清空所有旧快照
 nodetool -u cassandra -pw cassandra enbalebackup          #启动增量备份
 nodetool -u cassandra -pw cassandra snapshot              #创建快照
 ```
+
+
+cqlsh命令
+---
+
+```
+#连接到cassandra
+cqlsh -u cassandra -p cassandra
+
+#查看所有的keyspaces
+DESCRIBE KEYSPACES
+
+#查看集群信息
+DESCRIBE CLUSTER
+
+#连接到指定keyspace
+USE sps_proxy
+
+#查看所有table
+DESCRIBE TABLES
+
+#查看keyspace信息
+DESCRIBE KEYSPACE_NAME
+
+#查看table描述
+DESCRIBE TABLE TABLE_NAME
+
+#查看所有用户自定义数据类型（当前为空）
+DESCRIBE TYPES
+
+#查看用户自定义数据类型描述
+DESCRIBE TYPE xxx
+
+#扩展输出，使用此命令前必须打开expand 命令
+EXPAND ON
+
+#显示当前cqlsh 会话信息
+SHOW HOST
+
+#从文件执行命令
+source filename
+
+```
