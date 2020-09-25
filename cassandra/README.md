@@ -96,3 +96,10 @@ nodetool -u cassandra -pw cassandra setcompactionhroughput 100        #设置com
 nodetool -u cassandra -pw cassandra stop --COMPACTION                 #停止压缩，避免备份数据时sstable compaction 变化
 nodetool -u cassandra -pw cassandra compactionhistory                 #显示压缩操作历史
 ```
+
+17、移除节点
+```
+nodetool -u cassandra -pw cassandra decommission             #退服节点
+nodetool -u cassandra -pw cassandra removenode               #节点下线
+nodetool -u cassandra -pw cassandra assassinate node_ip      #强制删除节点
+```
