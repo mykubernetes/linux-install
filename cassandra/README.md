@@ -83,3 +83,16 @@ nodetool -u cassandra -pw cassandra status -r           #查看集群所有节�
 nodetool -u cassandra -pw cassandra getlogginglevels               #查看日志级别
 nodetool -u cassandra -pw cassandra setlogginglevel ROOT DEBUG     #设置日志级别为DEBUG
 ```
+
+16、压缩相关操作
+```
+nodetool -u cassandra -pw cassandra disableautocompaction             #禁用自动压缩
+nodetool -u cassandra -pw cassandra enableautocompaction              #启动自动压缩
+nodetool -u cassandra -pw cassandra compactionstats                   #压缩状态查看
+nodetool -u cassandra -pw cassandra compact --user-defined mc-103-big-Date.db       手动指定文件压缩
+nodetool -u cassandra -pw cassandra setstreamthroughput 200           #设置streaming throughput 默认200Mb/s
+nodetool -u cassandra -pw cassandra getcompactionthroughput           #打印compaction throughput
+nodetool -u cassandra -pw cassandra setcompactionhroughput 100        #设置compaction throughput，默认100Mb/s
+nodetool -u cassandra -pw cassandra stop --COMPACTION                 #停止压缩，避免备份数据时sstable compaction 变化
+nodetool -u cassandra -pw cassandra compactionhistory                 #显示压缩操作历史
+```
