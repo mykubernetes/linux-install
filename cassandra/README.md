@@ -103,3 +103,10 @@ nodetool -u cassandra -pw cassandra decommission             #退服节点
 nodetool -u cassandra -pw cassandra removenode               #节点下线
 nodetool -u cassandra -pw cassandra assassinate node_ip      #强制删除节点
 ```
+18、快照备份
+```
+nodetool -u cassandra -pw cassandra listsnapshots         #查看快照列表
+nodetool -u cassandra -pw cassandra clearsnapshot         #清空所有旧快照
+nodetool -u cassandra -pw cassandra enbalebackup          #启动增量备份
+nodetool -u cassandra -pw cassandra snapshot              #创建快照
+```
