@@ -79,8 +79,6 @@ mongodump -uroot -p123456 --port 27017  --authenticationDatabase admin -d DB_NAM
 
 备份单个表
 mongodump -uroot -p123456 --port 27017 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME -o /monggodb/backup/mongo_201507021701.bak
-
-
 ```  
 
 mongodb数据库的恢复  
@@ -89,11 +87,13 @@ mongodb数据库的恢复
 mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin /monggodb/backup/
 
 恢复单个库：
-mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin -d DB_NAME /monggodb/backup/
+mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin -d DB_NAME /monggodb/backup/DB_NAME/
 
 恢复单表
-mongorestore -uroot -p 123456 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME /monggodb/backup/myTest_d_bak_201507021701.bak/myTest/d.bson
+mongorestore -uroot -p 123456 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME /monggodb/backup/DN_NAME/TABLES_NAME.bson
 ```  
+- --gzip压缩备份
+
 
 ```
 备份所有库推荐使用添加--oplog参数的命令，这样的备份是基于某一时间点的快照，只能用于备份全部库时才可用，单库和单表不适用：
