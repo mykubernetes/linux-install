@@ -486,8 +486,9 @@ node02 http_port=8080
      copy: content={{ http_port }} dest=/opt/test_http_port
 ```  
 
-通过inventory主机清单进行变量定义  
-在项目目录下创建两个变量的目录,host_vars group_vars
+通过inventory主机清单进行变量定义,在项目目录下创建两个变量的目录,host_vars group_vars
+
+一、group_vars
 ```
 1）在当前的项目目录中创建两个变量的目录
 # mkdir host_vars
@@ -510,6 +511,43 @@ ftp_packages: tree
         state: present
 ```
 注意: 默认情况下,group_vars目录中文件名与hosts清单中的组名保持一致.比如在group_vars目录中创建了webserver组的变量,其他组是无法使用webserver组的变量系统提供了一个特殊组,all,只需要在group_vars目录下建立一个all文件,编写好变量,所有组都可使用.
+
+二、host_vars
+```
+1）在host_vars目录中创建一个文件，文件名与inventory清单中的主机名称要保持完全一致
+# cat hosts 
+[test]
+172.16.1.7
+172.16.1.8
+
+2）在host_vars目录中创建文件，给172.16.1.7主机定义变量
+# cat host_vars/172.16.1.7 
+web_packages: zlib-static
+ftp_packages: zmap
+
+#3）准备一个playbook文件调用host主机变量
+# cat test.yml 
+- hosts: 172.16.1.7
+  tasks:
+    - name: Install Rpm Packages "{{ web_packages }}" "{{ ftp_packages }}"
+      yum: 
+        name: 
+          - "{{ web_packages }}"
+          - "{{ ftp_packages }}"
+        state: present
+
+- hosts: 172.16.1.8
+  tasks:
+    - name: Install Rpm Packages "{{ web_packages }}" "{{ ftp_packages }}"
+      yum: 
+        name: 
+          - "{{ web_packages }}"
+          - "{{ ftp_packages }}"
+        state: present
+```
+- host_vars 特殊的变量目录,针对单个主机进行变量.
+- group_vars 特殊的变量目录,针对inventory主机清单中的组进行变量定义. 对A组定义的变量 B组无法调用
+- group_vars/all 特殊的变量文件,可以针对所有的主机组定义变量.
 
 all.yml中定义变量
 ```
