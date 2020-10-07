@@ -1,17 +1,3 @@
-https://www.cnblogs.com/xiaotengyi/p/6393972.html
-
-
-mongob备份支持bson格式
-
-mongodb数据库的备份，备份所有库  
-```
-mongodump -h 127.0.0.1:27017 -o /data/mongodbbackup/
-```  
-
-mongodb数据库的恢复  
-```
-mongorestore -h 127.0.0.1:27018 /data/mongodbbackup/
-```  
 
 跨版本备份，支持json和csv两种格式
 ---
@@ -67,3 +53,47 @@ select * from t100w into outfile "/opt.t100w.csv" fields terminated by ',';
 mongoimport -uroot -p12456 -d mysqltest -c test --type -f id,num,k1,k2,dt --authenticationatabase admin /opt.t100w.csv
 ```
 
+
+
+https://www.cnblogs.com/xiaotengyi/p/6393972.html
+
+
+mongob备份支持bson格式
+
+mongodb数据库的备份，备份所有库 
+
+mongodump
+- -h 指明数据库宿主机的IP 
+- -u 指明数据库的用户名
+- -p 指明数据库的密码
+- -d 指明数据库的名字
+- -c 指明collection的名字
+- -o 指明要导出的文件名
+- -q 指明导出的数据库过滤条件
+- -j 并发
+--oplog 备份的同时备份oplog
+
+```
+备份所有库
+mongodump -uroot -p123456 --port 27017--authenticationDatabase admin -o /monggodb/backup/
+
+备份单个库
+mongodump -uroot -p123456 --port 27017  --authenticationDatabase admin -d DB_NAME -o /monggodb/backup/
+
+备份单个表
+mongodump -uroot -p123456 --port 27017 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME -o /monggodb/backup/mongo_201507021701.bak
+
+
+```  
+
+mongodb数据库的恢复  
+```
+恢复所有库：
+mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin /monggodb/backup/
+
+恢复单个库：
+mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin -d DB_NAME /monggodb/backup/
+
+恢复单表
+mongorestore -uroot -p 123456 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME /monggodb/backup/myTest_d_bak_201507021701.bak/myTest/d.bson
+```  
