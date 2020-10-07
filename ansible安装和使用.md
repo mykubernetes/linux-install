@@ -325,7 +325,8 @@ ansible-playbook example.yaml --limit node01
 
 查看主机变量
 ansible node01 -m setup
-# ansible 172.16.1.8 -m setup -a "filter=ansible_memtotal_mb" -i hosts
+
+ansible 172.16.1.8 -m setup -a "filter=ansible_memtotal_mb" -i hosts
 172.16.1.8 | SUCCESS => {
     "ansible_facts": {
         "ansible_memtotal_mb": 1996, 
