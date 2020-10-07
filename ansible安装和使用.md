@@ -495,6 +495,7 @@ ansible facts变量
 #编写playbook打印被控端变量值
 # cat test.yml 
 - hosts: node02
+  gather_facts: yes     #获取被控端主机变量，模式为yes,关闭no
   tasks:
     - name: OutPut Variables ansible facets
       debug:
