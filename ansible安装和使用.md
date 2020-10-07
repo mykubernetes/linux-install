@@ -358,6 +358,14 @@ ansible node01 -m setup
 
 2、ansible变量相关
 ---
+
+ansible变量的优先级  
+1）在plabook中定义vars变量  
+2）在playbook中定义vars_files变量  
+3）在host_vars中定义变量  
+4）在group_vars中定义变量  
+5）通过执行命令传递变量  
+
 ```
 # ansible node01 -m setup
 
@@ -379,7 +387,7 @@ ansible node01 -m setup
      yum: name={{ pkgname }} state=latest
 ```
 
-playbook变量  
+在playbook文件中的play使用变量
 ```
 # cat vars.yml 
 - hosts: oldboy
@@ -394,6 +402,27 @@ playbook变量
           - "{{ web_packages }}"
           - "{{ ftp_packages }}"
         state: present	
+```
+
+定义一个变量文件,然后使用playbook进行调用
+```
+定义一个变量文件
+# cat vars_public.yml 
+web_packages: httpd-2.4.6
+ftp_packages: vsftpd-3.0.2
+
+编写playbook调用变量文件
+# cat vars_1.yml
+- hosts: oldboy
+  vars_files: ./vars_public.yml
+
+  tasks:
+    - name: Installed {{ web_packages }} {{ ftp_packages }}
+      yum: 
+        name:
+          - "{{ web_packages }}"
+          - "{{ ftp_packages }}"
+        state: present
 ```
 
 注册变量（register）
