@@ -37,7 +37,16 @@ become_user=root
 become_ask_pass=False
 ```  
 
-2、配置ansible可以获取的主机
+2、ansible读取配置文件优先级
+---
+```
+ANSIBLE_CONFIG
+ansible.cfg                # 项目目录
+.ansible.cfg               # 当前用户的家目录
+/etc/ansible/ansible.cfg
+```
+
+3、配置ansible可以获取的主机
 ---
 ```
 vim /etc/ansible/hosts
@@ -48,7 +57,7 @@ node02
 192.168.1.[1:3]
 ```  
 
-3、常用命令  
+4、常用命令  
 ---
 
 ```
