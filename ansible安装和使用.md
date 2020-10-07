@@ -37,13 +37,13 @@ become_user=root
 become_ask_pass=False
 ```  
 
-2、ansible读取配置文件优先级
+2、ansible读取配置文件优先级，自上而下
 ---
 ```
 ANSIBLE_CONFIG
 ansible.cfg                # 项目目录
 .ansible.cfg               # 当前用户的家目录
-/etc/ansible/ansible.cfg
+/etc/ansible/ansible.cfg   # 优先级最低
 ```
 
 3、配置ansible可以获取的主机
