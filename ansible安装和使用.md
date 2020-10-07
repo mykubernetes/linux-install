@@ -676,15 +676,46 @@ bind 192.168.1.70
 ---
 when判断
 ```
-- hosts: web
-  remote_user: root
+1、根据不同操作系统，安装相同的软件包
+# cat tasks_1.yml 
+- hosts: webserver
   tasks:
-   - name: install httpd
-     yum: name=httpd state=latest
-     when: ansible_os_family == "RedHat"
-   - name: install apache2
-     when: ansible_os_family == "Debian"
-     apt: name=apache2 state=latest
+
+    - name: Installed {{ ansible_distribution }} Httpd Server
+      yum: name=httpd state=present
+      when: ( ansible_distribution == "CentOS" )
+
+    - name: Installed {{ ansible_distribution }} Httpd2 Server
+      yum: name=httpd2 state=present
+      when: ( ansible_distribution == "Ubuntu" )
+	
+	
+2、为所有的web主机名添加nginx仓库，其余的都跳过添加
+# cat tasks_2.yml 
+- hosts: all
+  tasks:
+    - name: Create YUM Repo
+      yum_repository:
+        name: ansible_nginx
+        description: ansible_test
+        baseurl: https://mirrors.oldboy.com
+        gpgcheck: no
+        enabled: no
+      when: ( ansible_fqdn is match ("web*"))
+
+3、主机名称是web*或主机名称是lb*的则添加这个nginx源
+# cat tasks_2.yml 
+- hosts: all
+  tasks:
+    - name: Create YUM Repo
+      yum_repository:
+        name: ansible_nginx
+        description: ansible_test
+        baseurl: https://mirrors.oldboy.com
+        gpgcheck: no
+        enabled: no
+      when: ( ansible_fqdn is match ("web*")) or 
+	        ( ansible_fqdn is match ("lb*"))
 ```  
 
 with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
