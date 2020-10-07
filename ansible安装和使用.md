@@ -490,7 +490,7 @@ ansible facts变量
 - 默认情况的facts变量名都已经预先定义好了, 只需要采集被控端的信息,然后传递至facts变量即可.
 ```
 #手动获取被控端变量，拿到变量名
-# ansible node -m setup
+# ansible node02 -m setup
 
 #编写playbook打印被控端变量值
 # cat test.yml 
