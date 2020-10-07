@@ -283,6 +283,7 @@ ansible playbook
 ===
 
 常用执行语法
+
 ```
 #检查语法是否正确
 ansible-playbook --syntax-checak first.yaml
@@ -321,15 +322,18 @@ ansible-playbook example.yaml --forks=5
 
 指定运行的主机
 ansible-playbook example.yaml --limit node01
+
+查看主机变量
+ansible node01 -m setup
 ```
 
 
 基本语法  
 
-在变更时执行操作（handlers）  
+1、handlers
+---
 - notify：在任务结束时触发  
 - handlers：由特定条件触发Tasks  
-任务控制（tags）  
 ```
 - hosts: node01
   remote_user: root
@@ -348,21 +352,23 @@ ansible-playbook example.yaml --limit node01
 
 
 
-ansible-playbook first.yaml                #运行playbook
-ansible-playbook -t conf first.yaml        #运行tags里的命令
+# ansible-playbook first.yaml                #运行playbook
+# ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```  
 
-ansible查看变量 
-``` ansible node01 -m setup ```  
+2、ansible变量相关
+---
 ```
+# ansible node01 -m setup
+
 - hosts: node01
   remote_user: root
   tasks:
    - name: copy file
      copy: content={{ ansible_env }} dest=/tmp/ansible.env
-```   
+```
 
-8)命令行传递变量  
+命令行传递变量  
 ```  
 #  ansible-playbook -e pkgname=memcached  test.yaml
 # cat test.yaml
@@ -371,21 +377,21 @@ ansible查看变量
   tasks:
    - name: install package {{ pkgname }}
      yum: name={{ pkgname }} state=latest
-```  
-
-9)在Playbook中定义变量
-```
-- hosts: webservers
-    gather_facts: no
-    vars:
-      var_name: value
-      var_name: value
-    tasks:
-      - name: hello
-        shell: "echo {{var_name}}"
 ```
 
-10）注册变量（register）
+playbook变量  
+```
+# cat test.yaml
+- hosts: node01
+  remote_user: root
+  vars:                            #定义变量
+  - pbvar: plabook_variable_testing
+  tasks:
+   - name: host playbook var
+     copy: content={{ pbvar }} dest=/tmp/playbook.var
+```
+
+注册变量（register）
 ```
 - hosts: webservers 
     gather_facts: no
@@ -415,28 +421,17 @@ set_fact变量在tasks中定义
       #var: shellreturn
 ```
 
-
-11)系统信息变量（facts）
-```
-- hosts: webservers 
-    gather_facts: no
-    tasks:
-      - name: Get date 
-        command: date +"%F_%T"
-        register: date_output
-      - name: Echo date_output
-        command: touch /tmp/{{date_output.stdout}}
-
-```
-
-12)invertory参数变量
-- ansible_ssh_host  
-- ansible_ssh_port  
-- ansible_ssh_user  
-- ansible_ssh_pass  
-- ansible_ssh_sudo_pass  
+invertory自带变量和自定义变量
+- ansible_ssh_host
+- ansible_ssh_port
+- ansible_ssh_user
+- ansible_ssh_pass
+- ansible_ssh_sudo_pass
 ```
 # cat /etc/ansible/hosts
+node01 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
+node02 ansible_host=192.169.101.67 ansible_user=root ansible_ssh_pass='123456'
+
 [test]
 node01 ansible_ssh_port=5678 ansible_ssh_user=hadoop ansible_ssh_pass=123456
 
@@ -456,19 +451,6 @@ node02 http_port=8080
      copy: content={{ http_port }} dest=/opt/test_http_port
 ```  
 
-inventory中定义变量
-```
-node01 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
-node02 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
-
-[lamp]
-node01
-
-[monitor]
-node01
-node02
-```
-
 all.yml中定义变量
 ```
 vim group_vars/all.yml
@@ -480,21 +462,7 @@ timezone: 'Asia/Shanghai'
 apt_mirror: 'mirrors.aliyun.com'
 ```
 
-
-
-13)playbook变量  
-```
-# cat test.yaml
-- hosts: node01
-  remote_user: root
-  vars:                            #定义变量
-  - pbvar: plabook_variable_testing
-  tasks:
-   - name: host playbook var
-     copy: content={{ pbvar }} dest=/tmp/playbook.var
-```  
-
-14)template文件
+template文件
 ```
 # cat /opt/src/redis.conf |grep ^bind
 bind {{ ansible_enp0s3.ipv4.address }}
@@ -519,7 +487,9 @@ bind {{ ansible_enp0s3.ipv4.address }}
 bind 192.168.1.70
 ```  
 
-15)when判断
+判断循环
+---
+when判断
 ```
 - hosts: web
   remote_user: root
@@ -532,7 +502,7 @@ bind 192.168.1.70
      apt: name=apache2 state=latest
 ```  
 
-16)with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
+with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 ```
 - hosts: web
   remote_user: root
@@ -575,7 +545,7 @@ bind 192.168.1.70
 ```
 
 Playbook模板（jinja2）
-===
+---
 条件和循环
 ```
 # cat test.yml 
