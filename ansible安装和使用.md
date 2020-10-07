@@ -1057,6 +1057,18 @@ import*（静态）：在Playbook解析时预先导入
   debug: msg="hello {{user}}"
 ```
 
+3、include
+```
+# cat a_project.yml 
+- hosts: webserver
+  tasks:
+    - name: A Project command
+      command: echo "A"
+
+    - name: Restart httpd
+      include: restart_httpd.yml
+```
+
 自动部署Nginx
 ```
 - hosts: webservers
