@@ -55,11 +55,8 @@ mongoimport -uroot -p12456 -d mysqltest -c test --type -f id,num,k1,k2,dt --auth
 
 
 
-https://www.cnblogs.com/xiaotengyi/p/6393972.html
-
-
 mongob备份支持bson格式
-
+---
 mongodb数据库的备份，备份所有库 
 
 mongodump
@@ -97,3 +94,11 @@ mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin -d DB_
 恢复单表
 mongorestore -uroot -p 123456 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME /monggodb/backup/myTest_d_bak_201507021701.bak/myTest/d.bson
 ```  
+
+```
+备份所有库推荐使用添加--oplog参数的命令，这样的备份是基于某一时间点的快照，只能用于备份全部库时才可用，单库和单表不适用：
+mongodump -h 127.0.0.1 --port 27017   --oplog -o  /root/bak 
+
+同时，恢复时也要加上--oplogReplay参数，具体命令如下(下面是恢复单库的命令)：
+mongorestore  -d swrd --oplogReplay  /home/mongo/swrdbak/swrd/
+```
