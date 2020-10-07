@@ -31,10 +31,10 @@ log_path = /var/log/ansible.log
 private_key_file = /root/.ssh/id_rsa
 
 [privilege_escalation]                                     #如果是普通用户则需要配置提权
-#become=True
-#become_method=sudo
-#become_user=root
-#become_ask_pass=False
+become=True
+become_method=sudo
+become_user=root
+become_ask_pass=False
 ```  
 
 2、配置ansible可以获取的主机
