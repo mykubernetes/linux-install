@@ -485,6 +485,25 @@ set_fact变量在tasks中定义
       #var: shellreturn
 ```
 
+ansible facts变量
+- 用来采集被控端的状态指标,比如: IP地址  主机名称  cpu信息  内存  等等
+- 默认情况的facts变量名都已经预先定义好了, 只需要采集被控端的信息,然后传递至facts变量即可.
+```
+#手动获取被控端变量，拿到变量名
+# ansible node -m setup
+
+#编写playbook打印被控端变量值
+# cat test.yml 
+- hosts: node02
+  tasks:
+    - name: OutPut Variables ansible facets
+      debug:
+        msg: this default IPv4 address "{{ ansible_fqdn }}" is "{{ ansible_default_ipv4.address }}"
+
+#查看输出结果
+# ansible-playbook test.yml
+```
+
 invertory自带变量和自定义变量
 ---
 - ansible_ssh_host
