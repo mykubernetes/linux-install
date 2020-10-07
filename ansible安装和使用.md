@@ -262,21 +262,21 @@ ansible node01 -m get_url -a "url=https://mirrors.aliyun.com/zabbix/zabbix/4.2/r
 
 14)selinux
 ```
-# ansible oldboy -m selinux -a "state=disabled"  -i hosts
+# ansible node02 -m selinux -a "state=disabled"  -i hosts
 ```
 
 15)firewalld
 ```
-# ansible oldboy -m service -a "name=firewalld state=started" -i hosts
+# ansible node02 -m service -a "name=firewalld state=started" -i hosts
 
 #1、永久放行https的流量,只有重启才会生效
-# ansible oldboy -m firewalld -a "zone=public service=https permanent=yes state=enabled" -i hosts 
+# ansible node02 -m firewalld -a "zone=public service=https permanent=yes state=enabled" -i hosts 
 
 #2、永久放行8081端口的流量,只有重启才会生效
-# ansible oldboy -m firewalld -a "zone=public port=8080/tcp permanent=yes state=enabled" -i hosts 
+# ansible node02 -m firewalld -a "zone=public port=8080/tcp permanent=yes state=enabled" -i hosts 
 	
 #3、放行8080-8090的所有tcp端口流量,临时和永久都生效.
-# ansible oldboy -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled" -i hosts 
+# ansible node02 -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled" -i hosts 
 ```
 
 ansible playbook
@@ -422,7 +422,7 @@ ftp_packages: vsftpd-3.0.2
 
 编写playbook调用变量文件
 # cat vars_1.yml
-- hosts: oldboy
+- hosts: node02
   vars_files: ./vars_public.yml
 
   tasks:
