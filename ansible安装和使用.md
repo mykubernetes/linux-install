@@ -381,14 +381,19 @@ ansible node01 -m setup
 
 playbook变量  
 ```
-# cat test.yaml
-- hosts: node01
-  remote_user: root
-  vars:                            #定义变量
-  - pbvar: plabook_variable_testing
+# cat vars.yml 
+- hosts: oldboy
+  vars:
+    - web_packages: httpd-2.4.6
+    - ftp_packages: vsftpd-3.0.2
+
   tasks:
-   - name: host playbook var
-     copy: content={{ pbvar }} dest=/tmp/playbook.var
+    - name: Installed {{ web_packages }} {{ ftp_packages }}
+      yum: 
+        name:
+          - "{{ web_packages }}"
+          - "{{ ftp_packages }}"
+        state: present	
 ```
 
 注册变量（register）
