@@ -1083,6 +1083,74 @@ import*（静态）：在Playbook解析时预先导入
        file: path=/tmp/tttt state=touch
 ```
 
+错误处理changed_when
+---
+```
+1.强制调用handlers
+# cat tast.yml 
+- hosts: webserver
+  force_handlers: yes #强制调用handlers
+
+  tasks:
+    - name: Touch File
+      file: path=/tmp/bgx_handlers state=touch
+      notify: Restart Httpd Server
+
+    - name: Installed Packages
+      yum: name=sb state=latest
+
+  handlers:
+    - name: Restart Httpd Server
+      service: name=httpd state=restarted
+
+2.关闭changed的状态(确定该tasks不会对被控端做任何的修改和变更.)
+# cat tast.yml 
+- hosts: webserver
+  tasks:
+    - name: Installed Httpd Server
+      yum: name=httpd state=present
+
+    - name: Service Httpd Server
+      service: name=httpd state=started
+
+    - name: Check Httpd Server
+      shell: ps aux|grep httpd
+      register: check_httpd
+      changed_when: false
+
+    - name: OutPut Variables
+      debug:
+        msg: "{{ check_httpd.stdout_lines }}"
+
+
+3、使用changed_when检查tasks任务返回的结果
+# cat tast.yml 
+- hosts: webserver
+  tasks: 
+
+    - name: Installed Nginx Server
+      yum: name=nginx state=present
+
+    - name: Configure Nginx Server
+      copy: src=./nginx.conf.j2 dest=/etc/nginx/nginx.conf
+      notify: Restart Nginx Server
+
+    - name: Check Nginx Configure Status
+      command: /usr/sbin/nginx -t
+      register: check_nginx
+      changed_when: 
+       - ( check_nginx.stdout.find('successful'))
+       - false
+	   
+    - name: Service Nginx Server
+      service: name=nginx state=started 
+
+
+  handlers:
+    - name: Restart Nginx Server
+      service: name=nginx state=restarted
+```
+
 自动部署Nginx
 ```
 - hosts: webservers
