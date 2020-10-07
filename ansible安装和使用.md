@@ -421,7 +421,7 @@ web_packages: httpd-2.4.6
 ftp_packages: vsftpd-3.0.2
 
 编写playbook调用变量文件
-# cat vars_1.yml
+# cat test.yml
 - hosts: node02
   vars_files: ./vars_public.yml
 
@@ -446,6 +446,24 @@ ftp_packages: vsftpd-3.0.2
         command: touch /tmp/{{date_output.stdout}}
 ```
 
+```
+# cat test.yml 
+- hosts: node02
+  tasks:
+    - name: Installed Httpd Server
+      yum: name=httpd state=present
+
+    - name: Service Httpd Server
+      service: name=httpd state=started
+
+    - name: Check Httpd Server
+      shell: ps aux|grep httpd
+      register: check_httpd
+
+    - name: OutPut Variables
+      debug:
+        msg: "{{ check_httpd.stdout_lines }}"
+```
 set_fact变量在tasks中定义
 ```
 ---
