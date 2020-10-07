@@ -375,7 +375,7 @@ ansible变量的优先级
 4）在group_vars中定义变量  
 5）通过执行命令传递变量  
 
-变量的优先级  
+变量的优先级(从左到右，外置参数最高，all.yaml最低）
 外置传参--->playbook(vars_files--->vars)--->inventory(host_vars-->group_vars/group_name--->group_vars-all)
 
 ```
