@@ -227,6 +227,44 @@ ansible node01 -m get_url -a "url=http://fj.xuliangwei.com/public/ip.txt dest=/v
 ansible node01 -m get_url -a "url=http://fj.xuliangwei.com/public/ip.txt dest=/var/www/html/ checksum=md5:7b86f423757551574a7499f0aae" -i hosts
 ```
 
+13)mount
+- present	将挂载信息写入/etc/fstab
+- unmounted	卸载临时,不会清理/etc/fstab
+- mounted	先挂载,在将挂载信息/etc/fstab		
+- absent 卸载临时,也会清理/etc/fstab
+```
+#环境准备：将172.16.1.61作为nfs服务端，172.16.1.7、172.16.1.8作为nfs客户端挂载
+# ansible localhost -m yum -a 'name=nfs-utils state=present'
+# ansible localhost -m file -a 'path=/ops state=directory'
+# ansible localhost -m copy -a 'content="/ops 172.16.1.0/24(rw,sync)" dest=/etc/exports'
+# ansible localhost -m service -a "name=nfs state=restarted"
+
+#1、挂载nfs存储至本地的/opt目录，并实现开机自动挂载
+# ansible node02 -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=mounted"  
+
+#2、永久卸载nfs的挂载，会清理/etc/fstab
+# ansible webservers -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=absent"
+```
+
+14)selinux
+```
+# ansible oldboy -m selinux -a "state=disabled"  -i hosts
+```
+
+15)firewalld
+```
+# ansible oldboy -m service -a "name=firewalld state=started" -i hosts
+
+#1、永久放行https的流量,只有重启才会生效
+# ansible oldboy -m firewalld -a "zone=public service=https permanent=yes state=enabled" -i hosts 
+
+#2、永久放行8081端口的流量,只有重启才会生效
+# ansible oldboy -m firewalld -a "zone=public port=8080/tcp permanent=yes state=enabled" -i hosts 
+	
+#3、放行8080-8090的所有tcp端口流量,临时和永久都生效.
+# ansible oldboy -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled" -i hosts 
+```
+
 ansible playbook
 ===
 
