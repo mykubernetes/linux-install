@@ -282,23 +282,17 @@ ansible node01 -m get_url -a "url=https://mirrors.aliyun.com/zabbix/zabbix/4.2/r
 ansible playbook
 ===
 
-1)检查语法是否正确
+常用执行语法
 ```
+#检查语法是否正确
 ansible-playbook --syntax-checak first.yaml
-```
 
-2)不实际运行测试
-```
+#不实际运行测试
 ansible-playbook -C first.yaml
-```
 
-3)检查运行的主机
-```
+#检查运行的主机
 ansible-playbook --list-host first.yaml
-```
 
-4)任务控制（tags）
-```
 #加密playbook文件时提示输入密码
 ansible-playbook --ask-vault-pass example.yaml
 
@@ -315,7 +309,6 @@ ansible-playbook example.yaml --list-tags
 #列出所有即将被执行的任务
 ansible-playbook example.yaml --list-tasks  
 
-
 #指定tags
 ansible-playbook example.yaml --tags "configuration,install"
 
@@ -325,15 +318,13 @@ ansible-playbook example.yaml --skip-tags "install"
 #并行任务数。FORKS被指定为一个整数,默认是5
 ansible-playbook example.yaml -f 5
 ansible-playbook example.yaml --forks=5
-```
 
-5）指定主机
-```
+指定运行的主机
 ansible-playbook example.yaml --limit node01
 ```
 
 
-6)基本语法  
+基本语法  
 
 在变更时执行操作（handlers）  
 - notify：在任务结束时触发  
@@ -354,13 +345,14 @@ ansible-playbook example.yaml --limit node01
   handlers:
    - name: restart redis
      service: name=redis state=restarted
-```  
-```
+
+
+
 ansible-playbook first.yaml                #运行playbook
 ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```  
 
-7)ansible查看变量 
+ansible查看变量 
 ``` ansible node01 -m setup ```  
 ```
 - hosts: node01
