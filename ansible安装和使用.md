@@ -388,6 +388,30 @@ ansible变量的优先级
 变量的优先级(从左到右，外置参数最高，all.yaml最低）
 外置传参--->playbook(vars_files--->vars)--->inventory(host_vars-->group_vars/group_name--->group_vars-all)
 
+task控制:
+- 1.判断语句  when
+  - 根据主机名称来安装不同的yum仓库
+  - 根据主机的系统安装不同的软件包
+- 2.循环语句 with_items:	列表     item
+  - 基本循环
+  - 字典循环   facts
+- 3.handlers触发
+  - notify   通知
+  - handlers 执行
+- 4.include
+  - include  #tasks
+  - include_tasks #tasks
+  - import_playbook #playbook
+- 5. tags标签
+  - 调试模式使用
+    -t 指定
+    --skip-tags: 跳过
+- 6.忽略错误ignore_errors: yes
+- 7.错误处理
+  - fource_handlers: yes  强制调用handlers(少)
+  - change_when: false    抑制changed状态
+  - change_when: (check_nginx.stdout.find('ok')
+		
 ```
 # ansible node01 -m setup
 
