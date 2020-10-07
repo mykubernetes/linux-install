@@ -35,7 +35,8 @@ become=True
 become_method=sudo
 become_user=root
 become_ask_pass=False
-```  
+```
+注意：控制端和被控制端第一次通讯，需要确认指纹信息, host_key_checking = False 参数注释打开即可
 
 2、ansible读取配置文件优先级，自上而下
 ---
