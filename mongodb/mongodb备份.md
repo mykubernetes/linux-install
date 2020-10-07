@@ -58,5 +58,12 @@ mongoimport -uroot -p12456 -c test --type -f uid,name,age,date --authenticationa
 ```
 
 
+把mysql数据导入到mongodb
 
+备份mysql数据为csv格式,默认空格为分隔符，改为指定逗号分隔
+```
+select * from t100w into outfile "/opt.t100w.csv" fields terminated by ',';
+
+mongoimport -uroot -p12456 -d mysqltest -c test --type -f id,num,k1,k2,dt --authenticationatabase admin /opt.t100w.csv
+```
 
