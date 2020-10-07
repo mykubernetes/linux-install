@@ -359,7 +359,7 @@ ansible node01 -m setup
 2、ansible变量相关
 ---
 
-2.ansible定义变量的方式{{ 变量名称 }}
+ansible定义变量的方式{{ 变量名称 }}
 - 1.通过playbook文件中的play进行定义
   - 通过vars来进行定义变量
   - 通过vars_files来进行定义变量
