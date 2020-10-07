@@ -359,6 +359,15 @@ ansible node01 -m setup
 2、ansible变量相关
 ---
 
+2.ansible定义变量的方式{{ 变量名称 }}
+- 1.通过playbook文件中的play进行定义
+  - 通过vars来进行定义变量
+  - 通过vars_files来进行定义变量
+- 2.通过inventory主机清单进行变量定义
+  - 通过host_vars对主机进行定义
+  - 通过group_vars对主机组进行定义
+- 3.通过执行playbook时使用-e参数指定变量
+
 ansible变量的优先级  
 1）在plabook中定义vars变量  
 2）在playbook中定义vars_files变量  
