@@ -235,10 +235,10 @@ ansible all -m script -a "/opt/script_file.sh"
 ```
 #1、下载互联网的软件至本地
 url  ==> http  https  ftp 
-ansible node01 -m get_url -a "url=http://fj.xuliangwei.com/public/ip.txt dest=/var/www/html/" -i hosts
+ansible node01 -m get_url -a "url=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm dest=/var/www/html/" -i hosts
 
 #2、下载互联网文件并进行md5校验(了解)
-ansible node01 -m get_url -a "url=http://fj.xuliangwei.com/public/ip.txt dest=/var/www/html/ checksum=md5:7b86f423757551574a7499f0aae" -i hosts
+ansible node01 -m get_url -a "url=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm dest=/var/www/html/ checksum=md5:7b86f423757551574a7499f0aae" -i hosts
 ```
 
 13)mount
