@@ -677,7 +677,7 @@ bind 192.168.1.70
 when判断
 ```
 1、根据不同操作系统，安装相同的软件包
-# cat tasks_1.yml 
+# cat tasks.yml 
 - hosts: webserver
   tasks:
 
@@ -691,7 +691,7 @@ when判断
 	
 	
 2、为所有的web主机名添加nginx仓库，其余的都跳过添加
-# cat tasks_2.yml 
+# cat tasks.yml 
 - hosts: all
   tasks:
     - name: Create YUM Repo
@@ -704,7 +704,7 @@ when判断
       when: ( ansible_fqdn is match ("web*"))
 
 3、主机名称是web*或主机名称是lb*的则添加这个nginx源
-# cat tasks_2.yml 
+# cat tasks.yml 
 - hosts: all
   tasks:
     - name: Create YUM Repo
@@ -715,7 +715,23 @@ when判断
         gpgcheck: no
         enabled: no
       when: ( ansible_fqdn is match ("web*")) or 
-	        ( ansible_fqdn is match ("lb*"))
+	    ( ansible_fqdn is match ("lb*"))
+可以用or 或者and 做判断
+
+4、根据命令执行的结果进行判断
+# cat tasks.yml 
+- hosts: all
+  tasks:
+    #检查httpd服务是否是活动的
+    - name: Check Httpd Server
+      command: systemctl is-active httpd
+      ignore_errors: yes
+      register: check_httpd
+
+    #如果check_httpd变量中的rc结果等于0，则执行重启httpd，否则跳过
+    - name: Httpd Restart 
+      service: name=httpd state=restarted
+      when: check_httpd.rc == 0
 ```  
 
 with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
