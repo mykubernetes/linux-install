@@ -340,33 +340,7 @@ ansible 172.16.1.8 -m setup -a "filter=ansible_memtotal_mb" -i hosts
 
 基本语法  
 
-1、handlers
----
-- notify：在任务结束时触发  
-- handlers：由特定条件触发Tasks  
-```
-- hosts: node01
-  remote_user: root
-  tasks:
-   - name: install redis
-     yum: name=redis state=present
-   - name: copy config file
-     copy: src=/opt/src/redis.conf dest=/etc/redis.conf owner=redis
-     notify: restart redis
-     tags: conf
-   - name: start redis
-     service: name=redis state=started enabled=true
-  handlers:
-   - name: restart redis
-     service: name=redis state=restarted
-
-
-
-# ansible-playbook first.yaml                #运行playbook
-# ansible-playbook -t conf first.yaml        #运行tags里的命令
-```  
-
-2、ansible变量相关
+ansible变量相关
 ---
 
 ansible定义变量的方式{{ 变量名称 }}
@@ -671,6 +645,36 @@ bind {{ ansible_enp0s3.ipv4.address }}
 # cat /etc/redis.conf |grep ^bind
 bind 192.168.1.70
 ```  
+
+handlers
+---
+- notify：在任务结束时触发  
+- handlers：由特定条件触发Tasks  
+```
+- hosts: node01
+  remote_user: root
+  tasks:
+   - name: install redis
+     yum: name=redis state=present
+   - name: copy config file
+     copy: src=/opt/src/redis.conf dest=/etc/redis.conf owner=redis
+     notify: restart redis
+     tags: conf
+   - name: start redis
+     service: name=redis state=started enabled=true
+  handlers:
+   - name: restart redis
+     service: name=redis state=restarted
+
+
+
+# ansible-playbook first.yaml                #运行playbook
+# ansible-playbook -t conf first.yaml        #运行tags里的命令
+```  
+- 1.无论多少个task通知了相同的handlers，handlers仅会在所有tasks结束后运行一次。
+- 2.只有task发生改变了才会通知handlers，没有改变则不会触发handlers。
+- 3.不能使用handlers替代tasks、因为handlers是一个特殊的tasks。
+
 
 判断循环
 ---
