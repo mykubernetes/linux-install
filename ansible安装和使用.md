@@ -14,25 +14,27 @@ http://www.luyixian.cn/news_show_361949.aspx
 
 # vim /etc/ansible/ansible.cfg 
 [defaults]
-inventory = /etc/ansible/hosts                          #ansible inventory文件路径
-
-remote_tmp = /tmp/.ansible/tmp                          #远程主机脚本临时存放目录 
-
-forks = 5                                               #并发数
-
+inventory = /etc/ansible/hosts                             #ansible inventory文件路径
+remote_tmp = /tmp/.ansible/tmp                             #远程主机脚本临时存放目录
+local_tmp = ~/.ansible/tmp                                 #本机的临时执行目录
+forks = 5                                                  #并发数
 become = root
-
+sudo_user = root                                           #默认sudo用户
 remote_port  = 22
-
-host_key_checking = False                               #避免ssh的时候输入yes
-
+host_key_checking = False                                  #避免ssh的时候输入yes
 roles_path = /etc/ansible/roles:/usr/share/ansible/roles   #role路径
-
+ask_sudo_pass = True                                       #每次执行是否询问sudo的ssh密码
+ask_pass = True                                            #每次执行是否询问ssh密码
+host_key_checking = False                                  #跳过检查主机指纹
 timeout = 10
-
 log_path = /var/log/ansible.log
-
 private_key_file = /root/.ssh/id_rsa
+
+[privilege_escalation]                                     #如果是普通用户则需要配置提权
+#become=True
+#become_method=sudo
+#become_user=root
+#become_ask_pass=False
 ```  
 
 2、配置ansible可以获取的主机
