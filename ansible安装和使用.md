@@ -55,6 +55,10 @@ node01
 node02
 [dbserver]
 192.168.1.[1:3]
+
+[server:children]    #定义server组包含两个子组[dbserver,webserver]
+webserver
+dbserver
 ```  
 
 4、常用命令  
