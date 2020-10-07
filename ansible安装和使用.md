@@ -399,7 +399,7 @@ ansible变量的优先级
 在playbook文件中的play使用变量
 ```
 # cat vars.yml 
-- hosts: oldboy
+- hosts: node02
   vars:
     - web_packages: httpd-2.4.6
     - ftp_packages: vsftpd-3.0.2
