@@ -375,6 +375,9 @@ ansible变量的优先级
 4）在group_vars中定义变量  
 5）通过执行命令传递变量  
 
+变量的优先级  
+外置传参--->playbook(vars_files--->vars)--->inventory(host_vars-->group_vars/group_name--->group_vars-all)
+
 ```
 # ansible node01 -m setup
 
