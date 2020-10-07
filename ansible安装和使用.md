@@ -404,8 +404,8 @@ task控制:
   - import_playbook #playbook
 - 5. tags标签
   - 调试模式使用
-    -t 指定
-    --skip-tags: 跳过
+    - -t 指定
+    - --skip-tags: 跳过
 - 6.忽略错误ignore_errors: yes
 - 7.错误处理
   - fource_handlers: yes  强制调用handlers(少)
