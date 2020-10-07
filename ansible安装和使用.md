@@ -733,6 +733,8 @@ when判断
       service: name=httpd state=restarted
       when: check_httpd.rc == 0
 ```  
+- is match
+- is not match
 
 with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 ```
