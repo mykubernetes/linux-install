@@ -698,7 +698,7 @@ when判断
       yum_repository:
         name: ansible_nginx
         description: ansible_test
-        baseurl: https://mirrors.oldboy.com
+        baseurl: https://mirrors.aliyun.com/repo/Centos-7.repo
         gpgcheck: no
         enabled: no
       when: ( ansible_fqdn is match ("web*"))
@@ -711,7 +711,7 @@ when判断
       yum_repository:
         name: ansible_nginx
         description: ansible_test
-        baseurl: https://mirrors.oldboy.com
+        baseurl: https://mirrors.aliyun.com/repo/Centos-7.repo
         gpgcheck: no
         enabled: no
       when: ( ansible_fqdn is match ("web*")) or 
