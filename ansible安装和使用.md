@@ -1069,6 +1069,20 @@ import*（静态）：在Playbook解析时预先导入
       include: restart_httpd.yml
 ```
 
+错误忽略ignore_errors
+---
+```
+# cat tast.yml 
+- hosts: webserver
+  tasks:
+     - name: Command 
+       command: /bin/false
+       ignore_errors: yes
+
+     - name: Create File 
+       file: path=/tmp/tttt state=touch
+```
+
 自动部署Nginx
 ```
 - hosts: webservers
