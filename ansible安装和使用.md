@@ -674,7 +674,7 @@ bind 192.168.1.70
 
 判断循环
 ---
-when判断
+1、when判断
 ```
 1、根据不同操作系统，安装相同的软件包
 # cat tasks.yml 
@@ -736,8 +736,10 @@ when判断
 - is match 匹配到的
 - is not match 没有匹配到的
 
-with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
+
+2、with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 ```
+1、使用循环启动多个服务
 - hosts: web
   remote_user: root
   tasks:
@@ -747,9 +749,8 @@ with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_l
       - tomcat
       - tomcat-webapps
       - tomcat-admin-webapps
-```  
 
-```
+
 - name: with_list
   debug:
     msg: "{{ item }}"
@@ -764,17 +765,48 @@ with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_l
     - 1
     - 2
 
-- name: with_items
-  user: name={{itme.name}} groups={{item.groups}} state=present
-  with_items:
-    - {name: 'zhangsan', groups: nginx}
-    - {name: 'lisi', groups: nginx}
 
 #通过变量传递的方式
 - name: with_items -> loop
   debug:
     msg: "{{ item }}"
   loop: "{{ items|flatten(levels=1) }}"
+  
+2、定义变量方式循环安装软件包
+# cat vars.yml
+- hosts: web
+  tasks:
+    - name: Installed Httpd Mariadb Package
+      yum: name={{ pack }} state=latest
+      vars:
+       pack:
+         - httpd
+         - mariadb-server	
+
+3、使用变量字典循环方式批量创建用户
+- name: with_items
+  user: name={{itme.name}} groups={{item.groups}} state=present
+  with_items:
+    - {name: 'zhangsan', groups: nginx}
+    - {name: 'lisi', groups: nginx}
+
+
+4、使用变量字典循环方式批量拷贝文件
+- hosts: webserver
+  tasks:
+    - name: Configure Rsyncd Server
+      copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+      with_items:
+        - { src: './rsyncd.conf.j2', dest: '/tmp/rsyncd.conf', mode: '0644' }
+        - { src: './rsync.pass.j2', dest: '/tmp/rsync.pass', mode: '0600' }
+
+    - name: Configure PHP-FPM {{ php_fpm_conf }}
+      template: src={{ item.src }} dest={{ item.dest }}
+      with_items:
+        - { src: './docs1/php_www.conf.j2', dest: '{{ php_fpm_conf }}' }
+        - { src: './docs1/php.ini.j2', dest: '{{ php_ini_conf }}' }
+
+
 
 ```
 
