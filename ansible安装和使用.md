@@ -86,23 +86,98 @@ node02
 3)user  
 ``` ansible all -m user -a "name=hadoop uid=3000 state=present system=no" ```  
 4)copy  
-``` ansible node02 -m copy -a "src=/etc/fstab dest=/opt/fstab.ansible mode=600 owner=hadoop group=hadoop" ```  
-``` ansible node02 -m copy -a "src=/etc/pam.d/ dest=/tmp/ " ```  
-5)command  
-``` ansible all -m command -a "chdir=/opt/ touch new.ansible" ```  
-6)shell  
-``` ansible node02 -m shell -a "cat /etc/fstab |grep ^#" ```  
+```
+#1、将本地的httpd.conf文件推送到远端服务。
+ansible node02 -m copy -a "src=./httpd.conf dest=/etc/httpd/conf/httpd.conf owner=root group=root mode=644" -i hosts
+
+#2、将本地的httpd.conf文件推送到远端，检查远端是否存在上一次的备份文件
+ansible node02 -m copy -a "src=./httpd.conf dest=/etc/httpd/conf/httpd.conf owner=root group=root mode=644 backup=yes" -i hosts
+
+#3、往远程的主机文件中写入内容
+ansible node02 -m copy -a "content=HttpServer... dest=/var/www/html/index.html" -i hosts 
+
+#4、拷贝目录
+ansible node02 -m copy -a "src=/etc/pam.d/ dest=/tmp/ "
+```  
+
+5)command  shell  本质上执行都是基础命令  (command不支持管道技术)
+```
+command 模块
+ansible all -m command -a "chdir=/opt/ touch new.ansible"
+
+shell 模块
+ansible node02 -m shell -a "ps aux|grep nginx"  -i hosts
+```
+
 7)file  
-``` ansible all -m file -a "path=/opt/test.dir state=directory" ```  
-``` ansible all -m file -a "src=/etc/fstab path=/tmp/fstab.ansible state=link" ```  
+```
+#1、创建文件，并设定属主、属组、权限。
+ansible node02 -m file -a "path=/var/www/html/tt.html state=touch owner=apache group=apache mode=644" -i hosts 
+
+#2、创建目录，并设定属主、属组、权限。
+ansible node02 -m file -a "path=/var/www/html/dd state=directory owner=apache group=apache mode=755" -i hosts
+
+#3、递归授权目录的方式。
+ansible node02 -m file -a "path=/var/www/html/ owner=apache group=apache mode=755" -i hosts 
+ansible node02 -m file -a "path=/var/www/html/ owner=apache group=apache recurse=yes" -i hosts
+
+#4、创建连接文件
+ansible all -m file -a "src=/etc/fstab path=/tmp/fstab.ansible state=link"
+```
+
 8)cron  
 ``` ansible all -m cron -a "minute=*/3 job='/usr/bin/update 192.168.1.1 &> /dev/null' state=present name=update" ```  
-9)yum  
-``` ansible all -m yum -a "name=nginx state=installed" ```  
+
+9)yum模块	(安装present 卸载absent 升级latest  排除exclude 指定仓库enablerepo)
+```
+#1、安装当前最新的Apache软件，如果存在则更新
+ansible web -m yum -a "name=httpd state=latest" -i hosts
+
+#2、安装当前最新的Apache软件，通过epel仓库安装
+ansible web -m yum -a "name=httpd state=latest enablerepo=epel" -i hosts 
+
+#3、通过公网URL安装rpm软件
+ansible web -m yum -a "name=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm state=latest" -i hosts 
+
+#4、更新所有的软件包，但排除和kernel相关的
+ansible web -m yum -a "name=* state=latest exclude=kernel*,foo*" -i hosts
+
+#5、删除Apache软件
+ansible web -m yum -a "name=httpd state=absent" -i hosts
+```  
+
 10)service  
-``` ansible all -m service -a "name=httpd state=started enabled=true" ```  
+```
+#1、启动Httpd服务
+ansible web -m service -a "name=httpd state=started"
+
+#2、重载Httpd服务
+ansible web -m service -a "name=httpd state=reloaded"
+
+#3、重启Httpd服务
+ansible web -m service -a "name=httpd state=restarted"
+
+#4、停止Httpd服务
+ansible web -m service -a "name=httpd state=stopped"
+
+#5、启动Httpd服务，并加入开机自启
+ansible web -m service -a "name=httpd state=started enabled=yes"  
+```  
+
 11)script 本地脚本拷贝到目标主机执行  
-``` ansible all -m script -a "/opt/script_file.sh" ```  
+```
+ansible all -m script -a "/opt/script_file.sh"
+```
+
+12)get_url
+```
+#1、下载互联网的软件至本地
+url  ==> http  https  ftp 
+ansible node01 -m get_url -a "url=http://fj.xuliangwei.com/public/ip.txt dest=/var/www/html/" -i hosts
+
+#2、下载互联网文件并进行md5校验(了解)
+ansible node01 -m get_url -a "url=http://fj.xuliangwei.com/public/ip.txt dest=/var/www/html/ checksum=md5:7b86f423757551574a7499f0aae" -i hosts
+```
 
 ansible playbook
 ===
