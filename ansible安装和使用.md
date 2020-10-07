@@ -1225,6 +1225,16 @@ server {
 }
 ```
 
+galaxy
+---
+ansible-playbook代码托管网址  
+https://galaxy.ansible.com/home
+
+```
+下载代码到默认目录/root/.ansible/roles
+ansible-galaxy install geerlingguy.nginx
+```
+
 自动部署Tomcat
 ```
 ---
