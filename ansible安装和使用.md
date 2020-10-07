@@ -392,9 +392,9 @@ task控制:
 - 1.判断语句  when
   - 根据主机名称来安装不同的yum仓库
   - 根据主机的系统安装不同的软件包
-- 2.循环语句 with_items:  列表  item
+- 2.循环语句 with_items:  列表 item
   - 基本循环
-  - 字典循环   facts
+  - 字典循环 facts
 - 3.handlers触发
   - notify   通知
   - handlers 执行
@@ -402,7 +402,7 @@ task控制:
   - include  #tasks
   - include_tasks #tasks
   - import_playbook #playbook
-- 5. tags标签
+- 5.tags标签
   - -t 指定tag
   - --skip-tags: 跳过
 - 6.忽略错误ignore_errors: yes
