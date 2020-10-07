@@ -907,6 +907,14 @@ server {
 }
 ```
 
+循环inventory主机清单中的webserver组,将提取到的IP赋值给i变量.
+```
+upstream {{ server_name }} {
+{% for i in groups['webserver'] %}
+    server {{i}}:{{http_port}} weight=2;
+{% endfor %}
+```
+
 roles
 ---
 Roles目录结构
