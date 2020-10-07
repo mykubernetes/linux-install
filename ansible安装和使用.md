@@ -78,13 +78,49 @@ node02
 ```
 
 0)查看模块帮助
-``` ansible-doc -s file ```  
+```
+ansible-doc -s file
+```
+
 1)ping测试  
-``` ansible all -m ping ```  
+```
+ansible all -m ping
+```
+
 2)group  
-``` ansible webserver -m group -a "name=mygrp gid=3000 state=present system=no" ```  
+```
+#1、创建news基本组，指定uid为9999
+ansible node02 -m group -a "name=news gid=9999 state=present" -i hosts
+
+#2、创建http系统组，指定uid为8888
+ansible node02 -m group -a "name=http gid=8888 system=yes state=present" -i hosts 
+
+#3、删除news基本组
+ansible node02 -m group -a "name=news state=absent" -i hosts
+```
+
 3)user  
-``` ansible all -m user -a "name=hadoop uid=3000 state=present system=no" ```  
+```
+#1、创建joh用户，uid是1040，主要的组是adm
+ansible node02 -m user -a "name=joh uid=1040 group=adm state=present system=no" -i hosts
+
+#2、创建joh用户，登录shell是/sbin/nologin，追加bin、sys两个组
+ansible node02 -m user -a "name=joh shell=/sbin/nologin groups=bin,sys" -i hosts 
+
+#3、创建jsm用户，为其添加123作为登录密码，并且创建家目录
+#ansible localhost -m debug -a "msg={{ '123' | password_hash('sha512', 'salt') }}"
+$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1
+
+# ansible node02 -m user -a 'name=jsm password=$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1 create_home=yes'
+
+#4、移除joh用户
+# ansible node02  -m user -a 'name=joh state=absent remove=yes' -i hosts 
+
+#示5、创建http用户，并为该用户创建2048字节的私钥，存放在~/http/.ssh/id_rsa
+# ansible node02  -m user -a 'name=http generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa' -i hosts
+```  
+
+
 4)copy  
 ```
 #1、将本地的httpd.conf文件推送到远端服务。
@@ -126,7 +162,19 @@ ansible all -m file -a "src=/etc/fstab path=/tmp/fstab.ansible state=link"
 ```
 
 8)cron  
-``` ansible all -m cron -a "minute=*/3 job='/usr/bin/update 192.168.1.1 &> /dev/null' state=present name=update" ```  
+```
+#0、每3分钟同步一次时间
+ansible all -m cron -a "minute=*/3 job='/usr/bin/update 192.168.1.1 &> /dev/null' state=present name=update"
+
+#1、添加定时任务。每分钟执行一次ls  * * * * * ls >/dev/null
+ansible node02 -m cron -a "name=job1 job='ls >/dev/null'" -i hosts 
+
+#2、添加定时任务，每天的凌晨2点和凌晨5点执行一次ls。"0 5,2 * * ls >/dev/null
+ansible node02 -m cron -a "name=job2 minute=0 hour=5,2 job='ls >/dev/null'" -i hosts 
+
+#3、关闭定时任务，使定时任务失效
+ansible node02 -m cron -a "name=job2 minute=0 hour=5,2 job='ls >/dev/null' disabled=yes" -i hosts 
+```  
 
 9)yum模块	(安装present 卸载absent 升级latest  排除exclude 指定仓库enablerepo)
 ```
