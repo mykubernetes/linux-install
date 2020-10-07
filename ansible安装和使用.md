@@ -268,20 +268,22 @@ ansible node01 -m get_url -a "url=http://fj.xuliangwei.com/public/ip.txt dest=/v
 ansible playbook
 ===
 
-1)检查语法是否正确  
----
-``` ansible-playbook --syntax-checak first.yaml ```  
+1)检查语法是否正确
+```
+ansible-playbook --syntax-checak first.yaml
+```
 
-2)不实际运行测试  
----
-``` ansible-playbook -C first.yaml ```   
+2)不实际运行测试
+```
+ansible-playbook -C first.yaml
+```
 
-3)检查运行的主机  
----
-``` ansible-playbook --list-host first.yaml ```  
+3)检查运行的主机
+```
+ansible-playbook --list-host first.yaml
+```
 
 4)任务控制（tags）
----
 ```
 #加密playbook文件时提示输入密码
 ansible-playbook --ask-vault-pass example.yaml
@@ -312,17 +314,16 @@ ansible-playbook example.yaml --forks=5
 ```
 
 5）指定主机
----
 ```
 ansible-playbook example.yaml --limit node01
 ```
 
 
 6)基本语法  
----
+
 在变更时执行操作（handlers）  
-notify：在任务结束时触发  
-handlers：由特定条件触发Tasks  
+- notify：在任务结束时触发  
+- handlers：由特定条件触发Tasks  
 任务控制（tags）  
 ```
 - hosts: node01
@@ -345,8 +346,7 @@ ansible-playbook first.yaml                #运行playbook
 ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```  
 
-7)ansible查看变量  
----
+7)ansible查看变量 
 ``` ansible node01 -m setup ```  
 ```
 - hosts: node01
@@ -357,7 +357,6 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```   
 
 8)命令行传递变量  
----
 ```  
 #  ansible-playbook -e pkgname=memcached  test.yaml
 # cat test.yaml
@@ -369,7 +368,6 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```  
 
 9)在Playbook中定义变量
----
 ```
 - hosts: webservers
     gather_facts: no
@@ -382,7 +380,6 @@ ansible-playbook -t conf first.yaml        #运行tags里的命令
 ```
 
 10）注册变量（register）
----
 ```
 - hosts: webservers 
     gather_facts: no
@@ -414,7 +411,6 @@ set_fact变量在tasks中定义
 
 
 11)系统信息变量（facts）
----
 ```
 - hosts: webservers 
     gather_facts: no
@@ -427,13 +423,12 @@ set_fact变量在tasks中定义
 
 ```
 
-12)invertory参数变量  
----
-ansible_ssh_host  
-ansible_ssh_port  
-ansible_ssh_user  
-ansible_ssh_pass  
-ansible_ssh_sudo_pass  
+12)invertory参数变量
+- ansible_ssh_host  
+- ansible_ssh_port  
+- ansible_ssh_user  
+- ansible_ssh_pass  
+- ansible_ssh_sudo_pass  
 ```
 # cat /etc/ansible/hosts
 [test]
@@ -456,7 +451,6 @@ node02 http_port=8080
 ```  
 
 inventory中定义变量
----
 ```
 node01 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
 node02 ansible_host=192.169.101.66 ansible_user=root ansible_ssh_pass='123456'
@@ -470,7 +464,6 @@ node02
 ```
 
 all.yml中定义变量
----
 ```
 vim group_vars/all.yml
 ansible_user: 'vagrant'
@@ -484,7 +477,6 @@ apt_mirror: 'mirrors.aliyun.com'
 
 
 13)playbook变量  
----
 ```
 # cat test.yaml
 - hosts: node01
@@ -497,7 +489,6 @@ apt_mirror: 'mirrors.aliyun.com'
 ```  
 
 14)template文件
----
 ```
 # cat /opt/src/redis.conf |grep ^bind
 bind {{ ansible_enp0s3.ipv4.address }}
@@ -523,7 +514,6 @@ bind 192.168.1.70
 ```  
 
 15)when判断
----
 ```
 - hosts: web
   remote_user: root
@@ -537,7 +527,6 @@ bind 192.168.1.70
 ```  
 
 16)with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
----
 ```
 - hosts: web
   remote_user: root
@@ -579,8 +568,8 @@ bind 192.168.1.70
 
 ```
 
-17)Playbook模板（jinja2）
----
+Playbook模板（jinja2）
+===
 条件和循环
 ```
 # cat test.yml 
@@ -651,7 +640,7 @@ server {
 }
 ```
 
-18)roles
+roles
 ---
 Roles目录结构
 ```
@@ -672,13 +661,13 @@ roles/
      defaults/ 
      meta/
 ```
--	tasks - 包含角色要执行的主要任务列表
--	handlers - 包含角色使用的处理程序
--	defaults - 角色默认的变量
--	vars - 角色其他的变量
--	files - 角色部署时用到的文件
--	templates - 角色部署时用到的模板
--	meta - 角色定义的一些元数据
+- tasks - 包含角色要执行的主要任务列表
+- handlers - 包含角色使用的处理程序
+- defaults - 角色默认的变量
+- vars - 角色其他的变量
+- files - 角色部署时用到的文件
+- templates - 角色部署时用到的模板
+- meta - 角色定义的一些元数据
 
 
 role中定定义变量变量
