@@ -1072,7 +1072,7 @@ import*（静态）：在Playbook解析时预先导入
 错误忽略ignore_errors
 ---
 ```
-# cat tast.yml 
+# cat test.yml 
 - hosts: webserver
   tasks:
      - name: Command 
@@ -1087,7 +1087,7 @@ import*（静态）：在Playbook解析时预先导入
 ---
 ```
 1.强制调用handlers
-# cat tast.yml 
+# cat test.yml 
 - hosts: webserver
   force_handlers: yes #强制调用handlers
 
@@ -1104,7 +1104,7 @@ import*（静态）：在Playbook解析时预先导入
       service: name=httpd state=restarted
 
 2.关闭changed的状态(确定该tasks不会对被控端做任何的修改和变更.)
-# cat tast.yml 
+# cat test.yml 
 - hosts: webserver
   tasks:
     - name: Installed Httpd Server
@@ -1124,7 +1124,7 @@ import*（静态）：在Playbook解析时预先导入
 
 
 3、使用changed_when检查tasks任务返回的结果
-# cat tast.yml 
+# cat test.yml 
 - hosts: webserver
   tasks: 
 
