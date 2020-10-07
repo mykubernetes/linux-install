@@ -456,6 +456,7 @@ set_fact变量在tasks中定义
 ```
 
 invertory自带变量和自定义变量
+---
 - ansible_ssh_host
 - ansible_ssh_port
 - ansible_ssh_user
@@ -477,7 +478,7 @@ node02 http_port=8080
    http_port=9090
 
 
-#cat test.yaml
+# vim test.yaml
 - hosts: web
   remote_user: root
   tasks:
@@ -485,9 +486,34 @@ node02 http_port=8080
      copy: content={{ http_port }} dest=/opt/test_http_port
 ```  
 
+通过inventory主机清单进行变量定义  
+在项目目录下创建两个变量的目录,host_vars group_vars
+```
+1）在当前的项目目录中创建两个变量的目录
+# mkdir host_vars
+# mkdir group_vars
+
+2）在group_vars目录中创建一个文件，文件名与inventory清单中的组名称要保持完全一致。
+# vim group_vars/webserver
+web_packages: wget
+ftp_packages: tree
+        
+3）编写playbook，只需在playbook文件中使用变量即可。
+# vim install.yml 
+- hosts: webserver
+  tasks:
+    - name: Install Rpm Packages "{{ web_packages }}" "{{ ftp_packages }}"
+      yum: 
+        name: 
+          - "{{ web_packages }}"
+          - "{{ ftp_packages }}"
+        state: present
+```
+注意: 默认情况下,group_vars目录中文件名与hosts清单中的组名保持一致.比如在group_vars目录中创建了webserver组的变量,其他组是无法使用webserver组的变量系统提供了一个特殊组,all,只需要在group_vars目录下建立一个all文件,编写好变量,所有组都可使用.
+
 all.yml中定义变量
 ```
-vim group_vars/all.yml
+# vim group_vars/all.yml
 ansible_user: 'vagrant'
 ansible_ssh_private_key_file: '/home/haibin/.vagrant.d/insecure_private_key'
 
@@ -497,6 +523,7 @@ apt_mirror: 'mirrors.aliyun.com'
 ```
 
 template文件
+---
 ```
 # cat /opt/src/redis.conf |grep ^bind
 bind {{ ansible_enp0s3.ipv4.address }}
