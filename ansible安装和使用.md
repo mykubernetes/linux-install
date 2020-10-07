@@ -817,6 +817,10 @@ handlers
 Playbook模板（jinja2）
 ---
 条件和循环
+- {% for i in EXPR %}...{% endfor%}
+
+判断
+- {% if EXPR %}...{% elif EXPR %}...{% endif%} 作为条件判断
 ```
 # cat test.yml 
 ---
@@ -850,6 +854,23 @@ Playbook模板（jinja2）
 {% endfor %}
 ```
 
+```
+# 判断
+{% if ansible_fqdn == "web01" %}
+	echo "123"
+{% elif ansible_fqdn == "web02" %}
+	echo "456"
+{% else %}
+	echo "789"
+{% endif %}
+
+#循环
+{% for i in range(1,10) %}
+     server 172.16.1.{{i}};
+{% endfor %}
+
+{# COMMENT #} 表示注释
+```
 管理Nginx配置文件
 ```
 # cat main.yml 
