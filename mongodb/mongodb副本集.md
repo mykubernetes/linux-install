@@ -147,7 +147,7 @@ goumin:PRIMARY> rs.status()
 			"_id" : 0,                                          # 节点标识符
 			"name" : "192.168.101.69:27017",                    # 节点名称
 			"health" : 1,                                       # 节点监控状态
-			"state" : 1,                                        # 有无状态信息
+			"state" : 1,                                        # 1为主节点，2为从节点
 			"stateStr" : "PRIMARY",                             # PRIMARY代表主节点
 			"uptime" : 281,                                     # 运行时间
 			"optime" : {                                        # oplog最后一次的操作时间戳
