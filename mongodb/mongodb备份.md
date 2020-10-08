@@ -103,3 +103,28 @@ mongodump -h 127.0.0.1 --port 27017 --oplog -o /root/bak
 同时，恢复时也要加上--oplogReplay参数，具体命令如下(下面是恢复单库的命令)：
 mongorestore -d swrd --oplogReplay /home/mongo/swrdbak/swrd/
 ```
+
+
+通过oplog恢复
+---
+
+```
+1、备份oplog日志
+mongodump -h 127.0.0.1 --port 27017 -d local -c oplog.rs -o /monggodb/oplog/
+
+2、把日志拷贝到之前全备份库中
+cp /monggodb/oplog/oplog.rs.bson /monggodb/backup/DB_NAME/
+
+3、修改名称
+mv oplog.rs.bson oplog.bson
+
+mongorestore -h 127.0.0.1 --port 27017 -d test --oplogReplay --oplogLimit "1563957100:3" /monggodb/backup/DB_NAME/
+```
+
+
+
+
+
+
+
+
