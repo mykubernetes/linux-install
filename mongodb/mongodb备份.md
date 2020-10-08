@@ -105,20 +105,29 @@ mongorestore -d swrd --oplogReplay /home/mongo/swrdbak/swrd/
 ```
 
 
-通过oplog恢复
+全量恢复加oplog恢复
 ---
 
 ```
-1、备份oplog日志
-mongodump -h 127.0.0.1 --port 27017 -d local -c oplog.rs -o /monggodb/oplog/
+1、全量备份,然后删除库
+mongodump --port27017 --oplog -o /monggodb/backup/
 
-2、把日志拷贝到之前全备份库中
-cp /monggodb/oplog/oplog.rs.bson /monggodb/backup/DB_NAME/
+2、查看删除数据库操作时间戳
+use local
+db.oplog.rs.find("op":"d").pretty()
 
-3、修改名称
-mv oplog.rs.bson oplog.bson
+2、备份oplog日志
+mongodump --port 27017 -d local -c oplog.rs -o /monggodb/backup/
 
-mongorestore -h 127.0.0.1 --port 27017 -d test --oplogReplay --oplogLimit "1563957100:3" /monggodb/backup/DB_NAME/
+3、把日志拷贝到之前全备份库中,并重命名
+cp /monggodb/backup/oplog.rs.bson ../oplog.bson
+
+4、删除local库
+cd ..
+rm -rf local/
+
+5、恢复
+mongorestore --port 27017 --oplogReplay --oplogLimit "1563957100:3" --drop /monggodb/backup/DB_NAME/
 ```
 
 
