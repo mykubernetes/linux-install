@@ -334,6 +334,7 @@ ansible 172.16.1.8 -m setup -a "filter=ansible_memtotal_mb" -i hosts
     "changed": false
 }
 
+ansible 172.16.1.8 -m setup -a "filter=ansible_default_ipv4"
 ```
 
 
