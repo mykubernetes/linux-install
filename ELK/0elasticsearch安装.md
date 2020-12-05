@@ -126,7 +126,7 @@ connect: {
 ```
 vi _site/app.js
 搜索localhost:9200
-this.base_uri = this.config.base_uri || this.prefs.get("app-base_uri") || "http://192.108.101.66:9200";
+this.base_uri = this.config.base_uri || this.prefs.get("app-base_uri") || "http://192.168.101.66:9200";
 ```
 
 4、Es配置,增加跨域的配置(需要重启es才能生效)
