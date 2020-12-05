@@ -172,10 +172,32 @@ curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_c
 创建操作可以使用POST，也可以使用PUT，区别在于POST是作用在一个集合资源之上的（/articles），而PUT操作是作用在一个具体资源之上的（/articles/123）比如说很多资源使用数据库自增主键作为标识信息，而创建的资源的标识信息到底是什么只能由服务端提供，这个时候就必须使用POST
 
 
+2、查询索引
+```
+根据id查询
+curl -XGET http://master:9200/test/user/1
 
+检索文档中的一部分，如果只需要显示指定字段
+curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
+查询指定索引库指定类型所有数据
+curl -XGET http://master:9200/test/user/_search?pretty
 
+根据条件进行查询name=john的
+curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty=true‘
+或者
+curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
+```
 
+3、DSL 查询  
+Domain Specific Language领域特定语言
+```
+新添加一个文档
+curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/4/_create -d '{"name":"qiqi","age":17}'
+
+DSL查询
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"qiqi"}}}'
+```
 
 
 
