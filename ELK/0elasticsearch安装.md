@@ -289,3 +289,19 @@ bulk一次最大处理多少数据量
 - 一般建议是1000-5000个文档，如果你的文档很大，可以适当减少队列，大小建议是5-15MB，默认不能超过100M，可以在es的配置文件中修改这个值http.max_content_length: 100mb.
 - https://www.elastic.co/guide/en/elasticsearch/reference/6.6/modules-http.html
 
+
+9、ES 版本控制  
+普通关系型数据库使用的是（悲观并发控制（PCC））当我们在修改一个数据前先锁定这一行，然后确保只有读取到数据的这个线程可以修改这一行数据.
+
+ES使用的是（乐观并发控制（OCC））ES不会阻止某一数据的访问，然而，如果基础数据在我们读取和写入的间隔中发生了变化，更新就会失败，这时候就由程序来决定如何处理这个冲突。它可以重新读取新数据来进行更新，又或者将这一情况直接反馈给用户。
+
+ES如何实现版本控制(使用es内部版本号)
+```
+首先得到需要修改的文档，获取版本(_version)号
+curl -XGET http://master:9200/test/user/2
+
+在执行更新操作的时候把版本号传过去
+curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/2?version=1 -d '{"name":"john","age":29}'
+curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/2/_update?version=2 -d'{"doc":{"age":30}}'
+如果传递的版本号和待更新的文档的版本号不一致，则会更新失败
+```
