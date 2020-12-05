@@ -216,4 +216,45 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mge
 如果所有的文档拥有相同的_index 以及_type，直接在请求中添加ids的数组即可。
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"ids":["1","2"]}'
 ```
-   
+
+5、HEAD 的使用  
+如果只想检查一下文档是否存在，可以使用HEAD来替代GET方法，这样就只会返回HTTP头文件
+```
+curl -i -XHEAD http://master:9200/test/user/1
+```
+
+6、ES 更新  
+ES可以使用PUT或者POST对文档进行更新(全部更新)，如果指定ID的文档已经存在，则执行更新操作  
+注意:执行更新操作的时候  
+- ES首先将旧的文档标记为删除状态
+- 然后添加新的文档
+- 旧的文档不会立即消失，但是你也无法访问
+- ES会在你继续添加更多数据的时候在后台清
+- 理已经标记为删除状态的文档
+
+局部更新，可以添加新字段或者更新已有字段（必须使用POST）
+```
+curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/1/_update -d '{"doc":{"name":"baby","age":27}}‘
+
+curl -XGET http://master:9200/test/user/1?pretty
+```
+
+7、ES 删除  
+删除操作
+```
+curl -XDELETE http://master:9200/test/user/1
+curl -XGET http://master:9200/test/user/1
+```
+如果文档存在，result属性值为deleted，_version属性的值+1
+
+如果文档不存在，result属性值为not_found，但是_version属性的值依然会+1，这个就是内部管理的一部分，它保证了我们在多个节点间的不同操作的顺序都被正确标记了
+
+注意：删除一个文档也不会立即生效，它只是被标记成已删除。Elasticsearch将会在你之后添加更多索引的时候才会在后台进行删除内容的清理。
+
+
+
+
+
+
+
+
