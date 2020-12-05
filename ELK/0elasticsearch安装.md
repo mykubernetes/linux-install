@@ -253,8 +253,39 @@ curl -XGET http://master:9200/test/user/1
 
 
 
+8、ES 批量操作-bulk  
+bulk API可以帮助我们同时执行多个请求
+```
+格式：
+action：index/create/update/delete
+metadata：_index,_type,_id
+request body：_source(删除操作不需要)
+{ action: { metadata }}
+{ request body }
+{ action: { metadata }}
+{ request body }
 
+create 和index的区别,如果数据存在，使用create操作失败，会提示文档已经存在，使用index则可以成功执行。
+```
 
+```
+使用文件的方式新建一个requests文件
+vi requests
+{"index":{"_index":"test","_type":"user","_id":"6"}}
+{"name":"mayun","age":51}
+{"update":{"_index":"test","_type":"user","_id":"6"}}
+{"doc":{"age":52}}
 
+执行批量操作
+curl -H "Content-Type: application/json" -XPOST http://master:9200/_bulk --data-binary @requests;
 
+curl -XGET http://master:9200/test/user/6?pretty
+```
+
+bulk请求可以在URL中声明/_index 或者/_index/_type.  
+bulk一次最大处理多少数据量
+- bulk会把将要处理的数据载入内存中，所以数据量是有限制的.
+- 最佳的数据量不是一个确定的数值，它取决于你的硬件，你的文档大小以及复杂性，你的索引以及搜索的负载.
+- 一般建议是1000-5000个文档，如果你的文档很大，可以适当减少队列，大小建议是5-15MB，默认不能超过100M，可以在es的配置文件中修改这个值http.max_content_length: 100mb.
+- https://www.elastic.co/guide/en/elasticsearch/reference/6.6/modules-http.html
 
