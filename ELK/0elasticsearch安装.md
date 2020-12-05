@@ -200,6 +200,20 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
 ```
 
 
+4、MGET 查询  
+使用mget API获取多个文档
+```
+先新建一个库
+curl -XPUT 'http://master:9200/test2/'
+curl -H "Content-Type: application/json" -XPOST http://master:9200/test2/user/1 -d '{"name" : "marry","age" : 16}'
 
+查询不同_index的数据
+curl -H "Content-Type: application/json" -XGET http://master:9200/_mget?pretty -d '{"docs":[{"_index":"test","_type":"user","_id":2,"_source":"name"},{"_index":"test2","_type":"user","_id":1}]}'
 
+如果需要的文档在同一个_index或者同一个_type中，可以在URL中指定一个默认的/_index或者/_index/_type。
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"docs":[{"_id":1},{"_id":2}]}‘
 
+如果所有的文档拥有相同的_index 以及_type，直接在请求中添加ids的数组即可。
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"ids":["1","2"]}'
+```
+   
