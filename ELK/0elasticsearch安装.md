@@ -90,3 +90,59 @@ $ cd /opt/module/elasticsearch-6.6.0/bin/
 5）查看集群详细信息  
 ``` curl 'node001:9200/_cluster/state?pretty' ```
 
+HEAD
+---
+1、安装head
+```
+安装运行环境
+yum install -y nodejs npm
+
+安装head
+yum -y install git
+git clone git://github.com/mobz/elasticsearch-head.git
+cd elasticsearch-head/
+npm install
+
+如果报错： node npm install Error: CERT_UNTRUSTED  ssl验证问题，使用下面的命令取消ssl验证即可解决
+npm config set strict-ssl false
+```
+
+2、配置head可以通过域名或者ip进行访问
+```
+vi Gruntfile.js
+connect: {
+        server: {
+                opentions: {
+                          prot: 9100,
+                          base: '.',
+                          keepalive: true,
+                          hostname: '*'            #增加hostname
+                 }
+         }
+}
+```
+
+3、配置head连接es
+```
+vi _site/app.js
+搜索localhost:9200
+this.base_uri = this.config.base_uri || this.prefs.get("app-base_uri") || "http://192.108.101.66:9200";
+```
+
+4、Es配置,增加跨域的配置(需要重启es才能生效)
+```
+修改elasticsearch.yml
+vi config/elasticsearch.yml
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+```
+
+5、启动head插件
+```
+cd node_modules/grunt/bin/
+./grunt server &
+netstat -ntlp
+```
+
+6、浏览器打开
+http://192.168.101.66:9100/
