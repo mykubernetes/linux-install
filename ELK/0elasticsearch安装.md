@@ -144,5 +144,5 @@ cd node_modules/grunt/bin/
 netstat -ntlp
 ```
 
-6、浏览器打开
+6、浏览器打开  
 http://192.168.101.66:9100/
