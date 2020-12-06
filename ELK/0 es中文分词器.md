@@ -91,6 +91,9 @@ curl -H 'Content-Type:application/json' -XGET http://master:9200/_analyze?pretty
 curl -H 'Content-Type:application/json' -XGET http://master:9200/_analyze?pretty -d '{"analyzer": "ik_max_word","text": "蓝瘦香菇"}'
 
 首先在ik插件的config/custom目录下创建一个文件test.dic，在文件中添加词语即可，每一个词语一行。
+mkdir config/custom
+vim config/custom/test.dic
+蓝瘦香菇
 
 修改ik的配置文件IKAnalyzer.cfg.xml将test.dic添加到ik的配置文件中即可
 vi config/IKAnalyzer.cfg.xml
@@ -107,8 +110,8 @@ curl -H 'Content-Type:application/json' -XGET http://master:9200/_analyze?pretty
 
 热更新IK 词库
 ---
-部署http服务，安装tomcat
 ```
+1、部署http服务，安装tomcat
 新建热词文件
 cd /home/hadoop/app/apache-tomcat-7.0.67/webapps/ROOT
 vi hot.dic
@@ -117,21 +120,19 @@ vi hot.dic
 需正常访问
 bin/startup.sh
 http://192.168.20.210:8080/hot.dic
-```
 
-修改ik插件的配置文件
-```
+
+2、修改ik插件的配置文件
 vi config/IKAnalyzer.cfg.xml
 添加如下内容
 <entry key="remote_ext_dict">http://192.168.20.210:8080/hot.dic</entry>
-分发修改后的配置到其他es节点
-```
+如果为集群需要分发修改后的配置到其他es节点
 
 重启es，可以看到加载热词库
 bin/elasticsearch
+```
 
-p 测试动态添加热词
-对比添加热词之前和之后的变化
+测试动态添加热词,对比添加热词之前和之后的变化
 ```
 curl -H 'Content-Type:application/json' -XGET http://master:9200/_analyze?pretty -d '{"analyzer": "ik_max_word", "text": "老司机"}'
 ```
