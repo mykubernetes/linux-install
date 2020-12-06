@@ -7,10 +7,20 @@ $ tar -zxf /opt/softwares/jdk-8u121-linux-x64.gz -C /opt/modules/
 # vi /etc/profile
 #JAVA_HOME
 export JAVA_HOME=/opt/modules/jdk1.8.0_121
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 export PATH=$PATH:$JAVA_HOME/bin
 # source /etc/profile
 ```
 
+时钟同步
+```
+设置本地时间
+cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+集群时间日期同步NTP
+yum install ntp
+ntpdate pool.ntp.org
+```
 二、安装elasticsearch  
 1下载elasticsearch  
 ```
