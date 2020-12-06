@@ -33,7 +33,10 @@ output.logstash:
   #loadbalance: true                        #多个输出的时候开启负载
 ```  
 3、启动filebeat  
-``` systemctl  restart filebeat ```  
+``` 
+systemctl  restart filebeat 
+nohup ./filebeat -c filebeat_console.yml >/dev/null 2>&1 &
+```  
 4、收集tomcat日志  
 ```
 #  grep -v "#"  /etc/filebeat/filebeat.yml | grep -v "^$"
