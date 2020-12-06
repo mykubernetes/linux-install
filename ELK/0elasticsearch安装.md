@@ -399,3 +399,15 @@ curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test6' -d'{"m
 # 操作已存在的索引（修改）：
 curl -H "Content-Type: application/json" -XPOST http://master:9200/test6/user/_mapping -d '{"properties":{"name":{"type":"text","analyzer":"ik_max_word"}}}'
 ```
+
+
+ES 索引模块- 停用词
+---
+有些词在文本中出现的频率非常高，但是对文本所携带的信息基本不产生影响，这样的词我们称之为停用词。
+```
+中文停用词
+https://www.ranks.nl/stopwords/chinese-stopwords
+
+英文停用词
+https://www.ranks.nl/stopwords
+```
