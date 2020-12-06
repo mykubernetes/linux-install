@@ -344,3 +344,28 @@ curl -H "Content-Type: application/json" -XPUT 'master:9200/test4/' -d'{"setting
 index.number_of_replicas: 1
 ```
 注意：主分片和副本不会存在一个节点中
+
+recovery
+---
+- 数据恢复或叫数据重新分布，es在有节点加入或退出时会根据机器的负载对索引分片进行重新分配，挂掉的节点重新启动时也会进行数据恢复。
+
+Gateway
+---
+- es索引的持久化存储方式，es默认是先把索引存放到内存中，当内存满了时再持久化到硬盘。当es集群关闭再重新启动时就会从gateway中读取索引数据。es支持多种类型的gateway，有本地文件系统（默认），分布式文件系统，Hadoop的HDFS和Amazon的s3云存储服务。
+
+Discovery.zen
+---
+代表es的自动发现节点机制，es是一个基于p2p的系统，它先通过广播寻找存在的节点，再通过多播协议来进行节点之间的通信，同时也支持点对点的交互。
+```
+如果是不同网段的节点如何组成es集群禁用自动发现机制
+discovery.zen.ping.multicast.enabled: false
+```
+
+```
+设置新节点被启动时能够发现的主节点列表
+discovery.zen.ping.unicast.hosts: ["192.168.20.210","192.168.20.211", "192.168.20.212"]
+```
+
+Transport
+---
+- es内部节点或集群与客户端的交互方式，默认内部是使用tcp协议进行交互，同时它支持http协议（json格式）、thrift、servlet、memcached、zeroMQ等的传输协议（通过插件方式集成）。
