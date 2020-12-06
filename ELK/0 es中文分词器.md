@@ -58,6 +58,7 @@ cp target/releases/elasticsearch-analysis-ik-*.zip 到 elasticsearch 插件目�
 unzip elasticsearch-analysis-ik-*.zip
 
 重启ElasticSearch服务
+bin/elasticsearch
 ```
 
 测试分词效果：
