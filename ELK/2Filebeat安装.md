@@ -21,10 +21,10 @@ filebeat.prospectors:
   document_type: system-log-node01          #和elasticsearch一样打标签
 output.redis:
   hosts: ["192.168.56.12:6379"]
-  key: "system-log-5612"  
-  db: 1
+  key: "system-log-5612"                    #redis的key名
+  db: 1                                     #库
   timeout: 5
-  password: 123456
+  password: 123456                          #redis密码
 output.logstash:
   hosts: ["192.168.56.11:5044"]             #logstash 服务器地址，可以是多个
   enabled: true                             #是否开启输出至logstash，默认即为true
