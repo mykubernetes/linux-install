@@ -9,7 +9,7 @@ tar -xvf kibana-6.6.0-linux-x86_64.tar.gz -C /opt/module/
 # vim /opt/module/kibana-6.6.0/kibana/kibana.yml
   server.port: 5601
   server.host: "0.0.0.0"
-  elasticsearch.hosts: "http://node001:9200"
+  elasticsearch.hosts: ["http://node001:9200"]
   logging.dest: /var/log/kibana.log
 ```  
 
