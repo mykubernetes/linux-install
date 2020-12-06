@@ -28,6 +28,8 @@ tar -xvf elasticsearch-6.6.0.tar.gz -C /opt/module/
 # vim /opt/module/elasticsearch-6.6.0/config/elasticsearch.yml
 cluster.name: my-elk                               #集群的名称
 node.name: my-test01                               #节点的名称
+path.data: /opt/module/elasticsearch-6.6.0/data    #数据路径
+path.logs: /opt/module/elasticsearch-6.6.0/datalog #日志路径
 node.master: true                                  #是否为master（主节点），true：是，false：不是
 node.data: true                                    #是否是数据节点，false：不是，true：是
 bootstrap.memory_lock: true                        #锁定物理内存，开启后只使用物理内存，不会使用swap,建议开启
@@ -35,6 +37,8 @@ http.port: 9200                                    #es端口
 transport.tcp.port: 9300                           #集群选举通信端口
 network.host: 192.168.101.66         #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]   #默认使用9300，如果修改可node001:9300
+discovery.zen.ping_timeout: 10s
+discovery.zen.minimum_master_nodes: 3
 ```  
 4、优化内核限制文件数和打开的进程数  
 ```
