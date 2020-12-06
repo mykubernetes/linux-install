@@ -337,8 +337,10 @@ es可以给索引分片设置副本，副本的作用：
 【副本的数量可以随时修改】
 ```
 可以在创建索引库的时候指定
-curl -H "Content-Type: application/json" -XPUT 'master:9200/test4/' -d'{"settings":{"number_of_replicas":3}}‘
+curl -H "Content-Type: application/json" -XPUT 'master:9200/test4/' -d'{"settings":{"number_of_replicas":3}}'
 ```
-默认是一个分片有1个副本 index.number_of_replicas: 1
-
+默认是一个分片有1个副本
+```
+index.number_of_replicas: 1
+```
 注意：主分片和副本不会存在一个节点中
