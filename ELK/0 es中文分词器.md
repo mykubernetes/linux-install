@@ -49,6 +49,22 @@ ES 索引模块- 集成IK 中文分词插件
 下载ES的IK插件
 https://github.com/medcl/elasticsearch-analysis-ik
 
+vim pom.xml
+    <properties>
+        <elasticsearch.version>7.4.0</elasticsearch.version>           #如果插件版本pom文件和下载的版本不一致需要修改，一致可忽略
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <elasticsearch.assembly.descriptor>${project.basedir}/src/main/assemblies/plugin.xml</elasticsearch.assembly.descriptor>
+        <elasticsearch.plugin.name>analysis-ik</elasticsearch.plugin.name>
+        <elasticsearch.plugin.classname>org.elasticsearch.plugin.analysis.ik.AnalysisIkPlugin</elasticsearch.plugin.classname>
+        <elasticsearch.plugin.jvm>true</elasticsearch.plugin.jvm>
+        <tests.rest.load_packaged>false</tests.rest.load_packaged>
+        <skip.unit.tests>true</skip.unit.tests>
+        <gpg.keyname>4E899B30</gpg.keyname>
+        <gpg.useagent>true</gpg.useagent>
+    </properties>
+
+
+
 使用maven对下载的插件进行源码编译（提前安装maven）
 mvn clean package -DskipTests
 
