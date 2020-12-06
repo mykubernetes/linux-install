@@ -334,7 +334,7 @@ Replicas
 es可以给索引分片设置副本，副本的作用：
 - 一是提高系统的容错性，当某个节点某个分片损坏或丢失时可以从副本中恢复。
 - 二是提高es的查询效率，es会自动对搜索请求进行负载均衡。
-【副本的数量可以随时修改】
+- 副本的数量可以随时修改
 ```
 可以在创建索引库的时候指定
 curl -H "Content-Type: application/json" -XPUT 'master:9200/test4/' -d'{"settings":{"number_of_replicas":3}}'
