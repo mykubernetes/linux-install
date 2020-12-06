@@ -369,3 +369,33 @@ discovery.zen.ping.unicast.hosts: ["192.168.20.210","192.168.20.211", "192.168.2
 Transport
 ---
 - es内部节点或集群与客户端的交互方式，默认内部是使用tcp协议进行交互，同时它支持http协议（json格式）、thrift、servlet、memcached、zeroMQ等的传输协议（通过插件方式集成）。
+
+settings
+---
+https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html  
+例如：分片数量，副本数量
+```
+查看
+curl -XGET http://master:9200/test/_settings?pretty
+
+# 操作不存在索引(创建)：
+curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test5/' -d'{"settings":{"number_of_shards":3,"number_of_replicas":2}}'
+
+# 操作已存在索引（修改）：
+curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test5/_settings' -d'{"index":{"number_of_replicas":1}}'
+```
+
+Mapping
+---
+https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+
+```
+# 查询索引库的mapping信息：
+curl -XGET http://master:9200/test/user/_mapping?pretty
+
+# 操作不存在的索引（创建）：
+curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test6' -d'{"mappings":{"user":{"properties":{"name":{"type":"text","analyzer": "ik_max_word"}}}}}'
+
+# 操作已存在的索引（修改）：
+curl -H "Content-Type: application/json" -XPOST http://master:9200/test6/user/_mapping -d '{"properties":{"name":{"type":"text","analyzer":"ik_max_word"}}}'
+```
