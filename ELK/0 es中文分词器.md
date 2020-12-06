@@ -1,5 +1,4 @@
-
-ES 索引模块- 停用词
+停用词
 ---
 有些词在文本中出现的频率非常高，但是对文本所携带的信息基本不产生影响，这样的词我们称之为停用词。
 ```
@@ -10,7 +9,7 @@ https://www.ranks.nl/stopwords/chinese-stopwords
 https://www.ranks.nl/stopwords
 ```
 
-ES 索引模块-中文分词器
+中文分词器
 ---
 ```
 单字分词：
@@ -25,7 +24,7 @@ ES 索引模块-中文分词器
 按某种算法构造词，然后去匹配已建好的词库集合，如果匹配到就切分出来成为词语。通常词库分词被认为是最理想的中文分词算法。
 ```
 
-ES 索引模块- 常见的中文分词器
+常见的中文分词器
 ---
 StandardAnalyzer(单字分词)
 - 能够根据空格、符号、数字、字母、E-mail地址、IP地址以及中文字符的分析处理分割原始的文本信息。但中文文字没有完成中文分词的功能，只是按照单个的汉字进行了分割。
@@ -41,7 +40,7 @@ IKAnalyzer(词库分词)
 curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '{"text":"我们是中国人"}'
 ```
 
-ES 索引模块- 集成IK 中文分词插件
+集成 IK 中文分词插件
 ---
 
 安装IK插件
@@ -83,7 +82,7 @@ curl -H 'Content-Type:application/json' -XGET http://master:9200/_analyze?pretty
 curl -H 'Content-Type:application/json' -XGET http://master:9200/_analyze?pretty -d '{"analyzer": "ik_smart", "text":"我们是中国人"}'
 ```
 
-ES 索引模块- 自定义IK 词库
+自定义IK 词库
 ---
 
 创建自定义词库
@@ -106,7 +105,7 @@ bin/elasticsearch
 curl -H 'Content-Type:application/json' -XGET http://master:9200/_analyze?pretty -d '{"analyzer": "ik_max_word","text": "蓝瘦香菇"}'
 ```
 
-ES 索引模块- 热更新IK 词库
+热更新IK 词库
 ---
 部署http服务，安装tomcat
 ```
