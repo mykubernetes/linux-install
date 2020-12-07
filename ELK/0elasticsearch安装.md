@@ -218,6 +218,28 @@ curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/4/_c
 
 DSL查询
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"qiqi"}}}'
+
+
+DSL查询男性，年龄大于30
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d '
+{
+   "query": {
+      "bool": {
+         "filter": {
+             "ranage": {
+                "age": {
+                   "gt": 30
+                }
+              }
+          },
+          "must": {
+             "match": {
+                "sex": "男"
+              }
+           }
+       }
+   }
+}'
 ```
 
 
