@@ -262,11 +262,21 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
    }
   
 }'
-
-
-
 ```
 
+聚合
+```
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
+{
+   "aggs": {
+      "all_interests": {
+         "terns": {
+             "field": "age"
+          }
+       }
+    }
+ }
+```
 
 4、MGET 查询  
 使用mget API获取多个文档
