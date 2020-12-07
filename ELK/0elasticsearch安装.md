@@ -246,6 +246,27 @@ DSL全文搜索 "张三" "李四"
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"张三 李四"}}}'
 ```
 
+高亮显示
+```
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
+{
+  "query": {
+    "match": {
+      "name": "张三 李四"
+    }
+  },
+  "highlight": {
+     "fields": {
+        "name": {}
+      }
+   }
+  
+}'
+
+
+
+```
+
 
 4、MGET 查询  
 使用mget API获取多个文档
