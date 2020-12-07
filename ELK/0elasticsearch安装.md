@@ -240,6 +240,10 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
        }
    }
 }'
+
+
+DSL全文搜索 "张三" "李四"
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"张三 李四"}}}'
 ```
 
 
