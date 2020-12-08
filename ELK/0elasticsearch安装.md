@@ -191,7 +191,8 @@ curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_c
 
 ```
 创建操作可以使用POST，也可以使用PUT，区别在于POST是作用在一个集合资源之上的（/articles），而PUT操作是作用在一个具体资源之上的（/articles/123）比如说很多资源使用数据库自增主键作为标识信息，而创建的资源的标识信息到底是什么只能由服务端提供，这个时候就必须使用POST
-
+- put请求必须带id,如果id不存在则为创建，如果id存在则为更新
+- post请求不用带id,如果id不存在则为创建，如果id存在则为更新
 
 2、查询索引
 ```
