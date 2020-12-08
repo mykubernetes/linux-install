@@ -14,9 +14,9 @@ curl -XGET localhost:9200/_cat
 /_cat/allocation
 /_cat/shards
 /_cat/shards/{index}
-/_cat/master
-/_cat/nodes
-/_cat/indices
+/_cat/master                  #查看住节点信息
+/_cat/nodes                   #查看所有节点
+/_cat/indices                 #查看所有索引 类似于数据库的show databases;
 /_cat/indices/{index}
 /_cat/segments
 /_cat/segments/{index}
@@ -24,7 +24,7 @@ curl -XGET localhost:9200/_cat
 /_cat/count/{index}
 /_cat/recovery
 /_cat/recovery/{index}
-/_cat/health
+/_cat/health                  #查看es健康状况
 /_cat/pending_tasks
 /_cat/aliases
 /_cat/aliases/{alias}
