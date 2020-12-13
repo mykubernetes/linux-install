@@ -27,7 +27,7 @@ filebeat.prospectors:
     - /usr/local/tomcat/logs/tomcat_access_log.*.log
   document_type: tomcat-accesslog-node01
 
-# 发送熬reddis
+# 发送到redis
 output.redis:
   hosts: ["192.168.56.12:6379"]
   key: "system-log-5612"                    #redis的key名
