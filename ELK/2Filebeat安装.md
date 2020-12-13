@@ -27,6 +27,10 @@ filebeat.prospectors:
     - /usr/local/tomcat/logs/tomcat_access_log.*.log
   document_type: tomcat-accesslog-node01
 
+# 发送到前台
+output.console
+  pretty: true
+
 # 发送到redis
 output.redis:
   hosts: ["192.168.56.12:6379"]
@@ -43,7 +47,7 @@ output.logstash:
   compression_level: 3                      #压缩级别
   loadbalance: true                         #多个输出的时候开启负载
 
-# 输出熬kafka
+# 发送到kafka
 output.kafka:
   enabled: true
   hosts: ["172.16.213.51:9092", "172.16.213.75:9092", "172.16.213.109:9092"]
@@ -61,6 +65,9 @@ logging.level: debug
 3、启动filebeat  
 ``` 
 systemctl  restart filebeat 
+
+./filebeat -h
+
 nohup ./filebeat -c filebeat_console.yml >/dev/null 2>&1 &
 ```  
 
