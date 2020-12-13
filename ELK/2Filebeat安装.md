@@ -12,6 +12,7 @@ yum install -y filebeat-6.6.1-x86_64.rpm
 2、修改配置文件
 ```
 # grep -v "#"  /etc/filebeat/filebeat.yml | grep -v "^$"
+# 收集系统日志
 filebeat.prospectors:
 - input_type: log
   paths:
@@ -19,56 +20,30 @@ filebeat.prospectors:
     - /var/log/*.log
   exclude_lines: ["^DBG","^$"]              #不收集的行                       
   document_type: system-log-node01          #和elasticsearch一样打标签
+
+# 收集tomat日志
+- input_type: log
+  paths:
+    - /usr/local/tomcat/logs/tomcat_access_log.*.log
+  document_type: tomcat-accesslog-node01
+
+# 发送熬reddis
 output.redis:
   hosts: ["192.168.56.12:6379"]
   key: "system-log-5612"                    #redis的key名
   db: 1                                     #库
   timeout: 5
   password: 123456                          #redis密码
+
+# 发送到logstash
 output.logstash:
   hosts: ["192.168.56.11:5044"]             #logstash 服务器地址，可以是多个
   enabled: true                             #是否开启输出至logstash，默认即为true
   worker: 1                                 #工作线程数
   compression_level: 3                      #压缩级别
-  #loadbalance: true                        #多个输出的时候开启负载
-```  
-3、启动filebeat  
-``` 
-systemctl  restart filebeat 
-nohup ./filebeat -c filebeat_console.yml >/dev/null 2>&1 &
-```  
-4、收集tomcat日志  
-```
-#  grep -v "#"  /etc/filebeat/filebeat.yml | grep -v "^$"
-filebeat.prospectors:
-- input_type: log
-  paths:
-    - /var/log/messages
-    - /var/log/*.log
-  exclude_lines: ["^DBG","^$"]
-  document_type: system-log-node01
-- input_type: log
-  paths:
-    - /usr/local/tomcat/logs/tomcat_access_log.*.log
-  document_type: tomcat-accesslog-node01
-output.logstash:
-  hosts: ["192.168.56.11:5044","192.168.56.11:5045"] #多个logstash服务器
-  enabled: true
-  worker: 1
-  compression_level: 3
-  loadbalance: true
-```  
-5、发送到kafka  
-```
-filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-   - /var/log/messages
-   - /var/log/secure
-  fields:
-    log_topic: osmessages
-name: "172.16.213.157"
+  loadbalance: true                         #多个输出的时候开启负载
+
+# 输出熬kafka
 output.kafka:
   enabled: true
   hosts: ["172.16.213.51:9092", "172.16.213.75:9092", "172.16.213.109:9092"]
@@ -82,3 +57,11 @@ output.kafka:
   max_message_bytes: 10000000
 logging.level: debug
 ```  
+
+3、启动filebeat  
+``` 
+systemctl  restart filebeat 
+nohup ./filebeat -c filebeat_console.yml >/dev/null 2>&1 &
+```  
+
+
