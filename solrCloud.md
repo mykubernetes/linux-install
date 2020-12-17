@@ -82,17 +82,66 @@ server.3=node03:2881:3881
 ```
 
 
-3、安装tomcat  
+3、部署三台tomcat  
 --- 
 ```
-5、安装tomcat
+1、部署tomcat
 # wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.92/bin/apache-tomcat-7.0.92.tar.gz
-# tar -zxvf  apache-tomcat-7.0.92.tar.gz  
-```  
+# tar -zxvf  apache-tomcat-7.0.92.tar.gz
 
+2、如果一台机器需要修改端口号，不同机器不用修改
+# cd taomcat
+# vim conf/server.xml
 
+3、启动
+# bin/startup.sh
+```
 
+4、部署solr
+```
+1、解压solr-4.10.3.tar.gz压缩包。复制solr.war到tomcat
+# tar xvf solr-4.10.3.tar.gz
 
+2、解压war包
+# cd solr-4.10.3/dist
+# jar xvf solr-4.10.3.war
+
+3、分别拷贝solr到tomcat中
+# cp solr -r tomcat/webapps/
+
+4、拷贝solrhome，修改每个web.xml指定solrhome的位置。
+# cp -r solrhome/ tomcat/webapps/solrcloud/solrhome
+# vim tomcat/webapps/solr/WEB-INF/web.xml
+ solrcloud/solrhome
+
+#组成集群
+
+5、把solrhome中的配置文件上传到zookeeper集群。使用zookeeper的客户端上传。
+# cd /root/solr-4.10.3/example/scripts/cloud-scripts
+# ./zkcli.sh -zkhost 192.168.101.66:2181,192.168.101.67:2181,192.168.101.68:2181 -cmd upconfig -confdir /usr/local/solrcloud/solrhome/collection1/conf -confname myconf
+
+6、修改solrhome下的solr.xml文件，指定当前实例运行的ip地址及端口号。
+vim /usr/local/solrcloud/solrhome1/solr.xml
+<solr>
+  <solrcloud>
+    <str name="host">${host:192.168.101.66}</str>             #ip地址
+    <int name="hostPort">${jetty.port:8083}</int>             #端口号
+    <str name="hostContext">${hostContext:solr}</str>
+    <int name="zkclientTimeout">${zkclientTimeout:30000}</int>
+    <bool name="genericCoreNodeNames">${genericCoreNodeNames:true}</bool>
+  </solrcloud>
+  
+7、修改每一台solr的tomcat 的 bin目录下catalina.sh文件中加入DzkHost指定zookeeper服务器地址
+# vim tomcat/bin/catalina.sh
+JAVA_OPTS="-DzkHost=192.168.101.66:2181,192.168.101.67:2182,192.168.101.68:2183"
+
+8、重启tomcat
+# zookeeper/bin/zkServer.sh stop
+# zookeeper/bin/zkServer.sh start
+# tomcat/bin/shutdown.sh
+# tomcat/bin/startup.sh
+
+```
 
 
 
@@ -132,23 +181,29 @@ solrCloud 管理
 创建collection：  
 ./zkcli.sh -cmd upconfig -zkhost 10.0.0.1:2181/solrcloud -confdir /apps/conf/solr/config-files-confname test_date  
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=CREATE&name=test_date&numShards=1&replicationFactor=3'  
+
 修改collection的配置信息：  
 写入ZK：  
 1. sh zkcli.sh -zkhost 10.0.0.1:2181/solrcloud -cmd upconfig -confdir /apps/conf/solr/config-files -confname collection1  
 2. reload conf： curl 'http://10.0.0.1:8080/solr/admin/collections?action=RELOAD&name=collection1'  
+
 删除collection  
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETE&name=test'  
 数据目录下只保留了目录，数据已经删除了。
+
 zk中的该collection的信息没有被删除。
 split shard  
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=SPLITSHARD&collection=name&shard=shardID'  
 delete inactive shard  
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETESHARD&shard1=shardID&collection=name'  
+
 给分片创建副本：  
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=ADDREPLICA&collection=collection&shard=shard&node=solr_node_name'  
 例如：curl 'http://10.0.0.1:8080/solr/admin/collections?action=ADDREPLICA&collection=test_shard&shard=shard1_0&node=10.0.0.2:8080_solr'  
+
 删除副本：  
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collection=collection&shard=shard&replica=replica'
+
 例如：curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collection=test_shard&shard=shard1_0&replica=core_node5'  
 Zookeeper维护的集群状态数据是存放在solr/data目录下的。  
 
