@@ -181,14 +181,14 @@ curl 'http://192.168.101.66:8080/solr/admin/collections?action=DELETESHARD&shard
 
 给分片创建副本
 ```
-curl 'http://10.0.0.1:8080/solr/admin/collections?action=ADDREPLICA&collection=collection&shard=shard&node=solr_node_name'  
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=ADDREPLICA&collection=collection&shard=shard&node=solr_node_name'  
 
-curl 'http://10.0.0.1:8080/solr/admin/collections?action=ADDREPLICA&collection=test_shard&shard=shard1_0&node=10.0.0.2:8080_solr'  
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=ADDREPLICA&collection=test_shard&shard=shard1_0&node=10.0.0.2:8080_solr'  
 ```
 
 删除副本
 ```
-curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collection=collection&shard=shard&replica=replica'
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=DELETEREPLICA&collection=collection&shard=shard&replica=replica'
 
-curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collection=test_shard&shard=shard1_0&replica=core_node5'  
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=DELETEREPLICA&collection=test_shard&shard=shard1_0&replica=core_node5'  
 ```
