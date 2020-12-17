@@ -98,6 +98,7 @@ server.3=node03:2881:3881
 ```
 
 4、部署solr
+---
 ```
 1、解压solr-4.10.3.tar.gz压缩包。复制solr.war到tomcat
 # tar xvf solr-4.10.3.tar.gz
@@ -140,70 +141,54 @@ JAVA_OPTS="-DzkHost=192.168.101.66:2181,192.168.101.67:2182,192.168.101.68:2183"
 # zookeeper/bin/zkServer.sh start
 # tomcat/bin/shutdown.sh
 # tomcat/bin/startup.sh
-
 ```
+可以通过web界面访问http://192.168.101.66:8080/solr/#/~cloud  
 
 
-
-
-
-
-1.	启动10.0.0.1上的tomcat，这时候，SolrCloud集群中只有一个活跃的节点，而且默认生成了一个collection1实例，可以通过web界面访问http://10.0.0.1:8080/solr  
-2.	启动其余4台服务器的tomcat，会在zookeeper集群中查看到当前所有的集群状态：   
-```
-[zk: solr-cloud-001:2181(CONNECTED) 1] ls /live_nodes
-[10.0.0.1:8080_solr, 10.0.0.2:8080_solr, 10.0.0.3:8080_solr, 10.0.0.4:8080_solr, 10.0.0.5:8080_solr]
-```  
-这时，已经存在5个active的节点了，但是SolrCloud集群并没有更多信息;  
-
-
-创建collection、Shard和replication  
+4、创建collection、Shard和replication
+---
 创建3个分片1个副本  
 ```
-curl 'http://10.0.0.2:8080/solr/admin/collections?action=CREATE&name=userinfo&numShards=3&replicationFactor=1'
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=CREATE&name=userinfo&numShards=3&replicationFactor=1'
 ```  
+
 创建5个分片3个副本  
 ```
-curl 'http://10.0.0.2:8080/solr/admin/collections?action=CREATE&name=userinfo&numShards=5&replicationFactor=3&maxShardsPerNode=3'
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=CREATE&name=userinfo&numShards=5&replicationFactor=3&maxShardsPerNode=3'
 ```  
 - name 待创建Collection的名称  
 - numShards 分片的数量  
 - replicationFactor 复制副本的数量  
 
-通过Web管理页面查看SolrCloud集群的分片信息  
-访问http://10.0.0.1:8080/solr/#/~cloud  
-
-
-
-
-solrCloud 管理
-----
-创建collection：  
-./zkcli.sh -cmd upconfig -zkhost 10.0.0.1:2181/solrcloud -confdir /apps/conf/solr/config-files-confname test_date  
-curl 'http://10.0.0.1:8080/solr/admin/collections?action=CREATE&name=test_date&numShards=1&replicationFactor=3'  
 
 修改collection的配置信息：  
-写入ZK：  
-1. sh zkcli.sh -zkhost 10.0.0.1:2181/solrcloud -cmd upconfig -confdir /apps/conf/solr/config-files -confname collection1  
-2. reload conf： curl 'http://10.0.0.1:8080/solr/admin/collections?action=RELOAD&name=collection1'  
+```
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=RELOAD&name=collection1'  
+```
 
-删除collection  
-curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETE&name=test'  
-数据目录下只保留了目录，数据已经删除了。
+删除collection,数据目录下只保留了目录，数据已经删除了。
+```
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=DELETE&name=test'  
+```
+
 
 zk中的该collection的信息没有被删除。
-split shard  
-curl 'http://10.0.0.1:8080/solr/admin/collections?action=SPLITSHARD&collection=name&shard=shardID'  
-delete inactive shard  
-curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETESHARD&shard1=shardID&collection=name'  
+```
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=SPLITSHARD&collection=name&shard=shardID'  
 
-给分片创建副本：  
+curl 'http://192.168.101.66:8080/solr/admin/collections?action=DELETESHARD&shard1=shardID&collection=name'  
+```
+
+给分片创建副本
+```
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=ADDREPLICA&collection=collection&shard=shard&node=solr_node_name'  
-例如：curl 'http://10.0.0.1:8080/solr/admin/collections?action=ADDREPLICA&collection=test_shard&shard=shard1_0&node=10.0.0.2:8080_solr'  
 
-删除副本：  
+curl 'http://10.0.0.1:8080/solr/admin/collections?action=ADDREPLICA&collection=test_shard&shard=shard1_0&node=10.0.0.2:8080_solr'  
+```
+
+删除副本
+```
 curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collection=collection&shard=shard&replica=replica'
 
-例如：curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collection=test_shard&shard=shard1_0&replica=core_node5'  
-Zookeeper维护的集群状态数据是存放在solr/data目录下的。  
-
+curl 'http://10.0.0.1:8080/solr/admin/collections?action=DELETEREPLICA&collection=test_shard&shard=shard1_0&replica=core_node5'  
+```
