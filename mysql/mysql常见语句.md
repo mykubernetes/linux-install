@@ -82,6 +82,9 @@ truncat T2；
 
 查询操作
 ```
+#去重
+select DISTINCT id from T1;
+
 #交叉连接
 select s.Name as stuName,c.Class as claName from students as s,classes as c where s.ClassID=c.ClassID;
 
@@ -97,7 +100,7 @@ select s.Name,c.class from students as s RIGHT JOIN classes as c ON s.classID=c.
 select s.Name,t.Name from students as s,students as t where s.teacherID=t.StuID;
 
 #联合查询 将第一个表和第二个表合一起
-select Name,Age from students union select Name,Age from teachers;  
+select Name,Age from students UNION select Name,Age from teachers;  
 
 #子查询
 select Name,Age from students where Age>(select avg(Age) from students); 
