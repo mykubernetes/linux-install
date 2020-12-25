@@ -24,6 +24,9 @@ show databases;
 #查看登陆的用户
 show processlist;
 
+#查看表结构
+desc T1;
+
 查看警告
 show warning;
 
