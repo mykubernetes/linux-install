@@ -94,3 +94,11 @@ select VERSION();
 select DATABEAS();
 select USER90;
 ```
+
+流程控制函数
+---
+```
+#1、if 函数： if else 的效果 
+select IF(10<5,'大','小');
+select last_name,commission_pct,IF(commission_pct IS NULL,'没奖金','有奖金') as 备注 FROM employess;
+```
