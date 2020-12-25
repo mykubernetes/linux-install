@@ -172,6 +172,10 @@ select * FROM employees WHERE NOT(department_id<90 AND department_id>110) OR sal
 #模糊查询，不适用比较符合,%代表任意多个字符,_代码任意单个字符
 select * FROM employees WHERE last_name LIKE '%li%';
 
+#模糊查询，查找第二个字符为_的员工名，转义字符\和转义表达式ESCAPE 自定义转义字符
+select last_name FROM employees WHERE last_name LIKE '_\_%';
+select last_name FROM employees WHERE last_name LIKE '_$_%' ESCAPE '$';
+
 #区间检索：between...and
 select name,yuwen from T1 where yuwen between 59 and 99;
 
