@@ -192,7 +192,7 @@ select * FROM employees WHERE commission_pct IS NOT NULL;
 
 #排序:order by
 select * from T1 order by yuwen; 从小到大
-select * from T1 order by yuwen desc; 从大到小
+select * from T1 order by yuwen desc; 从大到小,默认asc不用输入 
 select * from T1 order by yuwen desc limit 3; 打印前三行
 select *,yuwen+shuxue+yingyu as total T1 order by total; 总分
 
