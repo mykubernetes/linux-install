@@ -160,10 +160,14 @@ select name,shuxue+yuwen+yinyu as zongfen from T1;
 
 #比较运算： > , < , >= , <= , !=, =
 
-#逻辑运算：与&& 或|| 非 not 
+#逻辑运算：&& ||  !
+and or not
 
 #条件检索： where
-select name from T1 where yuwen=100;
+select name FROM T1 where yuwen=100;
+select * FROM employees WHERE salary>=12000 AND salary<=20000;
+select * FROM employees WHERE department_id<90 OR department_id>110 OR salary>15000;
+select * FROM employees WHERE NOT(department_id<90 AND department_id>110) OR salary>15000;
 
 #区间检索：between...and
 select name,yuwen from T1 where yuwen between 59 and 99;
