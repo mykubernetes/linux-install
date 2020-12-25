@@ -58,6 +58,9 @@ create database DB1;
 #删除数据库
 drop database DB1;
 
+#清除表数据
+truncate tablev T1
+
 #创建表
 create table T1 (id int(5) not null,name char(10) );
 
