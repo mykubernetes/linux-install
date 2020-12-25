@@ -27,6 +27,9 @@ show processlist;
 #查看表结构
 desc T1;
 
+#查看当前mysql的版本号
+select version();
+
 查看警告
 show warning;
 
