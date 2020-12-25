@@ -158,7 +158,7 @@ alter table 表名 drop 列名
 #at 别名
 select name,shuxue+yuwen+yinyu as zongfen from T1;
 
-#比较运算： > , < , >= , <= , !=
+#比较运算： > , < , >= , <= , !=, =
 
 #逻辑运算：与&& 或|| 非 not
 
