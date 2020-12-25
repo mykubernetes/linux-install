@@ -163,6 +163,7 @@ select name,shuxue+yuwen+yinyu as zongfen from T1;
 #逻辑运算：&& ||  !
 and or not
 
+
 #条件检索： where
 select name FROM T1 WHERE yuwen=100;
 select * FROM employees WHERE salary>=12000 AND salary<=20000;
@@ -178,6 +179,16 @@ select last_name FROM employees WHERE last_name LIKE '_$_%' ESCAPE '$';
 
 #区间检索：between...and
 select name,yuwen from T1 where yuwen between 59 and 99;
+
+#IN语句,判断某字段的值是否属于in列表中的某一项
+select last_name,job_id FROM employees WHERE job_id IN ('IT_PROT','AD_VP','ADPRESS');
+
+#is null 判断值为空值时使用
+select * FROM employees WHERE commission_pct IS NULL;
+
+#is not null 判断值不为空值时使用
+select * FROM employees WHERE commission_pct IS NOT NULL;
+
 
 #排序:order by
 select * from T1 order by yuwen; 从小到大
