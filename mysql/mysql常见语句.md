@@ -164,10 +164,13 @@ select name,shuxue+yuwen+yinyu as zongfen from T1;
 and or not
 
 #条件检索： where
-select name FROM T1 where yuwen=100;
+select name FROM T1 WHERE yuwen=100;
 select * FROM employees WHERE salary>=12000 AND salary<=20000;
 select * FROM employees WHERE department_id<90 OR department_id>110 OR salary>15000;
 select * FROM employees WHERE NOT(department_id<90 AND department_id>110) OR salary>15000;
+
+#模糊查询，不适用比较符合,%代表任意多个字符,_代码任意单个字符
+select * FROM employees WHERE last_name LIKE '%li%';
 
 #区间检索：between...and
 select name,yuwen from T1 where yuwen between 59 and 99;
