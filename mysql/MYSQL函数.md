@@ -102,3 +102,25 @@ select USER90;
 select IF(10<5,'大','小');
 select last_name,commission_pct,IF(commission_pct IS NULL,'没奖金','有奖金') as 备注 FROM employess;
 ```
+
+```
+SELECT salary as 原始工资,department_id,
+CASE department_id
+WHEN 30 THEN salary*1.1
+WHEN 40 THEN salary*1.2
+WHEN 50 THEN salary*1.3
+ELSE salary
+END AS 新工资
+FROM employees;
+```
+
+```
+SELECT salary,
+CASE
+WHEN salary>20000 THEN 'A'
+WHEN salary>15000 THEN 'B'
+WHEN salary>10000 THEN 'C'
+ELSE 'D'
+END AS 工资级别
+FROM employees;
+```
