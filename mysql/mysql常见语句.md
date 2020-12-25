@@ -101,6 +101,7 @@ select DISTINCT id from T1;
 
 #查询的结果做拼接
 select CONCAT(last_name,firest_name) AS 姓名 from employees;
+select CONCAT(last_name,'_',firest_name) AS 姓名 from employees;      #指定分隔符
 
 #交叉连接
 select s.Name as stuName,c.Class as claName from students as s,classes as c where s.ClassID=c.ClassID;
