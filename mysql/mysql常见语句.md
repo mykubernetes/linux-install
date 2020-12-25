@@ -155,12 +155,12 @@ alter table 表名 drop 列名
 ```
 #数据运算：+ - * / % 加 减 乘 除 余数
 
-#at 别名
+#at 别名,+号做数值运算
 select name,shuxue+yuwen+yinyu as zongfen from T1;
 
 #比较运算： > , < , >= , <= , !=, =
 
-#逻辑运算：与&& 或|| 非 not
+#逻辑运算：与&& 或|| 非 not 
 
 #条件检索： where
 select name from T1 where yuwen=100;
