@@ -99,9 +99,13 @@ truncat T2；
 #去重
 select DISTINCT id from T1;
 
-#查询的结果做拼接
+#查询的结果做拼接，若拼接的字段中有NULL则显示为NULL
 select CONCAT(last_name,firest_name) AS 姓名 from employees;
 select CONCAT(last_name,'_',firest_name) AS 姓名 from employees;      #指定分隔符
+
+#判断如果结果为NULL则显示为自定义的值（commission_pct为空显示为0）
+select IFNULL(commission_pct,0) AS 奖金,commission_pct FROM employees;
+
 
 #交叉连接
 select s.Name as stuName,c.Class as claName from students as s,classes as c where s.ClassID=c.ClassID;
