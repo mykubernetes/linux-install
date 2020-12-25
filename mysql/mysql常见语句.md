@@ -99,6 +99,9 @@ truncat T2；
 #去重
 select DISTINCT id from T1;
 
+#查询的结果做连接
+select CONCAT(last_name,firest_name) AS 姓名 from employees;
+
 #交叉连接
 select s.Name as stuName,c.Class as claName from students as s,classes as c where s.ClassID=c.ClassID;
 
