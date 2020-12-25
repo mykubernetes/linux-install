@@ -170,6 +170,7 @@ select * FROM employees WHERE salary>=12000 AND salary<=20000;
 select * FROM employees WHERE department_id<90 OR department_id>110 OR salary>15000;
 select * FROM employees WHERE NOT(department_id<90 AND department_id>110) OR salary>15000;
 
+
 #模糊查询，不适用比较符合,%代表任意多个字符,_代码任意单个字符
 select * FROM employees WHERE last_name LIKE '%li%';
 
@@ -177,11 +178,13 @@ select * FROM employees WHERE last_name LIKE '%li%';
 select last_name FROM employees WHERE last_name LIKE '_\_%';
 select last_name FROM employees WHERE last_name LIKE '_$_%' ESCAPE '$';
 
+
 #区间检索：between...and
 select name,yuwen from T1 where yuwen between 59 and 99;
 
 #IN语句,判断某字段的值是否属于in列表中的某一项
 select last_name,job_id FROM employees WHERE job_id IN ('IT_PROT','AD_VP','ADPRESS');
+
 
 #is null 判断值为空值时使用
 select * FROM employees WHERE commission_pct IS NULL;
@@ -195,6 +198,8 @@ select * from T1 order by yuwen; 从小到大
 select * from T1 order by yuwen desc; 从大到小,默认asc不用输入 
 select * from T1 order by yuwen desc limit 3; 打印前三行
 select *,yuwen+shuxue+yingyu as total T1 order by total; 总分
+select LENGTH(last_name) as a FROM employees ORDER BY a DESC;
+
 
 #分组:group by
 update T1 set class=1 where id=1 || id=3;
