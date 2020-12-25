@@ -277,3 +277,45 @@ Thanks for using MySQL!
 - 删除test库和对test库的访问权限
 - 刷新授权表使修改生效
 
+
+
+MySQL批量SQL插入性能优化
+---
+1、一条SQL语句插入多条数据
+
+常用的插入语句如：
+```
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0', 'userid_0', 'content_0', 0);
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('1', 'userid_1', 'content_1', 1);
+```
+修改成：
+```
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0', 'userid_0', 'content_0', 0), ('1', 'userid_1', 'content_1', 1);
+```
+- 降低日志刷盘的数据量和频率，从而提高效率。通过合并SQL语句，同时也能减少SQL语句解析的次数，减少网络传输的IO。
+
+2、在事务中进行插入处理  
+把插入修改成：
+```
+START TRANSACTION;
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0', 'userid_0', 'content_0', 0);
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('1', 'userid_1', 'content_1', 1);
+...
+COMMIT;
+```
+
+3、数据有序插入
+
+数据有序的插入是指插入记录在主键上是有序排列，例如datetime是记录的主键：
+```
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('1', 'userid_1', 'content_1', 1);
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0', 'userid_0', 'content_0', 0);
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('2', 'userid_2', 'content_2',2);
+```
+修改成：
+```
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0', 'userid_0', 'content_0', 0);
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('1', 'userid_1', 'content_1', 1);
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('2', 'userid_2', 'content_2',2);
+```
+- 由于数据库插入时，需要维护索引数据，无序的记录会增大维护索引的成本
