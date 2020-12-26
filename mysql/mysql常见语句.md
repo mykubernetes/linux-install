@@ -100,6 +100,8 @@ truncat T2；
 - sum和avg 只能适应于数值型
 - max和mix 可以适应于数值型和字符型，以及日期型
 - count 只记录非NUlL的个数
+- NULL+任何数值都为NULL
+- SUM、AVG、MAX、MIN、COUNT函数都忽略NULL
 
 ```
 #去重
