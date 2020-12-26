@@ -155,13 +155,16 @@ select s.Name,c.class from students as s RIGHT JOIN classes as c ON s.classID=c.
 select s.Name,c.class from students as s FULL JOIN classes as c ON s.classID=c.ClassId;
 
 
-#联合查询 将第一个表和第二个表合一起
+#####################################################
+联合查询 将第一个表和第二个表合一起
 select Name,Age from students UNION select Name,Age from teachers;  
 
+
+########################子查询########################
 #子查询
 select Name,Age from students where Age>(select avg(Age) from students); 
 
-子查询 用于IN中
+#子查询 用于IN中
 select Name,Age from students where Age IN (select Age from teachers); 
 
 自查询 用于from中
