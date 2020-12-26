@@ -56,9 +56,9 @@ select * from T2;
 create database DB1;
 CREATE DATABASE IF NOT EXISTS books;    #如果不存在就创建
 
-
 #删除数据库
 drop database DB1;
+DROP DATABASE IF EXISTS DB1;        #如果存在就删除
 
 #清除表数据
 truncate tablev T1
@@ -87,8 +87,12 @@ use DB1；
 #删除表
 delete from T1；
 
-删除表（打碎表后再创建新表）
+#删除表（打碎表后再创建新表）
 truncat T2； 
+
+#修改库的字符集
+ALTER DATABASE books CHARACTER SET utf8;
+
 ```
 
 查询操作
