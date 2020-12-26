@@ -161,11 +161,22 @@ select Name,Age from students UNION select Name,Age from teachers;
 
 
 ########################子查询########################
-#子查询
+#1、子查询
 select Name,Age from students where Age>(select avg(Age) from students); 
 
-#子查询 用于IN中
+2、子查询中的多行查询
+#1）子查询 用于IN中
 select Name,Age from students where Age IN (select Age from teachers); 
+select Name,Age from students where Age NOT IN (select Age from teachers); 
+
+#2）子查询 (ANY/SOME 和子查询返回的某一个值比较）any和some意思一样
+select last_name,employee_id,job_id,salary FROM employees WHERE salary<ANY(select DISTINCT salary FROM employees WHERE job_id = 'IT_PROG');
+
+
+#3）子查询 (ALL 和子查询返回的所有值比较)
+select last_name,employee_id,job_id,salary FROM employees WHERE salary<ALL(select DISTINCT salary FROM employees WHERE job_id = 'IT_PROG');
+
+
 
 自查询 用于from中
 select s.aage,s.ClassID from (select avg(Age) as aage,ClassID from students where ClassID is not null group by ClassID) as s where s.aage>30;
