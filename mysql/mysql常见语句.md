@@ -123,6 +123,7 @@ select 查询列表 from 表1 别名,表2 别名 where 表1.key=表2.key [and �
 select s.Name as stuName,c.Class as claName from students as s,classes as c where s.ClassID=c.ClassID;
 最新写法：
 select s.Name as stuName,c.Class as claName from students as s INNER JOIN classes as c ON s.ClassID=c.ClassID;
+SELECT city,COUNT(*) FROM departments d INNER JOIN locations l ON d.`location_id`=l.`localion_id` GROUP BY HAVING COUNT(*)>3;
 
 select s.Name as StuName,t.Name as TeaName from students as s,teachers as t where s.teacherID=t.TID;
 
