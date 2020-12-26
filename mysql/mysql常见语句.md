@@ -176,9 +176,10 @@ select last_name,employee_id,job_id,salary FROM employees WHERE salary<ANY(selec
 #3）子查询 (ALL 和子查询返回的所有值比较)
 select last_name,employee_id,job_id,salary FROM employees WHERE salary<ALL(select DISTINCT salary FROM employees WHERE job_id = 'IT_PROG');
 
+#4、select后面
+SELECT d.*,(SELECT COUNT(*) FROM employees e WHERE e.department_id = d.`department_id`) 个数 FROM departments d;
 
-
-自查询 用于from中
+#5、子查询 用于from中
 select s.aage,s.ClassID from (select avg(Age) as aage,ClassID from students where ClassID is not null group by ClassID) as s where s.aage>30;
 ```
 
