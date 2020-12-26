@@ -66,8 +66,12 @@ create table T1 (id int(5) not null,name char(10) );
 
 #插入值
 insert into mysql.user(Host,User,Password) values("localhost","test",password("1234"));
+insert into mysql.user values("localhost","test",password("1234"));   #可以不写字段，但是得写全values
+
 
 insert into user set Host=192.168.1.1,User=admin,Password=password("1234");
+
+insert into user SELECT 192.168.1.1,app,123;   #支持子查询的插入方式
 
 #更新数据
 update TABLE set user="user1" where user="user1";
