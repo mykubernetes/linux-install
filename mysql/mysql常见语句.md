@@ -211,6 +211,7 @@ select LENGTH(last_name) as a FROM employees ORDER BY a DESC;
 
 
 #分组:group by
+select 分组函数，分组后的字段 from 表 [where 筛选条件] group by 分组的字段 [having 分组后的筛选] [order by 排序列表]
 update T1 set class=1 where id=1 || id=3;
 update T1 set class=2 where id=2 or id=4;
 select class,count(class) from T1; 没有分组信息
@@ -218,6 +219,12 @@ select class,count(class) from T1 group by class; 显示分组信息
 #使用group by的时候不能用where 使用having 替换
 select class，count（class） from T1 group by class where count（class）>=2; 不可以
 select class，count（class） from T1 group by class having count（class）>=2; 可以
+
+			      使用关键字		筛选的表	        位置
+分组前筛选   where			  原始表		         group by的前面
+分组后筛选	  having		  分组后的结果	    group by 的后面
+
+
 
 #统计函数:count sum avg max min
 select avg（shuxue） from T1；
