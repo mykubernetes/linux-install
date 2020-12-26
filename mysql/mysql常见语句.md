@@ -155,8 +155,8 @@ select s.Name,c.class from students as s RIGHT JOIN classes as c ON s.classID=c.
 select s.Name,c.class from students as s FULL JOIN classes as c ON s.classID=c.ClassId;
 
 
-#####################################################
-联合查询 将第一个表和第二个表合一起
+###################联合查询###########################
+#1、联合查询 将第一个表和第二个表合一起
 select Name,Age from students UNION select Name,Age from teachers;  
 
 
