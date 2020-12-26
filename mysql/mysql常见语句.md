@@ -97,6 +97,9 @@ truncat T2；
 最大：select max(field1) as maxvalue from table1
 最小：select min(field1) as minvalue from table1
 ```
+- sum和avg 只能适应于数值型
+- max和mix 可以适应于数值型和字符型，以及日期型
+- count 只记录非NUlL的个数
 
 ```
 #去重
