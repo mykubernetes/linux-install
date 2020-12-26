@@ -121,6 +121,8 @@ select IFNULL(commission_pct,0) AS 奖金,commission_pct FROM employees;
 select 查询列表 from 表1 别名,表2 别名 where 表1.key=表2.key [and 筛选条件] [group by 分组字段] [having 分组后的筛选] [order by 排序字段]
 
 select s.Name as stuName,c.Class as claName from students as s,classes as c where s.ClassID=c.ClassID;
+最新写法：
+select s.Name as stuName,c.Class as claName from students as s INNER JOIN classes as c ON s.ClassID=c.ClassID;
 
 select s.Name as StuName,t.Name as TeaName from students as s,teachers as t where s.teacherID=t.TID;
 
