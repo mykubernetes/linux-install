@@ -115,11 +115,28 @@ select CONCAT(last_name,'_',firest_name) AS 姓名 from employees;      #指定�
 #判断如果结果为NULL则显示为自定义的值（commission_pct为空显示为0）
 select IFNULL(commission_pct,0) AS 奖金,commission_pct FROM employees;
 
+########################内连接########################
 
-#交叉连接
+#1、等值连接，和不同表的连接
+select 查询列表 from 表1 别名,表2 别名 where 表1.key=表2.key [and 筛选条件] [group by 分组字段] [having 分组后的筛选] [order by 排序字段]
+
 select s.Name as stuName,c.Class as claName from students as s,classes as c where s.ClassID=c.ClassID;
 
 select s.Name as StuName,t.Name as TeaName from students as s,teachers as t where s.teacherID=t.TID;
+
+
+#2、非等值连接，和不同表的连接
+select 查询列表 from 表1 别名,表2 别名 where 非等值的连接条件 [and 筛选条件] [group by 分组字段] [having 分组后的筛选] [order by 排序字段]
+
+SELECT  salary,grade_level FROM employees e,job_grades g WHERE salary BETWEEN g.`lowest_sal` AND g.`highest_sal` AND g.`grade_level`='A';
+
+
+#3、自连接,自己的表和自己的表连接
+select 查询列表 from 表 别名1,表 别名2 where 等值的连接条件 [and 筛选条件] [group by 分组字段] [having 分组后的筛选] [order by 排序字段
+
+select s.Name,t.Name from students as s,students as t where s.teacherID=t.StuID;
+
+########################外连接########################
 
 #左外连接  左边有的右边没有留空
 select s.Name,c.class from students as s LEFT JOIN classes as c ON s.classID=c.ClassId;
@@ -127,8 +144,7 @@ select s.Name,c.class from students as s LEFT JOIN classes as c ON s.classID=c.C
 #右外连接  右边有的左边没有左边留空
 select s.Name,c.class from students as s RIGHT JOIN classes as c ON s.classID=c.ClassId;
 
-#自连接
-select s.Name,t.Name from students as s,students as t where s.teacherID=t.StuID;
+
 
 #联合查询 将第一个表和第二个表合一起
 select Name,Age from students UNION select Name,Age from teachers;  
