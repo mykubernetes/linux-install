@@ -6,6 +6,12 @@ YUM或APT安装或更新MySQL是最方面的方法。
 https://dev.mysql.com/downloads/repo/yum/  
 https://dev.mysql.com/doc/mysql-yum-repo-quick-guide/en/  
 
+- DQL 查询语言select
+- DML 数据操作语音insert、update、delete
+- DDL 数据库操作
+- TCL 事务
+
+
 ```
 # rpm -Uvh mysql57-community-release-el7-11.noarch.rpm
 ```
