@@ -54,6 +54,8 @@ select * from T2;
 ```
 #创建数据库
 create database DB1;
+CREATE DATABASE IF NOT EXISTS books;    #如果不存在就创建
+
 
 #删除数据库
 drop database DB1;
