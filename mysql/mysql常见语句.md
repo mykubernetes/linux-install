@@ -181,6 +181,10 @@ SELECT d.*,(SELECT COUNT(*) FROM employees e WHERE e.department_id = d.`departme
 
 #5、子查询 用于from中
 select s.aage,s.ClassID from (select avg(Age) as aage,ClassID from students where ClassID is not null group by ClassID) as s where s.aage>30;
+
+#5、exists后面,结果只有1或者0，有值则为1，无值则为0
+select EXISTS(SELECT employee_id FROM employees);
+
 ```
 
 表结构修改
