@@ -219,7 +219,7 @@ select class,count(class) from T1 group by class; 显示分组信息
 #使用group by的时候不能用where 使用having 替换
 select class，count（class） from T1 group by class where count（class）>=2; 不可以
 select class，count（class） from T1 group by class having count（class）>=2; 可以
-
+select MAX(salary),job_id FROM employees WHERE commission_pct IS NOT NOLL GROUP BY job_id HAVING MAX(salary) > 12000;
 	     使用关键字     筛选的表           位置
 分组前筛选    where         原始表             group by的前面
 分组后筛选    having        分组后的结果        group by 的后面
