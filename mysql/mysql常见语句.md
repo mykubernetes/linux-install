@@ -121,7 +121,7 @@ select IFNULL(commission_pct,0) AS 奖金,commission_pct FROM employees;
 select 查询列表 from 表1 别名,表2 别名 where 表1.key=表2.key [and 筛选条件] [group by 分组字段] [having 分组后的筛选] [order by 排序字段]
 
 select s.Name as stuName,c.Class as claName from students as s,classes as c where s.ClassID=c.ClassID;
-sql99写法：
+sql99写法：INNER JOIN可以简写为JOIN
 select s.Name as stuName,c.Class as claName from students as s INNER JOIN classes as c ON s.ClassID=c.ClassID;
 SELECT city,COUNT(*) FROM departments d INNER JOIN locations l ON d.`location_id`=l.`localion_id` GROUP BY HAVING COUNT(*)>3;
 
@@ -132,13 +132,16 @@ select s.Name as StuName,t.Name as TeaName from students as s,teachers as t wher
 select 查询列表 from 表1 别名,表2 别名 where 非等值的连接条件 [and 筛选条件] [group by 分组字段] [having 分组后的筛选] [order by 排序字段]
 
 SELECT  salary,grade_level FROM employees e,job_grades g WHERE salary BETWEEN g.`lowest_sal` AND g.`highest_sal` AND g.`grade_level`='A';
-sql99写法：
+sql99写法：INNER JOIN可以简写为JOIN
 SELECT salary,grade_level FROM employess e JOIN job_grades g ON e.`salary` BETWEEN g.`lowest_sal` AND g.`highest_sal`;
 
 #3、自连接,自己的表和自己的表连接
 select 查询列表 from 表 别名1,表 别名2 where 等值的连接条件 [and 筛选条件] [group by 分组字段] [having 分组后的筛选] [order by 排序字段
 
 select s.Name,t.Name from students as s,students as t where s.teacherID=t.StuID;
+sql99写法：INNER JOIN可以简写为JOIN
+select s.Name,t.Name from students as s JOIN students as t ON s.teacherID=t.StuID;
+
 
 ########################外连接########################
 
