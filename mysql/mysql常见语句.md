@@ -96,6 +96,7 @@ truncat T2；
 平均：select avg(field1) as avgvalue from table1
 最大：select max(field1) as maxvalue from table1
 最小：select min(field1) as minvalue from table1
+去重后求和 select sum(distinct fieldl) from table1
 ```
 - sum和avg 只能适应于数值型
 - max和mix 可以适应于数值型和字符型，以及日期型
