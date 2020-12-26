@@ -220,9 +220,9 @@ select class,count(class) from T1 group by class; 显示分组信息
 select class，count（class） from T1 group by class where count（class）>=2; 不可以
 select class，count（class） from T1 group by class having count（class）>=2; 可以
 
-			      使用关键字		筛选的表	        位置
-分组前筛选   where			  原始表		         group by的前面
-分组后筛选	  having		  分组后的结果	    group by 的后面
+	     使用关键字     筛选的表           位置
+分组前筛选    where         原始表             group by的前面
+分组后筛选    having        分组后的结果        group by 的后面
 
 
 
