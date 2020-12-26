@@ -145,12 +145,14 @@ select s.Name,t.Name from students as s JOIN students as t ON s.teacherID=t.StuI
 
 ########################外连接########################
 
-#左外连接  左边有的右边没有留空
+#1、左外连接  左边有的右边没有留空'LEFT OUTER JOIN'可简写
 select s.Name,c.class from students as s LEFT JOIN classes as c ON s.classID=c.ClassId;
 
-#右外连接  右边有的左边没有左边留空
+#2、右外连接  右边有的左边没有左边留空'RIGHT OUTER JOIN'可简写
 select s.Name,c.class from students as s RIGHT JOIN classes as c ON s.classID=c.ClassId;
 
+#3、全外连接
+select s.Name,c.class from students as s FULL JOIN classes as c ON s.classID=c.ClassId;
 
 
 #联合查询 将第一个表和第二个表合一起
