@@ -67,6 +67,8 @@ create table T1 (id int(5) not null,name char(10) );
 #插入值
 insert into mysql.user(Host,User,Password) values("localhost","test",password("1234"));
 
+insert into user set Host=192.168.1.1,User=admin,Password=password("1234");
+
 #更新数据
 update TABLE set user="user1" where user="user1";
 
