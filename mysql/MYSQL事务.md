@@ -65,6 +65,9 @@ mysql> select @@tx_isolation;
 +-----------------+
 1 row in set, 1 warning (0.00 sec)
 
-# 设置隔离级别
+# 设置当前会话隔离级别
 set session transaction isolation leve red uncommitted;
+
+# 设置数据库系统的全局隔离级别
+set global session transaction isolation leve red uncommitted;
 ```
