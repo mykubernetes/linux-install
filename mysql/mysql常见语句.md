@@ -49,49 +49,26 @@ select database()；
 select * from T2; 
 ```
 
-
-增删改操作
+DDL语音
 ```
+##############################数据库操作##############################
 #创建数据库
 create database DB1;
 CREATE DATABASE IF NOT EXISTS books;    #如果不存在就创建
 
 #删除数据库
-drop database DB1;
-DROP DATABASE IF EXISTS DB1;        #如果存在就删除
+drop database 库名;
+DROP DATABASE [IF EXISTS] 库名;        #如果存在就删除
 
-#清除表数据
-truncate tablev T1
+##############################表操作##############################
+#使用表
+use DB1；
 
 #创建表
 create table T1 (id int(5) not null,name char(10) );
 
-#插入值
-insert into mysql.user(Host,User,Password) values("localhost","test",password("1234"));
-insert into mysql.user values("localhost","test",password("1234"));   #可以不写字段，但是得写全values
-
-
-insert into user set Host=192.168.1.1,User=admin,Password=password("1234");
-
-insert into user SELECT 192.168.1.1,app,123;   #支持子查询的插入方式
-
-#更新数据
-update TABLE set user="user1" where user="user1";
-
-#删除数据
-delete from mysql.user where user="user1";
-
-#使用表
-use DB1；
-
-#删除表
-delete from T1；
-
-#删除表（打碎表后再创建新表）
-truncat T2； 
-
-#修改库的字符集
-ALTER DATABASE books CHARACTER SET utf8;
+删除表
+drop table [if exists] 表名;
 
 ##############################修改表##############################
 1.添加列
@@ -109,8 +86,8 @@ alter table 表名 drop column 列名;
 5.修改表名
 alter table 表名 rename 【to】 新表名;
 
-删除表
-drop table【if exists】 表名;
+#修改库的字符集
+ALTER DATABASE books CHARACTER SET utf8;
 
 复制表
 1、复制表的结构
@@ -121,7 +98,39 @@ create table 表名
 select 查询列表 from 旧表【where 筛选】;
 ```
 
-查询操作
+
+DML语言
+---
+```
+#插入值
+insert into mysql.user(Host,User,Password) values("localhost","test",password("1234"));
+insert into mysql.user values("localhost","test",password("1234"));   #可以不写字段，但是得写全values
+
+insert into user set Host=192.168.1.1,User=admin,Password=password("1234");
+
+insert into user SELECT 192.168.1.1,app,123;   #支持子查询的插入方式
+
+#更新数据
+update TABLE set user="user1" where user="user1";
+
+#删除数据
+delete from mysql.user where user="user1";
+delete from T1；
+
+#清除表数据
+truncate table T1
+```
+
+delete和truncate的区别
+- truncate删除后，如果再插入，标识列从1开始，delete删除后，如果再插入，标识列从断点开始
+- delete可以添加筛选条件，truncate不可以添加筛选条件
+- truncate效率较高
+- truncate没有返回值，delete可以返回受影响的行数
+- truncate不可以回滚，delete可以回滚
+
+
+DQL语言
+---
 ```
 选择：select * from table1 where 范围
 插入：insert into table1(field1,field2) values(value1,value2)
