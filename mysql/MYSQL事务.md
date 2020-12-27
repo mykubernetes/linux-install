@@ -28,13 +28,13 @@ start transaction;#可以省略
 2、编写一组逻辑sql语句
 sql语句支持的是insert、update、delete
 ......sql语句......
-savepoint 回滚点名;                          #rollback to 回滚点名; 实例：savepoint a;
+savepoint 回滚点名;                          #rollback to 回滚点名; 示例：savepoint a;
 ......sql语句......
 
 3、结束事务
 提交：commit;
 回滚：rollback;
-回滚到指定的地方：rollback to 回滚点名;        #只能配合savepoint一起使用;实例: rollback to a;
+回滚到指定的地方：rollback to 回滚点名;        #只能配合savepoint一起使用，回滚到保存点之前的数据之后的不保存;示例: rollback to a;
 ```
 
 并发事务
