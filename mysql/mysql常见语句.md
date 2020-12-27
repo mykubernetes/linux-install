@@ -236,7 +236,7 @@ alter table 表名 modify column 字段名 字段类型 ;
 
 3、主键
 添加主键
-alter table 表名 add [ constraint 约束名] primary key(字段名);
+alter table 表名 add [constraint 约束名] primary key(字段名);
 删除主键
 alter table 表名 drop primary key;
 
