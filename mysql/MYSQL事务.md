@@ -53,3 +53,18 @@ sql语句支持的是insert、update、delete
 | read committed：读已提交 | √ | × | × |
 | repeatable read：可重复读 | √ | √ | × |
 | serializable：串行化 | √ | √ | √ |
+
+
+```
+# 查看当前隔离级别
+mysql> select @@tx_isolation;
++-----------------+
+| @@tx_isolation  |
++-----------------+
+| REPEATABLE-READ |
++-----------------+
+1 row in set, 1 warning (0.00 sec)
+
+# 设置隔离级别
+set session transaction isolation leve red uncommitted;
+```
