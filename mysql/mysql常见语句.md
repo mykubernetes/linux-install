@@ -100,6 +100,7 @@ create table 表名 select 查询列表 from 旧表 [where 筛选];
 ```
 
 数据类型
+
 一、数值型
 
 1、整形
