@@ -45,8 +45,6 @@ show grants for user1；
 #查看在哪个表
 select database()；
 
-#查看表
-select * from T2; 
 ```
 
 DDL语音
