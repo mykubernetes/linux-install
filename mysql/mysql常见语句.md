@@ -257,10 +257,10 @@ alter table 表名 drop foreign key 约束名;
 自增长列
 ---
 - 不用手动插入值，可以自动提供序列值，默认从1开始，步长为1
-  - auto_increment_increment
+  - auto_increment
   - 如果要更改起始值：手动插入值
   - 如果要更改步长：更改系统变量
-  - set auto_increment_increment=值;
+  - set auto_increment=值;
 - 一个表至多有一个自增长列
 - 自增长列只能支持数值型
 - 自增长列必须为一个key
