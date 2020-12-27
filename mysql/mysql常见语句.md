@@ -135,12 +135,15 @@ create table 表名 select 查询列表 from 旧表 [where 筛选];
 | :------: | :--------: | :------: |
 | Bit(M) | 1~8 | Bit(1)~bit(8) |
 
-4、char和varchar类型
+4、char和varchar类型  
+- 用来保存MySQL 中较短的字符串
+
 | 字符串类型	| 最多字符数 | 描述及存储需求 |
 | :------: | :--------: | :------: |
 | char(M) | M | M为0~255之间的整数 |
 | varchar (M) | M | M为0~65535之间的整数 |
-- 用来保存MySQL 中较短的字符串
+- char：固定长度的字符，写法为char(M)，最大长度不能超过M，其中M可以省略，默认为1
+- varchar：可变长度的字符，写法为varchar(M)，最大长度不能超过M，其中M不可以省略
 
 5、binary和varbinary类型
 - 类似于char 和varchar ，不同的是它们包含二进制字符串而不包含非二进制字符串
