@@ -55,6 +55,8 @@ DDL语音
 create database 库名;
 CREATE DATABASE [IF NOT EXISTS] 库名;    #如果不存在就创建
 
+create database [if not exists] 库名 [character set 字符集名];
+
 #删除数据库
 drop database 库名;
 DROP DATABASE [IF EXISTS] 库名;        #如果存在就删除
