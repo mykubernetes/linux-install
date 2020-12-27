@@ -191,9 +191,10 @@ datetime和timestamp的区别
 - 要求在从表设置外键关系，用于限制两个表的关系，从表的字段值引用了主表的某字段值
 - 从表外键列和主表的被引用列要求类型一致或兼容，意义一样，名称无要求
 - 主表的被引用列必须是一个key（一般就是主键或者唯一）
-- 插入数据，先插入主表
+- 插入数据，先插入主表，再插入从表
+- 删除数据，先删除从表,再删除主表
 
-删除数据，先删除从表,可以通过以下两种方式来删除主表的记录
+可以通过以下两种方式来删除主表的记录
 ```
 #方式一：级联删除
 ALTER TABLE stuinfo ADD CONSTRAINT fk_stu_major FOREIGN KEY(majorid) REFERENCES major(id) ON DELETE CASCADE;
