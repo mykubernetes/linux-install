@@ -96,8 +96,7 @@ ALTER DATABASE books CHARACTER SET utf8;
 create table 表名 like 旧表;
 
 2、复制表的结构+数据
-create table 表名 
-select 查询列表 from 旧表 [where 筛选];
+create table 表名 select 查询列表 from 旧表 [where 筛选];
 ```
 
 
