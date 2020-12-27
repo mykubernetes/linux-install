@@ -48,7 +48,7 @@ select database()；
 ```
 
 DDL语音
----
+===
 ```
 ##############################数据库操作##############################
 #创建数据库
@@ -100,7 +100,7 @@ create table 表名 select 查询列表 from 旧表 [where 筛选];
 ```
 
 数据类型
-
+---
 一、数值型
 
 1、整形
@@ -175,6 +175,7 @@ datetime和timestamp的区别
 
 
 常见的约束
+---
 - NOT NULL：非空，该字段的值必填
 - UNIQUE：唯一，该字段的值不可重复,可以为空
 - DEFAULT：默认，该字段的值不用手动插入也会有默认值，设置默认值
@@ -219,8 +220,66 @@ create table 表名(
 - 列级约束可以在一个字段上追加多个，中间用空格隔开，没有顺序要求
 
 
-DML语言
+修改表时添加或删除约束
+```
+1、非空
+添加非空
+alter table 表名 modify column 字段名 字段类型 not null;
+删除非空
+alter table 表名 modify column 字段名 字段类型 ;
+
+2、默认
+添加默认
+alter table 表名 modify column 字段名 字段类型 default 值;
+删除默认
+alter table 表名 modify column 字段名 字段类型 ;
+
+3、主键
+添加主键
+alter table 表名 add [ constraint 约束名] primary key(字段名);
+删除主键
+alter table 表名 drop primary key;
+
+4、唯一
+添加唯一
+alter table 表名 add [constraint 约束名] unique(字段名);
+删除唯一
+alter table 表名 drop index 索引名;
+
+5、外键
+添加外键
+alter table 表名 add [constraint 约束名] foreign key(字段名) references 主表（被引用列）;
+删除外键
+alter table 表名 drop foreign key 约束名;
+```
+
+自增长列
 ---
+- 不用手动插入值，可以自动提供序列值，默认从1开始，步长为1
+  - auto_increment_increment
+  - 如果要更改起始值：手动插入值
+  - 如果要更改步长：更改系统变量
+  - set auto_increment_increment=值;
+- 一个表至多有一个自增长列
+- 自增长列只能支持数值型
+- 自增长列必须为一个key
+
+```
+1、创建表时设置自增长列
+create table 表(
+	字段名 字段类型 约束 auto_increment
+)
+
+2、修改表时设置自增长列
+alter table 表 modify column 字段名 字段类型 约束 auto_increment
+
+3、删除自增长列
+alter table 表 modify column 字段名 字段类型 约束 
+```
+
+
+DML语言
+===
 ```
 #插入值
 insert into mysql.user(Host,User,Password) values("localhost","test",password("1234"));
@@ -250,7 +309,7 @@ delete和truncate的区别
 
 
 DQL语言
----
+===
 ```
 选择：select * from table1 where 范围
 插入：insert into table1(field1,field2) values(value1,value2)
@@ -451,6 +510,7 @@ select user，password，host from mysql.user;
 ```
 
 mysql_secure_installation安全配置向导
+===
 ```
 # mysql_secure_installation
 NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
@@ -507,7 +567,7 @@ Thanks for using MySQL!
 
 
 MySQL批量SQL插入性能优化
----
+===
 1、一条SQL语句插入多条数据
 
 常用的插入语句如：
