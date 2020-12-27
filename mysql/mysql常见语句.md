@@ -174,6 +174,51 @@ datetime和timestamp的区别
 - timestamp的属性受Mysql版本和SQLMode的影响很大
 
 
+常见的约束
+- NOT NULL：非空，该字段的值必填
+- UNIQUE：唯一，该字段的值不可重复,可以为空
+- DEFAULT：默认，该字段的值不用手动插入也会有默认值，设置默认值
+- CHECK：检查，mysql不支持
+- PRIMARY KEY：主键，该字段的值不可重复并且非空  unique+not null
+- FOREIGN KEY：外键，该字段的值引用了另外的表的字段
+
+主键和唯一
+- 区别：一个表最多有一个主键，但可以有多个唯一。主键不允许为空，唯一可以为空
+- 相同点都具有唯一性，都支持组合键，但不推荐
+
+外键：
+- 用于限制两个表的关系，从表的字段值引用了主表的某字段值
+- 外键列和主表的被引用列要求类型一致，意义一样，名称无要求
+- 主表的被引用列要求是一个key（一般就是主键）
+- 插入数据，先插入主表
+
+删除数据，先删除从表,可以通过以下两种方式来删除主表的记录
+```
+#方式一：级联删除
+ALTER TABLE stuinfo ADD CONSTRAINT fk_stu_major FOREIGN KEY(majorid) REFERENCES major(id) ON DELETE CASCADE;
+
+#方式二：级联置空
+ALTER TABLE stuinfo ADD CONSTRAINT fk_stu_major FOREIGN KEY(majorid) REFERENCES major(id) ON DELETE SET NULL;
+```
+
+创建表时添加约束
+```
+create table 表名(
+	字段名 字段类型 not null,#非空
+	字段名 字段类型 primary key,#主键
+	字段名 字段类型 unique,#唯一
+	字段名 字段类型 default 值,#默认
+	constraint 约束名 foreign key(字段名) references 主表（被引用列）
+)
+```
+
+|   | 支持类型 | 可以起约束名 |
+| :------: | :--------: | :------: |
+| 列级约束 | 表级约束 | 不可以 |
+| 表级约束 | 除了非空和默认 | 可以，但对主键无效 |
+- 列级约束可以在一个字段上追加多个，中间用空格隔开，没有顺序要求
+
+
 DML语言
 ---
 ```
