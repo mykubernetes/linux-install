@@ -93,6 +93,32 @@ truncat T2；
 #修改库的字符集
 ALTER DATABASE books CHARACTER SET utf8;
 
+##############################修改表##############################
+1.添加列
+alter table 表名 add column 列名 类型 【first|after 字段名】;
+
+2.修改列的类型或约束
+alter table 表名 modify column 列名 新类型 【新约束】;
+
+3.修改列名
+alter table 表名 change column 旧列名 新列名 类型;
+
+4 .删除列
+alter table 表名 drop column 列名;
+
+5.修改表名
+alter table 表名 rename 【to】 新表名;
+
+删除表
+drop table【if exists】 表名;
+
+复制表
+1、复制表的结构
+create table 表名 like 旧表;
+
+2、复制表的结构+数据
+create table 表名 
+select 查询列表 from 旧表【where 筛选】;
 ```
 
 查询操作
@@ -199,22 +225,6 @@ select EXISTS(SELECT employee_id FROM employees);
 
 ```
 
-表结构修改
-```
-#修改表
-alter table 表名 rename 新表名
-
-#添加一列
-alter table 表名 add 列名选项
-#修改调整 类型
-alter table 表名 modify 列名 类型
-
-#修改调整 列名和类型
-alter table 表名 change 列名 新表名+类型
-
-#删除
-alter table 表名 drop 列名
-```
 
 
 ```
