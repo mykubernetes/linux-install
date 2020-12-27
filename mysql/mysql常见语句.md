@@ -52,8 +52,8 @@ DDL语音
 ```
 ##############################数据库操作##############################
 #创建数据库
-create database DB1;
-CREATE DATABASE IF NOT EXISTS books;    #如果不存在就创建
+create database 库名;
+CREATE DATABASE [IF NOT EXISTS] 库名;    #如果不存在就创建
 
 #删除数据库
 drop database 库名;
@@ -61,10 +61,11 @@ DROP DATABASE [IF EXISTS] 库名;        #如果存在就删除
 
 ##############################表操作##############################
 #使用表
-use DB1；
+use 表名；
 
 #创建表
-create table T1 (id int(5) not null,name char(10) );
+create table 表名 (id int(5) not null,name char(10) );
+CREATE TABLE [IF  NOT EXISTS] 表名 (id int(5) not null,name char(10) );
 
 删除表
 drop table [if exists] 表名;
@@ -228,7 +229,7 @@ SELECT d.*,(SELECT COUNT(*) FROM employees e WHERE e.department_id = d.`departme
 #5、子查询 用于from中
 select s.aage,s.ClassID from (select avg(Age) as aage,ClassID from students where ClassID is not null group by ClassID) as s where s.aage>30;
 
-#5、exists后面,结果只有1或者0，有值则为1，无值则为0
+#6、exists后面,结果只有1或者0，有值则为1，无值则为0
 select EXISTS(SELECT employee_id FROM employees);
 
 ```
