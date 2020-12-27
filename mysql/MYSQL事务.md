@@ -49,4 +49,4 @@ sql语句支持的是insert、update、delete
 | read uncommitted:读未提交 | × | × | × |
 | read committed：读已提交 | √ | × | × |
 | repeatable read：可重复读 | √ | √ | × |
-| serializable：串行化 | √ | √) | √ |
+| serializable：串行化 | √ | √ | √ |
