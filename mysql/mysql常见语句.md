@@ -612,11 +612,8 @@ INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('2', '
 ===
 - 变量由系统提供的，不用自定义
 
-1、全局变量
-- 服务器层面上的，必须拥有super权限才能为系统变量赋值，作用域为整个服务器，也就是针对于所有连接（会话）有效
-
-2、会话变量
-- 服务器为每一个连接的客户端都提供了系统变量，作用域为当前的连接（会话）
+- 全局变量: 服务器层面上的，必须拥有super权限才能为系统变量赋值，作用域为整个服务器，也就是针对于所有连接（会话）有效
+- 会话变量: 服务器为每一个连接的客户端都提供了系统变量，作用域为当前的连接（会话）
 
 
 1、查看所有的系统变量，如果没有显式声明global还是session，则默认是session
@@ -634,7 +631,7 @@ show [global|session] variables like '%char%';
 select @@[global|session].系统变量名;
 ```
 
-3、为系统变量赋值
+4、为系统变量赋值
 ```
 方式一：如果没有显式声明global还是session，则默认是session
 set [global|session] 变量名=值;
