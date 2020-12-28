@@ -657,11 +657,11 @@ select @变量名:=值;
 
 2、更新值
 方式一：
-	set @变量名=值;或
-	set @变量名:=值;或
+	set @变量名=值;
+	set @变量名:=值;
 	select @变量名:=值;
 方式二：
-	select xx into @变量名 from 表;
+	select 字段 into @变量名 from 表;
 
 3、使用
 select @变量名;
@@ -679,8 +679,8 @@ declare 变量名 类型 [default 值];
 
 2、赋值或更新
 方式一：
-	set 变量名=值;或
-	set 变量名:=值;或
+	set 变量名=值;
+	set 变量名:=值;
 	select @变量名:=值;
 方式二：
 	select xx into 变量名 from 表;
