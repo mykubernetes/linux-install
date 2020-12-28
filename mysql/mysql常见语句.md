@@ -618,7 +618,7 @@ INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('2', '
 
 1、查看所有的系统变量，如果没有显式声明global还是session，则默认是session
 ```
-show global|session variables;
+show [global|session] variables;
 ```
 
 2、查看满足条件的部分系统变量，如果没有显式声明global还是session，则默认是session
@@ -676,7 +676,7 @@ select @变量名;
 使用：
 ```
 1、声明
-declare 变量名 类型 【default 值】;
+declare 变量名 类型 [default 值];
 
 2、赋值或更新
 方式一：
