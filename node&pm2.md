@@ -40,18 +40,12 @@ npm -v
 
 npm使用,包管理器
 ---
-1. 查看node版本
 ```
-node --version
-```
+node --version                               # 查看node版本
+npm -v                                       # 查看npm 版本,检查npm 是否正确安装
 
-2. 查看npm 版本,检查npm 是否正确安装。
-```
-npm -v
-```
+# 初始化npm，初始化会创建package.json文件，安装模块会到node_modules目录
 
-3、初始化npm，初始化会创建package.json文件，安装模块会到node_modules目录
-```
 # npm init 
 Package name: (hello)                        # 模块名字，npm init会自动取当前目录名作为默认名字，这里不需要改，直接确认即可  
 Description: A example for write a module    # 模块说明  
@@ -83,61 +77,27 @@ About to write to /home/elmer/hello/package.json
   "devDependencies": {}  
 }  
   
-Is this ok? (yes)                             # 对以上内容确认无误后，就可以直接回车确认了
-```
+Is this ok? (yes)                           # 对以上内容确认无误后，就可以直接回车确认了
 
-3. 安装cnpm (国内淘宝镜像源),主要用于某些包或命令程序下载不下来的情况
-```
-npm install cnpm -g --registry=https://registry.npm.taobao.org
-```
 
-4、搜索需要安装的包
-```
-npm search express
-```
 
-5. 安装express模块
-```
-npm install express
-```
+npm version                                 # 查看所有模块的版本
+npm install cnpm -g --registry=https://registry.npm.taobao.org    # 安装cnpm (国内淘宝镜像源),主要用于某些包或命令程序下载不下来的情况
+npm search express                          # 搜索需要安装的包
+npm install express                         # 安装express模块
+npm install -g express                      # 全局安装express模块
+npm install express --save                  # 安装包并添加到依赖中*****
+npm list                                    # 列出已安装模块
+npm show express                            # 显示模块详情
+npm update                                  # 升级当前目录下的项目的所有模块
+npm update express                          # 升级当前目录下的项目的指定模块
+npm update -g express                       # 升级全局安装的express模块
+npm uninstall express                       # 删除指定的模块
+npm remove express                          # 删除指定模块
 
-6. 全局安装express模块
-```
-npm install -g express
-```
-
-7. 列出已安装模块
-```
-npm list
-```
-
-8. 显示模块详情
-```
-npm show express
-```
-
-9. 升级当前目录下的项目的所有模块
-```
-npm update
-```
-
-10. 升级当前目录下的项目的指定模块
-```
-npm update express
-```
-
-11. 升级全局安装的express模块
-```
-npm update -g express
-```
-
-12. 删除指定的模块
-```
-npm uninstall express
-```
 
 13. 更新node 版本
-```
+
 首先需要确保是否安装 n 模块，这个是node升级需要
 
 没有安装执行：npm i n -g -f
@@ -145,11 +105,11 @@ npm uninstall express
 检测使用: n --version
 
 更新node命令：n stable
-```
+
  
 
-14. node 引入模块使用 require
-```
+node 引入模块使用 require
+
 var http = require("http")
 ```
 
