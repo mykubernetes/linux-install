@@ -44,8 +44,8 @@ npm使用,包管理器
 node --version                               # 查看node版本
 npm -v                                       # 查看npm 版本,检查npm 是否正确安装
 
+————————————————————————————————————————————————————————————————————————
 # 初始化npm，初始化会创建package.json文件，安装模块会到node_modules目录
-
 # npm init 
 Package name: (hello)                        # 模块名字，npm init会自动取当前目录名作为默认名字，这里不需要改，直接确认即可  
 Description: A example for write a module    # 模块说明  
@@ -78,7 +78,7 @@ About to write to /home/elmer/hello/package.json
 }  
   
 Is this ok? (yes)                           # 对以上内容确认无误后，就可以直接回车确认了
-
+————————————————————————————————————————————————————————————————————————
 
 
 npm version                                 # 查看所有模块的版本
