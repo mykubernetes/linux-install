@@ -40,7 +40,8 @@ npm -v
 
 6、运行node命令
 ```
-node hellwork.js        #node.js语言编写脚本
+node hellnode.js        #node.js语言编写脚本
+console.log("hello node");
 ```
 
 npm使用,包管理器
