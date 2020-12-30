@@ -164,3 +164,56 @@ pm2常用命令记录
 # pm2 generate                    # Generate a sample json configuration file
 ```
 - pm2文档地址：http://pm2.keymetrics.io/docs/usage/quick-start/
+
+
+
+nvm
+---
+- nvm是的github中的一个开源项目, 可以很方便的在linux中安装和切换node的各个版本.nvm项目链接
+
+1、linux安装nrm切换npm镜像
+```
+npm install -g nrm
+nrm ls
+nrm use taobao
+```
+
+2、下载安装nvm脚本
+```
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
+或:
+wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
+```
+
+3、执行nvm脚本
+```
+source ~/.nvm/nvm.sh
+```
+
+4、查看nodejs版本
+```
+# 查看nodejs本地已安装nodejs版本
+nvm ls
+
+# 查看nodejs远端版本
+nvm ls-remote
+```
+
+5、nvm的使用
+```
+# nvm安装nodejs指定版本
+# nvm install 版本号。安装nodejs5.0为例
+nvm install 5.0
+
+# 选择切换nodejs版本:
+nvm use 5.0
+
+# 运行指定nodejs版本:
+nvm run 5.0 --version
+
+# 在指定nodejs版本环境中运行任意命令:
+nvm exec 4.2 node --version
+
+查看版本安装路径:
+nvm which 5.04.4
+```
