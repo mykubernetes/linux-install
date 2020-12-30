@@ -50,7 +50,7 @@ node --version
 npm -v
 ```
 
-3、初始化npm，初始化会创建node_modules、package.json
+3、初始化npm，初始化会创建package.json文件，安装模块会到node_modules目录
 ```
 # npm init 
 Package name: (hello)                        # 模块名字，npm init会自动取当前目录名作为默认名字，这里不需要改，直接确认即可  
@@ -62,7 +62,7 @@ Author name: Elmer Zhang                     # 模块作者名字
 Author email: (none) freeboy6716@gmail.com   # 模块作者邮箱  
 Author url: (none) http://www.elmerzhang.com # 模块作者URL  
 Main module/entry point: (none) hello.js     # 模块的入口文件，我们这里是hello.js </span><span style="color:#ff6666;">(这个必填)</span><span style="color:#333333;">  
-Test command: (none)    //测试脚本，选填  
+Test command: (none)                         # 测试脚本，选填  
 What versions of node does it run on? (~v0.5.7) *   # 依赖的node版本号，我们这个脚本可以运行在任何版本的node上，因此填 *  
 About to write to /home/elmer/hello/package.json  
 
