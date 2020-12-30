@@ -16,7 +16,7 @@
 2、ln -s /data/node-v12.4.0-linux-x64/bin/npm /usr/bin/npm
 ```
 
-3、安装pm2（如果不知道pm2干啥的自行百度）
+3、安装pm2
 ```
 npm install -g pm2 这里安装之后需要指定软连接
 
