@@ -115,9 +115,7 @@ pm2常用命令记录
 ```
 # pm2 start app.js # 启动app.js应用程序
 
-# pm2 start app.js -i 4        # cluster mode 模式启动4个app.js的应用实例
-
-# 4个应用程序会自动进行负载均衡
+# pm2 start app.js -i 4        # cluster mode 模式启动4个app.js的应用实例, 4个应用程序会自动进行负载均衡
 
 # pm2 start app.js --name="api" # 启动应用程序并命名为 "api"
 
@@ -164,5 +162,5 @@ pm2常用命令记录
 # pm2 update                    # Save processes, kill PM2 and restore processes
 
 # pm2 generate                  # Generate a sample json configuration file
-pm2文档地址：http://pm2.keymetrics.io/docs/usage/quick-start/
 ```
+- pm2文档地址：http://pm2.keymetrics.io/docs/usage/quick-start/
