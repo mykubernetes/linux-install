@@ -10,18 +10,25 @@ wget https://npm.taobao.org/mirrors/node/latest-v12.x/node-v12.4.0-linux-x64.tar
 tar -xvf node-v12.4.0-linux-x64.tar.gz
 ```
 
-3、添加链接
+3、配置环境变量
 ```
-ln -s /data/node-v12.4.0-linux-x64/bin/node /usr/bin/node
 
-ln -s /data/node-v12.4.0-linux-x64/bin/npm /usr/bin/npm
+vim /etc/profile
+export NODE_HOME=/opt/node-v12.4.0-linux-x64
+export PATH=$NODE_HOME/bin:$PATH
+source /etc/profile
+
+或者
+ln -s /opt/node-v12.4.0-linux-x64/bin/node /usr/bin/node
+ln -s /opt/node-v12.4.0-linux-x64/bin/npm /usr/bin/npm
 ```
 
 3、安装pm2
 ```
 npm install -g pm2 这里安装之后需要指定软连接
 
-ln -s /data/node-v12.4.0-linux-x64/bin/pm2 /usr/bin/pm2
+未位置环境变量，配置软连接
+ln -s /droot/node-v12.4.0-linux-x64/bin/pm2 /usr/bin/pm2
 ```
 
 四、验证
