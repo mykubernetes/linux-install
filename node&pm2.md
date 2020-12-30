@@ -38,6 +38,86 @@ pm2 -v
 npm -v
 ```
 
+npm使用,包管理器
+---
+1. 查看node版本
+```
+node --version
+```
+
+2. 查看npm 版本,检查npm 是否正确安装。
+```
+npm -v
+```
+
+3. 安装cnpm (国内淘宝镜像源),主要用于某些包或命令程序下载不下来的情况
+```
+npm install cnpm -g --registry=https://registry.npm.taobao.org
+```
+
+4、搜索需要安装的包
+```
+npm search express
+```
+
+5. 安装express模块
+```
+npm install express
+```
+
+6. 全局安装express模块
+```
+npm install -g express
+```
+
+7. 列出已安装模块
+```
+npm list
+```
+
+8. 显示模块详情
+```
+npm show express
+```
+
+9. 升级当前目录下的项目的所有模块
+```
+npm update
+```
+
+10. 升级当前目录下的项目的指定模块
+```
+npm update express
+```
+
+11. 升级全局安装的express模块
+```
+npm update -g express
+```
+
+12. 删除指定的模块
+```
+npm uninstall express
+```
+
+13. 更新node 版本
+```
+首先需要确保是否安装 n 模块，这个是node升级需要
+
+没有安装执行：npm i n -g -f
+
+检测使用: n --version
+
+更新node命令：n stable
+```
+ 
+
+14. node 引入模块使用 require
+```
+var http = require("http")
+```
+
+
 pm2常用命令记录
 ---
 ```
