@@ -87,6 +87,7 @@ npm search express                          # 搜索需要安装的包
 npm install express                         # 安装express模块
 npm install -g express                      # 全局安装express模块
 npm install express --save                  # 安装包并添加到依赖中*****
+npm install                                 # 下载当前的项目所依赖的包，依赖上一条命令*****
 npm list                                    # 列出已安装模块
 npm show express                            # 显示模块详情
 npm update                                  # 升级当前目录下的项目的所有模块
