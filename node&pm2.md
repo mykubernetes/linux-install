@@ -171,6 +171,8 @@ nvm
 ---
 - nvm是的github中的一个开源项目, 可以很方便的在linux中安装和切换node的各个版本.nvm项目链接
 
+https://github.com/nvm-sh/nvm
+
 1、linux安装nrm切换npm镜像
 ```
 npm install -g nrm
@@ -214,6 +216,9 @@ nvm run 5.0 --version
 # 在指定nodejs版本环境中运行任意命令:
 nvm exec 4.2 node --version
 
-查看版本安装路径:
+# 查看版本安装路径:
 nvm which 5.04.4
+
+# 卸载
+nvm uninstall 5.0
 ```
