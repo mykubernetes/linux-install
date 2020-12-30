@@ -19,3 +19,5 @@ https://www.cnblogs.com/kevingrace/
 https://blog.51cto.com/moerjinrong?type=1
 
 https://www.jenkins.io/zh/doc/book/getting-started/
+
+https://www.cnblogs.com/caidingyu/
