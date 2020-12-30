@@ -97,6 +97,12 @@ npm uninstall express                       # 删除指定的模块
 npm remove express                          # 删除指定模块
 ```
 
+cnpm安装
+--
+- 使用淘宝模块使用cnpm,淘宝模块每隔10分钟同步意思官方模块,使用官方模块使用npm
+```
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+```
 
 pm2常用命令记录
 ---
