@@ -95,23 +95,6 @@ npm update express                          # 升级当前目录下的项目的�
 npm update -g express                       # 升级全局安装的express模块
 npm uninstall express                       # 删除指定的模块
 npm remove express                          # 删除指定模块
-
-
-13. 更新node 版本
-
-首先需要确保是否安装 n 模块，这个是node升级需要
-
-没有安装执行：npm i n -g -f
-
-检测使用: n --version
-
-更新node命令：n stable
-
- 
-
-node 引入模块使用 require
-
-var http = require("http")
 ```
 
 
