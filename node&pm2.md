@@ -23,7 +23,7 @@ ln -s /opt/node-v12.4.0-linux-x64/bin/node /usr/bin/node
 ln -s /opt/node-v12.4.0-linux-x64/bin/npm /usr/bin/npm
 ```
 
-3、安装pm2
+4、安装pm2
 ```
 npm install -g pm2 这里安装之后需要指定软连接
 
@@ -31,11 +31,16 @@ npm install -g pm2 这里安装之后需要指定软连接
 ln -s /droot/node-v12.4.0-linux-x64/bin/pm2 /usr/bin/pm2
 ```
 
-四、验证
+5、验证
 ```
 node -v
 pm2 -v
 npm -v
+```
+
+6、运行node命令
+```
+node hellwork.js        #node.js语言编写脚本
 ```
 
 npm使用,包管理器
