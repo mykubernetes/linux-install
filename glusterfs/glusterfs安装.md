@@ -1,5 +1,7 @@
 glusterfs安装
 ===
+https://buildlogs.centos.org/centos/6/storage/x86_64/gluster-7/
+
 1、每个节点分别安装并设置自启动  
 ``` 
 # wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
@@ -7,6 +9,10 @@ glusterfs安装
 # yum -y install glusterfs-server
 # systemctl enable glusterd
 # systemctl start glusterd
+
+#  netstat -tunlp | grep glus
+	tcp        0      0 0.0.0.0:49152      0.0.0.0:*        LISTEN      4633/gluterfsd     
+	tcp        0      0 0.0.0.0:24007      0.0.0.0:*        LISTEN      3341/gluterd   
 ```  
 
 2、配置hosts文件  
