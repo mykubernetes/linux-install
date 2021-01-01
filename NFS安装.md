@@ -7,7 +7,9 @@ NFS安装
 ```  
 
 2、安装NFS  
-``` yum -y install nfs-utils rpcbind ```  
+```
+yum -y install nfs-utils rpcbind
+```  
 
 3、创建nfs挂载目录  
 ```
@@ -90,11 +92,16 @@ Export list for localhost:
 -e ：显示某部主机的 /etc/exports 所分享的目录数据  
 
 二、客户端配置  
+
 1、安装客户端工具
-``` # yum -y install nfs-utils ```  
+```
+# yum -y install nfs-utils
+```
 
 2、创建客户端挂载目录  
-``` mkdir /opt/data/mount/nfs ```  
+```
+mkdir /opt/data/mount/nfs
+```
 
 3、查看服务器抛出的共享目录信息  
 ```
@@ -104,5 +111,7 @@ Export list for 192.168.2.203:
 ```  
 
 4、挂载  
-``` # mount -t nfs 192.168.2.203:/opt/data/nfs1 /l/opt/data/mount/nfs1 -o proto=tcp -o nolock ```  
+```
+# mount -t nfs 192.168.2.203:/opt/data/nfs1 /l/opt/data/mount/nfs1 -o proto=tcp -o nolock
+```
 
