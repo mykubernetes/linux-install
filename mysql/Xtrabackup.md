@@ -71,7 +71,6 @@ innobackupex: Finished copying back files.
 - 需要在每个备份(包括完全和各个增量备份)上，将已经提交的事务进行“重放”。“重放”之后，所有的备份数据将合并到完全备份上。
 - 基于所有的备份将未提交的事务进行“回滚”。
 
-操作就变成
 ```
 # innobackupex --apply-log --redo-only BASE-DIR
 
@@ -119,9 +118,6 @@ mysql> ALTER TABLE mydatabase.mytable  IMPORT TABLESPACE;
 
 使用Xtrabackup对数据库进行部分备份
 
-Xtrabackup也可以实现部分备份，即只备份某个或某些指定的数据库或某数据库中的某个或某些表。但要使用此功能，必须启用innodb_file_per_table选项，即每张表保存为一个独立的文件。同时，其也不支持--stream选项，即不支持将数据通过管道传输给其它程序进行处理。
-
-此外，还原部分备份跟还原全部数据的备份也有所不同，即你不能通过简单地将prepared的部分备份使用--copy-back选项直接复制回数据目录，而是要通过导入表的方向来实现还原。当然，有些情况下，部分备份也可以直接通过--copy-back进行还原，但这种方式还原而来的数据多数会产生数据不一致的问题，因此，无论如何不推荐使用这种方式。
 ```
 (1)创建部分备份
 
