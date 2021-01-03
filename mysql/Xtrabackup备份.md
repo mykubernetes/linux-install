@@ -1,10 +1,32 @@
 xtrabackup实现完全备份、增量备份和部分备份
 =====================================
+安装 xtrabackup工具包
+---
+1、几个percona 官方yum源  
+http://repo.percona.com/centos/  
+https://www.percona.com/downloads/percona-release/  
+
+2、下载rpm源
+```
+wget https://www.percona.com/redir/downloads/percona-release/percona-release-0.0-1.x86_64.rpm
+# rpm -ivh percona-release-0.0-1.x86_64.rpm
+```
+
+4、yum安装
+```
+# yum list percona-xtrabackup*
+通过 yum 方式安装 percona-xtrabackup：
+# yum install percona-xtrabackup-20.x86_64
+```
+
 一、完全备份
 -----------
 ```
 #完全备份到指定目录
-innobackupex --user=root --p 123 -H localhost /data/backup/ 
+innobackupex --user=root --p 123 -H localhost /data/backup/
+如果配置文件不在etc下需要手动指定批准文件
+innobackupex --user=root --p 123 -H localhost --defaults-file=/usr/local/mysql/my.cnf /data/backup/
+
 #查看备份目录内容 
 ls /data/backup/2108_xxxx
 #还原数据库，确认目录下没有数据
@@ -18,6 +40,8 @@ chown -R mysql.mysql  /var/lib/mysql/
 #启动mysql
 systemctl start mariadb.service
 ```  
+
+
 
 二、增量备份  
 ----------
