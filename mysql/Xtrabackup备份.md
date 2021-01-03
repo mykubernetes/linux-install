@@ -103,3 +103,31 @@ innobackupex --apply-log --redo-only BASEDIR  --incremental-dir=INCREMENTAL-DIR
 ```
 innobackupex --copy-back BASEDIR
 ```  
+
+mysql备份恢复例子
+1、对 mysql 的 zztx 库进行备份
+```
+innobackupex --user=root --password=123456 --defaults-file=/etc/my.cnf --database=zztx --stream=tar  /data/back_data/  2>/data/back_data/zztx.log  |  gzip 1>/data/back_data/zztx.tar.gz
+```
+- --database=zztx 单独对 zztx 数据库做备份 ，若是不添加此参数那就那就是对全库做备份
+- 2>/data/back_data/zztx.log 输出信息写入日志中
+- 1>/data/back_data/zztx.tar.gz 打包压缩存储到该文件中
+
+2、此处可以写个脚本做备份(backup.sh)
+```
+#!/bin/sh
+echo "开始备份..."`date`
+log=zztx01_`date +%y%m%d%H%M`.log
+str=zztx01_`date +%y%m%d%H%M`.tar.gz
+innobackupex --user=root --password=123456 --defaults-file=/etc/my.cnf --database=zztx --stream=tar /data/back_data/ 2>/data/back_data/$log | gzip 1>/data/back_data/$str
+echo "备份完毕..."`date`
+```
+
+3、恢复数据
+```
+1) 先停止数据库：service mysqld stop
+2) 解 压 tar -izxvf zztx.tar.gz -C /data/back_data/db/ (没 有 db ,需 要 mkdir/data/back_data/db/)
+3) 恢复 innobackupex --user=root --password --defaults-file=/etc/my.cnf --apply-log /data/back_data/db/ innobackupex --user=root --password --defaults-file=/etc/my.cnf --copy-back /data/back_data/db/
+4) 赋权 chown -R mysql.mysql /var/lib/mysql/*
+5) 重启数据库 service mysqld restart
+```
