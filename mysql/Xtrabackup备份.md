@@ -105,7 +105,8 @@ innobackupex --copy-back BASEDIR
 ```  
 
 mysql备份恢复例子
-1、对 mysql 的 zztx 库进行备份
+---
+1、对mysql的zztx库进行备份
 ```
 innobackupex --user=root --password=123456 --defaults-file=/etc/my.cnf --database=zztx --stream=tar  /data/back_data/  2>/data/back_data/zztx.log  |  gzip 1>/data/back_data/zztx.tar.gz
 ```
