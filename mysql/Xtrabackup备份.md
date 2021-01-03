@@ -21,6 +21,7 @@ wget https://www.percona.com/redir/downloads/percona-release/percona-release-0.0
 
 一、完全备份
 -----------
+1、备份
 ```
 #完全备份到指定目录
 innobackupex --user=root --p 123 -H localhost /data/backup/
@@ -28,13 +29,23 @@ innobackupex --user=root --p 123 -H localhost /data/backup/
 innobackupex --user=root --p 123 -H localhost --defaults-file=/usr/local/mysql/my.cnf /data/backup/
 
 #查看备份目录内容 
-ls /data/backup/2108_xxxx
-#还原数据库，确认目录下没有数据
-mkdir /data/backup -pv
+ls /data/backup/2108_08-35-24
+```
+
+恢复时操作  
+2、prepare数据库
+-  创建完备份之后的数据还不能马上用来还原， 需要回滚未提交事务，前滚提交事务，让数据库文件保持一致性。
+- prepare  的过程，其实是读取备份文件夹中的配置文件，然后 innobackupex  重做已提交事务，回滚未提交事务，之后数据就被写到了备份的数据文件(innodb  文件) 中，并重建日志文件。
+- --user-memory：指定 prepare 阶段可使用的内存，内存多则速度快，默认为 10MB。
+```
 #在备份点目录下，合并已提交的事物，回滚未提交的事物
-innobackupex --apply-log  ./
+innobackupex --apply-log --defaults-file=/usr/local/mysql/my.cnf /data/backup/2108_08-35-24
+```
+
+3、恢复数据库
+```
 #复制备份点的备份目录，到此要恢复的目录下
-innobackupex --copy-back ./
+innobackupex --copy-back --defaults-file=/usr/local/mysql/my.cnf /data/backup/2108_08-35-24
 #修改mysql目录下属主属组
 chown -R mysql.mysql  /var/lib/mysql/
 #启动mysql
