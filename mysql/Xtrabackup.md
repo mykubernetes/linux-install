@@ -62,15 +62,17 @@ innobackupex: Finished copying back files.
 ```
 # innobackupex --incremental /backup --incremental-basedir=BASEDIR
 ```
-其中，BASEDIR指的是完全备份所在的目录，此命令执行结束后，innobackupex命令会在/backup目录中创建一个新的以时间命名的目录以存放所有的增量备份数据。另外，在执行过增量备份之后再一次进行增量备份时，其--incremental-basedir应该指向上一次的增量备份所在的目录。
+- BASEDIR指的是完全备份所在的目录，此命令执行结束后，innobackupex命令会在/backup目录中创建一个新的以时间命名的目录以存放所有的增量备份数据。
+- 在执行过增量备份之后再一次进行增量备份时，其--incremental-basedir应该指向上一次的增量备份所在的目录。
+- 需要注意的是，增量备份仅能应用于InnoDB或XtraDB表，对于MyISAM表而言，执行增量备份时其实进行的是完全备份。
 
-需要注意的是，增量备份仅能应用于InnoDB或XtraDB表，对于MyISAM表而言，执行增量备份时其实进行的是完全备份。
 
 “准备”(prepare)增量备份与整理完全备份有着一些不同，尤其要注意的是：
-(1)需要在每个备份(包括完全和各个增量备份)上，将已经提交的事务进行“重放”。“重放”之后，所有的备份数据将合并到完全备份上。
-(2)基于所有的备份将未提交的事务进行“回滚”。
+- 需要在每个备份(包括完全和各个增量备份)上，将已经提交的事务进行“重放”。“重放”之后，所有的备份数据将合并到完全备份上。
+- 基于所有的备份将未提交的事务进行“回滚”。
 
-于是，操作就变成了：
+操作就变成
+```
 # innobackupex --apply-log --redo-only BASE-DIR
 
 接着执行：
@@ -78,30 +80,24 @@ innobackupex: Finished copying back files.
 
 而后是第二个增量：
 # innobackupex --apply-log --redo-only BASE-DIR --incremental-dir=INCREMENTAL-DIR-2
+```
+- 其中BASE-DIR指的是完全备份所在的目录，而INCREMENTAL-DIR-1指的是第一次增量备份的目录，INCREMENTAL-DIR-2指的是第二次增量备份的目录
 
-其中BASE-DIR指的是完全备份所在的目录，而INCREMENTAL-DIR-1指的是第一次增量备份的目录，INCREMENTAL-DIR-2指的是第二次增量备份的目录，其它依次类推，即如果有多次增量备份，每一次都要执行如上操作；
-
-5、Xtrabackup的“流”及“备份压缩”功能
-
-Xtrabackup对备份的数据文件支持“流”功能，即可以将备份的数据通过STDOUT传输给tar程序进行归档，而不是默认的直接保存至某备份目录中。要使用此功能，仅需要使用--stream选项即可。如：
-
+Xtrabackup的“流”及“备份压缩”功能
+```
+备份的数据通进行归档。仅需要使用--stream选项即可。
 # innobackupex --stream=tar  /backup | gzip > /backup/`date +%F_%H-%M-%S`.tar.gz
 
-甚至也可以使用类似如下命令将数据备份至其它服务器：
-# innobackupex --stream=tar  /backup | ssh user@www.magedu.com  "cat -  > /backups/`date +%F_%H-%M-%S`.tar" 
+将数据备份至其它服务器
+# innobackupex --stream=tar  /backup | ssh user@192.168.101.66  "cat -  > /backups/`date +%F_%H-%M-%S`.tar" 
 
-此外，在执行本地备份时，还可以使用--parallel选项对多个文件进行并行复制。此选项用于指定在复制时启动的线程数目。当然，在实际进行备份时要利用此功能的便利性，也需要启用innodb_file_per_table选项或共享的表空间通过innodb_data_file_path选项存储在多个ibdata文件中。对某一数据库的多个文件的复制无法利用到此功能。其简单使用方法如下：
-# innobackupex --parallel  /path/to/backup
-
-同时，innobackupex备份的数据文件也可以存储至远程主机，这可以使用--remote-host选项来实现：
-# innobackupex --remote-host=root@www.magedu.com  /path/IN/REMOTE/HOST/to/backup
-	 
+备份数据文件也可以存储至远程主机，使用--remote-host选项
+# innobackupex --remote-host=root@192.168.101.66  /path/IN/REMOTE/HOST/to/backup
+```	 
 
 
-6、导入或导出单张表
-
-默认情况下，InnoDB表不能通过直接复制表文件的方式在mysql服务器之间进行移植，即便使用了innodb_file_per_table选项。而使用Xtrabackup工具可以实现此种功能，不过，此时需要“导出”表的mysql服务器启用了innodb_file_per_table选项（严格来说，是要“导出”的表在其创建之前，mysql服务器就启用了innodb_file_per_table选项），并且“导入”表的服务器同时启用了innodb_file_per_table和innodb_expand_import选项。
-
+导入或导出单张表
+```
 (1)“导出”表
 导出表是在备份的prepare阶段进行的，因此，一旦完全备份完成，就可以在prepare过程中通过--export选项将某表导出了：
 # innobackupex --apply-log --export /path/to/backup
@@ -117,16 +113,16 @@ mysql> ALTER TABLE mydatabase.mytable  DISCARD TABLESPACE;
 
 接下来，将来自于“导出”表的服务器的mytable表的mytable.ibd和mytable.exp文件复制到当前服务器的数据目录，然后使用如下命令将其“导入”：
 mysql> ALTER TABLE mydatabase.mytable  IMPORT TABLESPACE;
+```
 
 
 
-
-7、使用Xtrabackup对数据库进行部分备份
+使用Xtrabackup对数据库进行部分备份
 
 Xtrabackup也可以实现部分备份，即只备份某个或某些指定的数据库或某数据库中的某个或某些表。但要使用此功能，必须启用innodb_file_per_table选项，即每张表保存为一个独立的文件。同时，其也不支持--stream选项，即不支持将数据通过管道传输给其它程序进行处理。
 
 此外，还原部分备份跟还原全部数据的备份也有所不同，即你不能通过简单地将prepared的部分备份使用--copy-back选项直接复制回数据目录，而是要通过导入表的方向来实现还原。当然，有些情况下，部分备份也可以直接通过--copy-back进行还原，但这种方式还原而来的数据多数会产生数据不一致的问题，因此，无论如何不推荐使用这种方式。
-
+```
 (1)创建部分备份
 
 创建部分备份的方式有三种：正则表达式(--include), 枚举表文件(--tables-file)和列出要备份的数据库(--databases)。
@@ -152,7 +148,7 @@ prepare部分备份的过程类似于导出表的过程，要使用--export选�
 
 (3)还原部分备份
 还原部分备份的过程跟导入表的过程相同。当然，也可以通过直接复制prepared状态的备份直接至数据目录中实现还原，不要此时要求数据目录处于一致状态。
-
+```
 
 
 
