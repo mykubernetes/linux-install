@@ -1,63 +1,37 @@
-
-
-使用Xtrabackup进行MySQL备份：
-
-一、安装
-
-1、简介
-Xtrabackup是由percona提供的mysql数据库备份工具，据官方介绍，这也是世界上惟一一款开源的能够对innodb和xtradb数据库进行热备的工具。特点：
-(1)备份过程快速、可靠；
-(2)备份过程不会打断正在执行的事务；
-(3)能够基于压缩等功能节约磁盘空间和流量；
-(4)自动实现备份检验；
-(5)还原速度快；
-
-2、安装
-其最新版的软件可从 http://www.percona.com/software/percona-xtrabackup/ 获得。本文基于RHEL5.8的系统，因此，直接下载相应版本的rpm包安装即可，这里不再演示其过程。
-
-二、备份的实现
-
+完全备份
+===
 1、完全备份
-
+```
 # innobackupex --user=DBUSER --password=DBUSERPASS  /path/to/BACKUP-DIR/
-
+```
 如果要使用一个最小权限的用户进行备份，则可基于如下命令创建此类用户：
+```
 mysql> CREATE USER ’bkpuser’@’localhost’ IDENTIFIED BY ’s3cret’;
 mysql> REVOKE ALL PRIVILEGES, GRANT OPTION FROM ’bkpuser’;
 mysql> GRANT RELOAD, LOCK TABLES, REPLICATION CLIENT ON *.* TO ’bkpuser’@’localhost’;
 mysql> FLUSH PRIVILEGES;
-
-使用innobakupex备份时，其会调用xtrabackup备份所有的InnoDB表，复制所有关于表结构定义的相关文件(.frm)、以及MyISAM、MERGE、CSV和ARCHIVE表的相关文件，同时还会备份触发器和数据库配置信息相关的文件。这些文件会被保存至一个以时间命名的目录中。
+```
 
 在备份的同时，innobackupex还会在备份目录中创建如下文件：
-(1)xtrabackup_checkpoints —— 备份类型（如完全或增量）、备份状态（如是否已经为prepared状态）和LSN(日志序列号)范围信息；
-
-每个InnoDB页(通常为16k大小)都会包含一个日志序列号，即LSN。LSN是整个数据库系统的系统版本号，每个页面相关的LSN能够表明此页面最近是如何发生改变的。
-
-(2)xtrabackup_binlog_info —— mysql服务器当前正在使用的二进制日志文件及至备份这一刻为止二进制日志事件的位置。
-
-(3)xtrabackup_binlog_pos_innodb —— 二进制日志文件及用于InnoDB或XtraDB表的二进制日志文件的当前position。
-
-(4)xtrabackup_binary —— 备份中用到的xtrabackup的可执行文件；
-
-(5)backup-my.cnf —— 备份命令用到的配置选项信息；
-
-在使用innobackupex进行备份时，还可以使用--no-timestamp选项来阻止命令自动创建一个以时间命名的目录；如此一来，innobackupex命令将会创建一个BACKUP-DIR目录来存储备份数据。
+- xtrabackup_checkpoints —— 备份类型（如完全或增量）、备份状态（如是否已经为prepared状态）和LSN(日志序列号)范围信息；每个InnoDB页(通常为16k大小)都会包含一个日志序列号，即LSN。LSN是整个数据库系统的系统版本号，每个页面相关的LSN能够表明此页面最近是如何发生改变的。
+- xtrabackup_binlog_info —— mysql服务器当前正在使用的二进制日志文件及至备份这一刻为止二进制日志事件的位置。
+- xtrabackup_binlog_pos_innodb —— 二进制日志文件及用于InnoDB或XtraDB表的二进制日志文件的当前position。
+- xtrabackup_binary —— 备份中用到的xtrabackup的可执行文件；
+- backup-my.cnf —— 备份命令用到的配置选项信息；
 
 2、准备(prepare)一个完全备份
-
-一般情况下，在备份完成后，数据尚且不能用于恢复操作，因为备份的数据中可能会包含尚未提交的事务或已经提交但尚未同步至数据文件中的事务。因此，此时数据文件仍处理不一致状态。“准备”的主要作用正是通过回滚未提交的事务及同步已经提交的事务至数据文件也使得数据文件处于一致性状态。
+- 一般情况下，在备份完成后，数据尚且不能用于恢复操作，因为备份的数据中可能会包含尚未提交的事务或已经提交但尚未同步至数据文件中的事务。因此，此时数据文件仍处理不一致状态。“准备”的主要作用正是通过回滚未提交的事务及同步已经提交的事务至数据文件也使得数据文件处于一致性状态。
 
 innobakupex命令的--apply-log选项可用于实现上述功能。如下面的命令：
-
+```
 # innobackupex --apply-log  /path/to/BACKUP-DIR
 如果执行正确，其最后输出的几行信息通常如下：
 xtrabackup: starting shutdown with innodb_fast_shutdown = 1
 120407  9:01:36  InnoDB: Starting shutdown...
 120407  9:01:40  InnoDB: Shutdown completed; log sequence number 92036620
 120407 09:01:40  innobackupex: completed OK!
-
-在实现“准备”的过程中，innobackupex通常还可以使用--use-memory选项来指定其可以使用的内存的大小，默认通常为100M。如果有足够的内存可用，可以多划分一些内存给prepare的过程，以提高其完成速度。
+```
+在实现“准备”的过程中，还可以使用--use-memory选项来指定其可以使用的内存的大小，默认通常为100M。
 
 
 3、从一个完全备份中恢复数据 
@@ -65,31 +39,29 @@ xtrabackup: starting shutdown with innodb_fast_shutdown = 1
 注意：恢复不用启动MySQL
 
 innobackupex命令的--copy-back选项用于执行恢复操作，其通过复制所有数据相关的文件至mysql服务器DATADIR目录中来执行恢复过程。innobackupex通过backup-my.cnf来获取DATADIR目录的相关信息。
-
+```
 # innobackupex --copy-back  /path/to/BACKUP-DIR
 如果执行正确，其输出信息的最后几行通常如下：
 innobackupex: Starting to copy InnoDB log files
 innobackupex: in '/backup/2012-04-07_08-17-03'
 innobackupex: back to original InnoDB log directory '/mydata/data'
 innobackupex: Finished copying back files.
-
 120407 09:36:10  innobackupex: completed OK!
-
-请确保如上信息的最行一行出现“innobackupex: completed OK!”。
+```
 
 当数据恢复至DATADIR目录以后，还需要确保所有数据文件的属主和属组均为正确的用户，如mysql，否则，在启动mysqld之前还需要事先修改数据文件的属主和属组。如：
-
+```
 # chown -R  mysql:mysql  /mydata/data/
+```
 
-
-4、使用innobackupex进行增量备份
-
+使用innobackupex进行增量备份
+===
 每个InnoDB的页面都会包含一个LSN信息，每当相关的数据发生改变，相关的页面的LSN就会自动增长。这正是InnoDB表可以进行增量备份的基础，即innobackupex通过备份上次完全备份之后发生改变的页面来实现。
 
 要实现第一次增量备份，可以使用下面的命令进行：
-
+```
 # innobackupex --incremental /backup --incremental-basedir=BASEDIR
-
+```
 其中，BASEDIR指的是完全备份所在的目录，此命令执行结束后，innobackupex命令会在/backup目录中创建一个新的以时间命名的目录以存放所有的增量备份数据。另外，在执行过增量备份之后再一次进行增量备份时，其--incremental-basedir应该指向上一次的增量备份所在的目录。
 
 需要注意的是，增量备份仅能应用于InnoDB或XtraDB表，对于MyISAM表而言，执行增量备份时其实进行的是完全备份。
