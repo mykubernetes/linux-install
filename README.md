@@ -1,7 +1,3 @@
-https://www.cnblogs.com/yyhh/
-
-https://www.runoob.com/
-
 http://archive.apache.org/dist/
 
 https://www.cnblogs.com/arjenlee
