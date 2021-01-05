@@ -243,6 +243,7 @@ ansible web -m service -a "name=httpd state=started enabled=yes"
 11)script 本地脚本拷贝到目标主机执行  
 ```
 ansible all -m script -a "/opt/script_file.sh"
+ansible all -m script -a 'chdir=/opt ./keme.sh'
 ```
 
 12)get_url
@@ -256,9 +257,9 @@ ansible node01 -m get_url -a "url=https://mirrors.aliyun.com/zabbix/zabbix/4.2/r
 ```
 
 13)mount
-- present	将挂载信息写入/etc/fstab
-- unmounted	卸载临时,不会清理/etc/fstab
-- mounted	先挂载,在将挂载信息/etc/fstab		
+- present 将挂载信息写入/etc/fstab
+- unmounted 卸载临时,不会清理/etc/fstab
+- mounted 先挂载,在将挂载信息/etc/fstab		
 - absent 卸载临时,也会清理/etc/fstab
 ```
 #环境准备：将172.16.1.61作为nfs服务端，172.16.1.7、172.16.1.8作为nfs客户端挂载
@@ -292,6 +293,19 @@ ansible node01 -m get_url -a "url=https://mirrors.aliyun.com/zabbix/zabbix/4.2/r
 #3、放行8080-8090的所有tcp端口流量,临时和永久都生效.
 # ansible node02 -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled" -i hosts 
 ```
+
+16）fetch  
+从被控远端机器上拉取文件(和COPY模块整好相反) 
+```
+#拉取node02的文件 到 /home/ansible/目录下
+# ansible node02 -m fetch -a 'src=/etc/hostname dest=/home/ansible/'
+```
+
+17)hostname
+```
+# ansible node02 -m hostname -a 'name=node05'
+```
+
 
 ansible playbook
 ===
