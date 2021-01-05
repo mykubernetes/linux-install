@@ -107,9 +107,23 @@ $ cd /opt/module/elasticsearch-6.6.0/bin/
 ``` curl -X GET 'http://node001:9200/_cat/nodes' ```  
 ``` curl -X GET 'http://node001:9200/_cat/nodes?v' ```  
 4)查看集群健康状态  
-``` curl -X GET 'http://node001:9200/_cluster/health?pretty' ```  
+```
+curl 'nofr001:9200/_cat/health?v'
+curl -X GET 'http://node001:9200/_cluster/health?pretty'
+```  
 5）查看集群详细信息  
 ``` curl 'node001:9200/_cluster/state?pretty' ```
+6)查看所有索引信息
+``` curl 'node001:9200/_cat/indices?v' ```
+7)计算集群中文档的数量
+```
+curl  -H "Content-Type: application/json"  -XGET 'http://localhost:9200/_count?pretty' -d '
+{
+  "query": {
+  "match_all": {}
+  }
+} '
+```
 
 HEAD
 ---
