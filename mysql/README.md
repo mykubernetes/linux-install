@@ -6,6 +6,8 @@ YUM或APT安装或更新MySQL是最方面的方法。
 https://dev.mysql.com/downloads/repo/yum/  
 https://dev.mysql.com/doc/mysql-yum-repo-quick-guide/en/  
 
+https://www.cnblogs.com/keme/p/10288168.html#1-mysql-%E6%9D%83%E9%99%90%E4%BB%8B%E7%BB%8D
+
 - DQL 查询语言select
 - DML 数据操作语音insert、update、delete
 - DDL 数据库操作
