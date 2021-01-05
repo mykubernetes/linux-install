@@ -120,7 +120,7 @@ curl -X GET 'http://node001:9200/_cluster/health?pretty'
 curl  -H "Content-Type: application/json"  -XGET 'http://localhost:9200/_count?pretty' -d '
 {
   "query": {
-  "match_all": {}
+    "match_all": {}
   }
 } '
 ```
