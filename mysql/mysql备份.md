@@ -1,5 +1,42 @@
 mysqldump
 ---
+```
+导出一个数据库：
+# mysqldump -u root -p -P 3306 --databases course>backup.sql
+导出多个数据库：
+# mysqldump -u root -p -P 3306 --databases course test>course.sql
+#或则
+# mysqldump -u root -p -P 3306 -B course test>course.sql
+ 
+导出所有数据库：
+# mysqldump -u root -p -P 3306 --all-databases>course.sql
+ 
+导出一个数据库的某几个表：
+# mysqldump -u root -p -P 3306 course students students_myisam>course.sql
+ 
+仅导出course数据库的数据而不包含表结构：
+]# mysqldump -u root -p -P 3306 --no-create-info course>course.sql
+ 
+仅导出course数据库中的students和students_myisam两个表的数据：
+# mysqldump -u root -p -P 3306 --no-create-info course students students_myisam>course.sq
+ 
+仅导出course数据库的表结构：
+# mysqldump -u root -p -P 3306 --no-data course>course.sql
+ 
+导出course数据库中除了teacher和score两个表的其他表结构和数据：
+# mysqldump -u root -p -P 3306 --ignore-table=course.teacher --ignoretable=course.score course>course.sql
+ 
+导出course数据库的表和存储过程和触发器：
+# mysqldump -u root -p -P 3306 --routine --trigger course>course.sql
+ 
+导出course数据库中符合where条件的数据：
+# mysqldump -u root -p -P 3306 --where="sid in (1,2)" course students
+students_myisam>course.sql
+ 
+远程导出course数据库，导出文件在发起导出命令的服务器上：
+# mysqldump -u root -p -P 3306 -h 10.0.0.201 course > course.sql
+```
+
 1、备份所有数据库  
 ```
 mysqldump -u root -p123456 --all-databases > /opt/mysqlbak/20190804.sql
