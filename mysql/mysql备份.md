@@ -108,3 +108,28 @@ show master status\G
 slave stop
 slave start
 ```
+
+自定义脚本定时备份  
+检测所有用户定义的数据库，定时备份所有的数据库，并上传到备份服务器
+```
+#!/bin/sh
+####################################
+##Function: mysql_dump
+##Version: 1.1
+# #####################################
+MYUSER=system
+PORT=5001
+DB_DATE=$(date +%F)
+DB_NAME=$(uname -n)
+MYPASS=********
+MYLOGIN=" /data/application/mysql/bin/mysql -u$MYUSER -p$MYPASS -P$PORT "
+MYDUMP=" /data/application/mysql/bin/mysqldump -u$MYUSER -p$MYPASS -P$PORT -B "
+DATABASE=" $($MYLOGIN -e "show databases;" |egrep -vi "information_schema|database|performance_schema|mysql") "
+for dbname in $DATABASE do
+MYDIR=/server/backup/$dbname
+[ ! -d $MYDIR ] && mkdir -p $MYDIR
+$MYDUMP $dbname --ignore-table=opsys.user_action|gzip > $MYDIR/${dbname}_${DB_NAME}_${DB_DATE}_sql.gz
+Done
+find /server/backup/ -type f -name "*.gz" -mtime +3|xargs rm –rf
+find /server/backup/* -type d -name "*" -exec rsync -avz {} data_backup:/data/backup/ \;
+```
