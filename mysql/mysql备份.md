@@ -75,7 +75,7 @@ mysqlbinlog --start-date="2016-09-30 18:19:30" --stop-date="2016-10-1 12:30:30" 
 
 2按位置号还原
 ```
-mysqlbinlog --start-position="436" --stop-position="521" /var/lib/mysql/binlog.000001 mysql -u root -p123
+mysqlbinlog --start-position="436" --stop-position="521" /var/lib/mysql/binlog.000001 | mysql -u root -p123
 ```
 
 3、记录日志方式 还原日志
