@@ -15,7 +15,7 @@ mysqldump
 # mysqldump -u root -p -P 3306 course students students_myisam>course.sql
  
 仅导出course数据库的数据而不包含表结构：
-]# mysqldump -u root -p -P 3306 --no-create-info course>course.sql
+# mysqldump -u root -p -P 3306 --no-create-info course>course.sql
  
 仅导出course数据库中的students和students_myisam两个表的数据：
 # mysqldump -u root -p -P 3306 --no-create-info course students students_myisam>course.sq
