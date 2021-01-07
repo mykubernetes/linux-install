@@ -113,7 +113,7 @@ curl -X GET 'http://node001:9200/_cluster/health?pretty'
 ```  
 5）查看集群详细信息  
 ``` curl 'node001:9200/_cluster/state?pretty' ```  
-6)查看所有索引信息
+6)查看所有索引信息  
 ``` curl 'node001:9200/_cat/indices?v' ```  
 7)计算集群中文档的数量
 ```
@@ -205,11 +205,25 @@ curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/ -d
 在url后面添加参数,下面两种方法都可以
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/2?op_type=create -d '{"name":"lucy","age":18}'
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_create -d '{"name":"lily","age":28}'
-
 ```
 创建操作可以使用POST，也可以使用PUT，区别在于POST是作用在一个集合资源之上的（/articles），而PUT操作是作用在一个具体资源之上的（/articles/123）比如说很多资源使用数据库自增主键作为标识信息，而创建的资源的标识信息到底是什么只能由服务端提供，这个时候就必须使用POST
 - put请求必须带id,如果id不存在则为创建，如果id存在则为更新
 - post请求不用带id,如果id不存在则为创建，如果id存在则为更新
+
+导入数据
+```
+wget https://raw.githubusercontent.com/elastic/elasticsearch/master/docs/src/test/resources/accounts.json
+
+# 导入数据
+curl -H "Content-Type: application/json" -XPOST "localhost:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@accounts.json"
+curl "localhost:9200/_cat/indices?v"
+
+curl -X GET "localhost:9200/bank/_search?q=*&sort=account_number:asc&pretty"
+```
+- _search 查询
+- q=* ES批量索引中的所有文档
+- sort=account_number:asc 表示根据account_number按升序对结果排序
+
 
 2、查询索引
 ```
