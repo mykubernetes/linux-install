@@ -284,6 +284,27 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
    }
 }'
 
+# 查询余额大于或等于20000且小于等于30000的账户
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "bool": {
+      "must": { "match_all": {} },
+      "filter": {
+        "range": {
+          "balance": {
+            "gte": 20000,
+            "lte": 30000
+          }
+        }
+      }
+    }
+  }
+}
+'
+
+
+
 
 # 返回10-19的文档：
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
