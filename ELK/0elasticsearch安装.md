@@ -216,9 +216,20 @@ wget https://raw.githubusercontent.com/elastic/elasticsearch/master/docs/src/tes
 
 # 导入数据
 curl -H "Content-Type: application/json" -XPOST "localhost:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@accounts.json"
+
 curl "localhost:9200/_cat/indices?v"
 
 curl -X GET "localhost:9200/bank/_search?q=*&sort=account_number:asc&pretty"
+
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": { "match_all": {} },
+  "sort": [
+    { "account_number": "asc" }
+  ]
+}
+'
+
 ```
 - _search 查询
 - q=* ES批量索引中的所有文档
