@@ -112,9 +112,9 @@ curl 'nofr001:9200/_cat/health?v'
 curl -X GET 'http://node001:9200/_cluster/health?pretty'
 ```  
 5）查看集群详细信息  
-``` curl 'node001:9200/_cluster/state?pretty' ```
+``` curl 'node001:9200/_cluster/state?pretty' ```  
 6)查看所有索引信息
-``` curl 'node001:9200/_cat/indices?v' ```
+``` curl 'node001:9200/_cat/indices?v' ```  
 7)计算集群中文档的数量
 ```
 curl  -H "Content-Type: application/json"  -XGET 'http://localhost:9200/_count?pretty' -d '
@@ -124,6 +124,9 @@ curl  -H "Content-Type: application/json"  -XGET 'http://localhost:9200/_count?p
   }
 } '
 ```
+- green：所有的主分片和副本分片都已分配。你的集群是 100% 可用的。
+- yellow：所有的主分片已经分片了，但至少还有一个副本是缺失的。不会有数据丢失，所以搜索结果依然是完整的。不过，你的高可用性在某种程度上被弱化。如果 更多的 分片消失，你就会丢数据了。把 yellow 想象成一个需要及时调查的警告。
+- red：至少一个主分片（以及它的全部副本）都在缺失中。这意味着你在缺少数据：搜索只能返回部分数据，而分配到这个分片上的写入请求会返回一个异常。
 
 HEAD
 ---
