@@ -234,7 +234,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 - _search 查询
 - q=* ES批量索引中的所有文档
 - sort=account_number:asc 表示根据account_number按升序对结果排序
-
+- match_all：匹配所有文档。默认查询
 
 2、查询索引
 ```
