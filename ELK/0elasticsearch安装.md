@@ -285,9 +285,20 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
 }'
 
 
+# 返回10-19的文档：
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": { "match_all": {} },
+  "from": 10,
+  "size": 10
+}
+'
+
 DSL全文搜索 "张三" "李四"
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"张三 李四"}}}'
 ```
+- from未指定，默认为0
+- size未指定，默认为10
 
 高亮显示
 ```
