@@ -294,8 +294,18 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 }
 '
 
-DSL全文搜索 "张三" "李四"
+# DSL全文搜索 "张三" "李四"
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"张三 李四"}}}'
+
+
+# 返回_source字段中的几个字段：
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": { "match_all": {} },
+  "_source": ["account_number", "balance"]
+}
+'
+
 ```
 - from未指定，默认为0
 - size未指定，默认为10
