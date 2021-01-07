@@ -305,10 +305,42 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
   "_source": ["account_number", "balance"]
 }
 '
-
 ```
 - from未指定，默认为0
 - size未指定，默认为10
+
+
+```
+# 查询包含mill和lane的所有账户：
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "address": "mill" } },
+        { "match": { "address": "lane" } }
+      ]
+    }
+  }
+}
+'
+该bool must指定了所有必须为真才匹配。
+
+# 查询包含mill或lane的所有账户：
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "address": "mill" } },
+        { "match": { "address": "lane" } }
+      ]
+    }
+  }
+}
+'
+
+```
 
 高亮显示
 ```
