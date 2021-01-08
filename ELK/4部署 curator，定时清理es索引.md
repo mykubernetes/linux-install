@@ -134,7 +134,7 @@ $ crontab -e
 - user_age: 这个就与action.yml样例类似，根据日期来确定哪些数据为老数据
 - source: 从哪里来获取索引时间。当user_age为True时，该配置为必填项。可以为name、creation_date、field_stats
   - name: 来源为索引名称，此时必须指定timestring来匹配索引名称中的日期
-  - creation_date: 来源为索引的创建时间，ES内部会保存每个索引创建的具体时间，可通过http://127.0.0.1:9200/zou_data*?pretty查看。
+  - creation_date: 来源为索引的创建时间，ES内部会保存每个索引创建的具体时间，可通过 http://127.0.0.1:9200/zou_data*?pretty 查看。
   - filed_stats: 来源为索引数据中某个日期字段，这个字段必须时ES能识别的日期字段，Curator会通过ES API获取每个索引中这个字段的最大值跟最小值。
 - timestring: 当source为name时必须配置，用于匹配索引名称中的日期，如 '%Y-%m-%d'
 - field: 当source为field_stats时必须配置，用于指定索引中的日期字段，默认@timestamp字段
