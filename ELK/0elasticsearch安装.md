@@ -1,6 +1,24 @@
 ELK
 ====
 官网：https://www.elastic.co/cn/  
+
+| ES | 关系型数据库（比如Mysql） |
+| :------: | :--------: |
+| Index | Database |
+| Type | Table |
+| Document | Row |
+| Field | Column |
+
+- Node：运行单个ES实例的服务器
+- Cluster：一个或多个节点构成集群
+- Index：索引是多个文档的集合
+- Document：Index里每条记录称为Document，若干文档构建一个Index
+- Type：一个Index可以定义一种或多种类型，将Document逻辑分组
+- Field：ES存储的最小单元
+- Shards：ES将Index分为若干份，每一份就是一个分片
+- Replicas：Index的一份或多份副本
+
+
 一、安装jdk  最低要求jdk 8版本
 ```
 $ tar -zxf /opt/softwares/jdk-8u121-linux-x64.gz -C /opt/modules/
