@@ -93,3 +93,39 @@ $ crontab -e
 
 0 0 * * * /usr/bin/curator --config /data/ELKStack/curator/config.yml /data/ELKStack/curator/action.yml
 ```
+
+```
+#根据索引名称排序
+- filtertype: space
+  disk_space: 0.001
+  reverse: True
+#根据索引创建的时间排序
+- filtertype: space
+  disk_space: 0.001
+  use_age: True
+  source: creation_date
+#根据索引名称获取时间排序
+- filtertype: space
+  disk_space: 0.001
+  use_age: True
+  source: name
+  timestring: '%Y-%m-%d'
+#根据索引时间字段的最小值排序
+- filtertype: space
+  disk_space: 0.001
+  use_age: True
+  source: field_stats
+  field: logtime
+  stats_result: min_value
+```
+- disk_space: 设置一个临界值，单位为gb，当匹配的索引数据总和与这个临界值进行比较
+- reverse: 默认为True,可以这样理解，True时索引按名称倒序，删除时从后往前删。False时索引按名称顺序，删除时也是从后往前删。如果配置了use_age为True时这个配置就被忽略了。
+- user_age: 这个就与action.yml样例类似，根据日期来确定哪些数据为老数据
+- source: 从哪里来获取索引时间。当user_age为True时，该配置为必填项。可以为name、creation_date、field_stats
+  - name: 来源为索引名称，此时必须指定timestring来匹配索引名称中的日期
+  - creation_date: 来源为索引的创建时间，ES内部会保存每个索引创建的具体时间，可通过http://127.0.0.1:9200/zou_data*?pretty查看。
+  - filed_stats: 来源为索引数据中某个日期字段，这个字段必须时ES能识别的日期字段，Curator会通过ES API获取每个索引中这个字段的最大值跟最小值。
+- timestring: 当source为name时必须配置，用于匹配索引名称中的日期，如 '%Y-%m-%d'
+- field: 当source为field_stats时必须配置，用于指定索引中的日期字段，默认@timestamp字段
+- stats_result: 只有当source为field时才需配置，用于指定永min_value 还是max_value ,默认为min_value 
+- exclude： 是否需要排除，为True表示该filter匹配到的内容不执行action操作
