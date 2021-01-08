@@ -67,6 +67,10 @@ network.host: 192.168.101.66         #监听的ip地址，如果是0.0.0.0，则
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]   #默认使用9300，如果修改可node001:9300
 discovery.zen.ping_timeout: 10s
 discovery.zen.minimum_master_nodes: 3
+
+# 允许跨域请求
+http.cors.enabled: true
+http.cors.allow-origin: "*"
 ```  
 4、优化内核限制文件数和打开的进程数  
 ```
