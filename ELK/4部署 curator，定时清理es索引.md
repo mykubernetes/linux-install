@@ -118,6 +118,17 @@ $ crontab -e
   field: logtime
   stats_result: min_value
 ```
+```
+- filtertype: space
+  disk_space: 100
+  reverse: True
+  use_age: False
+  source: creation_date
+  timestring:
+  field:
+  stats_result:
+  exclude: False
+```
 - disk_space: 设置一个临界值，单位为gb，当匹配的索引数据总和与这个临界值进行比较
 - reverse: 默认为True,可以这样理解，True时索引按名称倒序，删除时从后往前删。False时索引按名称顺序，删除时也是从后往前删。如果配置了use_age为True时这个配置就被忽略了。
 - user_age: 这个就与action.yml样例类似，根据日期来确定哪些数据为老数据
