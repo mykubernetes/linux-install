@@ -143,6 +143,8 @@ $ crontab -e
 
 
 
-delete_indices标识执行的动作为删除索引，action参考：https://www.elastic.co/guide/en/elasticsearch/client/curator/current/actions.html
+delete_indices标识执行的动作为删除索引，action参考：  
+https://www.elastic.co/guide/en/elasticsearch/client/curator/current/actions.html
 
-ignore_empty_list：是否忽略错误空列表，option参考：https://www.elastic.co/guide/en/elasticsearch/client/curator/current/option_ignore_empty.html
+ignore_empty_list：是否忽略错误空列表，option参考：  
+https://www.elastic.co/guide/en/elasticsearch/client/curator/current/option_ignore_empty.html
