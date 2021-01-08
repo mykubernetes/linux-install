@@ -219,6 +219,7 @@ curl -XPUT 'http://master:9200/test/'
 创建数据
 PUT请求,PUT是幂等方法，所以PUT用于更新操作,PUT，DELETE操作是幂等的,幂等是指不管进行多少次操作，结果都一样。
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/1 -d '{"name" : "jack","age" : 28}'
+curl -H "Content-Type: application/json" -XPUT http://master:9200/test/_doc/1 -d '{"name" : "jack","age" : 28}'
 
 POST请求,POST用于新增操作比较合适,POST操作不是幂等的,多次发出同样的POST请求后，其结果是创建出了若干的资源。
 使用自增ID（post）
