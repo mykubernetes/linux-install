@@ -140,3 +140,9 @@ $ crontab -e
 - field: 当source为field_stats时必须配置，用于指定索引中的日期字段，默认@timestamp字段
 - stats_result: 只有当source为field时才需配置，用于指定永min_value 还是max_value ,默认为min_value 
 - exclude： 是否需要排除，为True表示该filter匹配到的内容不执行action操作
+
+
+
+delete_indices标识执行的动作为删除索引，action参考：https://www.elastic.co/guide/en/elasticsearch/client/curator/current/actions.html
+
+ignore_empty_list：是否忽略错误空列表，option参考：https://www.elastic.co/guide/en/elasticsearch/client/curator/current/option_ignore_empty.html
