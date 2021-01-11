@@ -175,6 +175,8 @@ $ source /etc/profile
 1）创建topic  
 ```
 $ bin/kafka-topics.sh --create --zookeeper node001:2181 --replication-factor 3 --partitions 1 --topic first
+
+$ bin/kafka-topics.sh --zookeeper zk_host:port/chroot --create --topic my_topic_name --partitions 20 --replication-factor 3 --config x=y
 ```
 - --topic 定义topic名  
 - --replication-factor  定义副本数  
