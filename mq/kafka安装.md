@@ -219,6 +219,15 @@ $ bin/kafka-topics.sh --topic first --describe --zookeeper node001:2181
 $  bin/kafka-topics.sh  --zookeeper hadoop102:2181 --alter --topic first --partitions 6
 ```
 
+8)增加⼀个配置项
+```
+$ bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --add-config x=y
+```
+
+9)
+```
+$ bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --delete-config x
+```
 
 常用创建topic参数
 ```
