@@ -185,8 +185,10 @@ $ bin/kafka-topics.sh --create --zookeeper node001:2181 --replication-factor 3 -
 
 
 3）删除topic
-``` $ bin/kafka-topics.sh --delete --zookeeper node001:2181 --topic first ```  
-    需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
+```
+$ bin/kafka-topics.sh --delete --zookeeper node001:2181 --topic first
+```  
+- 需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
 
 4）发送消息
 ```
