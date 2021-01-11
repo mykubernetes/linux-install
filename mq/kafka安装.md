@@ -397,6 +397,20 @@ group.id=test001
 同一时刻只有一个消费者接收到消息。
 ```
 
+列出所有 topic  中的所有consumer  组
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+```
+
+显示 consumer  群体中所有 consumer  的位置，以及所在⽇志的结尾。
+```
+仅显示使⽤Java consumer API（基于⾮ZooKeeper的 consumer）的 consumer 的信息
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+
+显示关于使⽤ZooKeeper的 consumer 的信息（不是那些使⽤Java consumer API的消费者)
+# bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --describe --group my-group
+```
+
 
 Kafka  监控
 ===
