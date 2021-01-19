@@ -255,6 +255,24 @@ member d2d2e9fc758e6790 is healthy: got healthy result from http://127.0.0.1:237
 cluster is healthy
 ```
 
+```
+etcdctl --write-out=table --endpoints=172.16.0.8:2379,172.16.0.14:2379,172.16.0.17:2379 endpoint status
+
++------------------+------------------+---------+---------+-----------+-----------+------------+
+|     ENDPOINT     |        ID        | VERSION | DB SIZE | IS LEADER | RAFT TERM | RAFT INDEX |
++------------------+------------------+---------+---------+-----------+-----------+------------+
+| 172.16.0.8:2379  | 2d2e457c6a1a76cb | 3.0.0   | 45 kB   | false     |         4 |      16726 |
+| 172.16.0.14:2379 | 56e0b6dad4c53d42 | 3.0.0   | 45 kB   | true      |         4 |      16726 |
+| 172.16.0.17:2379 | d2d2e9fc758e6790 | 3.0.0   | 45 kB   | false     |         4 |      16726 |
++------------------+------------------+---------+---------+-----------+-----------+------------+
+
+etcdctl --endpoints=172.16.0.8:2379,172.16.0.14:2379,172.16.0.17:2379 endpoint health
+
+172.16.0.8:2379 is healthy: successfully committed proposal: took = 3.345431ms
+172.16.0.14:2379 is healthy: successfully committed proposal: took = 3.767967ms
+172.16.0.817:2379 is healthy: successfully committed proposal: took = 4.025451ms
+```
+
 五、简单使用
 ===
 
