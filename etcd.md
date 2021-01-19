@@ -243,6 +243,7 @@ tcp 0      0 172.16.0.8:2380   0.0.0.0:*     LISTEN 25167/etcd
 
 查看集群状态(可以看到etcd-0-17)
 ```
+# 查看集群成员
 [root@etcd-0-8 default.etcd]# etcdctl member list
 2d2e457c6a1a76cb: name=etcd-0-8 peerURLs=http://172.16.0.8:2380 clientURLs=http://127.0.0.1:2379,http://172.16.0.8:2379 isLeader=false
 56e0b6dad4c53d42: name=etcd-0-14 peerURLs=http://172.16.0.14:2380 clientURLs=http://127.0.0.1:2379,http://172.16.0.14:2379 isLeader=true
@@ -256,8 +257,8 @@ cluster is healthy
 ```
 
 ```
-etcdctl --write-out=table --endpoints=172.16.0.8:2379,172.16.0.14:2379,172.16.0.17:2379 endpoint status
-
+# 查看集群状态
+# etcdctl --write-out=table --endpoints=172.16.0.8:2379,172.16.0.14:2379,172.16.0.17:2379 endpoint status
 +------------------+------------------+---------+---------+-----------+-----------+------------+
 |     ENDPOINT     |        ID        | VERSION | DB SIZE | IS LEADER | RAFT TERM | RAFT INDEX |
 +------------------+------------------+---------+---------+-----------+-----------+------------+
@@ -266,8 +267,7 @@ etcdctl --write-out=table --endpoints=172.16.0.8:2379,172.16.0.14:2379,172.16.0.
 | 172.16.0.17:2379 | d2d2e9fc758e6790 | 3.0.0   | 45 kB   | false     |         4 |      16726 |
 +------------------+------------------+---------+---------+-----------+-----------+------------+
 
-etcdctl --endpoints=172.16.0.8:2379,172.16.0.14:2379,172.16.0.17:2379 endpoint health
-
+# etcdctl --endpoints=172.16.0.8:2379,172.16.0.14:2379,172.16.0.17:2379 endpoint health
 172.16.0.8:2379 is healthy: successfully committed proposal: took = 3.345431ms
 172.16.0.14:2379 is healthy: successfully committed proposal: took = 3.767967ms
 172.16.0.817:2379 is healthy: successfully committed proposal: took = 4.025451ms
