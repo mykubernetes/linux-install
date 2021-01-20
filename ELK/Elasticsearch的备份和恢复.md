@@ -264,3 +264,55 @@ curl -XGET http://127.0.0.1:9200/_recovery/
 ```
 curl -XDELETE http://127.0.0.1:9200/restored_index_3
 ```
+
+七、备份数据要在新集群恢复
+---
+
+1、需要先在新集群创建相同结构的index及type，并创建快照仓储
+```
+curl -X POST \
+  http://192.168.0.39:9200/yuqing \
+  -d '{
+    "settings":{
+        "number_of_shards":5,
+        "number_of_replicas":1
+    },
+    "mappings":{
+        "article":{
+            "dynamic":"strict",
+            "properties":{
+                "title":{"type":"string","store":"yes","index":"analyzed","analyzer": "ik_max_word","search_analyzer": "ik_max_word"},
+                "types":{"type":"string","store":"yes","index":"analyzed","analyzer": "ik_max_word","search_analyzer": "ik_max_word"},
+                "url":{"type":"string","store":"no","index":"no"}
+            }
+        }
+    }
+}'
+```
+
+2、需要先关闭index，否则会出现问题【cannot restore index [myindex] because it's open】
+```
+curl -X POST  http://192.168.0.38:9200/yuqing/_close
+```
+
+3、恢复数据（去掉参数即可恢复所有索引，否则恢复指定索引 myindex）
+```
+curl -X POST http://192.168.0.38:9200/_snapshot/mybackup/snapshot_1/_restore \
+-d '{
+    "indices": "myindex"
+}'
+
+#查看恢复进度
+curl -X GET http://192.168.0.38:9200/yuqing/_recovery
+
+#取消恢复(索引yuqing正在被恢复)
+curl -X DELETE http://192.168.0.38:9200/yuqing
+```
+  
+
+4、重新开启index
+```
+curl -X POST  http://192.168.0.38:9200/yuqing/_open
+
+# 查看看到备份的数据
+curl -X GET   http://192.168.0.38:9200/yuqing/article/_search
