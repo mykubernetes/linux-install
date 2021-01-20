@@ -1,0 +1,256 @@
+备份
+===
+备份数据之前，要创建一个仓库来保存数据，仓库的类型支持共享文件系统、Amazon S3、 HDFS和Azure Cloud。 
+
+
+Elasticsearch的一大特点就是使用简单，api也比较强大，备份也不例外。简单来说，备份分两步：
+- 创建一个仓库
+- 备份指定索引
+
+ 
+一、创建存储仓库
+---
+共享文件系统实例如下：
+```
+curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup
+{
+    "type": "fs", 
+    "settings": {
+        "location": "/mount/EsDataBackupDir" 
+    }
+}
+```
+- 创建了一个名为EsBackup的存仓库
+- 指定的备份方式为共享文件系统(type: fs)
+- 指定共享存储的具体路径（location参数）
+
+注意：共享存储路径，必须是所有的ES节点都可以访问的，最简单的就是nfs系统，然后每个节点都需要挂载到本地。
+ 
+如上所示，创建存储仓库的时候，除了可以指定location参数以外，我们还可以指点max_snapshot_bytes_per_sec和max_restore_bytes_per_sec参数来限制备份和恢复时的速度，默认值都是20mb/s，假设我们有一个非常快的网络环境,我们可以增大默认值：
+```
+curl -XPOST http://127.0.0.1:9200/_snapshot/EsBackup
+{
+    "type": "fs", 
+    "settings": {
+        "location": "/mount/EsDataBackupDir" 
+        "max_snapshot_bytes_per_sec" : "50mb", 
+        "max_restore_bytes_per_sec" : "50mb"
+    }
+}
+```
+注意:这是在第一段代码的基础上来增加配置，第一段代码利用的是PUT请求来创建存储库，这段代码则是利用POST请求来更新已经存在的存储库的settings配置。 
+
+
+Amazon S3存储库实例如下：
+```
+curl -XPUT 'http://localhost:9200/_snapshot/s3-backup' -d '{
+    "type": "s3",
+    "settings": {
+        "bucket": "esbackup",
+        "region": "cn-north-1",
+        "access_key": "xxooxxooxxoo",
+        "secret_key": "xxxxxxxxxooooooooooooyyyyyyyyy"
+    }
+}'
+```
+- Type: 仓库类型
+- Setting: 仓库的额外信息
+- Region: AWS Region
+- Access_key: 访问秘钥
+- Secret_key: 私有访问秘钥
+- Bucket: 存储桶名称
+
+不同的ES版本支持的region参考：https://github.com/elastic/elasticsearch-cloud-aws#aws-cloud-plugin-for-elasticsearch
+使用上面的命令，创建一个仓库（s3-backup），并且还创建了存储桶（esbackup）,返回{"acknowledged":true} 信息证明创建成功。
+
+```
+确认存储桶是否创建成功：
+curl -XPOST http://localhost:9200/_snapshot/s3-backup/_verify
+
+查看刚创建的存储桶
+curl -XGET localhost:9200/_snapshot/s3-backup?pretty
+
+查看所有的存储桶
+curl -XGET localhost:9200/_snapshot/_all?pretty
+
+删除一个快照存储桶
+curl -XDELETE localhost:9200/_snapshot/s3-backup?pretty
+```
+
+二、备份索引
+---
+一个仓库可以包含多个快照（snapshots），快照可以存所有的索引或者部分索引，当然也可以存储一个单独的索引。(要注意的一点就是快照只会备份open状态的索引，close状态的不会备份)
+
+
+1、备份所有索引
+
+将所有正在运行的open状态的索引，备份到EsBacup仓库下一个叫snapshot_all的快照中。上面的api会立刻返回{"accepted":true}，然后备份工作在后台运行。如果你想api同步执行，可以加wait_for_completion 标志：
+```
+# api会立刻返回{"accepted":true}，然后备份工作在后台运行
+curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_all
+
+api同步执行，可以加wait_for_completion,备份完全完成后才返回，如果快照数据量大的话，会花很长时间。
+curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_all?wait_for_completion=true
+```
+
+
+2、备份部分索引
+
+默认是备份所有open状态的索引，如果只备份某些或者某个索引，可以指定indices参数来完成：
+```
+curl -XPUT 'http://localhost:9200/_snapshot/EsBackup/snapshot_12' -d '{ "indices": "index_1,index_2" }'
+```
+
+三、查看快照信息
+
+查看快照snapshot_2的详细信息：
+```
+GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
+
+{
+   "snapshots": [
+      {
+         "snapshot": "snapshot_2",
+         "indices": [
+            ".marvel_2014_28_10",
+            "index1",
+            "index2"
+         ],
+         "state": "SUCCESS",
+         "start_time": "2014-09-02T13:01:43.115Z",
+         "start_time_in_millis": 1409662903115,
+         "end_time": "2014-09-02T13:01:43.439Z",
+         "end_time_in_millis": 1409662903439,
+         "duration_in_millis": 324,
+         "failures": [],
+         "shards": {
+            "total": 10,
+            "failed": 0,
+            "successful": 10
+         }
+      }
+   ]
+}
+```
+
+```
+# 查看所有快照信息如下
+GET http://127.0.0.1:9200/_snapshot/my_backup/_all
+
+# 查看更加详细的信息
+GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2/_status
+```
+ 
+四、删除快照
+---
+```
+DELETE _snapshot/my_backup/snapshot_2
+```
+重要的是使用API来删除快照,而不是其他一些机制(如手工删除,或使用自动s3清理工具)。因为快照增量,它是可能的,许多快照依靠old seaments。删除API了解最近仍在使用的数据快照,并将只删除未使用的部分。如果你手动文件删除,但是,你有可能严重破坏你的备份,因为你删除数据仍在使用,如果备份正在后台进行，也可以直接删除来取消此次备份。
+ 
+
+五、监控快照进展
+---
+ 
+查看更细节的状态的快照
+```
+GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3
+```
+ 
+API立即返回并给出一个更详细的输出的统计
+```
+GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3/_status
+{
+   "snapshots": [
+      {
+         "snapshot": "snapshot_3",
+         "repository": "my_backup",
+         "state": "IN_PROGRESS", 
+         "shards_stats": {
+            "initializing": 0,
+            "started": 1, 
+            "finalizing": 0,
+            "done": 4,
+            "failed": 0,
+            "total": 5
+         },
+         "stats": {
+            "number_of_files": 5,
+            "processed_files": 5,
+            "total_size_in_bytes": 1792,
+            "processed_size_in_bytes": 1792,
+            "start_time_in_millis": 1409663054859,
+            "time_in_millis": 64
+         },
+         "indices": {
+            "index_3": {
+               "shards_stats": {
+                  "initializing": 0,
+                  "started": 0,
+                  "finalizing": 0,
+                  "done": 5,
+                  "failed": 0,
+                  "total": 5
+               },
+               "stats": {
+                  "number_of_files": 5,
+                  "processed_files": 5,
+                  "total_size_in_bytes": 1792,
+                  "processed_size_in_bytes": 1792,
+                  "start_time_in_millis": 1409663054859,
+                  "time_in_millis": 64
+               },
+               "shards": {
+                  "0": {
+                     "stage": "DONE",
+                     "stats": {
+                        "number_of_files": 1,
+                        "processed_files": 1,
+                        "total_size_in_bytes": 514,
+                        "processed_size_in_bytes": 514,
+                        "start_time_in_millis": 1409663054862,
+                        "time_in_millis": 22
+                     }
+                  },
+                  ...
+```
+快照当前运行将显示IN_PROGRESS作为其状态，这个特定的快照有一个碎片仍然转移(其他四个已经完成)。
+ 
+响应包括总体状况的快照,但还深入每和每个实例统计数据。
+- INITIALIZING： 集群的碎片是检查状态是否可以快照。这通常是非常快。
+- STARTED：数据被转移到存储库。
+- FINALIZING：数据传输完成;碎片现在发送快照的元数据。
+- DONE：快照完成。
+- FAILED：在快照过程中错误的出处,这碎片/索引/快照无法完成。检查你的日志以获取更多信息。
+ 
+
+六、恢复
+---
+恢复snapshot_1里的全部索引
+```
+POST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
+```
+
+带参数恢复
+```
+POST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
+{
+    "indices": "index_1", 
+    "rename_pattern": "index_(.+)", 
+    "rename_replacement": "restored_index_$1" 
+}
+```
+- indices 设置只恢复index_1索引
+- rename_pattern 和rename_replacement用来正则匹配要恢复的索引，并且重命名
+
+ 
+可以使用下面两个api查看状态：
+```
+GET http://127.0.0.1:9200/_recovery/restored_index_3
+GET http://127.0.0.1:9200/_recovery/
+```
+
+如果要取消恢复过程（不管是已经恢复完，还是正在恢复），直接删除索引即可：
+```
+DELETE http://127.0.0.1:9200/restored_index_3
+```
