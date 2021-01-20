@@ -10,7 +10,14 @@ Elasticsearch的一大特点就是使用简单，api也比较强大，备份也�
  
 一、创建存储仓库
 ---
-共享文件系统实例如下：
+
+1、修改ES配置文件
+```
+vi config/elasticsearch.yml
+path.repo: ["/mount/EsDataBackupDir"]        #添加仓库路径
+```
+
+2、共享文件系统实例如下：
 ```
 curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup
 {
@@ -26,7 +33,8 @@ curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup
 
 注意：共享存储路径，必须是所有的ES节点都可以访问的，最简单的就是nfs系统，然后每个节点都需要挂载到本地。
  
-如上所示，创建存储仓库的时候，除了可以指定location参数以外，我们还可以指点max_snapshot_bytes_per_sec和max_restore_bytes_per_sec参数来限制备份和恢复时的速度，默认值都是20mb/s，假设我们有一个非常快的网络环境,我们可以增大默认值：
+
+3、更新已经存在的存储库的settings配置。 
 ```
 curl -XPOST http://127.0.0.1:9200/_snapshot/EsBackup
 {
@@ -38,10 +46,12 @@ curl -XPOST http://127.0.0.1:9200/_snapshot/EsBackup
     }
 }
 ```
-注意:这是在第一段代码的基础上来增加配置，第一段代码利用的是PUT请求来创建存储库，这段代码则是利用POST请求来更新已经存在的存储库的settings配置。 
+- max_snapshot_bytes_per_sec 指定备份时的速度，默认值都是20mb/s
+- max_restore_bytes_per_sec 指定恢复时的速度，默认值都是20mb/s
 
 
-Amazon S3存储库实例如下：
+
+4、Amazon S3存储库实例如下：
 ```
 curl -XPUT 'http://localhost:9200/_snapshot/s3-backup' -d '{
     "type": "s3",
@@ -60,7 +70,7 @@ curl -XPUT 'http://localhost:9200/_snapshot/s3-backup' -d '{
 - Secret_key: 私有访问秘钥
 - Bucket: 存储桶名称
 
-不同的ES版本支持的region参考：https://github.com/elastic/elasticsearch-cloud-aws#aws-cloud-plugin-for-elasticsearch
+不同的ES版本支持的region参考：https://github.com/elastic/elasticsearch-cloud-aws#aws-cloud-plugin-for-elasticsearch  
 使用上面的命令，创建一个仓库（s3-backup），并且还创建了存储桶（esbackup）,返回{"acknowledged":true} 信息证明创建成功。
 
 ```
