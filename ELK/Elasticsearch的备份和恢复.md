@@ -94,7 +94,7 @@ curl -XDELETE localhost:9200/_snapshot/s3-backup?pretty
 
 1、备份所有索引
 
-将所有正在运行的open状态的索引，备份到EsBacup仓库下一个叫snapshot_all的快照中。上面的api会立刻返回{"accepted":true}，然后备份工作在后台运行。如果你想api同步执行，可以加wait_for_completion 标志：
+将所有正在运行的open状态的索引，备份到EsBacup仓库下一个叫snapshot_all的快照中。
 ```
 # api会立刻返回{"accepted":true}，然后备份工作在后台运行
 curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_all
@@ -112,7 +112,7 @@ curl -XPUT 'http://localhost:9200/_snapshot/EsBackup/snapshot_12' -d '{ "indices
 ```
 
 三、查看快照信息
-
+---
 查看快照snapshot_2的详细信息：
 ```
 GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
