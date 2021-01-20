@@ -115,7 +115,7 @@ curl -XPUT 'http://localhost:9200/_snapshot/EsBackup/snapshot_12' -d '{ "indices
 ---
 查看快照snapshot_2的详细信息：
 ```
-GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
+curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
 
 {
    "snapshots": [
@@ -145,16 +145,16 @@ GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
 
 ```
 # 查看所有快照信息如下
-GET http://127.0.0.1:9200/_snapshot/my_backup/_all
+curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/_all
 
 # 查看更加详细的信息
-GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2/_status
+curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2/_status
 ```
  
 四、删除快照
 ---
 ```
-DELETE _snapshot/my_backup/snapshot_2
+curl -XDELETE http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
 ```
 重要的是使用API来删除快照,而不是其他一些机制(如手工删除,或使用自动s3清理工具)。因为快照增量,它是可能的,许多快照依靠old seaments。删除API了解最近仍在使用的数据快照,并将只删除未使用的部分。如果你手动文件删除,但是,你有可能严重破坏你的备份,因为你删除数据仍在使用,如果备份正在后台进行，也可以直接删除来取消此次备份。
  
@@ -164,12 +164,12 @@ DELETE _snapshot/my_backup/snapshot_2
  
 查看更细节的状态的快照
 ```
-GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3
+curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3
 ```
  
 API立即返回并给出一个更详细的输出的统计
 ```
-GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3/_status
+curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3/_status
 {
    "snapshots": [
       {
@@ -238,12 +238,12 @@ GET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3/_status
 ---
 恢复snapshot_1里的全部索引
 ```
-POST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
+curl -XPOST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
 ```
 
 带参数恢复
 ```
-POST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
+curl -XPOST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
 {
     "indices": "index_1", 
     "rename_pattern": "index_(.+)", 
@@ -256,11 +256,11 @@ POST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
  
 可以使用下面两个api查看状态：
 ```
-GET http://127.0.0.1:9200/_recovery/restored_index_3
-GET http://127.0.0.1:9200/_recovery/
+curl -XGET http://127.0.0.1:9200/_recovery/restored_index_3
+curl -XGET http://127.0.0.1:9200/_recovery/
 ```
 
 如果要取消恢复过程（不管是已经恢复完，还是正在恢复），直接删除索引即可：
 ```
-DELETE http://127.0.0.1:9200/restored_index_3
+curl -XDELETE http://127.0.0.1:9200/restored_index_3
 ```
