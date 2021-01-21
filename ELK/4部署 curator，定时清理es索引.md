@@ -148,3 +148,75 @@ https://www.elastic.co/guide/en/elasticsearch/client/curator/current/actions.htm
 
 ignore_empty_list：是否忽略错误空列表，option参考：  
 https://www.elastic.co/guide/en/elasticsearch/client/curator/current/option_ignore_empty.html
+
+```
+actions:
+  1:
+    action: delete_indices
+    description: >-
+      Delete metric indices older than 3 days (based on index name), for
+      .monitoring-es-6-
+      .monitoring-kibana-6-
+      .monitoring-logstash-6-
+      .watcher-history-3-
+      prefixed indices. Ignore the error if the filter does not result in an
+      actionable list of indices (ignore_empty_list) and exit cleanly.
+    options:
+      ignore_empty_list: True
+ #     disable_action: True
+    filters:
+    - filtertype: pattern
+      kind: regex
+      value: '^(\.monitoring-(es|kibana|logstash)-6-|\.watcher-history-3-).*$'
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 3
+
+  2:
+    action: close
+    description: >-
+      Close indices older than 30 days (based on index name), for syslog-
+      prefixed indices.
+    options:
+      ignore_empty_list: True
+      delete_aliases: False
+#      disable_action: True
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: syslog-
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 30
+
+  3:
+    action: forcemerge
+    description: >-
+      forceMerge syslog- prefixed indices older than 2 days (based on indexcreation_date) to 2 segments per shard.  Delay 120 seconds between each forceMerge operation to allow the cluster to quiesce. Skip indices that have already been forcemerged to the minimum number of segments to avoid reprocessing.
+    options:
+      ignore_empty_list: True
+      max_num_segments: 2
+      delay: 120
+      timeout_override:
+      continue_if_exception: False
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: syslog-
+      exclude:
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 2
+    - filtertype: forcemerged
+      max_num_segments: 2
+      exclude:
+```
