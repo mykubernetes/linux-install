@@ -351,15 +351,6 @@ cluster is healthy
 | -w,--wirte-out="simple" | 输出内容格式（Fields、Json、Protobuf、Simple、Table） |
 
 
-
-
-
-
-
-
-
-
-
 1）增加
 ---
 
@@ -525,7 +516,7 @@ Hello world2
 
 4、获取某个前缀的所有键值对，通过--prefix可以指定前缀
 ```
-$ etcdctl get --prefix /test/foo
+$ etcdctl get --prefix --limit=3 /test/foo
 /test/foo1
 Hello world
 /test/foo2
@@ -533,6 +524,7 @@ Hello world2
 /test/foo3
 Hello world3
 ```
+- --limit=2 限制获取的数量
 
 5、ls
 
