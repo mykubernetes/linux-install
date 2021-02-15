@@ -276,6 +276,59 @@ cluster is healthy
 五、简单使用
 ===
 
+| 命令 | 说明 |
+| :------: | :--------: |
+| alarm disarm | 接触所有的报警 |
+| alarm list | 列出所有的报警 |
+| auth disable | 禁用 authentication |
+| auth enable | 启动 authentication |
+| check datascale | 对于给定的服务器实例，检查持有数据的存储使用率 |
+| check perf | 检查etcd集群的性能表现 |
+| compaction | 压缩etcd中的事件历史 |
+| defrag | 整理给定etcd实例的存储碎片 |
+| del | 移除指定范围的[key,range_end]的键值对 |
+| elect | 加入leader选举 |
+| endpoint hashkv | 打印指定的etcd实例的历史键值对hash信息 |
+| endpoint health | 打印指定的etcd实例的健康信息 |
+| endpoint status | 打印指定的etcd实例的状态信息 |
+| get | 获取键值对 |
+| help | 帮助命令 |
+| lease grant | 创建leases |
+| lease keep-alive | 刷新leases |
+| lease list | 列出所有有效的leases |
+| lease revoke | 撤销leases |
+| lease timetolive | 获取leases信息 |
+| lock | 获取一个锁名 |
+| make-mirror | 指定一个etcd集群作为镜像集群 |
+| member add | 增加一个成员到集群 |
+| member list | 列出集群的所有成员 |
+| member promote | 提升集群中的一个non-voting成员 |
+| member remove | 移除集群中的成员 |
+| member update | 更新集群中的成员信息 |
+| migrate | 迁移V2存储中的键值对到MVCC存储 |
+| move-leader | 移动etcd集群的leader给另一个etcd成员 |
+| put | 写入一个键值对 |
+| role add | 添加一个角色 |
+| role delete | 删除一个角色 |
+| role get | 获取某个角色的详细信息 |
+| role grant-permission | 给某个角色授予key |
+| role list | 罗列所有的角色|
+| role revoke-permission | 撤销一个角色的key |
+| snapshot restore | 恢复快照 |
+| snapshot save | 存储某一个etcd节点的快照文件到指定位置 |
+| snapshot status | 获取指定文件的后端快照文件状态 |
+| txn | Txn在一个事务内处理所有的请求 |
+| user add | 增加一个用户 |
+| user delete | 删除某个用户 |
+| user get | 获取某个用户的详细信息 |
+| user grant-role | 将某个角色赋予某个用户 |
+| user list | 列出所有用户 |
+| user passwd | 更改某个用户的密码 |
+| user revoke-role | 撤销某个用户的角色 |
+| version | 输出etcdctl的版本 |
+| watch | 检测指定键或者前缀的事件流 |
+
+
 1）增加
 ---
 1、set
