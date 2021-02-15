@@ -768,6 +768,10 @@ Removed member 8e9e05c52164694d from cluster
 ```
 $ etcdctl --endpoints=http://localhost:2379 member add etcd3 --peer-urls=http://192.168.1.100:2380
 Added member named etcd3 with ID 8e9e05c52164694d to cluster
+ETCD_NAME="etcd3"
+ETCD_INITIAL_CLUSTER="etcd1=http://localhost:12380,etcd2=http://127.0.0.1:22380,etcd3=http://127.0.0.1:2380"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://localhost:2380"
+ETCD_INITIAL_CLUSTER_STATE="existing"
 ```
 
 10)etcd 网关模式
