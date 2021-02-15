@@ -450,6 +450,37 @@ $ etcdctl rmdir /dir
 Error: 108: Directory not empty (/dir) [17]
 ```
 
+3、删除了一个键
+```
+$ etcdctl del foo
+#删除从 foo 到 foo9 范围的键的命令
+$ etcdctl del foo foo9
+```
+
+4、删除键 zoo 并返回被删除的键值对
+```
+$ etcdctl del --prev-kv zoo
+1   # 一个键被删除
+zoo # 被删除的键
+val # 被删除的键的值
+```
+
+5、删除前缀为 zoo 的键
+```
+$ etcdctl del --prefix zoo
+2 # 删除了两个键
+```
+
+6、删除大于等于键 b 的 byte 值的键
+```
+a = 123
+b = 456
+z = 789
+
+$ etcdctl del --from-key b
+2 # 删除了两个键
+```
+
 3）更新
 ---
 1、update
@@ -526,7 +557,29 @@ Hello world3
 ```
 - --limit=2 限制获取的数量
 
-5、ls
+5、访问以前版本的key 
+```
+$ etcdctl get --prefix foo  # 访问最新版本的 key
+$ etcdctl get --prefix --rev=4 foo  # 访问第 4 个版本的 key
+$ etcdctl get --prefix --rev=3 foo  # 访问第 3 个版本的 key
+$ etcdctl get --prefix --rev=2 foo  # 访问第 2 个版本的 key
+$ etcdctl get --prefix --rev=1 foo  # 访问第 1 个版本的 key
+```
+
+6、读取大于等于键 b 的 byte 值的键
+```
+a = 123
+b = 456
+z = 789
+
+$ etcdctl get --from-key b
+b
+456
+z
+789
+```
+
+7、ls
 
 列出目录(默认为根目录)下的键或者子目录，默认不显示子目录中内容。
 ```
