@@ -1012,3 +1012,96 @@ Snapshot saved at mysnapshot.db
 - 相比于 zookeeper，etcd 使用起来要简单很多。不过要实现真正的服务发现功能，etcd 还需要和其他工具（比如 registrator、confd 等）一起使用来实现服务的自动注册和更新。
 - 目前 etcd 还没有图形化的工具。
 
+
+键值对读写操作
+===
+1、 /v3/kv/put接口，将键值对写入到etcd
+```
+$ curl -L http://localhost:2379/v3/kv/put \
+  -X POST -d '{"key": "Zm9v", "value": "YmFy"}'
+
+# 输出结果如下：
+{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"16","raft_term":"9"}}
+```
+- 键Zm9v，值YmFy。键值对经过base64编码，实际写入的键值对为foo:bar
+
+2、 /v3/kv/range接口，来读取刚写入的键值对
+```
+$ curl -L http://localhost:2379/v3/kv/range \
+  -X POST -d '{"key": "Zm9v"}'
+
+# 输出结果如下：
+{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"16","raft_term":"9"},"kvs":[{"key":"Zm9v","create_revision":"13","mod_revision":"16","version":"4","value":"YmFy"}],"count":"1"}
+```
+
+3、获取前缀为指定值的键值对时，可以使用如下请求
+```
+$ curl -L http://localhost:2379/v3/kv/range \
+  -X POST -d '{"key": "Zm9v", "range_end": "Zm9w"}'
+
+# 输出结果如下：
+{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"16","raft_term":"9"},"kvs":[{"key":"Zm9v","create_revision":"13","mod_revision":"16","version":"4","value":"YmFy"}],"count":"1"}
+```
+
+4、/v3/watch接口来监测keys，watch刚写入的"Zm9v"请求
+```
+$ curl -N http://localhost:2379/v3/watch \
+  -X POST -d '{"create_request": {"key":"Zm9v"} }' &
+
+# 输出结果如下：
+{"result":{"header":{"cluster_id":"12585971608760269493","member_id":"13847567121247652255","revision":"1","raft_term":"2"},"created":true}}
+```
+
+发起一个请求，用以更新该键值
+```
+$ curl -L http://localhost:2379/v3/kv/put \
+  -X POST -d '{"key": "Zm9v", "value": "YmFy"}' >/dev/null 2>&1
+```
+
+etcd 事务的实现
+---
+1、通过 /v3/kv/txn 接口发起一个事务
+```
+# 查询键值对的版本
+$ curl -L http://localhost:2379/v3/kv/range   -X POST -d '{"key": "Zm9v"}'
+#响应结果
+{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"20","raft_term":"9"},"kvs":[{"key":"Zm9v","create_revision":"13","mod_revision":"20","version":"8","value":"YmFy"}],"count":"1"}
+# 事务，对比指定键值对的创建版本
+
+$ curl -L http://localhost:2379/v3/kv/txn \
+  -X POST \
+  -d '{"compare":[{"target":"CREATE","key":"Zm9v","createRevision":"13"}],"success":[{"requestPut":{"key":"Zm9v","value":"YmFy"}}]}'
+ #响应结果
+ {"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"20","raft_term":"9"},"succeeded":true,"responses":[{"response_put":{"header":{"revision":"20"}}}]}
+```
+
+2、对比指定键值对版本的事务
+```
+# 事务，对比指定键值对的版本
+$ curl -L http://localhost:2379/v3/kv/txn \
+  -X POST \
+  -d '{"compare":[{"version":"8","result":"EQUAL","target":"VERSION","key":"Zm9v"}],"success":[{"requestRange":{"key":"Zm9v"}}]}'
+ #响应结果
+{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"6","raft_term":"3"},"succeeded":true,"responses":[{"response_range":{"header":{"revision":"6"},"kvs":[{"key":"Zm9v","create_revision":"2","mod_revision":"6","version":"4","value":"YmF6"}],"count":"1"}}]}
+```
+
+HTTP 请求的安全认证
+---
+```
+#1、创建 root 用户
+$ curl -L http://localhost:2379/v3/auth/user/add -X POST -d '{"name": "root", "password": "123456"}'
+#响应结果
+{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"20","raft_term":"9"}}
+
+#2、创建 root 角色
+curl -L http://localhost:2379/v3/auth/role/add -X POST -d '{"name": "root"}'
+#响应结果	{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"20","raft_term":"9"}}
+
+#3、为 root 用户授予角色
+curl -L http://localhost:2379/v3/auth/user/grant -X POST -d '{"user": "root", "role": "root"}'
+#响应结果{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"20","raft_term":"9"}}
+
+#4、开启权限
+$ curl -L http://localhost:2379/v3/auth/enable -X POST -d '{}'
+#响应结果 {"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"20","raft_term":"9"}}
+```
