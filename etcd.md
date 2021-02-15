@@ -742,6 +742,30 @@ $ETCDCTL_API=3 etcdctl --endpoints=192.168.10.7:12379 get foo
 - –listen-addr 绑定的接口和端口，用于接受客户端请求，默认配置为 127.0.0.1:23790；
 - –retry-delay 重试连接到失败的端点延迟时间。默认为 1m0s。需要注意的是，值的后面标注单位，类似123的设置不合法，命令行会出现参数不合法。
 
+2、在启动时指定自定义的前缀___grpc_proxy_endpoint来注册gRPC代理
+```
+$ etcd grpc-proxy start --endpoints=localhost:12379 \
+--listend-addr=172.0.0.1:23790 \
+--advertise-client-url=127.0.0.1:23790 \
+--resolver-prefix="___grpc_proxy_endpoint" \
+--resolver-ttl=60
+
+$ etcd grpc-proxy start --endpoints=localhost:12379 \
+--listend-addr=172.0.0.1:23791 \
+--advertise-client-url=127.0.0.1:23791 \
+--resolver-prefix="___grpc_proxy_endpoint" \
+--resolver-ttl=60
+
+$ ETCDCTL_API=3 etcdctl --endpoints=http://localhost:23790 member list --write-out table
++-------+----------+-----------------------+------------+------------------+---------------+
+|   ID  | STSTUS   |           NAME        | PEER ADDRS | CLIENT ADDRS     | IS LEARNER    |
++-------+----------+-----------------------+------------+------------------+---------------+
+|     0 | started  | localhost.localdomain |            | 127.0.0.1:23791  |         false |
+|-------+----------+-----------------------+------------+------------------+---------------+
+|     0 | started  | localhost.localdomain |            | 127.0.0.1:23790  |         false |
++-------+----------+-----------------------+------------+------------------+---------------+
+```
+
 
 示例
 ---
