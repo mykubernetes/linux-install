@@ -612,12 +612,17 @@ Hello watch
 $ etcdctl watch testdir/testkey
 Hello watch
 ```
-复制代码支持的选项包括:
 - --forever  一直监测直到用户按CTRL+C退出
 - --after-index '0' 在指定index之前一直监测
 - --recursive 返回所有的键值和子键值
+- -i 观察多个键
 
-2、exec-watch
+2、从上一次历史修改开始观察
+```
+etcdctl watch --prev-kv testdir/testkey
+```
+
+3、exec-watch
 
 监测一个键值的变化，一旦键值发生更新，就执行给定命令。
 
@@ -630,7 +635,68 @@ config Documentation etcd etcdctl README-etcdctl.md README.md READMEv2-etcdctl.m
 - --after-index '0' 在指定 index 之前一直监测
 - --recursive 返回所有的键值和子键值
 
-6)备份
+6)压缩修订版本
+---
+etcd 保存修订版本以便应用客户端可以读取键的历史版本，为了避免积累无限数量的历史数据，对历史的修订版本进行压缩。压缩后etcd删除历史修订版本，释放空间，压缩修订版本之前的数据将不可访问。
+```
+$ etcdctl compact 5
+compacted revision 5      #在压缩修订版本之前的任何修订版本都不可访问
+
+$ etcdctl get --rev=4 foo
+{"level":"warn","ts":"2020-05-04T16:37:38.020+0800","caller":"clientv3/retry_interceptor.go:62","msg":"retrying of unary invoker failed","target":"endpoint://client-c0d35565-0584-4c07-bfeb-034773278656/127.0.0.1:2379","attempt":0,"error":"rpc error: code = OutOfRange desc = etcdserver: mvcc: required revision has been compacted"}
+
+Error: etcdserver: mvcc: required revision has been compacted
+```
+
+7)lease（租约）
+---
+
+1、授予租约，一旦租约的 TTL 到期，租约就会过期并且所有附带的键都将被删除。
+```
+# 授予租约，TTL 为 100 秒
+$ etcdctl lease grant 100
+lease 694d71ddacfda227 granted with TTL(10s)
+
+# 附加键 foo 到租约 694d71ddacfda227
+$ etcdctl put --lease=694d71ddacfda227 foo10 bar
+OK
+```
+
+2、撤销租约,撤销租约将删除所有附带的 key
+```
+$ etcdctl lease revoke 694d71ddacfda227
+lease 694d71ddacfda227 revoked
+
+$ etcdctl get foo10
+```
+
+3、刷新租期,应用程序可以通过刷新其TTL保持租约存活，因此不会过期。
+```
+$ etcdctl lease keep-alive 694d71ddacfda227
+lease 694d71ddacfda227 keepalived with TTL(100)
+lease 694d71ddacfda227 keepalived with TTL(100)
+...
+```
+
+4、查询租期
+```
+#授予租约
+$ etcdctl lease grant 300
+lease 694d71ddacfda22c granted with TTL(300s)
+
+$ etcdctl put --lease=694d71ddacfda22c foo10 bar
+OK
+
+#获取有关租赁信息以及哪些 key 绑定了租赁信息
+$ etcdctl lease timetolive 694d71ddacfda22c
+lease 694d71ddacfda22c granted with TTL(300s), remaining(282s)
+
+$ etcdctl lease timetolive --keys 694d71ddacfda22c
+lease 694d71ddacfda22c granted with TTL(300s), remaining(220s), attached keys([foo10])
+
+```
+
+8)备份
 ---
 备份etcd的数据。
 ```
@@ -640,7 +706,7 @@ $ etcdctl backup --data-dir /var/lib/etcd --backup-dir /home/etcd_backup
 - --data-dir  etcd的数据目录
 - --backup-dir 备份到指定路径
 
-7)member
+9)member
 ---
 通过list、add、remove命令列出、添加、删除 etcd 实例到 etcd 集群中。
 
