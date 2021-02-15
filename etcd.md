@@ -810,6 +810,58 @@ $ ETCDCTL_API=3 etcdctl --endpoints=http://localhost:23790 member list --write-o
 +-------+----------+-----------------------+------------+------------------+---------------+
 ```
 
+11）命名空间的实现
+---
+1、当给代理提供标志--namespace时，所有进入代理的客户端请求都将转换为在键上具有用户定义的前缀
+```
+$ ./etcd grpc-proxy start --endpoints=localhost:12379 \
+>   --listen-addr=127.0.0.1:23790 \
+>   --namespace=my-prefix/
+{"level":"info","ts":"2020-12-13T01:53:16.875+0800","caller":"etcdmain/grpc_proxy.go:320","msg":"listening for gRPC proxy client requests","address":"127.0.0.1:23790"}
+{"level":"info","ts":"2020-12-13T01:53:16.876+0800","caller":"etcdmain/grpc_proxy.go:218","msg":"started gRPC proxy","address":"127.0.0.1:23790"}
+
+
+$ ETCDCTL_API=3 etcdctl --endpoints=localhost:23790 put my-key abc
+# OK
+
+$ ETCDCTL_API=3 etcdctl --endpoints=localhost:23790 get my-key
+# my-key
+# abc
+
+$ ETCDCTL_API=3 etcdctl --endpoints=localhost:2379 get my-prefix/my-key
+# my-prefix/my-key
+# abc
+```
+- 使用 proxy 的命名空间即可实现 etcd 键空间分区
+
+12）指标与健康检查接口
+---
+1、gRPC 代理为--endpoints定义的 etcd 成员公开了/health和 Prometheus 的/metrics接口
+```
+curl 192.168.10.7:12379/metrics
+curl 192.168.10.7:12379/health
+```
+
+2、指定监听的metric地址
+```
+$ ./etcd grpc-proxy start \
+  --endpoints http://localhost:12379 \
+  --metrics-addr http://0.0.0.0:6633 \
+  --listen-addr 127.0.0.1:23790 \
+```
+
+13）TLS 加密的代理
+---
+```
+$ ETCDCTL_API=3 etcdctl --endpoints=http://localhost:2379 endpoint status
+# works
+
+$ ETCDCTL_API=3 etcdctl --endpoints=https://localhost:2379 \
+--cert=client.crt \
+--key=client.key \
+--cacert=ca.crt \
+endpoint status
+```
 
 示例
 ---
