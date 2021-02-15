@@ -708,9 +708,17 @@ $ etcdctl backup --data-dir /var/lib/etcd --backup-dir /home/etcd_backup
 
 9)member
 ---
-通过list、add、remove命令列出、添加、删除 etcd 实例到 etcd 集群中。
 
-查看集群中存在的节点
+1、通过list、add、remove命令列出、添加、删除 etcd 实例到 etcd 集群中。
+```
+member add          #已有集群中增加成员
+member remove       #移除已有集群中的成员
+member update       #更新集群中的成员
+member list         #集群成员列表
+
+```
+
+2、查看集群中存在的节点
 ```
 $ etcdctl member list
 8e9e05c52164694d: name=dev-master-01 peerURLs=http://localhost:2380 clientURLs=http://localhost:2379 isLeader=true
@@ -718,15 +726,47 @@ $ etcdctl member list
 - --write-out table
 - --endpoints=http://localhost:2379
 
+3、更新成员
+- 更新 client URLs
+  - 只需要使用更新后的 client URL 标记（即 --advertise-client-urls）或者环境变量来重启这个成员（ETCD_ADVERTISE_CLIENT_URLS）。重启后的成员将自行发布更新后的 URL，错误更新的 client URL 将不会影响 etcd 集群的健康。
+- 更新 peer URLs
+```
+#查询所有的集群成员
+$ etcdctl --endpoints=http://localhost:22379 member list -w table
++------------------+---------+--------+------------------------+------------------------+------------+
+|        ID        | STATUS  |  NAME  |       PEER ADDRS       |      CLIENT ADDRS      | IS LEARNER |
++------------------+---------+--------+------------------------+------------------------+------------+
+| 8211f1d0f64f3269 | started | infra1 | http://127.0.0.1:12380 | http://127.0.0.1:12379 |      false |
+| 91bc3c398fb3c146 | started | infra2 | http://127.0.0.1:22380 | http://127.0.0.1:22379 |      false |
+| fd422379fda50e48 | started | infra3 | http://127.0.0.1:32380 | http://127.0.0.1:32379 |      false |
++------------------+---------+--------+------------------------+------------------------+------------+
+
+#通过集群id修改peer addrs地址
+$ etcdctl --endpoints=http://localhost:12379 member update 8211f1d0f64f3269 --peer-urls=http://127.0.0.1:2380
+Member 8211f1d0f64f3269 updated in cluster ef37ad9dc622a7c4
+
+#查看修改后的结果
+$ etcdctl --endpoints=http://localhost:22379  member list -w table
++------------------+---------+--------+------------------------+------------------------+------------+
+|        ID        | STATUS  |  NAME  |       PEER ADDRS       |      CLIENT ADDRS      | IS LEARNER |
++------------------+---------+--------+------------------------+------------------------+------------+
+| 8211f1d0f64f3269 | started | infra1 |  http://127.0.0.1:2380 | http://127.0.0.1:12379 |      false |
+| 91bc3c398fb3c146 | started | infra2 | http://127.0.0.1:22380 | http://127.0.0.1:22379 |      false |
+| fd422379fda50e48 | started | infra3 | http://127.0.0.1:32380 | http://127.0.0.1:32379 |      false |
++------------------+---------+--------+------------------------+------------------------+------------+
+
+```
+
+
 删除集群中存在的节点
 ```
-$ etcdctl member remove 8e9e05c52164694d
+$ etcdctl --endpoints=http://localhost:2379 member remove 8e9e05c52164694d
 Removed member 8e9e05c52164694d from cluster
 ```
 
 向集群中新加节点
 ```
-$ etcdctl member add etcd3 http://192.168.1.100:2380
+$ etcdctl --endpoints=http://localhost:2379 member add etcd3 --peer-urls=http://192.168.1.100:2380
 Added member named etcd3 with ID 8e9e05c52164694d to cluster
 ```
 
