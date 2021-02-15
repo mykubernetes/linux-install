@@ -328,6 +328,37 @@ cluster is healthy
 | version | 输出etcdctl的版本 |
 | watch | 检测指定键或者前缀的事件流 |
 
+| options | 说明 |
+| :------: | :--------: |
+| --cacert="" | 服务端使用https时，使用的CA文件进行验证 |
+| --cert="" | https下客户端使用ssl证书文件 |
+| --command-timeout=5s | 命令执行超时时间设置 |
+| --debug[=false] | 输出CURL命令，显示执行命令时发起的请求日志 |
+| --dial-timeout=2s | 客户端连接超时时间 |
+| -d,--discovery-srv="" | 使用查询描述集群端点SRV记录的郁闷 |
+| --discovery-srv-name="" | 使用DNS发现时，查询的服务名 |
+| --endpoints=[172.0.0.1:2379] | gRPC端点 |
+| -h,--help[=false] | etcdctl帮助 |
+| --hex[=false] |输出二进制字符串为十六进制编码的字符串 |
+| --insecure-discovery[=true] | 接受集群成员中不安全的SRV记录 |
+| --insecure-skip-tls-verify[=false] | 跳过服务端证书认证 |
+| --insecure-transport[=true] | 客户端紧张安全传输 |
+| --keepalive-time=2s | 客户端连接的keepalive时间 |
+| --keepalive-timeout=6s | 客户端连接的keepalive的超时时间 |
+| --key="" | HTTPS下客户端使用SSL密钥文件 |
+| --password="" | 认证的密码，当该选项开启，--user参数中不要包含密码 |
+| --user="" | username[:password]的形式 |
+| -w,--wirte-out="simple" | 输出内容格式（Fields、Json、Protobuf、Simple、Table） |
+
+
+
+
+
+
+
+
+
+
 
 1）增加
 ---
