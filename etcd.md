@@ -362,6 +362,16 @@ cluster is healthy
 
 1）增加
 ---
+
+1、put 
+
+设置或者更新某个键的值
+```
+$ etcdctl put /test/foo1 "Hello world"
+$ etcdctl put /test/foo2 "Hello world2"
+$ etcdctl put /test/foo3 "Hello world3"
+```
+
 1、set
 
 指定某个键的值。例如:
@@ -495,8 +505,36 @@ Error: 100: Key not found (/testdir/testkey2) [5]
 - --sort 对结果进行排序
 - --consistent 将请求发给主节点，保证获取内容的一致性。
 
+2、根据指定的键（key），获取其对应的十六进制格式值
+```
+$ etcdctl get /test/foo1 --hex
+\x2f\x74\x65\x73\x74\x64\x69\x72\x2f\x74\x65\x73\x74\x6b\x65\x79 #键
+\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64 #值
+```
+- --print-value-only可以读取对应的值
 
-2、ls
+3、GET 范围内的值
+```
+$ etcdctl get /test/foo1 /test/foo3
+/test/foo1
+Hello world
+/test/foo2
+Hello world2
+```
+- 获取了大于等于 /test/foo1，且小于 /test/foo3 的键值对
+
+4、获取某个前缀的所有键值对，通过--prefix可以指定前缀
+```
+$ etcdctl get --prefix /test/foo
+/test/foo1
+Hello world
+/test/foo2
+Hello world2
+/test/foo3
+Hello world3
+```
+
+5、ls
 
 列出目录(默认为根目录)下的键或者子目录，默认不显示子目录中内容。
 ```
