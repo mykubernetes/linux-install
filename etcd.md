@@ -1087,6 +1087,7 @@ $ curl -L http://localhost:2379/v3/kv/txn \
 
 HTTP 请求的安全认证
 ---
+1、通过 /v3/auth 接口设置认证
 ```
 #1、创建 root 用户
 $ curl -L http://localhost:2379/v3/auth/user/add -X POST -d '{"name": "root", "password": "123456"}'
@@ -1104,4 +1105,23 @@ curl -L http://localhost:2379/v3/auth/user/grant -X POST -d '{"user": "root", "r
 #4、开启权限
 $ curl -L http://localhost:2379/v3/auth/enable -X POST -d '{}'
 #响应结果 {"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"20","raft_term":"9"}}
+```
+
+2、使用 /v3/auth/authenticate API 接口对 etcd 进行身份验证以获取身份验证令牌
+```
+# 获取 root 用户的认证令牌
+$ curl -L http://localhost:2379/v3/auth/authenticate \
+  -X POST -d '{"name": "root", "password": "123456"}'
+#响应结果
+{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"21","raft_term":"9"},"token":"DhRvXkWhOkINVQXI.57"}
+```
+- 请求获取到 token 的值为 DhRvXkWhOkINVQXI.57
+
+3、设置请求的头部 Authorization 为刚刚获取到的身份验证令牌，以使用身份验证凭据设置 key 值
+```
+$ curl -L http://localhost:2379/v3/kv/put \
+  -H 'Authorization : DhRvXkWhOkINVQXI.57' \
+  -X POST -d '{"key": "Zm9v", "value": "YmFy"}'
+#响应结果
+{"header":{"cluster_id":"14841639068965178418","member_id":"10276657743932975437","revision":"21","raft_term":"9"}}
 ```
