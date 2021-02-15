@@ -730,6 +730,19 @@ $ etcdctl member add etcd3 http://192.168.1.100:2380
 Added member named etcd3 with ID 8e9e05c52164694d to cluster
 ```
 
+10)etcd 网关模式
+---
+1、启动 etcd 网关，以通过 etcd gateway 命令代理这些静态端点
+```
+$ etcd gateway start --endpoints=http://192.168.10.7:2379,http://192.168.10.8:2379,http://192.168.10.9:2379 –listen-addr=192.168.10.7:12379
+
+$ETCDCTL_API=3 etcdctl --endpoints=192.168.10.7:12379 put foo bar
+$ETCDCTL_API=3 etcdctl --endpoints=192.168.10.7:12379 get foo
+```
+- –listen-addr 绑定的接口和端口，用于接受客户端请求，默认配置为 127.0.0.1:23790；
+- –retry-delay 重试连接到失败的端点延迟时间。默认为 1m0s。需要注意的是，值的后面标注单位，类似123的设置不合法，命令行会出现参数不合法。
+
+
 示例
 ---
 ```
