@@ -715,6 +715,8 @@ $ etcdctl backup --data-dir /var/lib/etcd --backup-dir /home/etcd_backup
 $ etcdctl member list
 8e9e05c52164694d: name=dev-master-01 peerURLs=http://localhost:2380 clientURLs=http://localhost:2379 isLeader=true
 ```
+- --write-out table
+- --endpoints=http://localhost:2379
 
 删除集群中存在的节点
 ```
