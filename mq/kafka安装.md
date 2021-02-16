@@ -289,64 +289,116 @@ group.initial.rebalance.delay.ms=0
 五、Kafka命令行操作
 ---
 
-
-1）创建topic  
+1、创建topic  
 ```
-$ bin/kafka-topics.sh --create --zookeeper node001:2181 --replication-factor 3 --partitions 1 --topic first
-
-$ bin/kafka-topics.sh --zookeeper zk_host:port/chroot --create --topic my_topic_name --partitions 20 --replication-factor 3 --config x=y
+# ./kafka-topics.sh --zookeeper node001:2181 --create --topic test --partitions 20 --replication-factor 3
 ```
-- --topic 定义topic名  
-- --replication-factor  定义副本数  
+- --zookeeper 指定zookeeper的地址，如果zookeeper是集群，可以指定多个zookeeper，也可以只指定一个可用的zookeeper服务地址
+- --create 创建命令
+- --topic 指定topic的名称 
+- --replication-factor  设置消息保存在几个broker上，一般情况下和brocker数量相同
 - --partitions  定义分区数
+- --config x=y 创建时指定配置
 
-2）查看当前服务器中的所有topic  
-``` $ bin/kafka-topics.sh --list --zookeeper node001:2181 ```
-
-
-3）删除topic
+2、查看当前服务器中的所有topic  
 ```
-$ bin/kafka-topics.sh --delete --zookeeper node001:2181 --topic first
+# bin/kafka-topics.sh --list --zookeeper node001:2181
+test
+```
+
+3、查看topic详细信息
+```
+kafka-topics.sh --zookeeper node001:2181 --describe --topic test
+Topic:test  PartitionCount:20  ReplicationFactor:3  Configs:
+Topic: test  Partition: 0      Leader: 3            Replicas: 3,0,2Isr: 3,0,2
+Topic: test  Partition: 1      Leader: 0            Replicas: 0,2,3Isr: 0,2,3
+Topic: test  Partition: 2      Leader: 2            Replicas: 2,3,0Isr: 2,3,0
+Topic: test  Partition: 3      Leader: 3            Replicas: 3,2,0Isr: 3,2,0
+Topic: test  Partition: 4      Leader: 0            Replicas: 0,3,2Isr: 0,3,2
+Topic: test  Partition: 5      Leader: 2            Replicas: 2,0,3Isr: 2,0,3
+Topic: test  Partition: 6      Leader: 3            Replicas: 3,0,2Isr: 3,0,2
+Topic: test  Partition: 7      Leader: 0            Replicas: 0,2,3Isr: 0,2,3
+Topic: test  Partition: 8      Leader: 2            Replicas: 2,3,0Isr: 2,3,0
+Topic: test  Partition: 9      Leader: 3            Replicas: 3,2,0Isr: 3,2,0
+Topic: test  Partition: 10     Leader: 0            Replicas: 0,3,2Isr: 0,3,2
+Topic: test  Partition: 11     Leader: 2            Replicas: 2,0,3Isr: 2,0,3
+Topic: test  Partition: 12     Leader: 3            Replicas: 3,0,2Isr: 3,0,2
+Topic: test  Partition: 13     Leader: 0            Replicas: 0,2,3Isr: 0,2,3
+Topic: test  Partition: 14     Leader: 2            Replicas: 2,3,0Isr: 2,3,0
+Topic: test  Partition: 15     Leader: 3            Replicas: 3,2,0Isr: 3,2,0
+Topic: test  Partition: 16     Leader: 0            Replicas: 0,3,2Isr: 0,3,2
+Topic: test  Partition: 17     Leader: 2            Replicas: 2,0,3Isr: 2,0,3
+Topic: test  Partition: 18     Leader: 3            Replicas: 3,0,2Isr: 3,0,2
+Topic: test  Partition: 19     Leader: 0            Replicas: 0,2,3Isr: 0,2,3
+```
+- 第一行，列出了topic的名称，分区数(PartitionCount),副本数(ReplicationFactor)以及其他的配置(Configs) 
+- Leader:1 表示为做为读写的broker的编号
+- Replicas:表示该topic的每个分区在那些borker中保存
+- Isr:表示当前有效的broker, Isr是Replicas的子集
+
+4、增加partitions分区数
+```
+# kafka-topics.sh --zookeeper node001:2181 --alter --topic test --partitions 40
+WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
+Adding partitions succeeded!
+```
+
+5、删除topic
+```
+# kafka-topics.sh --zookeeper node001:2181 --delete --topic test
+Topic test is marked for deletion.
+Note: This will have no impact if delete.topic.enable is not set to true.
 ```  
 - 需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
 
-4）发送消息
+6、查看topic消费到的offset
 ```
-$ bin/kafka-console-producer.sh --broker-list node001:9092 --topic first
+# kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list node001:9092 --topic test0 --time -1
+test0:17:0
+test0:8:0
+test0:11:0
+test0:2:0
+test0:5:0
+test0:14:0
+test0:13:0
+test0:4:0
+test0:16:0
+test0:7:0
+test0:10:0
+test0:1:0
+test0:19:0
+test0:18:0
+test0:9:0
+test0:3:0
+test0:12:0
+test0:15:0
+test0:6:0
+test0:0:
+```
+
+7、发送消息
+```
+$ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
 >hello world
 >kafka  kafka
 ```
 
-5）消费消息    
+8、消费消息    
 ```
 老版本
-$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic first
-$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --from-beginning --topic first
+$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic test
+$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --from-beginning --topic test
 新版本
-$ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic first
-$ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic first
+$ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic test
 ```
 - --from-beginning 读取主题中所有的数据  
 注意： --zookeeper已经被弃用 改为 --bootstrap-server参数  
 
-6）查看某个Topic的详情  
-```
-$ bin/kafka-topics.sh --topic first --describe --zookeeper node001:2181
-```
 
-7)修改分区数
+8)增加、删除配置项
 ```
-$  bin/kafka-topics.sh  --zookeeper hadoop102:2181 --alter --topic first --partitions 6
-```
-
-8)增加⼀个配置项
-```
-$ bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --add-config x=y
-```
-
-9)
-```
-$ bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --delete-config x
+# bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --add-config x=y
+# bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --delete-config x
 ```
 
 常用创建topic参数
