@@ -29,85 +29,173 @@ zookpeer存储结构
 二、安装jdk
 ---
 1、卸载现有jdk  
-（1）查询是否安装java软件：  
-``` $ rpm -qa|grep java ```  
-（2）如果安装的版本低于1.7，卸载该jdk：  
-``` $ rpm -e 软件包 ```  
-2、在linux系统下的opt目录中查看软件包是否导入成功。  
-``` $ jdk-7u79-linux-x64.gz  hadoop-2.7.2.tar.gz ```  
-3、解压jdk到/opt/module目录下  
-``` $ tar -zxf jdk-7u79-linux-x64.gz -C /opt/module/ ```  
-4、配置jdk环境变量  
-（1）先获取jdk路径：  
-``` $ pwd ```  
-``` /opt/module/jdk1.7.0_79 ```  
-（2）打开/etc/profile文件：  
 ```
-$ vi /etc/profile
-在profie文件末尾添加jdk路径：
-##JAVA_HOME
-export JAVA_HOME=/opt/module/jdk1.7.0_79
-export PATH=$PATH:$JAVA_HOME/bin
+# rpm -qa|grep java
+# rpm -e 软件包
+```
+
+2、解压二进制包，移动到指定的目录
+```
+# tar -zxvf jdk-8u151-linux-x64.tar.gz
+# mv jdk1.8.0_151/ /usr/local/jdk
+```
+
+3、配置环境变量 
+```
+# vi /etc/profile
+JAVA_HOME=/usr/local/jdk
+JRE_HOME=/usr/local/jdk/jre
+CLASS_PATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib
+PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
+export JAVA_HOME JRE_HOME CLASS_PATH PATH
+
+# source /etc/profile
 ```  
-（3）让修改后的文件生效：  
-``` $ source  /etc/profile ```   
-（4）测试jdk安装成功  
+
+4、检查是否安装成功
 ```
-$ java -version
-$ java version "1.7.0_79"
+# java -version
+java version "1.8.0_151"
+Java(TM) SE Runtime Environment (build 1.8.0_151-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 25.151-b12, mixed mode)
 ```  
 
 三、安装Zookeeper
 ---
-1）解压安装  
-（1）解压zookeeper安装包到/opt/module/目录下  
-``` $ tar -zxvf zookeeper-3.4.10.tar.gz -C /opt/module/ ```  
-（2）在/opt/module/zookeeper-3.4.10/这个目录下创建zkData  
-``` $ mkdir -p zkData ```  
-（3）重命名/opt/module/zookeeper-3.4.10/conf这个目录下的zoo_sample.cfg为zoo.cfg  
-``` $ mv zoo_sample.cfg zoo.cfg ```  
-
-2）配置zoo.cfg文件
+1、解压zookeeper二进制包，移动到指定目录
 ```
-dataDir=/opt/module/zookeeper-3.4.10/zkData
-增加如下配置
-#######################cluster##########################
-server.1=node001:2888:3888
-server.2=node002:2888:3888
-server.3=node003:2888:3888
-集群模式下配置一个文件myid，这个文件在dataDir目录下
+# tar -zxvf zookeeper-3.4.10.tar.gz
+# mv zookeeper-3.4.10 /usr/local/zookeeper
 ```  
 
-3）集群操作  
-（1）在/opt/module/zookeeper-3.4.10/zkData目录下创建一个myid的文件  
-``` $ echo 1 > myid ```  
-（2）拷贝配置好的zookeeper到其他机器上  
+2、修改配置文件
 ```
-$ scp -r zookeeper-3.4.10/ root@node002:/opt/app/
-$ scp -r zookeeper-3.4.10/ root@node003:/opt/app/
-并分别修改myid文件中内容为2、3
+# 1、进入配置文件目录
+# cd /usr/local/zookeeper/conf
+# ls
+configuration.xsl  log4j.properties  zoo_sample.cfg
+
+# 2、zookeeper提供了一个示例配置文件 zoo_sample.cfg 复制一份
+# cp zoo_sample.cfg zoo.cfg
+
+# 3、编辑配置文件
+# vim zoo.cfg
+# The number of milliseconds of each tick
+tickTime=2000
+#zookeeper中的一个时间单元，zookeeper中所有的时间都是以这个时间单元为准，进行整倍数的调整，默认是2S
+
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit=10
+#Follower在启动过程中，会从Leader同步所有最新的数据，确定自己能够对外服务的起始状态。
+#当Follower在initLimit个tickTime还没有完成数据同步时，则Leader仍为Follower连接失败。
+
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit=5
+#Leader于Follower之间通信请求和应答的时间长度。
+#若Leader在syncLimit个tickTime还没有收到Follower应答，则认为该Lwader已经下线。
+
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just 
+# example sakes.
+#dataDir=/tmp/zookeeper
+dataDir=/data/zookeeper
+#存储快照文件的目录，默认情况下事务日志也会存储在该目录上。
+#由于事务日志的写性能直接影响zookeeper性能，因此建议同时配置dataLogDir
+#在生产环境中，一般我们要修改此目录，我们将修改为dataDir=/tmp/zookeeper
+
+dataLogDir=/data/zookeeper
+#事务日志输入目录
+# the port at which the clients will connect
+clientPort=2181
+#zookeeper的对外服务端口
+
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the 
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to "0" to disable auto purge feature
+#autopurge.purgeInterval=1
+
+server.1=zk1.linuxops.org:2888:3888
+server.2=zk2.linuxops.org:2888:3888
+server.3=zk3.linuxops.org:2888:3888
+#以上配置zookeeper集群的服务地址，需要手动添加。
+#其中server.1为第1台服务器，zk1.linuxops.org为第一台服务器解析的域名
+#2888为该服务器于集群中Leader交换信息的端口，3888为选举时服务器通信端口。
 ```  
-（3）分别启动zookeeper  
-``` $ bin/zkServer.sh start ```  
+
+3、设置myid
+准备目录，配置myid
+```
+# mkdir -p /data/zookeeper/log
+# echo '1' > /data/zookeeper/myid
+# cat /data/zookeeper/myid          # 不同zookeeper的myid不允许相同
+1
+```
+
+4、修改zkEnv.sh文件
+```
+# 1、设置环境变量ZOO_LOG_DIR为zookeeper的日志存放目录
+# vim /usr/local/zookeeper/bin/zkEnv.sh
+# 2、在有效配置范围为的第一行增加如下配置：
+export ZOO_LOG_DIR=/data/zookeeper/log
+```
+- 将日志文件zookeeper.out输出到/data/zookeeper/log目录下。默认输出到启动zookeeper时候所在的目录。
+
+5、修改环境变量
+```
+vim /etc/profile
+# 在文件末尾添加
+export PATH=$PATH:/usr/local/zookeeper/bin
+# source /etc/profile
+```
+
+6、启动、停止和状态管理
+```
+启动zookeeper
+# zkServer.sh start 
+ZooKeeper JMX enabled by default
+Using config: /usr/local/zookeeper/bin/../conf/zoo.cfg
+Starting zookeeper ... already running as process 4115.
+
+停止zookeeper
+# zkServer.sh stop
+ZooKeeper JMX enabled by default
+Using config: /usr/local/zookeeper/bin/../conf/zoo.cfg
+Stopping zookeeper ... STOPPED
+```
        
-（4）查看状态  
+7、查看状态  
 ```
-[root@node001 zookeeper-3.4.10]# bin/zkServer.sh status
-JMX enabled by default
-Using config: /opt/module/zookeeper-3.4.10/bin/../conf/zoo.cfg
+ZK1状态：
+# zkServer.sh status
+ZooKeeper JMX enabled by default
+Using config: /usr/local/zookeeper/bin/../conf/zoo.cfg
 Mode: follower
-	
-[root@node002 zookeeper-3.4.10]# bin/zkServer.sh status
-JMX enabled by default
-Using config: /opt/module/zookeeper-3.4.10/bin/../conf/zoo.cfg
-Mode: leader
-	
-[root@node003 zookeeper-3.4.5]# bin/zkServer.sh status
-JMX enabled by default
-Using config: /opt/module/zookeeper-3.4.10/bin/../conf/zoo.cfg
-Mode: follower
-```  
 
+ZK2状态：
+# zkServer.sh status
+ZooKeeper JMX enabled by default
+Using config: /usr/local/zookeeper/bin/../conf/zoo.cfg
+Mode: follower
+
+ZK3状态：
+# zkServer.sh status
+ZooKeeper JMX enabled by default
+Using config: /usr/local/zookeeper/bin/../conf/zoo.cfg
+Mode: leader
+```  
+- 启动zookeeper之后，可以通过/data/zookeeper/log/zookeeper.out 查看到zookeeper日志。
 
 四、Kafka集群部署
 ---
