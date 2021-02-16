@@ -232,17 +232,17 @@ kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partit
 4）修改配置文件
 | 参数 | 说明 |
 |------|-----|
-| broker.id =0 | 每一个broker在集群中的唯一表示，要求是正数。当该服务器的IP地址发生改变时，broker.id没有变化，则不会影响consumers的消息情况 |
+| broker.id =0 | 全局唯一当IP改变时，broker.id没有变化，不会影响consumers的消息情况 |
 | listeners=PLAINTEXT://:9092 | 配置kafka监听地址 |
-| advertised.listeners=PLAINTEXT://ip:9092 | 给producer和consumer连接使用，如果没有设置使用 listeners |
+| advertised.listeners=PLAINTEXT://ip:9092 | producer、consumer连接地址，如未设置使用 listeners |
 | num.network.threads=3 | broker处理消息的最大线程数，一般情况下数量为cpu核数 |
 | num.io.threads=8 | broker处理磁盘IO的线程数，数值为cpu核数2倍 |
 | socket.send.buffer.bytes=102400 | socket的发送缓冲区，socket的调优参数SO_SNDBUFF |
 | socket.receive.buffer.bytes=102400 | socket的接受缓冲区，socket的调优参数SO_RCVBUFF |
-| socket.request.max.bytes=104857600 | 这个参数是向kafka请求消息或者向kafka发送消息的请请求的最大数，这个值不能超过java的堆栈大小 |
-| log.dirs=/tmp/kafka-logs 	kafka数据的存放地址，多个地址的话用逗号分割,多个目录分布在不同磁盘上可以提高读写性能 /data/kafka-logs-1，/data/kafka-logs-2 |
-| num.partitions=1 	每个topic的分区个数，若是在topic创建时候没有指定的话会被topic创建时的指定参数覆盖 |
-| num.recovery.threads.per.data.dir=1 | 用于在启动时,用于日志恢复的线程个数 |
+| socket.request.max.bytes=104857600 | 向kafka请求消息或者向kafka发送消息的请请求的最大数，这个值不能超过java的堆栈大小 |
+| log.dirs=/tmp/kafka-logs | kafka数据的存放地址，多个地址的话用逗号分割,多个目录分布在不同磁盘上可以提高读写性能 /data/kafka-logs-1，/data/kafka-logs-2 |
+| num.partitions=1 | 每个topic的分区个数，在创建topic时没有指定使用 |
+| num.recovery.threads.per.data.dir=1 | 在启动时用于日志恢复的线程个数 |
 | offsets.topic.replication.factor=1 | 用于配置offset记录的topic的partition的副本个数 |
 | transaction.state.log.replication.factor=1 |  |
 | transaction.state.log.min.isr=1 |  |
