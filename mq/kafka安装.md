@@ -212,7 +212,7 @@ export PATH=$PATH:/usr/local/kafka/bin/"
 # source /etc/profile
 ```  
 
-2、
+2、bin目录文件
 ```
 # cd /usr/local/kafka/bin/ && ls
 connect-distributed.sh        kafka-console-consumer.sh    kafka-log-dirs.sh                    kafka-replay-log-producer.sh   kafka-simple-consumer-shell.sh      trogdor.sh     zookeeper-shell.sh
@@ -229,7 +229,7 @@ kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partit
 - zookeeper-server-start.sh ：zookeeper启动脚本
 - zookeeper-server-stop.sh ：zookeeper停止脚本
 
-4）修改配置文件
+3、修改配置文件
 | 参数 | 说明 |
 |------|-----|
 | broker.id =0 | 全局唯一当IP改变时，broker.id没有变化，不会影响consumers的消息情况 |
@@ -279,29 +279,13 @@ zookeeper.connection.timeout.ms=6000     #zookeeper链接超时时间
 group.initial.rebalance.delay.ms=0
 ```  
 
-5）配置环境变量  
+4、启动kafka服务
 ```
-$ cat /etc/profile
-   #KAFKA_HOME
-   export KAFKA_HOME=/opt/module/kafka
-   export PATH=$PATH:$KAFKA_HOME/bin
-$ source /etc/profile
-```  
+# kafka-server-start.sh /usr/local/kafka/config/server.properties
+# kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
+# kafka-server-stop.sh stop
+```
 
-6）分发安装包  
-``` $ scp -rp /opt/module/kafka node002:/opt/module/ ```  
-``` $ scp -rp /opt/module/kafka node003:/opt/module/ ```  
-
-7）分别在node002和node003上修改配置文件/opt/module/kafka/config/server.properties中的broker.id=1、broker.id=2  
-注：broker.id不得重复  
-  
-8）启动集群  
-依次在node001、node002、node003节点上启动kafka  
-``` $ bin/kafka-server-start.sh -daemon config/server.properties ```   
- 
-9)关闭集群
-``` $ bin/kafka-server-stop.sh stop ```
-      
 五、Kafka命令行操作
 ---
 
