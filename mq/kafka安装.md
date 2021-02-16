@@ -530,6 +530,42 @@ fi
 ```
 - brokers和Zookeeper通信没有启用SASL，如果Zookeeper服务器允许的话，将继续连接到Zookeeper服务器
 
+5、ACL的使用
+
+1. kafka提供了一个ACL的功能用来控制TOPIC的权限，权限如下：
+| 权限 | 说明 |
+|------|------|
+| READ | 读取topic |
+| WRITE | 写入topic |
+| DELETE | 删除topic |
+| CREATE | 创建topic |
+| ALTER | 修改topic |
+| DESCRIBE | 获取topic的信息 |
+| ClusterAction |  |
+| ALL | 所有权限 |
+- 访问控制列表ACL存储在zk上，路径为/kafka-acl
+
+2. kafka提供了一个bin/kafka-acls.sh脚本来设置权限
+
+Kafka 提供的命令如下表所示
+| Option | Description | Default | Option type |
+|--------|------|------|---------|-------------|
+| –add | Indicates to the script that user is trying to add an acl.  |  | Action |
+| –remove | Indicates to the script that user is trying to remove an acl. | | Action
+| –list | Indicates to the script that user is trying to list acts.  | | Action
+| –authorizer | Fully qualified class name of the authorizer. | kafka.security.auth.SimpleAclAuthorizer| Configuration |
+| –authorizer-properties | key=val pairs that will be passed to authorizer for initialization. For the default authorizer the example values are: zookeeper.connect=localhost:2181 	| | Configuration |
+| –cluster | Specifies cluster as resource. | | Resource |
+| –topic [topic-name] | Specifies the topic as resource. | | Resource |
+| –group [group-name] | Specifies the consumer-group as resource.| | Resource |
+| –allow-principal | Principal is in PrincipalType:name format that will be added to ACL with Allow permission. You can specify multiple –allow-principal in a single command. 	| | Principal |
+| –deny-principal | Principal is in PrincipalType:name format that will be added to ACL with Deny permission. You can specify multiple –deny-principal in a single command. 		| | Principal |
+| –allow-host | IP address from which principals listed in –allow-principal will have access. | if –allow-principal is specified defaults to * which translates to “all hosts” 	     | Host |
+| –deny-host | IP address from which principals listed in –deny-principal will be denied access. | if –deny-principal is specified defaults to * which translates to “all hosts” 	| Host |
+| –operation | Operation that will be allowed or denied. Valid values are : Read, Write, Create, Delete, Alter, Describe, ClusterAction, All | All | Operation |
+| –producer | Convenience option to add/remove acls for producer role. This will generate acls that allows WRITE, DESCRIBE on topic and CREATE on cluster.| | Convenience |
+| –consumer | Convenience option to add/remove acls for consumer role. This will generate acls that allows READ, DESCRIBE on topic and READ on consumer-group.| | Convenience |
+
 
 生产者和消费者配置
 1、配置server端配置
