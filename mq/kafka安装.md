@@ -229,15 +229,39 @@ kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partit
 - zookeeper-server-start.sh ：zookeeper启动脚本
 - zookeeper-server-stop.sh ：zookeeper停止脚本
 
-4）修改配置文件  
- ```
+4）修改配置文件
+| 参数 | 说明 |
+|------|-----|
+| broker.id =0 | 每一个broker在集群中的唯一表示，要求是正数。当该服务器的IP地址发生改变时，broker.id没有变化，则不会影响consumers的消息情况 |
+| listeners=PLAINTEXT://:9092 | 配置kafka监听地址 |
+| advertised.listeners=PLAINTEXT://ip:9092 | 给producer和consumer连接使用，如果没有设置使用 listeners |
+| num.network.threads=3 | broker处理消息的最大线程数，一般情况下数量为cpu核数 |
+| num.io.threads=8 | broker处理磁盘IO的线程数，数值为cpu核数2倍 |
+| socket.send.buffer.bytes=102400 | socket的发送缓冲区，socket的调优参数SO_SNDBUFF |
+| socket.receive.buffer.bytes=102400 | socket的接受缓冲区，socket的调优参数SO_RCVBUFF |
+| socket.request.max.bytes=104857600 | 这个参数是向kafka请求消息或者向kafka发送消息的请请求的最大数，这个值不能超过java的堆栈大小 |
+| log.dirs=/tmp/kafka-logs 	kafka数据的存放地址，多个地址的话用逗号分割,多个目录分布在不同磁盘上可以提高读写性能 /data/kafka-logs-1，/data/kafka-logs-2 |
+| num.partitions=1 	每个topic的分区个数，若是在topic创建时候没有指定的话会被topic创建时的指定参数覆盖 |
+| num.recovery.threads.per.data.dir=1 | 用于在启动时,用于日志恢复的线程个数 |
+| offsets.topic.replication.factor=1 | 用于配置offset记录的topic的partition的副本个数 |
+| transaction.state.log.replication.factor=1 |  |
+| transaction.state.log.min.isr=1 |  |
+| log.retention.hours=168 | 默认消息的最大持久化时间，168小时，7天 |
+| log.segment.bytes=1073741824 | topic的分区是以一堆segment文件存储的，这个控制每个segment的大小，会被topic创建时的指定参数覆盖 |
+| log.retention.check.interval.ms=300000 | 每隔300000毫秒去检查上面配置的log失效时间（log.retention.hours=168 ） |
+| zookeeper.connect=localhost:2181 | zookeeper集群的地址 |
+| zookeeper.connection.timeout.ms=6000 | ZooKeeper的连接超时时间 |
+| group.initial.rebalance.delay.ms=0 |  |	
+
+```
 $ cd config/
 $ vim server.properties
 broker.id=0                              #broker的全局唯一编号，不能重复
+listeners=PLAINTEXT://:9092              #监听所有地址
 port=9092                                #用来监听链接的端口，producer或consumer将在此端口建立连接
 delete.topic.enable=true                 #删除topic功能使能
-num.network.threads=3                    #处理网络请求的线程数量
-num.io.threads=8                         #用来处理磁盘IO的现成数量
+num.network.threads=8                    #处理网络请求的线程数量,设置为CPU核心数
+num.io.threads=16                        #用来处理磁盘IO的现成数量,设置为CPU核心数的两倍
 socket.send.buffer.bytes=102400          #发送套接字的缓冲区大小
 socket.receive.buffer.bytes=102400       #接收套接字的缓冲区大小
 socket.request.max.bytes=104857600       #请求套接字的缓冲区大小
@@ -252,6 +276,7 @@ log.flush.interval.messages=10000        #partion buffer中，消息的条数达
 log.flush.interval.ms=3000               #消息buffer的时间，达到阈值，将触发flush到磁盘
 zookeeper.connect=node001:2181,node002:2181,node003:2181       #配置连接Zookeeper集群地址
 zookeeper.connection.timeout.ms=6000     #zookeeper链接超时时间
+group.initial.rebalance.delay.ms=0
 ```  
 
 5）配置环境变量  
