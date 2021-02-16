@@ -395,13 +395,13 @@ $ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning
 注意： --zookeeper已经被弃用 改为 --bootstrap-server参数  
 
 
-8)增加、删除配置项
+9、增加、删除配置项
 ```
 # bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --add-config x=y
 # bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --delete-config x
 ```
 
-常用创建topic参数
+10、常用创建topic参数
 ```
 bin/kafka-topics.sh --create \
 --zookeeper $zookeeper_address \
@@ -415,80 +415,168 @@ bin/kafka-topics.sh --create \
 - --config retention.ms=86400000 #topic过期时间，86400000 为一天，单位是毫秒
 - --config retention.bytes=1073741824 # 日志数据存储的最大字节数。超过这个时间会根据policy处理数据。
 
-六、Kafka使用密码认证
+六、kafka manager安装配置
 ---
-在Kafka0.9版本之前，Kafka集群时没有安全机制的。Kafka Client应用可以通过连接Zookeeper地址，例如zk1:2181:zk2:2181,zk3:2181等。来获取存储在Zookeeper中的Kafka元数据信息。拿到Kafka Broker地址后，连接到Kafka集群，就可以操作集群上的所有主题了。由于没有权限控制，集群核心的业务主题时存在风险的。
+常用的kafka管理工具
+- kafka manager
+- Kafka Web Conslole
+- KafkaOffsetMonitor
 
-Kafka开启使用 SASL_PLAINTEXT认证
+1、下载
+```
+# git clone https://github.com/yahoo/kafka-manager
+Cloning into 'kafka-manager'...
+remote: Counting objects: 4555, done.
+remote: Total 4555 (delta 0), reused 0 (delta 0), pack-reused 4555
+Receiving objects: 100% (4555/4555), 2.81 MiB | 1.05 MiB/s, done.
+Resolving deltas: 100% (2914/2914), done.
+```
 
-1、配置server端配置
+2、编译打包
+```
+# cd kafka-manager/
+# ./sbt clean dist
+```
+
+3、解压安装
+```
+# unzip kafka-manager-1.3.3.16.zip
+# mv kafka-manager-1.3.3.16 /usr/local/kafka-manager
+```
+
+4、配置kafka-manager
+```
+vim /usr/local/kafka-manager/conf/application.conf
+#修改kafka-manager.zkhosts配置项为zookeeper地址即可
+```
+
+5、启动kafka-manager
+```
+./bin/kafka-manager -Dconfig.flie=/usr/local/kafka-manager/conf/application.conf -Dhttp.port=8011
+```
+- -Dhttp.port 默认kafka-manager使用的是9000端口
+
+启动后可以通过ip:8011访问kafka-manager页面
+
+
+
+七、Kafka使用密码认证
+---
+Kafka 目前支持SSL、SASL/Kerberos、SASL/PLAIN三种认证机制。可以支持 客户端与brokers之间的认证，可以支持brokers与zookeeper之间的认证。因为SASL/PLAIN认证的用户名密码均是明文传书，所以可以使用SSL加密传输，而ACL基于用户对topic的读写权限进行控制。
+
+在客户端与brokers、brokers与zookeeper之间的认证可以只做客户端与brokers，这并不影响brokers与zookeeper的之间的通讯，当然为了安全我们可以做brokers与zookeeper的认证。
+
+Kafka 的安全机制主要分为两个部分
+- 身份认证（Authentication）：对client 与服务器的连接进行身份认证。
+- 权限控制（Authorization）：实现对于TOPIC的权限控制
+
+1、修改server.properties配置文件
+```
+#之前配置listeners=PLAINTEXT://192.168.101.66:9092以PLAINTEXT协议监听，需要修改为如下配置
+listeners=SASL_PLAINTEXT://192.168.101.66:9092     #修改监听协议为SASL_PLAINTEXT
+
+security.inter.broker.protocol=SASL_PLAINTEXT     #配置安全协议为SASL_PLAINTEXT
+sasl.mechanism.inter.broker.protocol=PLAIN        #使用PLAIN做broker之间通信的协议
+sasl.enabled.mechanisms=PLAIN                     #启用SASL机制
+authorizer.class.name = kafka.security.auth.SimpleAclAuthorizer   #配置java认证类
+super.users=User:admin                            #设置超级用户为：admin
+allow.everyone.if.no.acl.found=true               #如果topic找不到acl配置是否运行操作，true为允许
+```
+- super.users配置了一个超级用户，这个超级用户不受ACL的限制可以自由访问任何的TOPIC，通常不对外使用，仅仅做管理使用，一般而言和JAAS配置的username一致。 allow.everyone.if.no.acl.found 配置了在TOPIC上没有找到ACL如何授权，配置true允许操作，配置false不允许操作，此配默认值为false，如果为false，TOPIC必须指定ACL，并且客户端使用指定的用户名才能访问成功。
+
+2、jaas文件配置
 ```
 # vim kafka_server_jaas.conf
 KafkaServer {
-  org.apache.kafka.common.security.plain.PlainLoginModule required
-  username="admin"
-  password="admin"
-  user_admin="admin"
-  user_alice="alice";
-　};
+    org.apache.kafka.common.security.plain.PlainLoginModule required
+    username="admin"
+    password="admin@2017"
+    user_alice="alice@2017";
+};
 ```
 - username和password是broker用于初始化连接到其他的broker
 - admin用户为broker间的通讯
 - user_UserName 定义了所有连接到 broker和 broker验证的所有的客户端连接包括其他 broker的用户密码，user_userName必须配置admin用户，否则报错。
 
-2、配置client配置
+3、添加kafka_server_jaas.conf到jvm的环境变量  
+kafka启动时，会运行 bin/kafka-run-class.sh,将变量传给JVM。修改kafka-run-class.sh，将kafka_server_jaas.conf传递给JVM
+```
+# vim kafka-run-class.sh
+#1、配置的第一行添加KAFKA_SASL_OPTS='-Djava.security.auth.login.config=/usr/local/kafka/config/kafka_server_jaas.conf'
+KAFKA_SASL_OPTS='-Djava.security.auth.login.config=/usr/local/kafka/config/kafka_server_jaas.conf'
+if [ $# -lt 1 ];
+then
+  echo "USAGE: $0 [-daemon] [-name servicename] [-loggc] classname [opts]"
+  exit 1
+fi
+.
+.
+#2、配置文件最后一段的Launch mode中，添加 $KAFKA_SASL_OPTS即可
+# Launch mode
+if [ "x$DAEMON_MODE" = "xtrue" ]; then
+  nohup $JAVA $KAFKA_HEAP_OPTS $KAFKA_JVM_PERFORMANCE_OPTS $KAFKA_GC_LOG_OPTS $KAFKA_SASL_OPTS $KAFKA_JMX_OPTS $KAFKA_LOG4J_OPTS -cp $CLASSPATH $KAFKA_OPTS "$@" > "$CONSOLE_OUTPUT_FILE" 2>&1 < /dev/null &
+else
+  exec $JAVA $KAFKA_HEAP_OPTS $KAFKA_JVM_PERFORMANCE_OPTS $KAFKA_GC_LOG_OPTS $KAFKA_SASL_OPTS $KAFKA_JMX_OPTS $KAFKA_LOG4J_OPTS -cp $CLASSPATH $KAFKA_OPTS "$@"
+fi
+```
+
+
+4、重启kafka
+```
+# kafka-server-stop.sh stop
+# kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
+
+[2018-05-09 10:58:09,225] WARN SASL configuration failed: javax.security.auth.login.LoginException: No JAAS configuration section named 'Client' was found in specified JAAS configuration file: '/usr/local/kafka/config/kafka_server_jaas.conf'. Will continue connection to Zookeeper server without SASL authentication, if Zookeeper server allows it. (org.apache.zookeeper.ClientCnxn)
+```
+- brokers和Zookeeper通信没有启用SASL，如果Zookeeper服务器允许的话，将继续连接到Zookeeper服务器
+
+
+生产者和消费者配置
+1、配置server端配置
+```
+# vim kafka_server_jaas.conf
+KafkaServer {
+    org.apache.kafka.common.security.plain.PlainLoginModule required
+    username="admin"
+    password="admin@2017"
+    user_alice="alice@2017";
+};
+```
+
+2、配置client配置，可用上边配置
 ```
 # vim kafka_cilent_jaas.conf
-KafkaClient {
-  org.apache.kafka.common.security.plain.PlainLoginModule required
-  username="admin"
-  password="admin";
-　};
+KafkaServer {
+    org.apache.kafka.common.security.plain.PlainLoginModule required
+    username="admin"
+    password="admin@2017"
+    user_alice="alice@2017";
+};
 ```
 - username和password是客户端用来配置客户端连接broker的用户，在上面配置中，客户端使用admin用户连接到broker
 
-3、配置文件
-```
-# vim server.properties
-listeners=SASL_PLAINTEXT://IP:9092                     # 使用的认证协议 
-security.inter.broker.protocol=SASL_PLAINTEXT          # SASL机制 
-sasl.enabled.mechanisms=PLAIN
-sasl.mechanism.inter.broker.protocol=PLAIN             # 完成身份验证的类
-authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer     # 如果没有找到ACL（访问控制列表）配置，则允许任何操作
-super.users=User:admin
-```
-
-4、修改consumer.properties和producer.properties，分别增加如下配置：
+3、修改consumer.properties和producer.properties，分别增加如下配置：
 ```
 security.protocol=SASL_PLAINTEXT
 sasl.mechanism=PLAIN
 ```
 
-5、修改启动文件参数
-```
-# vim kafka-server-start.sh
-export KAFKA_OPTS=" -Djava.security.auth.login.config=/data/kafka/kafka_2.11-1.1.0/config/kafka_server_jaas.conf"
-```
-
+4、修改生产者和消费者启动文件参数
 ```
 # vim kafka-console-consumer.sh
-export KAFKA_OPTS=" -Djava.security.auth.login.config=/data/kafka/kafka_2.11-1.1.0/config/kafka_client_jaas.conf"
+export KAFKA_OPTS=" -Djava.security.auth.login.config=/usr/local/kafka/config/kafka_client_jaas.conf"
 
 # vim kafka-console-producer.sh
-export KAFKA_OPTS=" -Djava.security.auth.login.config=/data/kafka/kafka_2.11-1.1.0/config/kafka_client_jaas.conf"
+export KAFKA_OPTS=" -Djava.security.auth.login.config=/usr/local/kafka/config/kafka_client_jaas.conf"
 ```
 
-6、启动zookeeper和kafka
-```
-bin/kafka-server-start.sh config/server.properties &
-```
 
-7、启动生产者：
+6、启动生产者：
 ```
 bin/kafka-console-producer.sh --broker-list 10.100.17.79:9092 --topic test --producer.config config/producer.properties
 ```
 
-8、启动消费者
+7、启动消费者
 ```
 bin/kafka-console-consumer.sh --bootstrap-server 10.100.17.79:9092 --topic test --from-beginning --consumer.config config/consumer.properties
 ```
