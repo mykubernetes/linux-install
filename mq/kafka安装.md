@@ -543,6 +543,7 @@ fi
 | DESCRIBE | 获取topic的信息 |
 | ClusterAction |  |
 | ALL | 所有权限 |
+
 - 访问控制列表ACL存储在zk上，路径为/kafka-acl
 
 2. kafka提供了一个bin/kafka-acls.sh脚本来设置权限
