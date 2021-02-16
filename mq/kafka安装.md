@@ -532,8 +532,7 @@ fi
 
 5、ACL的使用
 
-1. kafka提供了一个ACL的功能用来控制TOPIC的权限，权限如下
-
+1. kafka提供了一个ACL的功能用来控制TOPIC的权限
 | 权限 | 说明 |
 |------|------|
 | READ | 读取topic |
@@ -544,12 +543,11 @@ fi
 | DESCRIBE | 获取topic的信息 |
 | ClusterAction |  |
 | ALL | 所有权限 |
-
 - 访问控制列表ACL存储在zk上，路径为/kafka-acl
 
 2. kafka提供了一个bin/kafka-acls.sh脚本来设置权限
 
-Kafka 提供的命令如下表所示
+Kafka提供的命令
 | Option | Description | Default | Option type |
 |--------|-------------|---------|-------------|
 | –add | Indicates to the script that user is trying to add an acl.  |  | Action |
@@ -567,6 +565,47 @@ Kafka 提供的命令如下表所示
 | –operation | Operation that will be allowed or denied. Valid values are : Read, Write, Create, Delete, Alter, Describe, ClusterAction, All | All | Operation |
 | –producer | Convenience option to add/remove acls for producer role. This will generate acls that allows WRITE, DESCRIBE on topic and CREATE on cluster.| | Convenience |
 | –consumer | Convenience option to add/remove acls for consumer role. This will generate acls that allows READ, DESCRIBE on topic and READ on consumer-group.| | Convenience |
+
+3. 权限设置
+
+add 操作
+```
+# 为用户 alice 在 test（topic）上添加读写的权限
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --add --allow-principal User:alice --operation Read --operation Write --topic test
+
+# 对于 topic 为 test 的消息队列，拒绝来自 ip 为198.51.100.3账户为 BadBob  进行 read 操作，其他用户都允许
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --add --allow-principal User:* --allow-host * --deny-principal User:BadBob --deny-host 198.51.100.3 --operation Read --topic test
+
+# 为bob 和 alice 添加all，以允许来自 ip 为198.51.100.0或者198.51.100.1的读写请求
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --add --allow-principal User:bob --allow-principal User:alice --allow-host 198.51.100.0 --allow-host 198.51.100.1 --operation Read --operation Write --topic test
+```
+
+list 操作
+```
+# 列出 topic 为 test 的所有权限账户
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --list --topic test
+```
+输出信息为：
+```
+Current ACLs for resource `Topic:test`:
+    User:alice has Allow permission for operations: Describe from hosts: *
+    User:alice has Allow permission for operations: Read from hosts: *
+    User:alice has Allow permission for operations: Write from hosts: *
+```
+
+remove 操作
+```
+# 移除 acl
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --remove --allow-principal User:Bob --allow-principal User:Alice --allow-host 198.51.100.0 --allow-host 198.51.100.1 --operation Read --operation Write --topic test
+```
+
+producer 和 consumer 的操作
+```
+# producer
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --add --allow-principal User:alice --producer --topic test
+#consumer
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --add 
+```
 
 
 生产者和消费者配置
