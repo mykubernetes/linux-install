@@ -247,7 +247,7 @@ kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partit
 | transaction.state.log.replication.factor=1 |  |
 | transaction.state.log.min.isr=1 |  |
 | log.retention.hours=168 | 默认消息的最大持久化时间，168小时，7天 |
-| log.segment.bytes=1073741824 | topic的分区是以一堆segment文件存储的，这个控制每个segment的大小，会被topic创建时的指定参数覆盖 |
+| log.segment.bytes=1073741824 | topic分区以一堆segment文件存储，控制每个segment的大小，会被topic创建时的指定参数覆盖 |
 | log.retention.check.interval.ms=300000 | 每隔300000毫秒去检查上面配置的log失效时间（log.retention.hours=168 ） |
 | zookeeper.connect=localhost:2181 | zookeeper集群的地址 |
 | zookeeper.connection.timeout.ms=6000 | ZooKeeper的连接超时时间 |
