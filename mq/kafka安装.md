@@ -533,6 +533,7 @@ fi
 5、ACL的使用
 
 1. kafka提供了一个ACL的功能用来控制TOPIC的权限
+
 | 权限 | 说明 |
 |------|------|
 | READ | 读取topic |
@@ -548,7 +549,6 @@ fi
 
 2. kafka提供了一个bin/kafka-acls.sh脚本来设置权限
 
-Kafka提供的命令
 | Option | Description | Default | Option type |
 |--------|-------------|---------|-------------|
 | –add | Indicates to the script that user is trying to add an acl.  |  | Action |
