@@ -199,15 +199,36 @@ Mode: leader
 
 四、Kafka集群部署
 ---
-1）解压安装包  
-``` $ tar -zxvf kafka_2.11-0.11.0.0.tgz -C /opt/module/ ```
-  
-2）修改解压后的文件名称  
-``` $ mv kafka_2.11-0.11.0.0/ kafka ```  
-  
-3）在/opt/module/kafka目录下创建logs文件夹  
-``` $ mkdir logs ```  
-  
+1）kafka安装
+```
+# wget http://mirrors.shu.edu.cn/apache/kafka/1.0.0/kafka_2.11-1.0.0.tgz 
+# tar -zxvf kafka_2.11-1.0.0.tgz 
+# mv kafka_2.11-1.0.0 /usr/local/kafka
+
+# vim /etc/profile
+#在文件末尾添加"
+export PATH=$PATH:/usr/local/kafka/bin/"
+
+# source /etc/profile
+```  
+
+2、
+```
+# cd /usr/local/kafka/bin/ && ls
+connect-distributed.sh        kafka-console-consumer.sh    kafka-log-dirs.sh                    kafka-replay-log-producer.sh   kafka-simple-consumer-shell.sh      trogdor.sh     zookeeper-shell.sh
+connect-standalone.sh         kafka-console-producer.sh    kafka-mirror-maker.sh                kafka-replica-verification.sh  kafka-streams-application-reset.sh  windows
+kafka-acls.sh                 kafka-consumer-groups.sh     kafka-preferred-replica-election.sh  kafka-run-class.sh             kafka-topics.sh                     zookeeper-security-migration.sh
+kafka-broker-api-versions.sh  kafka-consumer-perf-test.sh  kafka-producer-perf-test.sh          kafka-server-start.sh          kafka-verifiable-consumer.sh        zookeeper-server-start.sh
+kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partitions.sh         kafka-server-stop.sh           kafka-verifiable-producer.sh        zookeeper-server-stop.sh
+```
+- kafka-console-consumer.sh ：官方控制台消费者
+- kafka-console-producer.sh ： 官方控制台生产者
+- kafka-server-start.sh ：kafka启动脚本
+- kafka-server-stop.sh：kafka停止脚本
+- kafka-topics.sh ： topics管理脚本
+- zookeeper-server-start.sh ：zookeeper启动脚本
+- zookeeper-server-stop.sh ：zookeeper停止脚本
+
 4）修改配置文件  
  ```
 $ cd config/
