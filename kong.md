@@ -22,6 +22,7 @@ curl -XPOST http://localhost:8001/routes --data "paths[]=/index" --data "service
 ```
 
 插件
+
 1、为tomcat服务添加50次/秒的限流
 ```
 curl -XPOST http://localhost:8001/services/tomcat/plugins --data "name=rate-limiting" --data "config.second=50"
