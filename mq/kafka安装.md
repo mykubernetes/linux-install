@@ -470,6 +470,8 @@ Kafka 的安全机制主要分为两个部分
 - 身份认证（Authentication）：对client 与服务器的连接进行身份认证。
 - 权限控制（Authorization）：实现对于TOPIC的权限控制
 
+一）SASL/PLAIN认证
+
 1、修改server.properties配置文件
 ```
 #之前配置listeners=PLAINTEXT://192.168.101.66:9092以PLAINTEXT协议监听，需要修改为如下配置
@@ -530,7 +532,57 @@ fi
 ```
 - brokers和Zookeeper通信没有启用SASL，如果Zookeeper服务器允许的话，将继续连接到Zookeeper服务器
 
-5、ACL的使用
+生产者和消费者配置  
+1、配置server端配置
+```
+# vim kafka_server_jaas.conf
+KafkaServer {
+    org.apache.kafka.common.security.plain.PlainLoginModule required
+    username="admin"
+    password="admin@2017"
+    user_alice="alice@2017";
+};
+```
+
+2、配置client配置，可用上边配置
+```
+# vim kafka_cilent_jaas.conf
+KafkaServer {
+    org.apache.kafka.common.security.plain.PlainLoginModule required
+    username="admin"
+    password="admin@2017"
+    user_alice="alice@2017";
+};
+```
+- username和password是客户端用来配置客户端连接broker的用户，在上面配置中，客户端使用admin用户连接到broker
+
+3、修改consumer.properties和producer.properties，分别增加如下配置：
+```
+security.protocol=SASL_PLAINTEXT
+sasl.mechanism=PLAIN
+```
+
+4、修改生产者和消费者启动文件参数
+```
+# vim kafka-console-consumer.sh
+export KAFKA_OPTS=" -Djava.security.auth.login.config=/usr/local/kafka/config/kafka_client_jaas.conf"
+
+# vim kafka-console-producer.sh
+export KAFKA_OPTS=" -Djava.security.auth.login.config=/usr/local/kafka/config/kafka_client_jaas.conf"
+```
+
+
+6、启动生产者：
+```
+bin/kafka-console-producer.sh --broker-list 10.100.17.79:9092 --topic test --producer.config config/producer.properties
+```
+
+7、启动消费者
+```
+bin/kafka-console-consumer.sh --bootstrap-server 10.100.17.79:9092 --topic test --from-beginning --consumer.config config/consumer.properties
+```
+
+二）ACL的使用
 
 1. kafka提供了一个ACL的功能用来控制TOPIC的权限
 
@@ -606,57 +658,6 @@ producer 和 consumer 的操作
 bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --add --allow-principal User:alice --producer --topic test
 #consumer
 bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test10 --add 
-```
-
-
-生产者和消费者配置
-1、配置server端配置
-```
-# vim kafka_server_jaas.conf
-KafkaServer {
-    org.apache.kafka.common.security.plain.PlainLoginModule required
-    username="admin"
-    password="admin@2017"
-    user_alice="alice@2017";
-};
-```
-
-2、配置client配置，可用上边配置
-```
-# vim kafka_cilent_jaas.conf
-KafkaServer {
-    org.apache.kafka.common.security.plain.PlainLoginModule required
-    username="admin"
-    password="admin@2017"
-    user_alice="alice@2017";
-};
-```
-- username和password是客户端用来配置客户端连接broker的用户，在上面配置中，客户端使用admin用户连接到broker
-
-3、修改consumer.properties和producer.properties，分别增加如下配置：
-```
-security.protocol=SASL_PLAINTEXT
-sasl.mechanism=PLAIN
-```
-
-4、修改生产者和消费者启动文件参数
-```
-# vim kafka-console-consumer.sh
-export KAFKA_OPTS=" -Djava.security.auth.login.config=/usr/local/kafka/config/kafka_client_jaas.conf"
-
-# vim kafka-console-producer.sh
-export KAFKA_OPTS=" -Djava.security.auth.login.config=/usr/local/kafka/config/kafka_client_jaas.conf"
-```
-
-
-6、启动生产者：
-```
-bin/kafka-console-producer.sh --broker-list 10.100.17.79:9092 --topic test --producer.config config/producer.properties
-```
-
-7、启动消费者
-```
-bin/kafka-console-consumer.sh --bootstrap-server 10.100.17.79:9092 --topic test --from-beginning --consumer.config config/consumer.properties
 ```
 
 七、验证kafka用户密码
