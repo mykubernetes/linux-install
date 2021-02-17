@@ -153,24 +153,10 @@ curl -s --url http://192.168.0.184:8001/services/?size=1 | python -m json.tool
     "offset": "WyIyN2YzMDI0OC1mZWYxLTRkZGMtOWZkYy00Y2E3M2YzNTRjNjQiXQ"
 }
 ```
+- size的参数来限定每一页的数量，在返回的结果中有两个字段，next表示下一页的端点，offset是本页的偏移。
 
-在上面的请求示例中，我们带了一个size的参数来限定每一页的数量，在返回的结果中有两个字段，next表示下一页的端点，offset是本页的偏移。
-
-当然，如果你在读取下一页的时候还需要限定返回的数据，还是依然要使用size的参数
 
 4、更新服务
-
-| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
-|--------|-----|--------|---------|------|
-| name | string | | 否 | 服务名称，全局唯一 |
-| protocol | string | http | 是 | 和上游通讯的协议取值http或https |
-| host | string | | 是 | 上游服务器的主机 |
-| port | int | 80 | 是 | 上游服务器的端口 |
-| path | string | | 否 | 上游服务器请求中的路径，必须以/开头 |
-| retries | int | 5 | 否 | 代理失败时要执行的重试次数 |
-| connect_timeout | int | 60000 | 否 | 与上游连接的超时时间，单位毫秒 |
-| write_timeout | int | 60000 | 否 | 向上游发送请求两次连续写操作的超时时间 ，单位毫秒 |
-| read_timeout | int | 60000 | 否 | 用于向上游服务器发送请求的两次连续读取操作之间的超时 ，单位毫秒 |
 
 ```
 curl -s -X PATCH --url http://192.168.0.184:8001/services/linuxops_server \
@@ -198,18 +184,6 @@ curl -s -X PATCH --url http://192.168.0.184:8001/services/linuxops_server \
 - 在上面的示例中，我修改了一个服务的name，从返回值中可以可能出来id是不会变化的。
 
 5、更新或者创建服务
-
-| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
-|--------|-----|--------|---------|------|
-| name | string | | 否 | 服务名称，全局唯一 |
-| protocol | string | http | 是 | 和上游通讯的协议取值http或https |
-| host | string | | 是 | 上游服务器的主机 |
-| port | int | 80 | 是 | 上游服务器的端口 |
-| path | string | | 否 | 上游服务器请求中的路径，必须以/开头 |
-| retries | int | 5 | 否 | 代理失败时要执行的重试次数 |
-| connect_timeout | int | 60000 | 否 | 与上游连接的超时时间，单位毫秒 |
-| write_timeout | int | 60000 | 否 | 向上游发送请求两次连续写操作的超时时间 ，单位毫秒 |
-| read_timeout | int | 60000 | 否 | 用于向上游服务器发送请求的两次连续读取操作之间的超时 ，单位毫秒 |
 
 ```
 curl -s -X PUT --url http://192.168.0.184:8001/services/linuxops_server_put \
