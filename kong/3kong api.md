@@ -1,9 +1,6 @@
 一、前言
 
-- 如果Kong是以集群的状态的运行的，那只需要将管理API的请求发送到其中的一个节点中，Kong会自动同步信息到其他的节点。
-- Kong默认监听8001和8444两个端口用接受管理API的请求，8001为http端口，8444为https端口
-
-Kong支持application/x-www-form-urlencoded和application/json两种类型，POST的数据我们需要以json的格式发送。
+- 如果Kong是以集群的状态的运行的，只需要将管理API的请求发送到其中的一个节点中，Kong会自动同步信息到其他的节点。
 
 Kong大概有以下几个管理对象：
 - 节点信息
@@ -27,7 +24,7 @@ curl -s http://192.168.0.184:8001 | python -m json.tool
 2、查看节点状态
 
 - 主要是显示nginx进程处理连接的情况，以及数据库连接的情况。
-- 如果Kong是以集群的方式运行，那么如果要查看其他节点的情况，必须要要一个一个访问节点的此接口。
+- 如果Kong是以集群的方式运行，那么如果要查看其他节点的情况，必须要一个一个访问节点的此接口。
 - 因为Kong是基于nginx的，可以直接使用Nginx的监控工具。
 
 ```
@@ -47,7 +44,6 @@ curl -s http://192.168.0.184:8001/status | python -m json.tool
     }
 }
 ```
-- -s参数表示静默模式，curl将不输入信息，可以不打印不需要关注的信息。
 - total_requests：客户端请求的总数。
 - connections_active：当前活动客户端连接数，包括等待连接。
 - connections_accepted：已接受的客户端连接总数。
@@ -55,7 +51,8 @@ curl -s http://192.168.0.184:8001/status | python -m json.tool
 - connections_reading：Kong正在读取请求标头的当前连接数。
 - connections_writing：nginx将响应写回客户端的当前连接数。
 - connections_waiting：等待请求的当前空闲客户端连接数。
-
+- -s参数表示静默模式，curl将不输入信息，可以不打印不需要关注的信息。
+- 
 三、服务
 ---
 服务是每一个后端真实接口的抽象，它与路由关联，客户端发起请求，如果路由匹配到了，那么会将这个请求代理到与匹配路由相关联的服务中。
@@ -95,32 +92,8 @@ curl -s -X POST --url http://192.168.0.184:8001/services/ \
     "write_timeout": 60000
 }
 ```
-- 如果在创建服务的时候没有指定name，那么Kong并不会自动创建name，但是会创建UUID形式的ID，Kong在调用、匹配等等的操作都是可以基于这个ID，所以这个ID绝对是全局唯一的。
-- 在其他的对象管理中，name字段可能是必须的，通常这个name资源也是全局唯一的，即便如此，Kong也会创建ID字段，也可以通过这个ID字段来匹配。
-- 在服务对象中，能组合起来成为上游服务也是唯一的，也就是说，在一个服务中无法同时存在 http和https，如果上游提供http和https服务，同时也需要Kong代理它们的话，那必须要设置两个服务。
 
-2、查询服务
-
-```
-curl -s --url http://192.168.0.184:8001/services/27f30248-fef1-4ddc-9fdc-4ca73f354c64 | python -m json.tool
-{
-    "connect_timeout": 60000,
-    "created_at": 1537986798,
-    "host": "www.baidu.com",
-    "id": "27f30248-fef1-4ddc-9fdc-4ca73f354c64",
-    "name": "linuxops_server",
-    "port": 80,
-    "protocol": "http",
-    "read_timeout": 60000,
-    "retries": 5,
-    "updated_at": 1537986798,
-    "write_timeout": 60000
-}
-```
-
-查询服务的接口我们可以通过id来查询，也可以通过name来查询，在创建服务的时候可以不指定name字段，在系统中显示为null，这种服务就无法通过指定name来查询了，必须要使用id来查询，所以，强烈建议在创建服务的时候指定name，这是一个好习惯。
-
-3、查询所有服务
+2、查询所有服务
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |-------|------|--------|---------|------|
@@ -153,6 +126,23 @@ curl -s --url http://192.168.0.184:8001/services/?size=1 | python -m json.tool
 ```
 - size的参数来限定每一页的数量，在返回的结果中有两个字段，next表示下一页的端点，offset是本页的偏移。
 
+3、查询单个服务
+```
+curl -s --url http://192.168.0.184:8001/services/27f30248-fef1-4ddc-9fdc-4ca73f354c64 | python -m json.tool
+{
+    "connect_timeout": 60000,
+    "created_at": 1537986798,
+    "host": "www.baidu.com",
+    "id": "27f30248-fef1-4ddc-9fdc-4ca73f354c64",
+    "name": "linuxops_server",
+    "port": 80,
+    "protocol": "http",
+    "read_timeout": 60000,
+    "retries": 5,
+    "updated_at": 1537986798,
+    "write_timeout": 60000
+}
+```
 
 4、更新服务
 ```
@@ -177,8 +167,6 @@ curl -s -X PATCH --url http://192.168.0.184:8001/services/linuxops_server \
     "write_timeout": 60000
 }
 ```
-- 和查看服务的接口一样，接入点是需要带上id或者name的，只不过方法变成了PATCH，参数和添加的参数一样。
-- 在上面的示例中，我修改了一个服务的name，从返回值中可以可能出来id是不会变化的。
 
 5、更新或者创建服务
 ```
@@ -204,9 +192,6 @@ curl -s -X PUT --url http://192.168.0.184:8001/services/linuxops_server_put \
 }
 ```
 
-- 如果接口带name，如果存在，则更新，这个时候POST到Kong的数据中name字段无效，Kong并不会修改。 如果不存，那么会创建name为"linuxops_server"的服务，并且Kong会生成UUID形式的id，此时POST上来的数据中的name字段依然无效。
-- 如果接口带id，如果存在，那么更新它，这个时候如果POST上来的数据中有name字段，那么Kong会更新name。 如果id为不存在，那么Kong会创建name为id的服务，并且Kong会生成UUID形式的id，这个时候POST上来的数据中如果有name字段，那么这个字段无效。
-
 6、删除服务
 ```
 curl -i  -X DELETE --url http://192.168.0.184:8001/services/b6094754-07da-4c31-bb95-0a7caf5e6c0b
@@ -225,8 +210,6 @@ curl -i  -X DELETE --url http://192.168.0.184:8001/services/b6094754-07da-4c31-b
 | strip_path | bool | true | 否 | 匹配到path时，是否删除匹配到的前缀 |
 | preserve_host | bool | false | 否 | 匹配到hosts时，使用请求头部的值为域名向后端发起请求，请求的头部为"host",例如"host:api.abc.com" |
 | service | string | | 是 | 关联的服务id。 |
-
-这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
 
 1、添加路由
 ```
@@ -263,31 +246,7 @@ curl -s -X POST --url http://192.168.0.184:8001/routes \
 - 值得注意的是，methods，hosts，paths这三个参数必须要指定一个，否则无法创建路由。
 
 
-2、查看路由
-```
-curl -s http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-8e4e5866a131 | python -m json.tool
-{
-    "created_at": 1538089668,
-    "id": "6c6b7863-9a05-4d51-bf7e-8e4e5866a131",
-    "paths": [
-        "/weather"
-    ],
-    "preserve_host": false,
-    "protocols": [
-        "http",
-        "https"
-    ],
-    "regex_priority": 0,
-    "service": {
-        "id": "43921b23-65fc-4722-a4e0-99bf84e26593"
-    },
-    "strip_path": true,
-    "updated_at": 1538089668
-}
-```
-- 路由中没有name字段，所以只能通过ID来查看
-
-3、查询所有路由
+2、查询所有路由
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |--------|-----|--------|---------|------|
@@ -302,7 +261,7 @@ curl -s --url http://192.168.0.184:8001/routes/?size=1 | python -m json.tool
         {
             "created_at": 1538004899,
             "hosts": [],
-            "id": "19377681-ba1c-43dc-9eb6-ff117467ce96",
+            "id": "cce1a279-d05a-4faa-8c10-1f9d27b881c9",
             "methods": [
                 "GET",
                 "POST"
@@ -326,13 +285,32 @@ curl -s --url http://192.168.0.184:8001/routes/?size=1 | python -m json.tool
 }
 ```
 
+3、查看单个路由
 ```
-如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
+curl -s http://192.168.0.184:8001/routes/cce1a279-d05a-4faa-8c10-1f9d27b881c9 | python -m json.tool
+{
+    "created_at": 1538089668,
+    "id": "cce1a279-d05a-4faa-8c10-1f9d27b881c9",
+    "paths": [
+        "/weather"
+    ],
+    "preserve_host": false,
+    "protocols": [
+        "http",
+        "https"
+    ],
+    "regex_priority": 0,
+    "service": {
+        "id": "43921b23-65fc-4722-a4e0-99bf84e26593"
+    },
+    "strip_path": true,
+    "updated_at": 1538089668
+}
 ```
 
 4、更新路由
 ```
-curl -s -X PATCH --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-8e4e5866a131 \
+curl -s -X PATCH --url http://192.168.0.184:8001/routes/cce1a279-d05a-4faa-8c10-1f9d27b881c9 \
 -d 'protocols=http' \
 -d 'methods=GET'  \
 -d 'paths=/weather' \
@@ -342,7 +320,7 @@ curl -s -X PATCH --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-
 {
     "created_at": 1538089668,
     "hosts": null,
-    "id": "6c6b7863-9a05-4d51-bf7e-8e4e5866a131",
+    "id": "cce1a279-d05a-4faa-8c10-1f9d27b881c9",
     "methods": [
         "GET"
     ],
@@ -396,7 +374,6 @@ curl -s -X PUT --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-29
 ```
 
 6、查看和服务关联的路由
-
 ```
 curl -s http://192.168.0.184:8001/services/wechat/routes | python -m json.tool
 
