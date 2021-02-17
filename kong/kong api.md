@@ -148,11 +148,8 @@ curl -s --url http://192.168.0.184:8001/services/27f30248-fef1-4ddc-9fdc-4ca73f3
 | offset | string | 否 | 分页偏移，用于定义列表中的唯一 |
 | size | int | 100 | 否 | 每页返回的对象的数量 |
 
-请求示例：
-
+```
 curl -s --url http://192.168.0.184:8001/services/?size=1 | python -m json.tool
-
-返回值：
 
 {
     "data": [
@@ -174,6 +171,7 @@ curl -s --url http://192.168.0.184:8001/services/?size=1 | python -m json.tool
     "next": "/services?offset=WyIyN2YzMDI0OC1mZWYxLTRkZGMtOWZkYy00Y2E3M2YzNTRjNjQiXQ",
     "offset": "WyIyN2YzMDI0OC1mZWYxLTRkZGMtOWZkYy00Y2E3M2YzNTRjNjQiXQ"
 }
+```
 
 在上面的请求示例中，我们带了一个size的参数来限定每一页的数量，在返回的结果中有两个字段，next表示下一页的端点，offset是本页的偏移。
 
