@@ -83,12 +83,12 @@ curl -s http://192.168.0.184:8001/status | python -m json.tool
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |-------|------|--------|---------|------|
-| name | string | 否 | 服务名称，全局唯一 |
+| name | string | | 否 | 服务名称，全局唯一 |
 | protocol | string | http | 是 | 和上游通讯的协议取值http或https |
-| host | string | 是 | 上游服务器的主机 |
-| port | int | 80 	是 | 上游服务器的端口 |
-| path | string | 否 | 上游服务器请求中的路径，必须以/开头 |
-| retries | int 	5 | 否 | 代理失败时要执行的重试次数 |
+| host | string | | 是 | 上游服务器的主机 |
+| port | int | 80 | 是 | 上游服务器的端口 |
+| path | string | | 否 | 上游服务器请求中的路径，必须以/开头 |
+| retries | int | 5 | 否 | 代理失败时要执行的重试次数 |
 | connect_timeout | int | 60000 | 否 | 与上游连接的超时时间，单位毫秒 |
 | write_timeout | int | 60000 | 否 | 向上游发送请求两次连续写操作的超时时间 ，单位毫秒 |
 | read_timeout | int | 60000 | 否 | 用于向上游服务器发送请求的两次连续读取操作之间的超时 ，单位毫秒 |
@@ -264,41 +264,29 @@ curl -i  -X DELETE --url http://192.168.0.184:8001/services/b6094754-07da-4c31-b
 ```
 
 四、路由
-
+---
 路由用来匹配客户端请求的规则，每一个路由都要与一个服务相关联，当一个请求到达Kong的时候，会先给路由匹配，如果匹配成功，那么会将请求转发给服务，服务再去后端请求数据。所以路由是Kong的入口。
 
-在Kong0.13.0之前的版本有API实体，因为API实体使用用起来并不方便，所以将API实体拆分成路由和服务，这样提供了最大的自由度。
-
-Kong的一个API实体必须是路由和服务的组合。
 1、添加路由
 
-接口信息：
-接口名称 	添加路由
-请求端点 	/routes/
-请求方法 	POST
-返回状态 	HTTP 201 Created
-
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-protocols 	string or list 	["http", "https"] 	否 	此路由允许的协议，取值http或https
-methods 	string or list 	null 	*否 	此路由允许的方法
-hosts 	string or list 	null 	*否 	此路由允许的域名
-paths 	string or list 	null 	*否 	此路由匹配的path
-strip_path 	bool 	true 	否 	匹配到path时，是否删除匹配到的前缀
-preserve_host 	bool 	false 	否 	匹配到hosts时，使用请求头部的值为域名向后端发起请求，请求的头部为"host",例如"host:api.abc.com"
-service 	string 		是 	关联的服务id。
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+| ------|------|--------|---------|------|
+| protocols | string or list | ["http", "https"] | 否 | 此路由允许的协议，取值http或https |
+| methods | string or list | null | *否 	此路由允许的方法 |
+| hosts | string or list | null | *否 | 此路由允许的域名 |
+| paths | string or list | null | *否 | 此路由匹配的path |
+| strip_path | bool | true | 否 | 匹配到path时，是否删除匹配到的前缀 |
+| preserve_host | bool | false | 否 	匹配到hosts时，使用请求头部的值为域名向后端发起请求，请求的头部为"host",例如"host:api.abc.com" |
+| service | string | 是 | 关联的服务id。 |
 这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
 
-请求示例：
-
+```
 curl -s -X POST --url http://192.168.0.184:8001/routes \
 -d 'protocols=http' \
 -d 'methods=GET'  \
 -d 'paths=/weather' \
 -d 'service.id=43921b23-65fc-4722-a4e0-99bf84e26593' \
 | python -m json.tool
-
-返回值：
 
 {
     "created_at": 1538089234,
@@ -321,12 +309,11 @@ curl -s -X POST --url http://192.168.0.184:8001/routes \
     "strip_path": true,
     "updated_at": 1538089234
 }
-
-在上面的示例中，我们创建了一个路由并且关联了一个服务，在创建路由的时候并没有指定hosts，路由匹配到host的时候会允许所有，因为默认值为null。当然如果不指定其他的也是一样的。
+```
+- 创建了一个路由并且关联了一个服务，在创建路由的时候并没有指定hosts，路由匹配到host的时候会允许所有，因为默认值为null。当然如果不指定其他的也是一样的。
 
 值得注意的是，methods，hosts，paths这三个参数必须要指定一个，否则无法创建路由。
 
-    路由和服务组合的规则相对比较复杂，我们将会重新开一篇文章来专门讲解这个，本文仅仅关注管理API的使用。
 
 2、查看路由
 
@@ -435,8 +422,7 @@ preserve_host 	bool 	false 	否 	匹配到hosts时，使用请求头部的值为
 service 	string 		是 	关联的服务id。
 这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
 
-请求示例：
-
+```
 curl -s -X PATCH --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-8e4e5866a131 \
 -d 'protocols=http' \
 -d 'methods=GET'  \
@@ -444,7 +430,6 @@ curl -s -X PATCH --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-
 -d 'service.id=43921b23-65fc-4722-a4e0-99bf84e26593' \
 | python -m json.tool
 
-返回值：
 
 {
     "created_at": 1538089668,
@@ -467,8 +452,9 @@ curl -s -X PATCH --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-
     "strip_path": true,
     "updated_at": 1538090658
 }
-
+```
 此接口的参数和添加路由的参数一样，接入点带了路由的id，路由没有name字段，所有的匹配都是以ID匹配的。
+
 5、更新或者添加路由
 
 接口信息：
@@ -489,15 +475,13 @@ service 	string 		是 	关联的服务id。
 这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
 
 请求示例：
-
+```
 curl -s -X PUT --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-2962c1d6b0e6 \
 -d 'protocols=http' \
 -d 'methods=GET'  \
 -d 'paths=/weather' \
 -d 'service.id=43921b23-65fc-4722-a4e0-99bf84e26593' \
 | python -m json.tool
-
-返回值：
 
 {
     "created_at": 1538091038,
@@ -520,7 +504,7 @@ curl -s -X PUT --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-29
     "strip_path": true,
     "updated_at": 1538091038
 }
-
+```
 此接口的参数和添加路由的参数一样，接入点带了路由的id，路由没有name字段，所有的匹配都是以ID匹配的。
 
 和服务的更新创建接口差不多，只不过路由没有name的字段，所以匹配均是按照id来匹配，所以规则比较简单：如果id存在则更新，如果id不存在则添加。
@@ -539,10 +523,8 @@ curl -s -X PUT --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-29
 无
 
 请求示例：
-
+```
 curl -s http://192.168.0.184:8001/services/wechat/routes | python -m json.tool
-
-返回值：
 
 {
     "data": [
@@ -588,24 +570,12 @@ curl -s http://192.168.0.184:8001/services/wechat/routes | python -m json.tool
     ],
     "next": null
 }
+```
 
 7、查看和路由关联的服务
 
-接口信息：
-接口名称 	查看和路由关联的服务
-请求端点 	/routes/{route id}/service
-请求方法 	GET
-返回状态 	HTTP 200 OK
-
-请求参数:
-
-无
-
-请求示例：
-
+```
 curl -s http://192.168.0.184:8001/routes/f8ef8876-9681-4629-a2ee-d7fac8a8094a/service | python -m json.tool
-
-返回值：
 
 {
     "connect_timeout": 60000,
@@ -621,101 +591,60 @@ curl -s http://192.168.0.184:8001/routes/f8ef8876-9681-4629-a2ee-d7fac8a8094a/se
     "updated_at": 1538005796,
     "write_timeout": 60000
 }
+```
 
 8、删除路由
 
-接口信息：
-接口名称 	删除路由
-请求端点 	/routes/{id}
-请求方法 	DELETE
-返回状态 	HTTP 204 No Content
-
-请求参数:
-
-无
-
-请求示例：
-
+```
 curl -s http://192.168.0.184:8001/routes/f8ef8876-9681-4629-a2ee-d7fac8a8094a/service | python -m json.tool
+```
 
-返回值：
-
-此接口没有返回值
 五、用户
+---
 1、添加用户
 
-接口信息：
-接口名称 	添加用户
-请求端点 	/consumers/
-请求方法 	POST
-返回状态 	HTTP 201 Created
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|-------|------|--------|---------|-------|
+| username | string | null | *否 | 全局唯一的用户名 |
+| custom_id | string | null | *否 | 全局唯一的用户ID |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-username 	string 	null 	*否 	全局唯一的用户名
-custom_id 	string 	null 	*否 	全局唯一的用户ID
-
-请求示例：
-
+```
 curl -s -X POST --url http://192.168.0.184:8001/consumers  -d 'username=linuxops' | python -m json.tool
-
-返回值：
-
 {
     "created_at": 1538126090,
     "custom_id": null,
     "id": "376a9ccf-7d10-45a7-a956-77eb129d8ff0",
     "username": "linuxops"
 }
+```
 
 在上面示例中，我们指定了一个username来创建一个用户，从返回值看出，如果没有指定参数，那么默认值为空。
 
 在调用这个接口，必须要指定username 和 custom_id其中一个参数，不能同时不指定。
 
 在创建用户的时候，系统都将会生成一个UUID的形式的唯一ID。
+
 2、查询用户
-
-接口信息：
-接口名称 	查询用户
-请求端点 	/consumers/{username or id}
-请求方法 	GET
-返回状态 	HTTP 200 OK
-
-请求参数:
-
-无
-
-请求示例：
-
+```
 curl -s http://192.168.0.184:8001/consumers/linuxops | python -m json.tool
-
-返回值：
 
 {
     "created_at": 1538126090,
     "id": "376a9ccf-7d10-45a7-a956-77eb129d8ff0",
     "username": "linuxops"
 }
-
+```
 查询用户只能通过系统ID和username来查询，无法通过custom_id查询
+
 3、查询所有用户
 
-接口信息：
-接口名称 	查询所有用户
-请求端点 	/consumers
-请求方法 	GET
-返回状态 	HTTP 200 OK
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|-------|------|--------|---------|------|
+| offset | string | 否 | 分页偏移，用于定义列表中的唯一 |
+| size | int | 100 	否 | 每页返回的对象的数量 |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-offset 	string 		否 	分页偏移，用于定义列表中的唯一
-size 	int 	100 	否 	每页返回的对象的数量
-
-请求示例：
-
+```
 curl -s http://192.168.0.184:8001/consumers?size=1 | python -m json.tool
-
-返回值：
 
 {
     "data": [
@@ -729,24 +658,16 @@ curl -s http://192.168.0.184:8001/consumers?size=1 | python -m json.tool
     "next": "/consumers?offset=WyIzNzZhOWNjZi03ZDEwLTQ1YTctYTk1Ni03N2ViMTI5ZDhmZjAiXQ",
     "offset": "WyIzNzZhOWNjZi03ZDEwLTQ1YTctYTk1Ni03N2ViMTI5ZDhmZjAiXQ"
 }
+```
 
 在上面的请求示例中，我们带了一个size的参数来限定每一页的数量，在返回的结果中有两个字段，next表示下一页的端点，offset是本页的偏移。
 
-当然，如果你在读取下一页的时候还需要限定返回的数据，还是依然要使用size的参数
 4、更新用户
 
-接口信息：
-接口名称 	更新用户
-请求端点 	/consumers/{username or id}
-请求方法 	PATCH
-返回状态 	HTTP 200 OK
-
-请求参数:
 参数名 	类型 	默认值 	是否必须 	说明
 username 	string 	null 	*否 	全局唯一的用户名
 custom_id 	string 	null 	*否 	全局唯一的用户ID
 
-请求示例：
 
 curl -s -X PATCH --url http://192.168.0.184:8001/consumers/376a9ccf-7d10-45a7-a956-77eb129d8ff0 -d "custom_id=linuxops123456789" | python -m json.tool
 
