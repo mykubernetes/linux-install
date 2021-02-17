@@ -317,22 +317,8 @@ curl -s -X POST --url http://192.168.0.184:8001/routes \
 
 2、查看路由
 
-接口信息：
-接口名称 	查看路由
-请求端点 	/routes/{id}
-请求方法 	GET
-返回状态 	HTTP 200 OK
-
-请求参数:
-
-无
-
-请求示例：
-
+```
 curl -s http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-8e4e5866a131 | python -m json.tool
-
-返回值：
-
 {
     "created_at": 1538089668,
     "id": "6c6b7863-9a05-4d51-bf7e-8e4e5866a131",
@@ -351,26 +337,19 @@ curl -s http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-8e4e5866a131 | 
     "strip_path": true,
     "updated_at": 1538089668
 }
-
+```
 路由中没有name字段，所以只能通过ID来查看。
+
 3、查询所有路由
 
-接口信息：
-接口名称 	查询所有路由
-请求端点 	/routes
-请求方法 	GET
-返回状态 	HTTP 200 OK
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-offset 	string 		否 	分页偏移，用于定义列表中的唯一
-size 	int 	100 	否 	每页返回的对象的数量
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|--------|-----|--------|---------|------|
+| offset | string | 否 | 分页偏移，用于定义列表中的唯一 |
+| size | int | 100 | 否 | 每页返回的对象的数量 |
 
-请求示例：
-
+```
 curl -s --url http://192.168.0.184:8001/routes/?size=1 | python -m json.tool
-
-返回值：
 
 {
     "data": [
@@ -399,27 +378,23 @@ curl -s --url http://192.168.0.184:8001/routes/?size=1 | python -m json.tool
     "next": "/routes?offset=WyIxOTM3NzY4MS1iYTFjLTQzZGMtOWViNi1mZjExNzQ2N2NlOTYiXQ",
     "offset": "WyIxOTM3NzY4MS1iYTFjLTQzZGMtOWViNi1mZjExNzQ2N2NlOTYiXQ"
 }
-
+```
 在上面的请求示例中，我们带了一个size的参数来限定每一页的数量，在返回的结果中有两个字段，next表示下一页的端点，offset是本页的偏移。
 
 当然，如果你在读取下一页的时候还需要限定返回的数据，还是依然要使用size的参数
+
 4、更新路由
 
-接口信息：
-接口名称 	更新路由
-请求端点 	/routes/{id}
-请求方法 	PATCH
-返回状态 	HTTP 200 OK
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|--------|-----|--------|---------|------|
+| protocols | string or list | ["http", "https"] | 否 | 此路由允许的协议，取值http或https |
+| methods | string or list | null | *否 | 此路由允许的方法 |
+| hosts | string or list | null | *否 | 此路由允许的域名 |
+| paths | string or list | null | *否 | 此路由匹配的path |
+| strip_path | bool | true | 否 | 匹配到path时，是否删除匹配到的前缀 |
+| preserve_host | bool | false | 否 | 匹配到hosts时，使用请求头部的值为域名向后端发起请求，请求的头部为"host",例如"host:api.abc.com" |
+| service | string 	| 是 | 关联的服务id。 |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-protocols 	string or list 	["http", "https"] 	否 	此路由允许的协议，取值http或https
-methods 	string or list 	null 	*否 	此路由允许的方法
-hosts 	string or list 	null 	*否 	此路由允许的域名
-paths 	string or list 	null 	*否 	此路由匹配的path
-strip_path 	bool 	true 	否 	匹配到path时，是否删除匹配到的前缀
-preserve_host 	bool 	false 	否 	匹配到hosts时，使用请求头部的值为域名向后端发起请求，请求的头部为"host",例如"host:api.abc.com"
-service 	string 		是 	关联的服务id。
 这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
 
 ```
@@ -457,24 +432,17 @@ curl -s -X PATCH --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-
 
 5、更新或者添加路由
 
-接口信息：
-接口名称 	更新或者添加路由
-请求端点 	/routes/{id}
-请求方法 	PUT
-返回状态 	HTTP 201 Created or HTTP 200 OK
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|--------|------|-------|----------|-----|
+| protocols | string or list | ["http", "https"] | 否 | 此路由允许的协议，取值http或https |
+| methods | string or list | null | *否 | 此路由允许的方法 |
+| hosts | string or list | null | *否 | 此路由允许的域名 |
+| paths | string or list | null | *否 | 此路由匹配的path |
+| strip_path | bool | true | 否 | 匹配到path时，是否删除匹配到的前缀 |
+| preserve_host | bool | false | 否 | 匹配到hosts时，使用请求头部的值为域名向后端发起请求，请求的头部为"host",例如"host:api.abc.com" |
+| service | string | 是 | 关联的服务id |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-protocols 	string or list 	["http", "https"] 	否 	此路由允许的协议，取值http或https
-methods 	string or list 	null 	*否 	此路由允许的方法
-hosts 	string or list 	null 	*否 	此路由允许的域名
-paths 	string or list 	null 	*否 	此路由匹配的path
-strip_path 	bool 	true 	否 	匹配到path时，是否删除匹配到的前缀
-preserve_host 	bool 	false 	否 	匹配到hosts时，使用请求头部的值为域名向后端发起请求，请求的头部为"host",例如"host:api.abc.com"
-service 	string 		是 	关联的服务id。
 这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
-
-请求示例：
 ```
 curl -s -X PUT --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-2962c1d6b0e6 \
 -d 'protocols=http' \
@@ -510,19 +478,10 @@ curl -s -X PUT --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-29
 和服务的更新创建接口差不多，只不过路由没有name的字段，所以匹配均是按照id来匹配，所以规则比较简单：如果id存在则更新，如果id不存在则添加。
 
 但是，此处的ID必须是UUID形式的ID，否则添加不成功。
+
 6、查看和服务关联的路由
 
-接口信息：
-接口名称 	查看和服务关联的路由
-请求端点 	/services/{service name or id}/routes
-请求方法 	GET
-返回状态 	HTTP 200 OK
 
-请求参数:
-
-无
-
-请求示例：
 ```
 curl -s http://192.168.0.184:8001/services/wechat/routes | python -m json.tool
 
@@ -664,14 +623,13 @@ curl -s http://192.168.0.184:8001/consumers?size=1 | python -m json.tool
 
 4、更新用户
 
-参数名 	类型 	默认值 	是否必须 	说明
-username 	string 	null 	*否 	全局唯一的用户名
-custom_id 	string 	null 	*否 	全局唯一的用户ID
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|-------|------|-------|----------|------|
+| username | string | null | *否 | 全局唯一的用户名 |
+| custom_id | string | null | *否 | 全局唯一的用户ID |
 
-
+```
 curl -s -X PATCH --url http://192.168.0.184:8001/consumers/376a9ccf-7d10-45a7-a956-77eb129d8ff0 -d "custom_id=linuxops123456789" | python -m json.tool
-
-返回值：
 
 {
     "created_at": 1538126090,
@@ -679,25 +637,17 @@ curl -s -X PATCH --url http://192.168.0.184:8001/consumers/376a9ccf-7d10-45a7-a9
     "id": "376a9ccf-7d10-45a7-a956-77eb129d8ff0",
     "username": "linuxops"
 }
+```
 
 5、更新或者添加用户
 
-接口信息：
-接口名称 	更新或者添加用户
-请求端点 	/consumers/{username or id}
-请求方法 	PUT
-返回状态 	HTTP 201 Created or HTTP 200 OK
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|-------|------|--------|---------|------|
+| username | string | null | *否 | 全局唯一的用户名 |
+| custom_id | string | null | *否 | 全局唯一的用户ID |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-username 	string 	null 	*否 	全局唯一的用户名
-custom_id 	string 	null 	*否 	全局唯一的用户ID
-
-请求示例：
-
+```
 curl -s -X PUT --url http://192.168.0.184:8001/consumers/376a9ccf-7d10-45a7-a956-77eb129d8ff0 -d "custom_id=linuxops123456789" | python -m json.tool
-
-返回值：
 
 {
     "created_at": 1538127246,
@@ -705,78 +655,57 @@ curl -s -X PUT --url http://192.168.0.184:8001/consumers/376a9ccf-7d10-45a7-a956
     "id": "376a9ccf-7d10-45a7-a956-77eb129d8ff0",
     "username": null
 }
-
+```
 这个接口和更新添加服务的接口类似，当{username or id}属性具有UUID的结构时，插入/更新的Consumer将由其标识id。否则它将由它识别username。
+
 6、删除用户
 
-接口信息：
-接口名称 	删除用户
-请求端点 	/consumers/{username or id}
-请求方法 	DELETE
-返回状态 	HTTP 204 No Content
-
-请求参数:
-
-无
-
-请求示例：
-
+```
 curl -i -X DELETE --url http://192.168.0.184:8001/consumers/376a9ccf-7d10-45a7-a956-77eb129d8ff0 
+```
 
-返回值：
-
-此操作没有返回值
 六、插件
 
-Kong提供了一个插件的功能，你可以通过配置指定某个服务或者路由或者用户启用某个插，插件始终只运行一次，所以对于不同的实体配置相同插件时就有优先级的概念。
+Kong提供了一个插件的功能，可以通过配置指定某个服务或者路由或者用户启用某个插，插件始终只运行一次，所以对于不同的实体配置相同插件时就有优先级的概念。
 
 多次配置插件的优先级如下：
-
-    在以下组合上配置的插件：路由，服务和使用者。 （消费者意味着必须对请求进行身份验证）。
-    在Route和Consumer的组合上配置的插件。 （消费者意味着必须对请求进行身份验证）。
-    在服务和使用者的组合上配置的插件。 （消费者意味着必须对请求进行身份验证）。
-    在路由和服务的组合上配置的插件。
-    在Consumer上配置的插件。 （消费者意味着必须对请求进行身份验证）。
-    在路由上配置的插件。
-    在服务上配置的插件。
-    配置为全局运行的插件。
+- 在以下组合上配置的插件：路由，服务和使用者。 （消费者意味着必须对请求进行身份验证）。
+- 在Route和Consumer的组合上配置的插件。 （消费者意味着必须对请求进行身份验证）。
+- 在服务和使用者的组合上配置的插件。 （消费者意味着必须对请求进行身份验证）。
+- 在路由和服务的组合上配置的插件。
+- 在Consumer上配置的插件。 （消费者意味着必须对请求进行身份验证）。
+- 在路由上配置的插件。
+- 在服务上配置的插件。
+- 配置为全局运行的插件。
 
 从以上的优先级可以看出全局配置的插件优先级最小，而越具体的组合优先级越高。
+
 1、添加插件
 
 可以通过以下几种不同的方式添加插件：
 
-    对于每个Service/Route和consumer。不要设置consumer_id和设置service_id或route_id。
-    适用于每个Service/Route和特定consumer。只有设定consumer_id。
-    适用于每个consumer和特定Service。仅设置service_id（警告：某些插件只允许设置route_id）
-    对于每个consumer和特定的Route。仅设置route_id（警告：某些插件只允许设置service_id）
-    对于特定的Service/Route和consumer。设置两个service_id/ route_id和consumer_id。
+- 对于每个Service/Route和consumer。不要设置consumer_id和设置service_id或route_id。
+- 适用于每个Service/Route和特定consumer。只有设定consumer_id。
+- 适用于每个consumer和特定Service。仅设置service_id（警告：某些插件只允许设置route_id）
+- 对于每个consumer和特定的Route。仅设置route_id（警告：某些插件只允许设置service_id）
+- 对于特定的Service/Route和consumer。设置两个service_id/ route_id和consumer_id。
 
-    并非所有插件都允许指定consumer_id。检查插件文档。
+并非所有插件都允许指定consumer_id。检查插件文档。
 
-接口信息：
-接口名称 	添加插件
-请求端点 	/plugins/
-请求方法 	POST
-返回状态 	HTTP 201 Created
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|--------|------|-------|----------|------|
+| name | string | 是 | 要添加的插件的名称。目前，插件必须分别安装在每个Kong实例中。 |
+| consumer_id | string | null | 否 | 使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置。 |
+| service_id | string | null | 否 | 服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置。 |
+| route_id | string | null | 否 | 路由的唯一标识符，它覆盖传入请求中此特定路由的现有设置。 |
+| config.{property} | string | null | 否 	插件的配置属性，可以在Kong Hub的插件文档页面找到。 |
+| enabled | bool | true | 否 | 是否应用插件。默认值：true。 |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-name 	string 		是 	要添加的插件的名称。目前，插件必须分别安装在每个Kong实例中。
-consumer_id 	string 	null 	否 	使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置。
-service_id 	string 	null 	否 	服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置。
-route_id 	string 	null 	否 	路由的唯一标识符，它覆盖传入请求中此特定路由的现有设置。
-config.{property} 	string 	null 	否 	插件的配置属性，可以在Kong Hub的插件文档页面找到。
-enabled 	bool 	true 	否 	是否应用插件。默认值：true。
-
-请求示例：
-
+```
 curl -s -X POST --url http://192.168.0.184:8001/plugins/ \
 -d 'name=basic-auth' \
 -d 'route_id=d1a10507-ea15-4c61-9d8c-7f10ebc79ecb' \
 | python -m json.tool
-
-返回值：
 
 {
     "config": {
@@ -789,7 +718,7 @@ curl -s -X POST --url http://192.168.0.184:8001/plugins/ \
     "name": "basic-auth",
     "route_id": "d1a10507-ea15-4c61-9d8c-7f10ebc79ecb"
 }
-
+```
 在上面的请求示例中，我们在route上添加了basic-auth插件，这个插件用于认证，通过http的头部带入用户名和密码信息进行认证。
 
 当然，启用插件后，我们要对user设置好basic-auth的凭证,否则访问不了，并且返回如下信息：
@@ -800,21 +729,11 @@ curl -s -X POST --url http://192.168.0.184:8001/plugins/ \
 
 2、查询插件
 
-接口信息：
-接口名称 	查询插件
-请求端点 	/plugins/{id}
-请求方法 	GET
-返回状态 	HTTP 200 OK
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+| id | string | 是 | 要检索的插件的唯一标识符 |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-id 	string 		是 	要检索的插件的唯一标识符
-
-请求示例：
-
+```
 curl -s  --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f  | python -m json.tool
-
-返回值：
 
 {
     "config": {
@@ -827,31 +746,22 @@ curl -s  --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c9
     "name": "basic-auth",
     "route_id": "d1a10507-ea15-4c61-9d8c-7f10ebc79ecb"
 }
+```
 
 3、查询所有插件
 
-接口信息：
-接口名称 	查询所有插件
-请求端点 	/plugins/
-请求方法 	GET
-返回状态 	HTTP 200 OK
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|--------|-----|--------|---------|------|
+| id | string | 否 | 通过id查询 |
+| name | string | 否 | 通过name查 |
+| service_id | string | 否 | 通过service_id查 |
+| route_id | string | 否 | 通过iroute_id查 |
+| consumer_id | string | 否 | 通过consumer_id查 |
+| offset | string | 否 | 分页偏移，用于定义列表中的唯一 |
+| size | int | 100 | 否 | 每页返回的对象的数量 |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-id 	string 		否 	通过id查询
-name 	string 		否 	通过name查
-service_id 	string 		否 	通过service_id查
-route_id 	string 		否 	通过iroute_id查
-consumer_id 	string 		否 	通过consumer_id查
-offset 	string 		否 	分页偏移，用于定义列表中的唯一
-size 	int 	100 	否 	每页返回的对象的数量
-
-请求示例：
-
+```
 curl -s --url http://192.168.0.184:8001/plugins/?size=1 | python -m json.tool
-
-返回值：
-
 {
     "data": [
         {
@@ -868,19 +778,14 @@ curl -s --url http://192.168.0.184:8001/plugins/?size=1 | python -m json.tool
     ],
     "total": 1
 }
-
+```
 在上面的请求示例中，我们带了一个size的参数来限定每一页的数量，在返回的结果中有两个字段，next表示下一页的端点，offset是本页的偏移。
 
 当然，如果你在读取下一页的时候还需要限定返回的数据，还是依然要使用size的参数
+
 4、更新插件
 
-接口信息：
-接口名称 	更新插件
-请求端点 	/plugins/{plugin id}
-请求方法 	PATCH
-返回状态 	HTTP 200 OK
 
-请求参数:
 参数名 	类型 	默认值 	是否必须 	说明
 plugin id 	string 		是 	要更新的插件配置的唯一标识符
 name 	string 	null 	否 	要添加的插件的名称要添加的插件的名称
@@ -891,10 +796,9 @@ config.{property} 	string 	null 	否 	插件的配置属性，可以在Kong Hub�
 enabled 	bool 	true 	否 	是否应用插件。
 
 请求示例：
-
+```
 curl -s -X PATCH --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f -d "service_id=da4dce88-4df3-4723-b544-b11b27184e97" | python -m json.tool
 
-返回值：
 
 {
     "config": {
@@ -908,27 +812,21 @@ curl -s -X PATCH --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea
     "route_id": "d1a10507-ea15-4c61-9d8c-7f10ebc79ecb",
     "service_id": "da4dce88-4df3-4723-b544-b11b27184e97"
 }
-
+```
 在上面的请求示例中，我更新了这个插件，原本只针对route启用的，现在又增加了对service生效，由此看出，一个插件是可以对多个实体生效的（前提是插件本身要支持此实体生效），因为插件只会在请求的生命周期中运行一次，所以对多个实体启用同一个插件会受到优先级的限制。
+
 5、更新或添加插件
 
-接口信息：
-接口名称 	更新或添加插件
-请求端点 	/plugins/
-请求方法 	PUT
-返回状态 	HTTP 201 Created or HTTP 200 OK
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|--------|------|-------|----------|------|
+| name | string | null | 否 | 要添加的插件的名称要添加的插件的名称 |
+| consumer_id | string | null | 否 | 使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置 |
+| service_id | string | null | 否 | 服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置 |
+| route_id | string | null | 否 | 路由的唯一标识符，它覆盖传入请求中此特定路由的现有设置 |
+| config.{property} | string | null | 否 | 插件的配置属性，可以在Kong Hub的插件文档页面找到 |
+| enabled | bool | true | 否 | 是否应用插件 |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-name 	string 	null 	否 	要添加的插件的名称要添加的插件的名称
-consumer_id 	string 	null 	否 	使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置。
-service_id 	string 	null 	否 	服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置。
-route_id 	string 	null 	否 	路由的唯一标识符，它覆盖传入请求中此特定路由的现有设置。
-config.{property} 	string 	null 	否 	插件的配置属性，可以在Kong Hub的插件文档页面找到。
-enabled 	bool 	true 	否 	是否应用插件。
-
-请求示例：
-
+```
 curl -s -X PUT --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f -d "service_id=da4dce88-4df3-4723-b544-b11b27184e97" | python -m json.tool
 
 返回值：
@@ -945,46 +843,26 @@ curl -s -X PUT --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-6
     "route_id": "d1a10507-ea15-4c61-9d8c-7f10ebc79ecb",
     "service_id": "da4dce88-4df3-4723-b544-b11b27184e97"
 }
-
+```
 这个接口是更新或者创建一个插件。
 
 如果传入的参数name已经存在，那么以传入的参数修改此插件，如果name不存在，则以传入的参数创建此插件。
+
 6、删除插件
 
-接口信息：
-接口名称 	删除插件
-请求端点 	/plugins/{plugin id}
-请求方法 	DELETE
-返回状态 	HTTP 204 No Content
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|--------|------|-------|---------|------|
+| plugin id | string | 是 | 要删除的插件配置的唯一标识符 |
 
-请求参数:
-参数名 	类型 	默认值 	是否必须 	说明
-plugin id 	string 		是 	要删除的插件配置的唯一标识符
-
-请求示例：
-
+```
 curl -s -X DELETE --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f | python -m json.tool
+```
 
-返回值：
-
-此操作没有返回值
 7、查询已启用的插件
 
-接口信息：
-接口名称 	查询已启用的插件
-请求端点 	/plugins/enabled
-请求方法 	GET
-返回状态 	HTTP 200 OK
-
-请求参数:
-
-无
-
-请求示例：
-
+```
 curl -s -X GET --url http://192.168.0.184:8001/plugins/enabled | python -m json.tool
 
-返回值：
 
 {
     "enabled_plugins": [
@@ -1021,25 +899,14 @@ curl -s -X GET --url http://192.168.0.184:8001/plugins/enabled | python -m json.
         "request-termination"
     ]
 }
-
+```
 返回Kong示例启用了那些插件，只有已经启用的插件才能被应用在实体上，需要说明的是，在kong集群中，插件启用的情况要一致。
+
 8、检索插件架构
 
-接口信息：
-接口名称 	检索插件架构
-请求端点 	/plugins/schema/{plugin name}
-请求方法 	GET
-返回状态 	HTTP 200 OK
-
-请求参数:
-
-无
-
-请求示例：
-
+```
 curl -s -X GET --url http://192.168.0.184:8001/plugins/schema/basic-auth | python -m json.tool
 
-返回值：
 
 {
     "fields": {
@@ -1055,3 +922,4 @@ curl -s -X GET --url http://192.168.0.184:8001/plugins/schema/basic-auth | pytho
     },
     "no_consumer": true
 }
+```
