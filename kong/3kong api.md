@@ -599,17 +599,6 @@ curl -s -X POST --url http://192.168.0.184:8001/plugins/ \
 ```
 
 2、查询所有插件
-
-| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
-|--------|-----|--------|---------|------|
-| id | string | | 否 | 通过id查询 |
-| name | string | | 否 | 通过name查 |
-| service_id | string | | 否 | 通过service_id查 |
-| route_id | string | | 否 | 通过iroute_id查 |
-| consumer_id | string | | 否 | 通过consumer_id查 |
-| offset | string | | 否 | 分页偏移，用于定义列表中的唯一 |
-| size | int | 100 | 否 | 每页返回的对象的数量 |
-
 ```
 curl -s --url http://192.168.0.184:8001/plugins/?size=1 | python -m json.tool
 {
@@ -664,7 +653,6 @@ curl -s -X PATCH --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea
     "service_id": "da4dce88-4df3-4723-b544-b11b27184e97"
 }
 ```
-在上面的请求示例中，我更新了这个插件，原本只针对route启用的，现在又增加了对service生效，由此看出，一个插件是可以对多个实体生效的（前提是插件本身要支持此实体生效），因为插件只会在请求的生命周期中运行一次，所以对多个实体启用同一个插件会受到优先级的限制。
 
 5、更新或添加插件
 ```
