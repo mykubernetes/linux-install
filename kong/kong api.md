@@ -785,17 +785,16 @@ curl -s --url http://192.168.0.184:8001/plugins/?size=1 | python -m json.tool
 
 4、更新插件
 
+| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|-------|------|-------|----------|------|
+| plugin id | string | 是 | 要更新的插件配置的唯一标识符 |
+| name | string | null | 否 | 要添加的插件的名称要添加的插件的名称 |
+| consumer_id | string | null | 否 | 使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置 |
+| service_id | string | null | 否 | 服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置 |
+| route_id | string | null | 否 | 路由的唯一标识符，它覆盖传入请求中此特定路由的现有设置 |
+| config.{property} | string | null | 否 | 插件的配置属性，可以在Kong Hub的插件文档页面找到 |
+| enabled | bool | true | 否 | 是否应用插件 |
 
-参数名 	类型 	默认值 	是否必须 	说明
-plugin id 	string 		是 	要更新的插件配置的唯一标识符
-name 	string 	null 	否 	要添加的插件的名称要添加的插件的名称
-consumer_id 	string 	null 	否 	使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置。
-service_id 	string 	null 	否 	服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置。
-route_id 	string 	null 	否 	路由的唯一标识符，它覆盖传入请求中此特定路由的现有设置。
-config.{property} 	string 	null 	否 	插件的配置属性，可以在Kong Hub的插件文档页面找到。
-enabled 	bool 	true 	否 	是否应用插件。
-
-请求示例：
 ```
 curl -s -X PATCH --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f -d "service_id=da4dce88-4df3-4723-b544-b11b27184e97" | python -m json.tool
 
