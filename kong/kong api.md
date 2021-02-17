@@ -81,8 +81,8 @@ curl -s http://192.168.0.184:8001/status | python -m json.tool
 
 1、添加服务
 
-
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
+|-------|------|--------|---------|------|
 | name | string | 否 | 服务名称，全局唯一 |
 | protocol | string | http | 是 | 和上游通讯的协议取值http或https |
 | host | string | 是 | 上游服务器的主机 |
@@ -254,38 +254,15 @@ curl -s -X PUT --url http://192.168.0.184:8001/services/linuxops_server_put \
     "write_timeout": 60000
 }
 ```
-这个接口是更新或者创建一个服务，接入点和查询、更新是一样的，不一样的是用了PUT的方法。
 
-此接口带了{name or id}，Kong会根据{name or id}的信息查询数据库，如果对应的数据存在，那么更新，如果对于的数据不存在，那么就新增。
+- 1.如果这个接口带的是name，例如/services/linuxops_server Kong会判断name为”linuxops_server“的服务存不存在，如果存在，则更新，这个时候POST到Kong的数据中name字段无效，Kong并不会修改。 如果不存在”linuxops_server“这个服务存，那么会创建name为"linuxops_server"的服务，并且Kong会生成UUID形式的id，此时POST上来的数据中的name字段依然无效。
+- 2.如果这个接口带的是id，例如/services/ca4f16bc-1562-4ab8-b201-131c7ac393f0 Kong会判断id为"ca4f16bc-1562-4ab8-b201-131c7ac393f0"的服务是否存在，如果存在，那么更新它，这个时候如果POST上来的数据中有name字段，那么Kong会更新name。 如果id为"ca4f16bc-1562-4ab8-b201-131c7ac393f0"的服务不存在，那么Kong会创建name为"ca4f16bc-1562-4ab8-b201-131c7ac393f0"的服务，并且Kong会生成UUID形式的id，这个时候POST上来的数据中如果有name字段，那么这个字段无效。
 
-在更新服务的接口中，我们也是可以带{name or id}，无论是带了id还是name，服务中的name字段都是能被更新到的，但是这个接口就有点不一样了。
-
-有以下几种情况：
-
-1.如果这个接口带的是name，例如/services/linuxops_server Kong会判断name为”linuxops_server“的服务存不存在，如果存在，则更新，这个时候POST到Kong的数据中name字段无效，Kong并不会修改。 如果不存在”linuxops_server“这个服务存，那么会创建name为"linuxops_server"的服务，并且Kong会生成UUID形式的id，此时POST上来的数据中的name字段依然无效。
-
-2.如果这个接口带的是id，例如/services/ca4f16bc-1562-4ab8-b201-131c7ac393f0 Kong会判断id为"ca4f16bc-1562-4ab8-b201-131c7ac393f0"的服务是否存在，如果存在，那么更新它，这个时候如果POST上来的数据中有name字段，那么Kong会更新name。 如果id为"ca4f16bc-1562-4ab8-b201-131c7ac393f0"的服务不存在，那么Kong会创建name为"ca4f16bc-1562-4ab8-b201-131c7ac393f0"的服务，并且Kong会生成UUID形式的id，这个时候POST上来的数据中如果有name字段，那么这个字段无效。
 6、删除服务
-
-接口信息：
-接口名称 	删除服务
-请求端点 	/services/{name or id}
-请求方法 	DELETE
-返回状态 	HTTP 204 No Content
-
-请求参数:
-
-无
-
-请求示例：
-
+```
 curl -i  -X DELETE --url http://192.168.0.184:8001/services/b6094754-07da-4c31-bb95-0a7caf5e6c0b
+```
 
-返回值：
-
-无
-
-此接口没有返回值
 四、路由
 
 路由用来匹配客户端请求的规则，每一个路由都要与一个服务相关联，当一个请求到达Kong的时候，会先给路由匹配，如果匹配成功，那么会将请求转发给服务，服务再去后端请求数据。所以路由是Kong的入口。
