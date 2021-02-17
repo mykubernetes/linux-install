@@ -16,26 +16,6 @@ Kong大概有以下几个管理对象：
 - 上游信息
 - 目标
 
-```
-# curl -s http://192.168.0.184:8001/status | python -m json.tool
-{
-    "database": {
-        "reachable": true
-    },
-    "server": {
-        "connections_accepted": 112,
-        "connections_active": 1,
-        "connections_handled": 112,
-        "connections_reading": 0,
-        "connections_waiting": 0,
-        "connections_writing": 1,
-        "total_requests": 65
-    }
-}
-```
-- -s参数表示静默模式，curl将不输入信息，可以不打印不需要关注的信息。
-
-
 二、节点信息
 ---
 1、查看节点信息
@@ -67,6 +47,7 @@ curl -s http://192.168.0.184:8001/status | python -m json.tool
     }
 }
 ```
+- -s参数表示静默模式，curl将不输入信息，可以不打印不需要关注的信息。
 - total_requests：客户端请求的总数。
 - connections_active：当前活动客户端连接数，包括等待连接。
 - connections_accepted：已接受的客户端连接总数。
@@ -664,7 +645,7 @@ curl -i -X DELETE --url http://192.168.0.184:8001/consumers/376a9ccf-7d10-45a7-a
 ```
 
 六、插件
-
+---
 Kong提供了一个插件的功能，可以通过配置指定某个服务或者路由或者用户启用某个插，插件始终只运行一次，所以对于不同的实体配置相同插件时就有优先级的概念。
 
 多次配置插件的优先级如下：
