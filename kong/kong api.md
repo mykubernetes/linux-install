@@ -786,7 +786,7 @@ curl -s --url http://192.168.0.184:8001/plugins/?size=1 | python -m json.tool
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |-------|------|-------|----------|------|
-| plugin id | string | 是 | 要更新的插件配置的唯一标识符 |
+| plugin id | string | | 是 | 要更新的插件配置的唯一标识符 |
 | name | string | null | 否 | 要添加的插件的名称要添加的插件的名称 |
 | consumer_id | string | null | 否 | 使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置 |
 | service_id | string | null | 否 | 服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置 |
@@ -850,7 +850,7 @@ curl -s -X PUT --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-6
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |--------|------|-------|---------|------|
-| plugin id | string | 是 | 要删除的插件配置的唯一标识符 |
+| plugin id | string | | 是 | 要删除的插件配置的唯一标识符 |
 
 ```
 curl -s -X DELETE --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f | python -m json.tool
