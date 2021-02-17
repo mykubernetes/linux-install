@@ -181,11 +181,11 @@ curl -s --url http://192.168.0.184:8001/services/?size=1 | python -m json.tool
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |--------|-----|--------|---------|------|
-| name | string | 否 | 服务名称，全局唯一 |
+| name | string | | 否 | 服务名称，全局唯一 |
 | protocol | string | http | 是 | 和上游通讯的协议取值http或https |
-| host | string | 是 | 上游服务器的主机 |
+| host | string | | 是 | 上游服务器的主机 |
 | port | int | 80 | 是 | 上游服务器的端口 |
-| path | string | 否 | 上游服务器请求中的路径，必须以/开头 |
+| path | string | | 否 | 上游服务器请求中的路径，必须以/开头 |
 | retries | int | 5 | 否 | 代理失败时要执行的重试次数 |
 | connect_timeout | int | 60000 | 否 | 与上游连接的超时时间，单位毫秒 |
 | write_timeout | int | 60000 | 否 | 向上游发送请求两次连续写操作的超时时间 ，单位毫秒 |
