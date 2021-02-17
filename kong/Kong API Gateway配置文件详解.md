@@ -80,7 +80,7 @@ mv /etc/kong/kong.conf.default /etc/kong/kong.conf
 | pg_ssl | off | 是否开启ssl连接 |
 | pg_ssl_verify | off | 如果启用了' pg_ssl '，则切换服务器证书验证。 |
 | cassandra配置 | | 如果database设置为cassandra以下配置生效 |
-| cassandra_contact_points | 127.0.0.1 	..... |
+| cassandra_contact_points | 127.0.0.1 | ..... |
 | cassandra_port | 9042 | ..... |
 | cassandra_keyspace | kong | ..... |
 | cassandra_timeout | 5000 | ..... |
