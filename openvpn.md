@@ -1,15 +1,17 @@
+https://linuxops.org/blog/linux/openvpn.html
+
 1.安装epel扩展源  
--------
+---
 ``` # yum -y install epel-release ```  
 
 2.为了保证OpenVPN的安装，需要使用easy-rsa秘钥生成工具生成证书  
------------
+---
 ``` # yum -y install easy-rsa -y ```   
 注：centos7安装的是三的版本easy-rsa.noarch 0:3.0.3-1.el7  
     centos6安装的是二的版本  
 
 3.生成秘钥证书前，需要准备vars文件  
-------------
+---
 ```
 # mkdir /opt/easy-rsa
 # cd /opt/easy-rsa/
@@ -32,7 +34,7 @@ set_var EASYRSA_NS_SUPPORT "yes"
 ```  
 
 4.初始化生成证书
----------------
+---
 
 #1.初始化，在当前目录创建PKI目录，用于存储证书 
 ``` 
@@ -200,7 +202,7 @@ Certificate created at: /opt/easy-rsa/pki/issued/client.crt          #生成公�
 ```  
 
 5、安装openvpn
-------------
+---
 1.安装openvpn  
 ```
 # yum install openvpn -y
@@ -271,7 +273,7 @@ tcp        0      0 0.0.0.0:1194            0.0.0.0:*               LISTEN      
 
 
 客户端连接  
--------
+===
 Windows  
 ---
 1.下载windows的openvpn软件  
