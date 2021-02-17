@@ -304,3 +304,4 @@ drwx------ 2 nobody root  4096 9月  23 14:25 scgi_temp
 drwxr-xr-x 2 root   root  4096 9月  23 14:25 ssl
 drwx------ 2 nobody root  4096 9月  23 14:25 uwsgi_temp
 ```
+- nginx.conf和nginx-kong.conf是Kong在启动的时候自动生成的nginx配置文件
