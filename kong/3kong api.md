@@ -52,7 +52,7 @@ curl -s http://192.168.0.184:8001/status | python -m json.tool
 - connections_writing：nginx将响应写回客户端的当前连接数。
 - connections_waiting：等待请求的当前空闲客户端连接数。
 - -s参数表示静默模式，curl将不输入信息，可以不打印不需要关注的信息。
-- 
+
 三、服务
 ---
 服务是每一个后端真实接口的抽象，它与路由关联，客户端发起请求，如果路由匹配到了，那么会将这个请求代理到与匹配路由相关联的服务中。
@@ -538,7 +538,8 @@ curl -i -X DELETE --url http://192.168.0.184:8001/consumers/376a9ccf-7d10-45a7-a
 
 六、插件
 ---
-Kong提供了一个插件的功能，可以通过配置指定某个服务或者路由或者用户启用某个插，插件始终只运行一次，所以对于不同的实体配置相同插件时就有优先级的概念。
+
+可以通过配置指定某个服务或者路由或者用户启用某个插，插件始终只运行一次，所以对于不同的实体配置相同插件时就有优先级的概念。
 
 多次配置插件的优先级如下：
 - 在以下组合上配置的插件：路由，服务和使用者。 （消费者意味着必须对请求进行身份验证）。
@@ -550,12 +551,9 @@ Kong提供了一个插件的功能，可以通过配置指定某个服务或者�
 - 在服务上配置的插件。
 - 配置为全局运行的插件。
 
-从以上的优先级可以看出全局配置的插件优先级最小，而越具体的组合优先级越高。
-
 1、添加插件
 
 可以通过以下几种不同的方式添加插件：
-
 - 对于每个Service/Route和consumer。不要设置consumer_id和设置service_id或route_id。
 - 适用于每个Service/Route和特定consumer。只有设定consumer_id。
 - 适用于每个consumer和特定Service。仅设置service_id（警告：某些插件只允许设置route_id）
@@ -591,36 +589,16 @@ curl -s -X POST --url http://192.168.0.184:8001/plugins/ \
     "route_id": "d1a10507-ea15-4c61-9d8c-7f10ebc79ecb"
 }
 ```
-在上面的请求示例中，我们在route上添加了basic-auth插件，这个插件用于认证，通过http的头部带入用户名和密码信息进行认证。
+- 在route上添加了basic-auth插件，这个插件用于认证，通过http的头部带入用户名和密码信息进行认证。
 
-当然，启用插件后，我们要对user设置好basic-auth的凭证,否则访问不了，并且返回如下信息：
-
+启用插件后，需要对user设置好basic-auth的凭证,否则访问不了，并且返回如下信息
+```
 {
 "message": "Unauthorized"
 }
-
-2、查询插件
-
-| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
-| id | string | 是 | 要检索的插件的唯一标识符 |
-
-```
-curl -s  --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f  | python -m json.tool
-
-{
-    "config": {
-        "anonymous": "",
-        "hide_credentials": false
-    },
-    "created_at": 1540102452000,
-    "enabled": true,
-    "id": "900aeaa3-0a47-49a1-9fea-649e6c90ab7f",
-    "name": "basic-auth",
-    "route_id": "d1a10507-ea15-4c61-9d8c-7f10ebc79ecb"
-}
 ```
 
-3、查询所有插件
+2、查询所有插件
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |--------|-----|--------|---------|------|
@@ -651,25 +629,27 @@ curl -s --url http://192.168.0.184:8001/plugins/?size=1 | python -m json.tool
     "total": 1
 }
 ```
-在上面的请求示例中，我们带了一个size的参数来限定每一页的数量，在返回的结果中有两个字段，next表示下一页的端点，offset是本页的偏移。
 
-当然，如果你在读取下一页的时候还需要限定返回的数据，还是依然要使用size的参数
+3、查询单个插件
+```
+curl -s --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f  | python -m json.tool
+
+{
+    "config": {
+        "anonymous": "",
+        "hide_credentials": false
+    },
+    "created_at": 1540102452000,
+    "enabled": true,
+    "id": "900aeaa3-0a47-49a1-9fea-649e6c90ab7f",
+    "name": "basic-auth",
+    "route_id": "d1a10507-ea15-4c61-9d8c-7f10ebc79ecb"
+}
+```
 
 4、更新插件
-
-| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
-|-------|------|-------|----------|------|
-| plugin id | string | | 是 | 要更新的插件配置的唯一标识符 |
-| name | string | null | 否 | 要添加的插件的名称要添加的插件的名称 |
-| consumer_id | string | null | 否 | 使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置 |
-| service_id | string | null | 否 | 服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置 |
-| route_id | string | null | 否 | 路由的唯一标识符，它覆盖传入请求中此特定路由的现有设置 |
-| config.{property} | string | null | 否 | 插件的配置属性，可以在Kong Hub的插件文档页面找到 |
-| enabled | bool | true | 否 | 是否应用插件 |
-
 ```
 curl -s -X PATCH --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f -d "service_id=da4dce88-4df3-4723-b544-b11b27184e97" | python -m json.tool
-
 
 {
     "config": {
@@ -687,20 +667,8 @@ curl -s -X PATCH --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea
 在上面的请求示例中，我更新了这个插件，原本只针对route启用的，现在又增加了对service生效，由此看出，一个插件是可以对多个实体生效的（前提是插件本身要支持此实体生效），因为插件只会在请求的生命周期中运行一次，所以对多个实体启用同一个插件会受到优先级的限制。
 
 5、更新或添加插件
-
-| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
-|--------|------|-------|----------|------|
-| name | string | null | 否 | 要添加的插件的名称要添加的插件的名称 |
-| consumer_id | string | null | 否 | 使用者的唯一标识符，用于覆盖传入请求中此特定使用者的现有设置 |
-| service_id | string | null | 否 | 服务的唯一标识符，用于覆盖传入请求中此特定服务的现有设置 |
-| route_id | string | null | 否 | 路由的唯一标识符，它覆盖传入请求中此特定路由的现有设置 |
-| config.{property} | string | null | 否 | 插件的配置属性，可以在Kong Hub的插件文档页面找到 |
-| enabled | bool | true | 否 | 是否应用插件 |
-
 ```
 curl -s -X PUT --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f -d "service_id=da4dce88-4df3-4723-b544-b11b27184e97" | python -m json.tool
-
-返回值：
 
 {
     "config": {
@@ -715,22 +683,13 @@ curl -s -X PUT --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-6
     "service_id": "da4dce88-4df3-4723-b544-b11b27184e97"
 }
 ```
-这个接口是更新或者创建一个插件。
-
-如果传入的参数name已经存在，那么以传入的参数修改此插件，如果name不存在，则以传入的参数创建此插件。
 
 6、删除插件
-
-| 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
-|--------|------|-------|---------|------|
-| plugin id | string | | 是 | 要删除的插件配置的唯一标识符 |
-
 ```
 curl -s -X DELETE --url http://192.168.0.184:8001/plugins/900aeaa3-0a47-49a1-9fea-649e6c90ab7f | python -m json.tool
 ```
 
 7、查询已启用的插件
-
 ```
 curl -s -X GET --url http://192.168.0.184:8001/plugins/enabled | python -m json.tool
 
@@ -771,13 +730,11 @@ curl -s -X GET --url http://192.168.0.184:8001/plugins/enabled | python -m json.
     ]
 }
 ```
-返回Kong示例启用了那些插件，只有已经启用的插件才能被应用在实体上，需要说明的是，在kong集群中，插件启用的情况要一致。
+- 只有已经启用的插件才能被应用在实体上，在kong集群中，插件启用的情况要一致。
 
 8、检索插件架构
-
 ```
 curl -s -X GET --url http://192.168.0.184:8001/plugins/schema/basic-auth | python -m json.tool
-
 
 {
     "fields": {
