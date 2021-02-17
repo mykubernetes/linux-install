@@ -60,8 +60,6 @@ curl -s http://192.168.0.184:8001/status | python -m json.tool
 ---
 服务是每一个后端真实接口的抽象，它与路由关联，客户端发起请求，如果路由匹配到了，那么会将这个请求代理到与匹配路由相关联的服务中。
 
-1、添加服务
-
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |-------|------|--------|---------|------|
 | name | string | | 否 | 服务名称，全局唯一 |
@@ -74,6 +72,7 @@ curl -s http://192.168.0.184:8001/status | python -m json.tool
 | write_timeout | int | 60000 | 否 | 向上游发送请求两次连续写操作的超时时间 ，单位毫秒 |
 | read_timeout | int | 60000 | 否 | 用于向上游服务器发送请求的两次连续读取操作之间的超时 ，单位毫秒 |
 
+1、添加服务
 ```
 curl -s -X POST --url http://192.168.0.184:8001/services/ \
 -d 'name=linuxops_server' \
@@ -121,14 +120,13 @@ curl -s --url http://192.168.0.184:8001/services/27f30248-fef1-4ddc-9fdc-4ca73f3
 
 查询服务的接口我们可以通过id来查询，也可以通过name来查询，在创建服务的时候可以不指定name字段，在系统中显示为null，这种服务就无法通过指定name来查询了，必须要使用id来查询，所以，强烈建议在创建服务的时候指定name，这是一个好习惯。
 
-3、查询所有服务
-
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |-------|------|--------|---------|------|
 | offset | string | 否 | 分页偏移，用于定义列表中的唯一 |
 | size | int | 100 | 否 | 每页返回的对象的数量 |
 
+3、查询所有服务
 ```
 curl -s --url http://192.168.0.184:8001/services/?size=1 | python -m json.tool
 
@@ -157,7 +155,6 @@ curl -s --url http://192.168.0.184:8001/services/?size=1 | python -m json.tool
 
 
 4、更新服务
-
 ```
 curl -s -X PATCH --url http://192.168.0.184:8001/services/linuxops_server \
 -d 'name=linuxops_server_patch' \
@@ -184,7 +181,6 @@ curl -s -X PATCH --url http://192.168.0.184:8001/services/linuxops_server \
 - 在上面的示例中，我修改了一个服务的name，从返回值中可以可能出来id是不会变化的。
 
 5、更新或者创建服务
-
 ```
 curl -s -X PUT --url http://192.168.0.184:8001/services/linuxops_server_put \
 -d 'name=linuxops_server_patch' \
@@ -220,8 +216,6 @@ curl -i  -X DELETE --url http://192.168.0.184:8001/services/b6094754-07da-4c31-b
 ---
 路由用来匹配客户端请求的规则，每一个路由都要与一个服务相关联，当一个请求到达Kong的时候，会先给路由匹配，如果匹配成功，那么会将请求转发给服务，服务再去后端请求数据。所以路由是Kong的入口。
 
-1、添加路由
-
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 | ------|------|--------|---------|------|
 | protocols | string or list | ["http", "https"] | 否 | 此路由允许的协议，取值http或https |
@@ -234,6 +228,7 @@ curl -i  -X DELETE --url http://192.168.0.184:8001/services/b6094754-07da-4c31-b
 
 这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
 
+1、添加路由
 ```
 curl -s -X POST --url http://192.168.0.184:8001/routes \
 -d 'protocols=http' \
@@ -294,14 +289,13 @@ curl -s http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-8e4e5866a131 | 
 ```
 路由中没有name字段，所以只能通过ID来查看。
 
-3、查询所有路由
-
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |--------|-----|--------|---------|------|
 | offset | string | 否 | 分页偏移，用于定义列表中的唯一 |
 | size | int | 100 | 否 | 每页返回的对象的数量 |
 
+3、查询所有路由
 ```
 curl -s --url http://192.168.0.184:8001/routes/?size=1 | python -m json.tool
 
@@ -337,7 +331,7 @@ curl -s --url http://192.168.0.184:8001/routes/?size=1 | python -m json.tool
 
 当然，如果你在读取下一页的时候还需要限定返回的数据，还是依然要使用size的参数
 
-4、更新路由
+
 
 | 参数名 | 类型 | 默认值 | 是否必须 | 说明 |
 |--------|-----|--------|---------|------|
@@ -351,6 +345,7 @@ curl -s --url http://192.168.0.184:8001/routes/?size=1 | python -m json.tool
 
 这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
 
+4、更新路由
 ```
 curl -s -X PATCH --url http://192.168.0.184:8001/routes/6c6b7863-9a05-4d51-bf7e-8e4e5866a131 \
 -d 'protocols=http' \
