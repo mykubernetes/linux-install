@@ -1,5 +1,7 @@
 一、前言
 
+https://docs.konghq.com/gateway-oss/2.3.x/admin-api/#certificate-object
+
 - 如果Kong是以集群的状态的运行的，只需要将管理API的请求发送到其中的一个节点中，Kong会自动同步信息到其他的节点。
 
 Kong大概有以下几个管理对象：
