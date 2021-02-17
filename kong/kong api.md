@@ -275,7 +275,7 @@ curl -i  -X DELETE --url http://192.168.0.184:8001/services/b6094754-07da-4c31-b
 | paths | string or list | null | *否 | 此路由匹配的path |
 | strip_path | bool | true | 否 | 匹配到path时，是否删除匹配到的前缀 |
 | preserve_host | bool | false | 否 | 匹配到hosts时，使用请求头部的值为域名向后端发起请求，请求的头部为"host",例如"host:api.abc.com" |
-| service | string | 是 | 关联的服务id。 |
+| service | string | | 是 | 关联的服务id。 |
 
 这里需要特别注意，如果是以表达的形式发送的，需要以 service.id=<service_id>形式发送，如果是json，需要以"service":{"id":"<service_id>"}形式发送
 
