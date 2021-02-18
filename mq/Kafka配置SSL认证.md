@@ -112,21 +112,21 @@ mkdir -p /usr/ca/{root,server,client,trust}
 ```
 keytool -keystore /usr/ca/server/server.keystore.jks -alias ds-kafka-single -validity 365 -genkey -keypass ds1994 -keyalg RSA -dname "CN=kafka-single,OU=aspire,O=aspire,L=beijing,S=beijing,C=cn" -storepass ds1994 -ext SAN=DNS:kafka-single
 ```
--alias #别名
--keystore #指定密钥库的名称(就像数据库一样的证书库，可以有很多个证书，cacerts这个文件是jre自带的， 也可以使用其它文件名字，如果没有这个文件名字，它会创建这样一个)
--storepass #指定密钥库的密码
--keypass #指定别名条目的密码
--list #显示密钥库中的证书信息
--v #显示密钥库中的证书详细信息
--export #将别名指定的证书导出到文件
--file #参数指定导出到文件的文件名
--delete #删除密钥库中某条目
--import #将已签名数字证书导入密钥库
--keypasswd #修改密钥库中指定条目口令
--dname #指定证书拥有者信息。其中，CN=名字与姓氏/域名,OU=组织单位名称,O=组织名称,L=城市或区域名称,ST=州或省份名称,C=单位的两字母国家代码
--keyalg #指定密钥的算法
--validity #指定创建的证书有效期多少天
--keysize #指定密钥长度
+- -alias #别名
+- -keystore #指定密钥库的名称(就像数据库一样的证书库，可以有很多个证书，cacerts这个文件是jre自带的， 也可以使用其它文件名字，如果没有这个文件名字，它会创建这样一个)
+- -storepass #指定密钥库的密码
+- -keypass #指定别名条目的密码
+- -list #显示密钥库中的证书信息
+- -v #显示密钥库中的证书详细信息
+- -export #将别名指定的证书导出到文件
+- -file #参数指定导出到文件的文件名
+- -delete #删除密钥库中某条目
+- -import #将已签名数字证书导入密钥库
+- -keypasswd #修改密钥库中指定条目口令
+- -dname #指定证书拥有者信息。其中，CN=名字与姓氏/域名,OU=组织单位名称,O=组织名称,L=城市或区域名称,ST=州或省份名称,C=单位的两字母国家代码
+- -keyalg #指定密钥的算法
+- -validity #指定创建的证书有效期多少天
+- -keysize #指定密钥长度
 
 3、生成CA认证证书(为了保证整个证书的安全性，需要使用CA进行证书的签名保证)
 ```
