@@ -1,4 +1,11 @@
-1、修改kafka配置
+
+1、修改/etc/hosts文件，自定义一个hosts名
+```
+vim /etc/hosts
+192.168.0.1    kafka-single
+```
+
+2、修改kafka配置
 ```
 # vim server.properties
 
@@ -47,7 +54,7 @@ zookeeper.connection.timeout.ms=6000
 group.initial.rebalance.delay.ms=0
 ```
 
-2、重启kafka
+3、重启kafka
 ```
 # 后台启动zookeeper
 ./zkServer.sh start 
@@ -55,7 +62,7 @@ group.initial.rebalance.delay.ms=0
 ./kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
 ```
 
-3、先创建一个主题
+4、先创建一个主题
 ```
 # 创建主题
 ./kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic topicOne
@@ -63,7 +70,7 @@ group.initial.rebalance.delay.ms=0
 ./kafka-topics.sh --list --zookeeper localhost:2181
 ```
 
-4、消费者配置
+5、消费者配置
 ```
 security.protocol=SSL
 group.id=test-group
@@ -77,7 +84,7 @@ ssl.keystore.location=/usr/ca/server/server.keystore.jks
 ./kafka-console-consumer.sh --bootstrap-server kafka-single:9095 --topic topicOne --from-beginning --consumer.config ../config/c.properties
 ```
 
-5、生产者配置,消费测试
+6、生产者配置,消费测试
 ```
 bootstrap.servers=kafka-single:9095
 security.protocol=SSL
