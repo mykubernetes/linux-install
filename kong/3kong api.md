@@ -879,6 +879,11 @@ curl -s -X DELETE --url http://192.168.0.184:8001/upstreams/1d3638c6-d5a0-4bb5-9
 curl -s -X DELETE --url http://192.168.0.184:8001/targets/1d3638c6-d5a0-4bb5-907b-015c8daf7861/upstream
 ```
 
+11、显示节点的upstream运行状况
+```
+curl -s -X GET --url http://192.168.0.184:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/health/
+```
+
 八、target
 ---
 
@@ -911,4 +916,39 @@ curl -s -X DELETE --url http://192.168.0.184:8001/targets/1d3638c6-d5a0-4bb5-907
     "target": "172.17.23.14:38002",
     "weight": 100
 }
+```
+
+2、查看targets
+```
+# curl -i -X GET --url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets
+```
+
+3、删除target
+```
+curl -i -X DELETE --url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets/66c83e7d-f006-43da-990b-d493a966fc66
+```
+
+4、将target地址设置为健康
+```
+curl -i -X POST --url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets/66c83e7d-f006-43da-990b-d493a966fc66/172.17.23.14:38002/healthy
+```
+
+5、将target地址设置为不健康
+```
+curl -i -X POST --url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets/66c83e7d-f006-43da-990b-d493a966fc66/unhealthy
+```
+
+6、将target设置为健康
+```
+curl -i -X POST --url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets/66c83e7d-f006-43da-990b-d493a966fc66/healthy
+```
+
+7、将target设置为不健康
+```
+curl -i -X POST --url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets/66c83e7d-f006-43da-990b-d493a966fc66/unhealthy
+```
+
+8、列出所有target
+```
+curl -i -X POST --url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets/all
 ```
