@@ -829,6 +829,21 @@ curl -i -X POST \
 }
 ```
 
+2、查看所有upstream
+```
+curl -s -X GET --url http://192.168.0.184:8001/upstreams/ | python -m json.tool
+```
+
+3、列出单个upstream
+```
+curl -s -X GET --url http://192.168.0.184:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861 | python -m json.tool
+```
+
+4、检索与特定目标相关的上游
+```
+curl -s -X GET --url http://192.168.0.184:8001/targets/66c83e7d-f006-43da-990b-d493a966fc66/upstream
+```
+
 八、target
 ---
 
