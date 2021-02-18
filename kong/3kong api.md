@@ -759,3 +759,106 @@ curl -s -X GET --url http://192.168.0.184:8001/plugins/schema/basic-auth | pytho
     "no_consumer": true
 }
 ```
+
+七、upstreams
+---
+1、添加upstream
+```
+curl -i -X POST \
+--url http://192.168.0.184:8001/upstreams/ \
+--data 'name=test.kong.service'  \
+--data 'algorithm=round-robin' \
+--data 'healthchecks.active.type=http' \
+--data 'healthchecks.active.http_path=/' \
+--data 'healthchecks.active.timeout=2' \
+--data 'healthchecks.active.healthy.successes=3' \
+--data 'healthchecks.active.healthy.interval=10' \
+--data 'healthchecks.active.unhealthy.interval=10' \
+--data 'healthchecks.active.unhealthy.http_failures=3'
+
+{
+    "created_at": 1582626649,
+    "hash_on": "none",
+    "id": "1d3638c6-d5a0-4bb5-907b-015c8daf7861",
+    "algorithm": "round-robin",
+    "name": "test.kong.service",
+    "tags": null,
+    "hash_fallback_header": null,
+    "hash_fallback": "none",
+    "hash_on_cookie": null,
+    "host_header": null,
+    "hash_on_cookie_path": "\/",
+    "healthchecks": {
+        "threshold": 0,
+        "active": {
+            "unhealthy": {
+                "http_statuses": [429, 404, 500, 501, 502, 503, 504, 505],
+                "tcp_failures": 0,
+                "timeouts": 0,
+                "http_failures": 3,
+                "interval": 10
+            },
+            "type": "http",
+            "http_path": "\/",
+            "timeout": 2,
+            "healthy": {
+                "successes": 3,
+                "interval": 10,
+                "http_statuses": [200, 302]
+            },
+            "https_sni": null,
+            "https_verify_certificate": true,
+            "concurrency": 10
+        },
+        "passive": {
+            "unhealthy": {
+                "http_failures": 0,
+                "http_statuses": [429, 500, 503],
+                "tcp_failures": 0,
+                "timeouts": 0
+            },
+            "healthy": {
+                "http_statuses": [200, 201, 202, 203, 204, 205, 206, 207, 208, 226, 300, 301, 302, 303, 304, 305, 306, 307, 308],
+                "successes": 0
+            },
+            "type": "http"
+        }
+    },
+    "hash_on_header": null,
+    "slots": 10000
+}
+```
+
+八、target
+---
+
+1、添加target
+```
+# curl -i -X POST \
+--url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets \
+--data 'target=172.17.23.14:38001'
+
+{
+    "created_at": 1582627463.954,
+    "upstream": {
+        "id": "1d3638c6-d5a0-4bb5-907b-015c8daf7861"
+    },
+    "id": "66c83e7d-f006-43da-990b-d493a966fc66",
+    "target": "172.17.23.14:38001",
+    "weight": 100
+}
+
+# curl -i -X POST \
+    --url http://localhost:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861/targets \
+    --data 'target=172.17.23.14:38002'
+
+{
+    "created_at": 1582627517.872,
+    "upstream": {
+        "id": "1d3638c6-d5a0-4bb5-907b-015c8daf7861"
+    },
+    "id": "d9940f44-30ad-437a-aaab-836dfaf27b93",
+    "target": "172.17.23.14:38002",
+    "weight": 100
+}
+```
