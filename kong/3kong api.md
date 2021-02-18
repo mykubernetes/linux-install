@@ -4,7 +4,25 @@ https://docs.konghq.com/gateway-oss/2.3.x/admin-api/#certificate-object
 
 - 如果Kong是以集群的状态的运行的，只需要将管理API的请求发送到其中的一个节点中，Kong会自动同步信息到其他的节点。
 
-Kong大概有以下几个管理对象：
+
+Kong 的插件机制是其高可扩展性的根源，Kong 可以很方便地为路由和服务提供各种插件，网关所需要的基本特性，Kong 都如数支持
+- 云原生: 与平台无关，Kong可以从裸机运行到Kubernetes
+- 动态路由：Kong 的背后是 OpenResty+Lua，所以从 OpenResty 继承了动态路由的特性
+- 熔断
+- 健康检查
+- 日志: 可以记录通过 Kong 的 HTTP，TCP，UDP 请求和响应。
+- 鉴权: 权限控制，IP 黑白名单，同样是 OpenResty 的特性
+- SSL: Setup a Specific SSL Certificate for an underlying service or API.
+- 监控: Kong 提供了实时监控插件
+- 认证: 如数支持 HMAC, JWT, Basic, OAuth2.0 等常用协议
+- 限流
+- REST API: 通过 Rest API 进行配置管理，从繁琐的配置文件中解放
+- 可用性: 天然支持分布式
+- 高性能: 背靠非阻塞通信的 nginx，性能自不用说
+- 插件机制: 提供众多开箱即用的插件，且有易于扩展的自定义插件接口，用户可以使用 Lua 自行开发插件
+
+
+Kong资源管理对象：
 - 节点信息
 - 服务
 - 路由
