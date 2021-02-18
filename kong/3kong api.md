@@ -831,7 +831,7 @@ curl -i -X POST \
 
 2、查看所有upstream
 ```
-curl -s -X GET --url http://192.168.0.184:8001/upstreams/ | python -m json.tool
+c | python -m json.tool
 ```
 
 3、列出单个upstream
@@ -839,9 +839,44 @@ curl -s -X GET --url http://192.168.0.184:8001/upstreams/ | python -m json.tool
 curl -s -X GET --url http://192.168.0.184:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861 | python -m json.tool
 ```
 
-4、检索与特定目标相关的上游
+4、检索与特定target相关联的upstream
 ```
 curl -s -X GET --url http://192.168.0.184:8001/targets/66c83e7d-f006-43da-990b-d493a966fc66/upstream
+```
+
+5、更新upstream
+```
+curl -s -X PATCH --url http://192.168.0.184:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861 \
+--data 'name=dev.kong.service'
+```
+
+6、更新与特定target相关联的upstream
+```
+curl -s -X PATCH --url http://192.168.0.184:8001/targets/1d3638c6-d5a0-4bb5-907b-015c8daf7861/upstream \
+--data 'name=prod.kong.service'
+```
+
+7、更新或创建上游
+```
+curl -s -X put --url http://192.168.0.184:8001/upstreams/ \
+--data 'name=test.kong.service'  \
+```
+
+8、创建或更新与特定target相关联的upstream
+```
+curl -s -X put --url http://192.168.0.184:8001/targets/1d3638c6-d5a0-4bb5-907b-015c8daf7861/upstreams/ \
+--data 'name=test.kong.service'  \
+```
+
+9、删除upstream
+```
+curl -s -X DELETE --url http://192.168.0.184:8001/upstreams/1d3638c6-d5a0-4bb5-907b-015c8daf7861
+```
+
+
+10、删除与特定target相关的upstream
+```
+curl -s -X DELETE --url http://192.168.0.184:8001/targets/1d3638c6-d5a0-4bb5-907b-015c8daf7861/upstream
 ```
 
 八、target
