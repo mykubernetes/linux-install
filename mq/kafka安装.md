@@ -761,7 +761,7 @@ group.id=test001
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 ```
 
-显示 consumer  群体中所有 consumer  的位置，以及所在⽇志的结尾。
+显示 consumer  群体中所有 consumer 的位置，以及所在⽇志的结尾。
 ```
 仅显示使⽤Java consumer API（基于⾮ZooKeeper的 consumer）的 consumer 的信息
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
@@ -770,6 +770,20 @@ group.id=test001
 # bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --describe --group my-group
 ```
 
+管理 Consumer Group 
+```
+# 列出所有 topic
+> bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+test-consumer-group
+
+# 查看偏移量
+> bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group test-consumer-group
+TOPIC                         PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG       CONSUMER-ID                                      HOST
+test-foo                      0         1              3              2         consumer-1-a5d61779-4d04-4c50-a6d6-fb35d942642d  /127.0.0.1
+
+# 使⽤⽼的⾼级 consumer 并在 ZooKeeper 中存储组元数据
+> bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
+```
 
 Kafka  监控
 ===
