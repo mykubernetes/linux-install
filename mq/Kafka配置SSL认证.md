@@ -147,6 +147,9 @@ openssl req -new -x509 -keyout /usr/ca/root/ca-key -out /usr/ca/root/ca-cert -da
 4、通过CA证书创建一个客户端信任证书
 ```
 keytool -keystore /usr/ca/trust/client.truststore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
+
+Trust this certificate? [no]:  y             # 输入Y
+Certificate was added to keystore
 ```
 
 5、通过CA证书创建一个服务端器端信任证书
