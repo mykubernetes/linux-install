@@ -98,4 +98,89 @@ ssl.keystore.location=/usr/ca/server/server.keystore.jks
 ./kafka-console-producer.sh --broker-list kafka-single:9095 --topic topicOne --producer.config ../config/p.properties
 ```
 
+证书配置方法
+---
 
+一、服务器端SSL证书签发
+
+1、创建目录来保存证书
+```
+mkdir -p /usr/ca/{root,server,client,trust}
+```
+
+2、生成server.keystore.jks文件(即：生成服务端的keystore文件)
+```
+keytool -keystore /usr/ca/server/server.keystore.jks -alias ds-kafka-single -validity 365 -genkey -keypass ds1994 -keyalg RSA -dname "CN=kafka-single,OU=aspire,O=aspire,L=beijing,S=beijing,C=cn" -storepass ds1994 -ext SAN=DNS:kafka-single
+```
+-alias #别名
+-keystore #指定密钥库的名称(就像数据库一样的证书库，可以有很多个证书，cacerts这个文件是jre自带的， 也可以使用其它文件名字，如果没有这个文件名字，它会创建这样一个)
+-storepass #指定密钥库的密码
+-keypass #指定别名条目的密码
+-list #显示密钥库中的证书信息
+-v #显示密钥库中的证书详细信息
+-export #将别名指定的证书导出到文件
+-file #参数指定导出到文件的文件名
+-delete #删除密钥库中某条目
+-import #将已签名数字证书导入密钥库
+-keypasswd #修改密钥库中指定条目口令
+-dname #指定证书拥有者信息。其中，CN=名字与姓氏/域名,OU=组织单位名称,O=组织名称,L=城市或区域名称,ST=州或省份名称,C=单位的两字母国家代码
+-keyalg #指定密钥的算法
+-validity #指定创建的证书有效期多少天
+-keysize #指定密钥长度
+
+3、生成CA认证证书(为了保证整个证书的安全性，需要使用CA进行证书的签名保证)
+```
+openssl req -new -x509 -keyout /usr/ca/root/ca-key -out /usr/ca/root/ca-cert -days 365 -passout pass:ds1994 -subj "/C=cn/ST=beijing/L=beijing/O=aspire/OU=aspire/CN=kafka-single"
+```
+
+4、通过CA证书创建一个客户端信任证书
+```
+keytool -keystore /usr/ca/trust/client.truststore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
+```
+
+5、通过CA证书创建一个服务端器端信任证书
+```
+keytool -keystore /usr/ca/trust/server.truststore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
+```
+
+6、服务器证书的签名处理
+```
+# 1、导出服务器端证书server.cert-file
+keytool -keystore /usr/ca/server/server.keystore.jks -alias ds-kafka-single -certreq -file /usr/ca/server/server.cert-file -storepass ds1994
+
+# 2、用CA给服务器端证书进行签名处理
+openssl x509 -req -CA /usr/ca/root/ca-cert -CAkey /usr/ca/root/ca-key -in /usr/ca/server/server.cert-file -out /usr/ca/server/server.cert-signed -days 365 -CAcreateserial -passin pass:ds1994
+
+# 3、将CA证书导入到服务器端keystore
+keytool -keystore /usr/ca/server/server.keystore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
+
+# 4、将已签名的服务器证书导入到服务器keystore
+keytool -keystore /usr/ca/server/server.keystore.jks -alias ds-kafka-single -import -file /usr/ca/server/server.cert-signed -storepass ds1994
+```
+
+二、客户端SSL证书签发
+
+1、导出客户端证书
+```
+keytool -keystore /usr/ca/client/client.keystore.jks -alias ds-kafka-single -validity 365 -genkey -keypass ds1994 -dname "CN=kafka-single,OU=aspire,O=aspire,L=beijing,S=beijing,C=cn" -ext SAN=DNS:kafka-single -storepass ds1994
+```
+
+2、将证书文件导入到客户端keystore
+```
+keytool -keystore /usr/ca/server/server.keystore.jks -alias ds-kafka-single -validity 365 -genkey -keypass ds1994 -keyalg RSA -dname "CN=kafka-single,OU=aspire,O=aspire,L=beijing,S=beijing,C=cn" -storepass ds1994 -ext SAN=DNS:kafka-single
+```
+
+3、用CA给客户端证书进行签名处理
+```
+openssl x509 -req -CA /usr/ca/root/ca-cert -CAkey /usr/ca/root/ca-key -in /usr/ca/client/client.cert-file -out /usr/ca/client/client.cert-signed -days 365 -CAcreateserial -passin pass:ds1994
+```
+
+4、将CA证书导入到客户端keystore
+```
+keytool -keystore /usr/ca/client/client.keystore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
+```
+
+5、将已签名的证书导入到客户端keystore
+```
+keytool -keystore /usr/ca/client/client.keystore.jks -alias ds-kafka-single -import -file /usr/ca/client/client.cert-signed -storepass ds1994
+```
