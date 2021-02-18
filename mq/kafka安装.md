@@ -376,6 +376,25 @@ test0:6:0
 test0:0:
 ```
 
+检查 consumer  位置
+```
+# 这将仅显示使⽤Java consumer API（基于⾮ZooKeeper的 consumer）的 consumer 的信息。
+> bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+  
+TOPIC                         PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG       CONSUMER-ID                                      HOST
+my-topic                      0         2              4              2         consumer-1-029af89c-873c-4751-a720-cefd41a669d6  /127.0.0.1
+my-topic                      1         2              3              1         consumer-1-029af89c-873c-4751-a720-cefd41a669d6  /127.0.0.1
+my-topic                      2         2              3              1         consumer-2-42c1abd4-e3b2-425d-a8bb-e1ea49b29bb2  /127.0.0.1
+
+
+# 这只会显示关于使⽤ZooKeeper的 consumer 的信息（不是那些使⽤Java consumer API的消费者）。
+> bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --describe --group my-group
+TOPIC                         PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG       CONSUMER-ID
+my-topic                      0         2              4              2         my-group_consumer-1
+my-topic                      1         2              3              1         my-group_consumer-1
+my-topic                      2         2              3              1         my-group_consumer-2
+```
+
 7、发送消息
 ```
 $ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
