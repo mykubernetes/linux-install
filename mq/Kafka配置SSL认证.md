@@ -106,6 +106,12 @@ ssl.keystore.location=/usr/ca/server/server.keystore.jks
 证书配置方法
 ---
 
+安装keytool命令，安装jdk即可
+```
+yum insltall java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64 -y
+```
+
+
 一、服务器端SSL证书签发
 
 1、创建目录来保存证书
