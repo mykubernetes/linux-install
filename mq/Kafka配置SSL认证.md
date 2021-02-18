@@ -148,7 +148,7 @@ openssl req -new -x509 -keyout /usr/ca/root/ca-key -out /usr/ca/root/ca-cert -da
 ```
 keytool -keystore /usr/ca/trust/client.truststore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
 
-Trust this certificate? [no]:  y             # 输入Y
+Trust this certificate? [no]:  y             # 输入y
 Certificate was added to keystore
 ```
 
@@ -156,7 +156,7 @@ Certificate was added to keystore
 ```
 keytool -keystore /usr/ca/trust/server.truststore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
 
-Trust this certificate? [no]:  y             # 输入Y
+Trust this certificate? [no]:  y             # 输入y
 Certificate was added to keystore
 ```
 
@@ -170,6 +170,9 @@ openssl x509 -req -CA /usr/ca/root/ca-cert -CAkey /usr/ca/root/ca-key -in /usr/c
 
 # 3、将CA证书导入到服务器端keystore
 keytool -keystore /usr/ca/server/server.keystore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
+
+Trust this certificate? [no]:  y             # 输入y
+Certificate was added to keystore
 
 # 4、将已签名的服务器证书导入到服务器keystore
 keytool -keystore /usr/ca/server/server.keystore.jks -alias ds-kafka-single -import -file /usr/ca/server/server.cert-signed -storepass ds1994
