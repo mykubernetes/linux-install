@@ -178,6 +178,24 @@ Certificate was added to keystore
 keytool -keystore /usr/ca/server/server.keystore.jks -alias ds-kafka-single -import -file /usr/ca/server/server.cert-signed -storepass ds1994
 ```
 
+7、查看生成的文件
+```
+# tree /usr/ca/                                                                                                           
+/usr/ca/
+├── client
+├── root
+│   ├── ca-cert
+│   ├── ca-cert.srl
+│   └── ca-key
+├── server
+│   ├── server.cert-file
+│   ├── server.cert-signed
+│   └── server.keystore.jks
+└── trust
+    ├── client.truststore.jks
+    └── server.truststore.jks
+```
+
 二、客户端SSL证书签发
 
 1、导出客户端证书
