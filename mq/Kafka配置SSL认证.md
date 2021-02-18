@@ -62,7 +62,12 @@ group.initial.rebalance.delay.ms=0
 ./kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
 ```
 
-4、先创建一个主题
+4、使用Linux自带的openssl测试一下，验证我们配置的ssl有效
+```
+openssl s_client -debug -connect kafka-single:9095 -tls1
+```
+
+5、先创建一个主题
 ```
 # 创建主题
 ./kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic topicOne
@@ -70,7 +75,7 @@ group.initial.rebalance.delay.ms=0
 ./kafka-topics.sh --list --zookeeper localhost:2181
 ```
 
-5、消费者配置
+6、消费者配置
 ```
 security.protocol=SSL
 group.id=test-group
@@ -84,7 +89,7 @@ ssl.keystore.location=/usr/ca/server/server.keystore.jks
 ./kafka-console-consumer.sh --bootstrap-server kafka-single:9095 --topic topicOne --from-beginning --consumer.config ../config/c.properties
 ```
 
-6、生产者配置,消费测试
+7、生产者配置,消费测试
 ```
 bootstrap.servers=kafka-single:9095
 security.protocol=SSL
