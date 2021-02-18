@@ -152,6 +152,9 @@ keytool -keystore /usr/ca/trust/client.truststore.jks -alias CARoot -import -fil
 5、通过CA证书创建一个服务端器端信任证书
 ```
 keytool -keystore /usr/ca/trust/server.truststore.jks -alias CARoot -import -file /usr/ca/root/ca-cert -storepass ds1994
+
+Trust this certificate? [no]:  y             # 输入Y
+Certificate was added to keystore
 ```
 
 6、服务器证书的签名处理
