@@ -1,14 +1,11 @@
 Metric类型
 ---
-关于时间序列存储，可以参考：https://www.infoq.cn/article/database-timestamp-01
-
 Prometheus会将所有采集到的样本数据以时间序列（time-series）的方式保存在内存数据库TSDB中，并且定时保存到硬盘上。time-series是按照时间戳和值的序列顺序存放的，我们称之为向量(vector)。每条time-series通过指标名称(metrics name)和一组标签集(labelset)命名。
 
 在time-series中的每一个点称为一个样本（sample），样本由以下三部分组成：
 - 指标(metric)：metric name和描述当前样本特征的labelsets;
 - 时间戳(timestamp)：一个精确到毫秒的时间戳;
 - 样本值(value)： 一个folat64的浮点型数据表示当前样本的值。
-
 
 Prometheus定义了4中不同的指标类型(metric type):
 
@@ -29,7 +26,6 @@ delta(kube_pod_status_ready[2h])
 
 - Histogram 直方图
 ```
-
 Histogram 由 <basename>_bucket{le="<upper inclusive bound>"}，<basename>_bucket{le="+Inf"}, <basename>_sum，<basename>_count 组成，主要用于表示一段时间范围内对数据进行采样（通常是请求持续时间或响应大小），并能够对其指定区间以及总数进行统计，通常它采集的数据展示为直方图。
 
 例如 Prometheus server 中 prometheus_local_storage_series_chunks_persisted, 表示 Prometheus 中每个时序需要存储的 chunks 数量，我们可以用它计算待持久化的数据的分位数。
