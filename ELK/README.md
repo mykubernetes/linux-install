@@ -1,3 +1,11 @@
+
+Promtail + Loki + Grafana 构建日志监控告警系统
+- promtail： 日志收集的代理，安装部署在需要收集和分析日志的服务器，promtail会将日志发给Loki服务。
+- Loki： 主服务器，负责存储日志和处理查询。
+- Grafana：提供web管理界面，数据展示功能。 
+
+
+
 https://blog.csdn.net/yangbosos/article/details/88903846
 
 http://www.jwsblog.com/archives/59.html
