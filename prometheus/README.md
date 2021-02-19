@@ -87,7 +87,7 @@ http_requests_total offset 5m
 http_requests_total{job="prometheus"}[5m]
 
 # 偏移量修饰符始终需要跟随选择器
-sum(http_requests_total{method="GET"} offset 5m) // GOOD.
+sum(http_requests_total{method="GET"} offset 5m)
 ```
 
 操作符
