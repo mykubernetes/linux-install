@@ -8,6 +8,7 @@ Prometheus会将所有采集到的样本数据以时间序列（time-series）�
 - 样本值(value)： 一个folat64的浮点型数据表示当前样本的值。
 
 Prometheus定义了4中不同的指标类型(metric type):
+---
 - Counter 计数器,只增不减，除非重置（例如服务器或进程重启）
 - Gauge 仪表盘，可增可减的数据。
 - Histogram 直方图，将时间范围内的数据划分成不同的时段，并各自评估其样本个数及样本值之和，因而可计算出分位数
@@ -15,7 +16,50 @@ Prometheus定义了4中不同的指标类型(metric type):
   - 分位数计算要使用专用的histogram_quantile函数
 - Summary 摘要，类似于Histogram,但客户端会直接计算并上报分位数
 
+1、counter
+- 通常，Counter的总数并没有直接作用，而是需要借助于rate、topk、increase和irate等函数来生成样本数据的变化状况（增长率）；
+  - rate(http_requests_total[2h])，获取2小内，该指标下各时间序列上的http总请求数的增长速率；
+  - topk(3, http_requests_total)，获取该指标下http请求总数排名前3的时间序列；
+  - irate(http_requests_total[2h])，高灵敏度函数，用于计算指标的瞬时速率；
+    - 基于样本范围内的最后两个样本进行计算，相较于rate函数来说，irate更适用于短期时间范围内的变化速率分析；
 
+2、Gauge
+- Gauge用于存储其值可增可减的指标的样本数据，常用于进行求和、取平均值、最小值、最大值等聚合计算；也会经常结合PromQL的predict_linear和delta函数使用；
+  - predict_linear(v range-vector, t, scalar)函数可以预测时间序列v在t秒后的值，它通过线性回归的方式来预测样本数据的Gauge变化趋势；
+  - delta(v range-vector)函数计算范围向量中每个时间序列元素的第一个值与最后一个值之差，从而展示不同时间点上的样本值的差值；
+    - delta(cpu_temp_celsius{host="web01.magedu.com"}[2h])，返回该服务器上的CPU温度与2小时之前的差异；
+
+3、Histogram
+- Histogram是一种对数据分布情况的图形表示，由一系列高度不等的长条图（bar）或线段表示，用于 展示单个测度的值的分布
+  - 它一般用横轴表示某个指标维度的数据取值区间，用纵轴表示样本统计的频率或频数，从而能够以二维图的形式展现数值的分布状况
+  - 为了构建Histogram，首先需要将值的范围进行分段，即将所有值的整个可用范围分成一系列连续、相邻（相邻处可以是等同值）但不重叠的间隔，而后统计每个间隔中有多少值
+  -  从统计学的角度看，分位数不能被聚合，也不能进行算术运算；
+- 对于Prometheus来说，Histogram会在一段时间范围内对数据进行采样（通常是请求持续时长或响应大小等），并将其计入可配置的bucket（存储桶）中
+  - Histogram事先将特定测度可能的取值范围分隔为多个样本空间，并通过对落入bucket内的观测值进行计数以及求和操作
+  - 与常规方式略有不同的是，Prometheus取值间隔的划分采用的是累积（Cumulative）区间间隔机制，即每个bucket中的样本均包含了其前面所有bucket中的样本，因而也称为累积直方图
+    - 可降低Histogram的维护成本
+    - 支持粗略计算样本值的分位数
+    - 单独提供了_sum和_count指标，从而支持计算平均值
+- Histogram类型的每个指标有一个基础指标名称<basename>，它会提供多个时间序列：
+  - <basename>_bucket{le="<upper inclusive bound>"}：观测桶的上边界（upper inclusivebound），即样本统计区间，最大区间（包含所有样本）的名称为<basename>_bucket{le="+Inf"}；
+  - <basename>_sum：所有样本观测值的总和；
+  - <basename>_count ：总的观测次数，它自身本质上是一个Counter类型的指标；
+- 累积间隔机制生成的样本数据需要额外使用内置的histogram_quantile()函数即可根据Histogram指标来计算相应的分位数（quantile），即某个bucket的样本数在所有样本数中占据的比例
+  - histogram_quantile()函数在计算分位数时会假定每个区间内的样本满足线性分布状态，因而它的结果仅是一个预估值，并不完全准确；
+  - 预估的准确度取决于bucket区间划分的粒度；粒度越大，准确度越低；
+
+4、
+- 指标类型是客户端库的特性，而Histogram在客户端仅是简单的桶划分和分桶计数，分位数计算由Prometheus Server基于样本数据进行估算，因而其结果未必准确，甚至不合理的bucket划分会导致较大的误差；
+- Summary是一种类似于Histogram的指标类型，但它在客户端于一段时间内（默认为10分钟）的每个采样点进行统计，计算并存储了分位数数值，Server端直接抓取相应值即可；
+- 但Summary不支持sum或avg一类的聚合运算，而且其分位数由客户端计算并生成，Server端无法获取客户端未定义的分位数，而Histogram可通过PromQL任意定义，有着较好的灵活性；
+- 对于每个指标，Summary以指标名称<basename>为前缀，生成如下几个个指标序列
+  - <basename>{quantile="<φ>"}，其中φ是分位点，其取值范围是(0 ≤φ≤ 1)；计数器类型指标；如下是几种典型的常用分位点；
+    - 0、0.25、0.5、0.75和1几个分位点；
+    - 0.5、0.9和0.99几个分位点；
+    - 0.01、0.05、0.5、0.9和0.99几个分位点；
+  - <basename>_sum，抓取到的所有样本值之和；
+  - <basename>_count，抓取到的所有样本总数；
+  
 标签匹配器
 ---
 ```
