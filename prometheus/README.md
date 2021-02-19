@@ -8,59 +8,44 @@ Prometheus会将所有采集到的样本数据以时间序列（time-series）�
 - 样本值(value)： 一个folat64的浮点型数据表示当前样本的值。
 
 Prometheus定义了4中不同的指标类型(metric type):
+- Counter 计数器,只增不减，除非重置（例如服务器或进程重启）
+- Gauge 仪表盘，可增可减的数据。
+- Histogram 直方图，将时间范围内的数据划分成不同的时段，并各自评估其样本个数及样本值之和，因而可计算出分位数
+  - 可用于分析因异常值而引起的平均值过大的问题
+  - 分位数计算要使用专用的histogram_quantile函数
+- Summary 摘要，类似于Histogram,但客户端会直接计算并上报分位数
 
-- Counter 计数器
-```
-计数器，只增不减，如http_requests_total请求总数
 
-例如，通过rate()函数获取HTTP请求量的增长率：
-rate(http_requests_total[5m])
-```
-
-- Gauge 仪表盘
-```
-当前状态，可增可减。如kube_pod_status_ready当前pod可用数
-可以获取样本在一段时间返回内的变化情况,如：
-delta(kube_pod_status_ready[2h])
-```
-
-- Histogram 直方图
-```
-Histogram 由 <basename>_bucket{le="<upper inclusive bound>"}，<basename>_bucket{le="+Inf"}, <basename>_sum，<basename>_count 组成，主要用于表示一段时间范围内对数据进行采样（通常是请求持续时间或响应大小），并能够对其指定区间以及总数进行统计，通常它采集的数据展示为直方图。
-
-例如 Prometheus server 中 prometheus_local_storage_series_chunks_persisted, 表示 Prometheus 中每个时序需要存储的 chunks 数量，我们可以用它计算待持久化的数据的分位数。
-```
-
-- Summary 摘要
-```
-Summary 和 Histogram 类似，由 <basename>{quantile="<φ>"}，<basename>_sum，<basename>_count 组成，主要用于表示一段时间内数据采样结果（通常是请求持续时间或响应大小），它直接存储了 quantile 数据，而不是根据统计区间计算出来的。
-
-例如 Prometheus server 中 prometheus_target_interval_length_seconds。
-
-Histogram 需要通过 <basename>_bucket 计算 quantile, 而 Summary 直接存储了 quantile 的值。
-```
-
-基础查询
+标签匹配器
 ---
-PromQL是Prometheus内置的数据查询语言，其提供对时间序列数据丰富的查询，聚合以及逻辑运算能力的支持。
-
 ```
 http_requests_total{job="prometheus",group="canary"}
 ```
-
-可以将标签值反向匹配，或者对正则表达式匹配标签值。
+匹配器用于定义标签过滤条件，目前支持4种匹配操作符
 - =：选择正好相等的字符串标签
 - !=：选择不相等的字符串标签
 - =~：选择匹配正则表达式的标签（或子标签）
 - !=：选择不匹配正则表达式的标签（或子标签）
 
-范围查询
+
+PromQl的数据类型
 ---
+- 即时向量（Instant vector）：特定或全部的时间序列集合上，具有相同时间戳的一组样本值称为即时向量
+- 范围向量（Range vector） 特定或全部的时间序列集合上，在指定的同一时间范围内的所有样本值
+- 标量（Scalar） 一个浮点型的数据值。
+- 字符串（String） 支持使用单引号、双引号或反引号进行引用，但反引号中不会对转义字符进行转义
+
+1、即时向量
 ```
-http_requests_total{job="prometheus",group="canary"}       #得到的是瞬时值
-http_requests_total{job="prometheus",group="canary"}[5m]   #5分钟的值
+http_requests_total{job="prometheus",group="canary"}
 ```
-除了分钟，支持的单位有：
+
+2、范围向量
+```
+http_requests_total{job="prometheus",group="canary"}[5m]
+```
+
+- ms -毫秒
 - s - 秒
 - m - 分钟
 - h - 小时
@@ -68,23 +53,25 @@ http_requests_total{job="prometheus",group="canary"}[5m]   #5分钟的值
 - w - 周
 - y - 年
 
-偏移查询
+必须使用整数时间，且能够将多个不同级别的单位进行串联组合，以时间单位由大到小为顺序，例如1h30m，但不能使用1.5h
+
+3、在两个标量之间进行数学运算，得到的结果也是标量。
+```
+# 根据 node_disk_bytes_written 和 node_disk_bytes_read 获取主机磁盘IO的总量
+node_disk_bytes_written + node_disk_bytes_read
+
+# node的内存数GB
+node_memory_free_bytes_total / (1024 * 1024)
+```
+
+偏移量修改器
 ---
-查询http_requests_total在当前时刻的一周的速率：
-```
-rate(http_requests_total{} offset 1w)
-```
-偏移修饰符允许更改查询中单个即时向量和范围向量的时间偏移量
-```
-# 相对于当前查询时间5分钟前的http_requests_total值
-http_requests_total offset 5m
 
-# 等价于
-http_requests_total{job="prometheus"}[5m]
+- 默认情况下，即时向量选择器和范围向量选择器都以当前时间为基准时间点，而偏移量修改器能够修改该基准；
+- 偏移量修改器的使用方法是紧跟在选择器表达式之后使用“offset”关键字指定
+  - “http_requests_total offset 5m”，表示获取以http_requests_total为指标名称的所有时间序列在过去5分钟之时的即时样本；
+  - “http_requests_total[5m] offset 1d”，表示获取距此刻1天时间之前的5分钟之内的所有样本；
 
-# 偏移量修饰符始终需要跟随选择器
-sum(http_requests_total{method="GET"} offset 5m)
-```
 
 操作符
 ---
@@ -97,22 +84,6 @@ Prometheus 的查询语言支持基本的逻辑运算和算术运算
 - / 除法
 - % 模
 - ^ 幂等
-```
-运算中用到的基础数据类型：
-- 瞬时向量（Instant vector） 一组时间序列，每个时间序列包含单个样本，它们共享相同的时间戳。表达式返回值中只会包含该时间序列中最新的一个样本值。
-- 区间向量（Range vector） 一组时间序列，每个时间序列包含一段时间范围内的样本数据。
-- 标量（Scalar） 一个浮点型的数据值。
-- 字符串（String） 一个简单的字符串值。
-
-二元运算操作符支持 scalar/scalar(标量/标量)、vector/scalar(向量/标量)、和 vector/vector(向量/向量) 之间的操作。
-
-在两个标量之间进行数学运算，得到的结果也是标量。
-```
-# 根据 node_disk_bytes_written 和 node_disk_bytes_read 获取主机磁盘IO的总量
-node_disk_bytes_written + node_disk_bytes_read
-
-# node的内存数GB
-node_memory_free_bytes_total / (1024 * 1024)
 ```
 
 布尔运算
