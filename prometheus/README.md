@@ -41,7 +41,7 @@ Prometheus定义了4中不同的指标类型(metric type):
     - 支持粗略计算样本值的分位数
     - 单独提供了_sum和_count指标，从而支持计算平均值
 - Histogram类型的每个指标有一个基础指标名称<basename>，它会提供多个时间序列：
-  - ${basename}_bucket{le="<upper inclusive bound>"}：观测桶的上边界（upper inclusivebound），即样本统计区间，最大区间（包含所有样本）的名称为<basename>_bucket{le="+Inf"}；
+  - ${basename}_bucket{le="${upper inclusive bound}"}：观测桶的上边界（upper inclusivebound），即样本统计区间，最大区间（包含所有样本）的名称为<basename>_bucket{le="+Inf"}；
   - ${basename}_sum：所有样本观测值的总和；
   - ${basename}_count ：总的观测次数，它自身本质上是一个Counter类型的指标；
 - 累积间隔机制生成的样本数据需要额外使用内置的histogram_quantile()函数即可根据Histogram指标来计算相应的分位数（quantile），即某个bucket的样本数在所有样本数中占据的比例
