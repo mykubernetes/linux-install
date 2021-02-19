@@ -41,9 +41,9 @@ Prometheus定义了4中不同的指标类型(metric type):
     - 支持粗略计算样本值的分位数
     - 单独提供了_sum和_count指标，从而支持计算平均值
 - Histogram类型的每个指标有一个基础指标名称<basename>，它会提供多个时间序列：
-  - <basename>_bucket{le="<upper inclusive bound>"}：观测桶的上边界（upper inclusivebound），即样本统计区间，最大区间（包含所有样本）的名称为<basename>_bucket{le="+Inf"}；
-  - <basename>_sum：所有样本观测值的总和；
-  - <basename>_count ：总的观测次数，它自身本质上是一个Counter类型的指标；
+  - ${basename}_bucket{le="<upper inclusive bound>"}：观测桶的上边界（upper inclusivebound），即样本统计区间，最大区间（包含所有样本）的名称为<basename>_bucket{le="+Inf"}；
+  - ${basename}_sum：所有样本观测值的总和；
+  - ${basename}_count ：总的观测次数，它自身本质上是一个Counter类型的指标；
 - 累积间隔机制生成的样本数据需要额外使用内置的histogram_quantile()函数即可根据Histogram指标来计算相应的分位数（quantile），即某个bucket的样本数在所有样本数中占据的比例
   - histogram_quantile()函数在计算分位数时会假定每个区间内的样本满足线性分布状态，因而它的结果仅是一个预估值，并不完全准确；
   - 预估的准确度取决于bucket区间划分的粒度；粒度越大，准确度越低；
@@ -53,12 +53,12 @@ Prometheus定义了4中不同的指标类型(metric type):
 - Summary是一种类似于Histogram的指标类型，但它在客户端于一段时间内（默认为10分钟）的每个采样点进行统计，计算并存储了分位数数值，Server端直接抓取相应值即可；
 - 但Summary不支持sum或avg一类的聚合运算，而且其分位数由客户端计算并生成，Server端无法获取客户端未定义的分位数，而Histogram可通过PromQL任意定义，有着较好的灵活性；
 - 对于每个指标，Summary以指标名称<basename>为前缀，生成如下几个个指标序列
-  - <basename>{quantile="<φ>"}，其中φ是分位点，其取值范围是(0 ≤φ≤ 1)；计数器类型指标；如下是几种典型的常用分位点；
+  - ${basename}{quantile="<φ>"}，其中φ是分位点，其取值范围是(0 ≤φ≤ 1)；计数器类型指标；如下是几种典型的常用分位点；
     - 0、0.25、0.5、0.75和1几个分位点；
     - 0.5、0.9和0.99几个分位点；
     - 0.01、0.05、0.5、0.9和0.99几个分位点；
-  - <basename>_sum，抓取到的所有样本值之和；
-  - <basename>_count，抓取到的所有样本总数；
+  - ${basename}_sum，抓取到的所有样本值之和；
+  - ${basename}_count，抓取到的所有样本总数；
   
 标签匹配器
 ---
