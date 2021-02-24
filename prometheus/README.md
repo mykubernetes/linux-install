@@ -16,56 +16,38 @@ Prometheus定义了4中不同的指标类型(metric type):
   - 分位数计算要使用专用的histogram_quantile函数
 - Summary 摘要，类似于Histogram,但客户端会直接计算并上报分位数
 
-#### 1. 选择器
-普罗米修斯被设计用来处理成千上万的时间序列。根据标签的组合，每个指标名称可以有几个不同的时间序列;当来自不同工作的类似名称的指标混合在一起时，查询正确的数据可能看起来很困难，甚至完全令人费解。在普罗米修斯中，选择器指的是一组标签匹配器。度量名称也包含在这个定义中，因为从技术上讲，它的内部表示也是一个标签，尽管是一个特殊的标签:`__name__`。选择器中的每个标签名称/值对称为标签匹配器，多个匹配器可用于进一步筛选选择器匹配的时间序列。标签匹配器用花括号括起来。如果不需要匹配器，可以省略花括号。选择器可以返回即时或范围向量。下面是一个选择器的例子:
+1. 选择器
+---
+选择器指的是一组标签匹配器，标签匹配器包含度量名称和标签名，__name__是一个特殊标签。
 
-```shell
-$ prometheus_build_info{version="2.17.0"}
 ```
-![](../uploads/y20191113/images/m_755f31655bf15b5dd0dffda4f8febaf1_r.png)
+$ prometheus_build_info{version="2.17.0"}
 
 上面的选择器等同于如下：
-```shell
 $ {__name__="prometheus_build_info", version="2.17.0"}
 ```
 
-####　2. 标签匹配器
-匹配器用于将查询搜索限制为特定的一组标签值。下面使用`node_cpu_seconds_total` metric来阐述标签匹配的操作：`=`,`!=`, `=~`和`!~`.如果没有任何匹配的规范，仅此度量就会返回一个包含度量名称的所有可用时间序列的即时向量.以及所有的CPU核心数（`cpu="0",` `cpu="1"`）和CPU的型号（`mode="idle", mode="iowait", mode="irq", mode="nice", mode="softirq", mode="steal", mode="user", mode="system"`）
-
-- 示例1：查询关于所有cpu的结果
-
-```shell
+2. 标签匹配器
+---
+匹配器用于将查询搜索限制为特定的一组标签值。
+```
+1、查询关于所有cpu的结果
 $ node_cpu_seconds_total
-```
 
-- 示例2： 查询cpu=0的结果
-
-```shell
+2、 查询cpu=0的结果
 $ node_cpu_seconds_total{cpu="0"}
-```
-- 查询cpu不等于0的结果。
 
-```shell
+3、查询cpu不等于0的结果。
 $ node_cpu_seconds_total{cpu!="0"}
-```
+`=~`和`!~`支持RE2类型的正则表达式
 
-- `=~`和`!~`支持RE2类型的正则表达式
-
-```shell
-# 比如只对`mode="user"`和`mode="system"`的感兴趣,那么可以执行如下：
+4、比如只对`mode="user"`和`mode="system"`的感兴趣,那么可以执行如下：
 $ node_cpu_seconds_total{mode=~"(system|user)"}
-```
 
-- 查询和上一条相反的结果
 
-```shell
+5、查询和上一条相反的结果
 $ node_cpu_seconds_total{mode!~"(system|user)"}
 ```
-
-标签匹配器
----
-
-匹配器用于定义标签过滤条件，目前支持4种匹配操作符
 - =：选择正好相等的字符串标签
 - !=：选择不相等的字符串标签
 - =~：选择匹配正则表达式的标签（或子标签）
