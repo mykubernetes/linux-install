@@ -16,6 +16,59 @@ Prometheus定义了4中不同的指标类型(metric type):
   - 分位数计算要使用专用的histogram_quantile函数
 - Summary 摘要，类似于Histogram,但客户端会直接计算并上报分位数
 
+1、Counter：只增不减的计数器
+Counter类型的指标其工作方式和计数器一样，只增不减（除非系统发生重置）。常见的监控指标，如http_requests_total，node_cpu都是Counter类型的监控指标。 一般在定义Counter类型指标的名称时推荐使用_total作为后缀。
+```
+//例如，通过rate()函数获取HTTP请求量的增长率：
+rate(http_requests_total[5m])
+//查询当前系统中，访问量前10的HTTP地址：
+topk(10, http_requests_total)
+```
+
+2、Gauge：可增可减的仪表盘
+与Counter不同，Gauge类型的指标侧重于反应系统的当前状态。因此这类指标的样本数据可增可减。常见指标如：node_memory_MemFree（主机当前空闲的内容大小）、node_memory_MemAvailable（可用内存大小）都是Gauge类型的监控指标。
+```
+//通过Gauge指标，用户可以直接查看系统的当前状态：
+node_memory_MemFree
+//还可以使用deriv()计算样本的线性回归模型，甚至是直接使用predict_linear()对数据的变化趋势进行预测。例如，预测系统磁盘空间在4个小时之后的剩余情况：
+predict_linear(node_filesystem_free{job="node"}[1h], 4 * 3600)
+```
+3、Histogram和Summary分析数据分布情况,Histogram和Summary主用用于统计和分析样本的分布情况。
+
+summary示例：
+```
+例如，指标prometheus_tsdb_wal_fsync_duration_seconds的指标类型为Summary。 它记录了Prometheus Server中wal_fsync处理的处理时间，通过访问Prometheus Server的/metrics地址，可以获取到以下监控样本数据：
+# HELP prometheus_tsdb_wal_fsync_duration_seconds Duration of WAL fsync.
+# TYPE prometheus_tsdb_wal_fsync_duration_seconds summary
+prometheus_tsdb_wal_fsync_duration_seconds{quantile="0.5"} 0.012352463
+prometheus_tsdb_wal_fsync_duration_seconds{quantile="0.9"} 0.014458005
+prometheus_tsdb_wal_fsync_duration_seconds{quantile="0.99"} 0.017316173
+prometheus_tsdb_wal_fsync_duration_seconds_sum 2.888716127000002
+prometheus_tsdb_wal_fsync_duration_seconds_count 216
+```
+从上面的样本中可以得知当前Prometheus Server进行wal_fsync操作的总次数为216次，耗时2.888716127000002s。其中中位数（quantile=0.5）的耗时为0.012352463，9分位数（quantile=0.9）的耗时为0.014458005s
+
+Histogram示例
+```
+# HELP prometheus_tsdb_compaction_chunk_range Final time range of chunks on their first compaction
+# TYPE prometheus_tsdb_compaction_chunk_range histogram
+prometheus_tsdb_compaction_chunk_range_bucket{le="100"} 0
+prometheus_tsdb_compaction_chunk_range_bucket{le="400"} 0
+prometheus_tsdb_compaction_chunk_range_bucket{le="1600"} 0
+prometheus_tsdb_compaction_chunk_range_bucket{le="6400"} 0
+prometheus_tsdb_compaction_chunk_range_bucket{le="25600"} 0
+prometheus_tsdb_compaction_chunk_range_bucket{le="102400"} 0
+prometheus_tsdb_compaction_chunk_range_bucket{le="409600"} 0
+prometheus_tsdb_compaction_chunk_range_bucket{le="1.6384e+06"} 260
+prometheus_tsdb_compaction_chunk_range_bucket{le="6.5536e+06"} 780
+prometheus_tsdb_compaction_chunk_range_bucket{le="2.62144e+07"} 780
+prometheus_tsdb_compaction_chunk_range_bucket{le="+Inf"} 780
+prometheus_tsdb_compaction_chunk_range_sum 1.1540798e+09
+prometheus_tsdb_compaction_chunk_range_count 780
+```
+与Summary类型的指标相似之处在于Histogram类型的样本同样会反应当前指标的记录的总数(以_count作为后缀)以及其值的总量（以_sum作为后缀）。不同在于Histogram指标直接反应了在不同区间内样本的个数，区间通过标签len进行定义。同时对于Histogram的指标，我们还可以通过histogram_quantile()函数计算出其值的分位数。不同在于Histogram通过histogram_quantile函数是在服务器端计算的分位数。 而Sumamry的分位数则是直接在客户端计算完成。因此对于分位数的计算而言，Summary在通过PromQL进行查询时有更好的性能表现，而Histogram则会消耗更多的资源。反之对于客户端而言Histogram消耗的资源更少。在选择这两种方式时用户应该按照自己的实际场景进行选择。
+
+
 选择器
 ---
 选择器指的是一组标签匹配器，标签匹配器包含度量名称和标签名，__name__是一个特殊标签。
