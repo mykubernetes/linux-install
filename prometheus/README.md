@@ -222,6 +222,7 @@ method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:
 |min   |选择最小的元素   |
 |max   |选择最大的元素   |
 |avg   |计算元素的平均值   |
+|stddev |计算元素的标准差   |
 |stdvar   |计算元素的标准方差   |
 |count   |计算元素的数量   |
 |count_values   |计算具有相同值的元素的数目   |
