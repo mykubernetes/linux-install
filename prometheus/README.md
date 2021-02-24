@@ -16,7 +16,7 @@ Prometheus定义了4中不同的指标类型(metric type):
   - 分位数计算要使用专用的histogram_quantile函数
 - Summary 摘要，类似于Histogram,但客户端会直接计算并上报分位数
 
-1. 选择器
+选择器
 ---
 选择器指的是一组标签匹配器，标签匹配器包含度量名称和标签名，__name__是一个特殊标签。
 
@@ -27,7 +27,7 @@ $ prometheus_build_info{version="2.17.0"}
 $ {__name__="prometheus_build_info", version="2.17.0"}
 ```
 
-2. 标签匹配器
+标签匹配器
 ---
 匹配器用于将查询搜索限制为特定的一组标签值。
 ```
