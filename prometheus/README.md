@@ -328,7 +328,7 @@ node_filesystem_avail_bytes{} / node_filesystem_size_bytes{} * 100
 |count   |计算元素的数量   |
 |count_values   |计算具有相同值的元素的数目   |
 |bottomk   |k以下的元素   |请求使用一个(K)作为标尺|
-|topq   |k以上的元素   |请求使用一个(K)作为标尺 |
+|topk   |k以上的元素   |请求使用一个(K)作为标尺 |
 |quantile   |计算元素的分位数   |Requires the quantile (0 ≤ φ ≤ 1) definition as a scalar |
 
 ```
