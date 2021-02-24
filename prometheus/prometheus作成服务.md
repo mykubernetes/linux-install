@@ -18,11 +18,12 @@ After=network.target
 Type=simple
 User=prometheus
 ExecStart=/data/apps/prometheus/prometheus \
---config.file=/data/apps/prometheus/prometheus.yml \
---storage.tsdb.path=/data/apps/prometheus/data \
---web.console.libraries=/data/apps/prometheus/console_libraries \
---web.console.templates=/data/apps/prometheus/consoles \
---web.enable-lifecycle
+  --config.file=/data/apps/prometheus/prometheus.yml \
+  --storage.tsdb.path=/data/apps/prometheus/data \
+  --web.console.libraries=/data/apps/prometheus/console_libraries \
+  --web.console.templates=/data/apps/prometheus/consoles \
+  --web.enable-lifecycle
+ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 
 [Install]
@@ -67,8 +68,8 @@ Description=https://prometheus.io
 [Service]
 Restart=on-failure
 ExecStart=/data/apps/node_exporter/node_exporter \
---collector.systemd \
---collector.systemd.unit-whitelist=(docker|kubelet|kube-proxy|flanneld).service
+  --collector.systemd \
+  --collector.systemd.unit-whitelist=(docker|kubelet|kube-proxy|flanneld).service
 
 [Install]
 WantedBy=multi-user.target
@@ -112,8 +113,8 @@ After=network.target
 Type=simple
 User=alertmanager
 ExecStart=/data/apps/alertmanager/alertmanager \
---config.file=/data/apps/alertmanager/alertmanager.yml \
---storage.path=/data/apps/alertmanager/data
+  --config.file=/data/apps/alertmanager/alertmanager.yml \
+  --storage.path=/data/apps/alertmanager/data
 Restart=on-failure
 
 [Install]
