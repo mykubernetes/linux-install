@@ -26,9 +26,12 @@ cd /opt/prometheus/prometheus-2.7.1.linux-amd64
 # cat prometheus.yml
 # my global config
 global:
-  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
-  # scrape_timeout is set to the global default (10s).
+  scrape_interval:     15s      # 抓取度量的间隔，通常是10秒-1分钟之间
+  scrape_timeout:      10s      # 设置抓取度量的等待时间 
+  evaluation_interval: 15s      # 评估警告的间隔，一般和 scrape_interval 一样的
+  external_labels:              # 给数据打上标签
+    dc: dc1
+    prom: prom1
 
 # Alertmanager configuration
 alerting:
