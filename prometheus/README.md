@@ -285,21 +285,7 @@ node_filesystem_avail_bytes{} / node_filesystem_size_bytes{} * 100
 
 2、Many-to-one和one-to-many
 
-```
-method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:rate5m
-```
-该表达式中，左向量 method_code:http_errors:rate5m 包含两个标签 method 和 code。而右向量 method:http_requests:rate5m 中只包含一个标签 method，因此匹配时需要使用 ignoring 限定匹配的标签为 code。
-
-在限定匹配标签后，右向量中的元素可能匹配到多个左向量中的元素 因此该表达式的匹配模式为多对一，需要使用 group 修饰符 group_left 指定左向量具有更好的基数。
-
-最终的运算结果如下：
-```
-{method="get", code="500"} 0.04 // 24 / 600
-{method="get", code="404"} 0.05 // 30 / 600
-{method="post", code="500"} 0.05 // 6 / 120
-{method="post", code="404"} 0.175 // 21 / 120
-```
-提醒：group 修饰符只能在比较和数学运算符中使用。在逻辑运算 and，unless 和 or 操作中默认与右向量中的所有元素进行匹配。
+需要执行这样的操作:一边的元素与另一边的几个元素相匹配。当这种情况发生时，您需要向普罗米修斯提供解释这种操作的方法。如果较高的基数在操作的左侧,你可以在`on`或`ignoring`后使用`group_left`修饰符; 假如在它的右侧,那么可以使用`group_right`. 
 
 聚合操作
 ---
