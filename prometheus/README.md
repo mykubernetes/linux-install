@@ -463,17 +463,13 @@ PromQL对于各种用例(比如math)有近50个不同的函数;排序;计数器�
 - 如果传递给它的向量参数具有样本数据，则返回空向量；
 - 如果传递的向量参数没有样本数据，则返回不带度量指标名称且带有标签的时间序列，且样本值为1。
 
-1. 当监控度量指标时，如果获取到的样本数据是空的， 使用 absent 方法对告警是非常有用的。例如：
+1)当监控度量指标时，如果获取到的样本数据是空的， 使用 absent 方法对告警是非常有用的。例如：
 ```
 absent(prometheus_http_requests_total)
-```
-
-2. 返回的结果：
-```
 no data
 ```
 
-3. 我们使用一个表达式与标签matcher使用不存在的标签值，就像下面的例子:
+2) 我们使用一个表达式与标签matcher使用不存在的标签值，就像下面的例子:
 
 ```
 absent(prometheus_http_requests_total2)
@@ -491,18 +487,15 @@ absent(prometheus_http_requests_total2)
 label_join(<vector>, <resulting_label>, <separator>, source_label1, source_labelN)
 ```
 
-比如
 ```
+# 1、按例
 http_requests_total{code="200",endpoint="hey-port", handler="/",instance="172.17.0.10:8000",job="hey-service",method="get"} 1366
 http_requests_total{code="200",endpoint="hey-port", handler="/health",instance="172.17.0.10:8000",job="hey-service",method="get"} 942
-```
 
-应用如下表达式：
-```
+# 2、应用如下表达式
 label_join(http_requests_total{instance="172.17.0.10:8000"}, "url", "", "instance", "handler")
-```
-我们得到如下的瞬时向量:
-```
+
+# 3、得到如下的瞬时向量:
 http_requests_total{code="200",endpoint="hey-port", handler="/",instance="172.17.0.10:8000",job="hey-service", method="get",url="172.17.0.10:8000/"} 1366
 http_requests_total{code="200",endpoint="hey-port", handler="/health",instance="172.17.0.10:8000",job="hey-service", method="get",url="172.17.0.10:8000/health"} 942
 ```
