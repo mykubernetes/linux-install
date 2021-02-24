@@ -572,6 +572,10 @@ irate 只能用于绘制快速变化的计数器，在长期趋势分析或者�
 
 API访问
 ---
+
+https://prometheus.io/docs/prometheus/latest/querying/api/
+
+
 Prometheus当前稳定的HTTP API可以通过/api/v1访问
 
 错误状态码：
