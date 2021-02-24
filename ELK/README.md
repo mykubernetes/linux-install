@@ -13,6 +13,9 @@ http://www.jwsblog.com/archives/59.html
 
 使用curl命令操作elasticsearch
 =============================
+
+https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
+
 一、使用_cat系列  
 _cat系列提供了一系列查询elasticsearch集群状态的接口。  
 ```
