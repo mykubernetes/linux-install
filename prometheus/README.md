@@ -162,19 +162,6 @@ http_requests_total > bool 10000        # 结果为 1 或 0
 - or (或者)
 - unless (排除)
 
-优先级
----
-查询主机的CPU使用率
-```
-100 * (1 - avg (irate(node_cpu{mode='idle'}[5m])) by(job) )
-```
-在PromQL操作符中优先级由高到低依次为
-- ^
-- *, /, %
-- +, -
-- ==, !=, <=, <, >=, >
-- and, unless
-- or
 
 匹配模式（联合查询）
 ---
@@ -286,6 +273,19 @@ quantile(0.5, http_requests_total)
 
 {}   656
 ```
+
+操作优先级
+---
+当使用PromQL查询时，应用二进制操作符的顺序由操作符优先级决定。下表显示了从高到低的优先顺序
+
+|优先级   |操作符   |描述   |
+| ------------ | ------------ | ------------ |
+|1   |^   |Evaluated right to left, for example, 1 ^ 2 ^ 3 is evaluated as 1 ^ (2 ^ 3)   |
+|2  |*, /, %   |Evaluated left to right, for example, 1 / 2 * 3 is evaluated as (1 / 2) * 3   |
+|3   |+, -   |Evaluated left to right   |
+|4   |==, !=, <=, <, >=, >  |Evaluated left to right   |
+|5   |and , unless   |Evaluated left to right   |
+|6   |or   |Evaluated left to right   |
 
 内置函数
 ---
