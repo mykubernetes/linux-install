@@ -47,13 +47,16 @@ rule_files:
 
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
+
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'prometheus'
 
     # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.
-
+    scrape_interval: 5s     # 抓取度量的间隔,如果配置则覆盖全局配置
+    scrape_timeout: 10s     # 设置抓取度量的等待时间,如果配置则覆盖全局配置
+    metrics_path: /metrics  # 监控指标url地址，默认为/metrics,一般不用配置
     static_configs:
     - targets: ['localhost:9090']
 
