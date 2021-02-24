@@ -2,10 +2,34 @@ Metric类型
 ---
 Prometheus会将所有采集到的样本数据以时间序列（time-series）的方式保存在内存数据库TSDB中，并且定时保存到硬盘上。time-series是按照时间戳和值的序列顺序存放的，我们称之为向量(vector)。每条time-series通过指标名称(metrics name)和一组标签集(labelset)命名。
 
+可以将time-series理解为一个以时间为Y轴的数字矩阵
+```
+  ^
+  │     . . . . . . . . . . . . . . . . . . .   node_cpu{cpu="cpu0",mode="idle"}
+  │     . . . . . . . . . . . . . . . . . . .   node_cpu{cpu="cpu0",mode="system"}
+  │     . . . . . . . . . .   . . . . . . . .   node_load1{}
+  │     . . . . . . . . . . . . . . . .   . .  
+  v
+    <------------------ 时间 ---------------->
+```
+
+
 在time-series中的每一个点称为一个样本（sample），样本由以下三部分组成：
 - 指标(metric)：metric name和描述当前样本特征的labelsets;
 - 时间戳(timestamp)：一个精确到毫秒的时间戳;
 - 样本值(value)： 一个folat64的浮点型数据表示当前样本的值。
+```
+<--------------- metric ---------------------><-timestamp -><-value->
+http_request_total{status="200", method="GET"}@1434417560938 => 94355
+http_request_total{status="200", method="GET"}@1434417561287 => 94334
+
+http_request_total{status="404", method="GET"}@1434417560938 => 38473
+http_request_total{status="404", method="GET"}@1434417561287 => 38544
+
+http_request_total{status="200", method="POST"}@1434417560938 => 4748
+http_request_total{status="200", method="POST"}@1434417561287 => 4785
+```
+
 
 Prometheus定义了4中不同的指标类型(metric type):
 ---
@@ -551,6 +575,7 @@ API访问
 Prometheus当前稳定的HTTP API可以通过/api/v1访问
 
 错误状态码：
+- 200 success：调用成功的返回状态码
 - 404 Bad Request：当参数错误或者缺失时。
 - 422 Unprocessable Entity 当表达式无法执行时。
 - 503 Service Unavailiable 当请求超时或者被中断时。
@@ -568,8 +593,8 @@ Prometheus当前稳定的HTTP API可以通过/api/v1访问
 ```
 通过HTTP API可以分别通过/api/v1/query和/api/v1/query_range查询PromQL表达式当前或者一定时间范围内的计算结果。
 
-瞬时数据查询
----
+1、瞬时数据查询
+
 URL请求参数：
 - query=：PromQL表达式。
 - time=：用于指定用于计算PromQL的时间戳。可选参数，默认情况下使用当前系统时间。
@@ -604,8 +629,8 @@ $ curl 'http://localhost:9090/api/v1/query?query=up&time=2015-07-01T20:10:51.781
 }
 ```
 
-区间查询
----
+2、区间查询
+
 URL请求参数：
 - query=: PromQL表达式。
 - start=: 起始时间。
