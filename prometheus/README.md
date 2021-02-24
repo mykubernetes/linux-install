@@ -254,38 +254,36 @@ node_filesystem_avail_bytes unless node_filesystem_avail_bytes < 200000
 ```
 
 
-匹配模式（联合查询）
+向量匹配
 ---
-与数据库中的join类似，promsql有两种典型的匹配查询：
+由于二进制操作符需要两个操作数，当相同大小和标签集的向量位于一个操作符(即一对一)的每一侧时，将具有完全相同的标签/值对的样本匹配在一起，同时删除度量名称和所有不匹配的元素。
 
 - 一对一（one-to-one）
 - 多对一（many-to-one）或一对多（one-to-many）
 
-例如当存在样本：
+1、one-to-one
+
+由于二进制操作符需要两个操作数，当相同大小和标签集的向量位于一个操作符(即一对一)的每一侧时，将具有完全相同的标签/值对的样本匹配在一起，同时删除度量名称和所有不匹配的元素。
+
 ```
-method_code:http_errors:rate5m{method="get", code="500"}  24
-method_code:http_errors:rate5m{method="get", code="404"}  30
-method_code:http_errors:rate5m{method="put", code="501"}  3
-method_code:http_errors:rate5m{method="post", code="500"} 6
-method_code:http_errors:rate5m{method="post", code="404"} 21
+1. 如下案例将会是我们使用的即时向量:
+node_filesystem_avail_bytes{instance="192.168.20.113:9100", job="node", mountpoint="/"}
+node_filesystem_avail_bytes{instance="192.168.20.113:9100", job="node", mountpoint="/boot"}
+node_filesystem_size_bytes{instance="192.168.20.113:9100", job="node", mountpoint="/"}
+node_filesystem_size_bytes{instance="192.168.20.113:9100", job="node", mountpoint="/boot"}
 
-method:http_requests:rate5m{method="get"}  600
-method:http_requests:rate5m{method="del"}  34
-method:http_requests:rate5m{method="post"} 120
+2. 应用如下操作:
+node_filesystem_avail_bytes{} / node_filesystem_size_bytes{} * 100
+
+3. 将会返回如下的瞬时向量:
+{device="/dev/mapper/centos-root",fstype="xfs",instance="192.168.20.113:9100",job="node",mountpoint="/"}	86.614480029033
+{device="/dev/sda1",fstype="xfs",instance="192.168.20.113:9100",job="node",mountpoint="/boot"}	81.76120253944774
+{device="rootfs",fstype="rootfs",instance="192.168.20.113:9100",job="node",mountpoint="/"}	86.614480029033
+{device="tmpfs",fstype="tmpfs",instance="192.168.20.113:9100",job="node",mountpoint="/run"}	99.12616754984639
+{device="tmpfs",fstype="tmpfs",instance="192.168.20.113:9100",job="node",mountpoint="/run/user/0"}	100
 ```
-使用 PromQL 表达式：
-```
-method_code:http_errors:rate5m{code="500"} / ignoring(code) method:http_requests:rate5m
 
-{method="get"} 0.04 // 24 / 600
-{method="post"} 0.05 // 6 / 120
-```
-该表达式会返回在过去 5 分钟内，HTTP 请求状态码为 500 的在所有请求中的比例。如果没有使用 ignoring(code)，操作符两边表达式返回的瞬时向量中将找不到任何一个标签完全相同的匹配项。
-
-
-同时由于 method 为 put 和 del 的样本找不到匹配项，因此不会出现在结果当中。
-
-多对一模式
+2、Many-to-one和one-to-many
 
 ```
 method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:rate5m
