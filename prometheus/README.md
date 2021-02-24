@@ -300,7 +300,7 @@ sum(rate(prometheus_http_requests_total[5m]))
 
 {}	0.21355932203389832
 
-3、现在，如果添加by操作符，我们可以通过处理程序端点聚合:
+3、如果想添加by操作符，可以通过处理程序端点聚合:
 sum by (handler)(rate(prometheus_http_requests_total[5m]))
 
 {handler="/metrics"}	0.2
