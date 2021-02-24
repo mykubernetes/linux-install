@@ -368,6 +368,9 @@ quantile(0.5, http_requests_total)
 
 内置函数
 ---
+
+https://prometheus.io/docs/prometheus/latest/querying/functions/
+
 Prometheus 提供了其它大量的内置函数，可以对时序数据进行丰富的处理。如上文提到的irate
 ```
 100 * (1 - avg (irate(node_cpu{mode='idle'}[5m])) by(job) )
