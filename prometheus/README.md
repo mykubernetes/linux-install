@@ -212,12 +212,46 @@ http_requests_total > 10000             # 结果为 true 或 false
 http_requests_total > bool 10000        # 结果为 1 或 0
 ```
 
-
-集合运算
+逻辑操作
 ---
-- and (并且)
-- or (或者)
-- unless (排除)
+这些操作符是PromQL中唯一可以多对多工作的操作符。有三个逻辑运算符可以在表达式之间使用:
+
+|操作   |描述   |
+| ------------ | ------------ |
+|and   |Intersectikon   |
+|or   |Union   |
+|unless   |Complement   |
+
+1、and的应用案例
+```
+1. 使用下面的案例:
+node_filesystem_avail_bytes{instance="192.168.20.113:9100", job="node", mountpoint="/"}
+node_filesystem_avail_bytes{instance="192.168.20.113:9100", job="node", mountpoint="/boot"}
+node_filesystem_size_bytes{instance="192.168.20.113:9100", job="node", mountpoint="/"}
+node_filesystem_size_bytes{instance="192.168.20.113:9100", job="node", mountpoint="/boot"}
+
+
+2. 应用如下表达式:
+node_filesystem_size_bytes and node_filesystem_size_bytes < 2000000000
+
+
+3. 返回如下结果:
+node_filesystem_size_bytes{device="/dev/sda1",fstype="xfs",instance="192.168.20.113:9100",job="node",mountpoint="/boot"}	1063256064
+node_filesystem_size_bytes{device="tmpfs",fstype="tmpfs",instance="192.168.20.113:9100",job="node",mountpoint="/run"}	1986519040
+node_filesystem_size_bytes{device="tmpfs",fstype="tmpfs",instance="192.168.20.113:9100",job="node",mountpoint="/run/user/0"}
+```
+
+2 or的应用案例
+```
+node_filesystem_avail_bytes > 200000 or node_filesystem_avail_bytes < 2500000
+```
+
+3 unless应用案例
+
+unless逻辑运算符将返回第一个表达式中与第二个表达式的标签名/值对不匹配的元素。在集合理论中，这叫做补集。实际上，这个操作符的工作方式与and相反，这意味着它也可以用作if not语句。
+```
+node_filesystem_avail_bytes unless node_filesystem_avail_bytes < 200000
+```
 
 
 匹配模式（联合查询）
