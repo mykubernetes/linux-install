@@ -433,104 +433,97 @@ PromQL对于各种用例(比如math)有近50个不同的函数;排序;计数器�
 | vector() |
 | year() |
 
-
-
-
-##### 1.1 absent()
-函数的作用是:获取一个瞬时向量作为参数，并返回以下内容:
-
+1、absent()函数的作用是:获取一个瞬时向量作为参数，并返回以下内容:
 - 如果传递给它的向量参数具有样本数据，则返回空向量；
-
 - 如果传递的向量参数没有样本数据，则返回不带度量指标名称且带有标签的时间序列，且样本值为1。
 
 1. 当监控度量指标时，如果获取到的样本数据是空的， 使用 absent 方法对告警是非常有用的。例如：
-
-```shell
+```
 absent(prometheus_http_requests_total)
 ```
 
 2. 返回的结果：
-```shell
+```
 no data
 ```
 
 3. 我们使用一个表达式与标签matcher使用不存在的标签值，就像下面的例子:
 
-```shell
+```
 absent(prometheus_http_requests_total2)
 {}	1
 ```
 
 
 
-##### 1.2 lable_join()和lable_replace()
+2、lable_join()和lable_replace()
 
 这些函数用于操作标签—它们允许您将标签连接到其他标签，提取标签值的一部分，甚至删除标签(尽管使用标准的聚合操作更容易、更符合人体工程学)。在这两个函数中，如果定义的目标标签是一个新的，它将被添加到标签集;如果它是一个现有的标签，它将被取代。
 
 1. 在使用label_join时，您需要提供一个即时向量，定义一个结果标签，识别结果连接的分隔符，并建立要连接的标签，如下面的语法所示:
-
-```shell
+```
 label_join(<vector>, <resulting_label>, <separator>, source_label1, source_labelN)
 ```
 
-比如，使用如下的案例：
-
-```shell
+比如
+```
 http_requests_total{code="200",endpoint="hey-port", handler="/",instance="172.17.0.10:8000",job="hey-service",method="get"} 1366
 http_requests_total{code="200",endpoint="hey-port", handler="/health",instance="172.17.0.10:8000",job="hey-service",method="get"} 942
 ```
 
 应用如下表达式：
-```shell
+```
 label_join(http_requests_total{instance="172.17.0.10:8000"}, "url", "", "instance", "handler")
 ```
 我们得到如下的瞬时向量:
-```shell
+```
 http_requests_total{code="200",endpoint="hey-port", handler="/",instance="172.17.0.10:8000",job="hey-service", method="get",url="172.17.0.10:8000/"} 1366
 http_requests_total{code="200",endpoint="hey-port", handler="/health",instance="172.17.0.10:8000",job="hey-service", method="get",url="172.17.0.10:8000/health"} 942
 ```
 
 当需要对标签进行任意操作时，可以使用label_replace函数。它的工作方式是将正则表达式应用于所选源标签的值，并将匹配的捕获组存储在目标标签上。源和目标可以是同一个标签，有效地替换其值。这听起来很复杂，但实际上并不复杂;让我们来看看label_replace的语法
-```shell
+```
 label_replace(<vector>, <destination_label>, <regex_match_result>, <source_label>, <regex>)
 ```
 
 假设我们使用前面的示例数据并应用下面的表达式：
 
-```shell
+```
 label_replace(http_requests_total{instance="172.17.0.10:8000"}, "port", "$1", "instance", ".*:(.*)")
 ```
 然后，结果将是与新标签(称为port)匹配的元素:
 
-```shell
+```
 http_requests_total{code="200",endpoint="hey-port",handler="/", instance="172.17.0.10:8000", job="hey-service",method="get",port="8000"} 1366
 http_requests_total{code="200",endpoint="hey-port",handler="/health", instance="172.17.0.10:8000", job="hey-service",method="get",port="8000"} 942
 ```
 
 在使用label_replace时，如果正则表达式与标签值不匹配，则原始时间序列将不加更改地返回。
 
-##### 1.3 predict_linear()
+3、predict_linear()
+
 predict_linear(v range-vector, t scalar) 函数可以预测时间序列 v 在 t 秒后的值。它基于简单线性回归的方式，对时间窗口内的样本数据进行统计，从而可以对时间序列的变化趋势做出预测。该函数的返回结果不带有度量指标，只有标签列表。
 
 例如，基于 2 小时的样本数据，来预测主机可用磁盘空间的是否在 4 个小时候被占满，可以使用如下表达式：
 
-```shell
+```
 predict_linear(node_filesystem_free{job="node"}[2h], 4 * 3600) < 0
 ```
 
 我们将应用下面的表达式，它使用一个1小时数据范围内的predict_linear，并推断出未来4小时的样本值(60(秒)* 60(分钟)* 4):
 
-```shell
+```
 predict_linear(node_filesystem_free_bytes{mountpoint="/data"}[1h], 60 * 60 * 4)
 
 {device="/dev/sda1", endpoint="node-exporter",fstype="ext4",instance="10.0.2.15:9100", job="node-exporter-service",mountpoint="/data", namespace="monitoring", pod="node-exporter-r88r6", service="node-exporter-service"} 15578514805.533087
 ```
 
-##### 1.4 rate()和irate()
+4、rate()和irate()
+
 rate(v range-vector) 函数可以直接计算区间向量 v 在时间窗口内平均增长速率，它会在单调性发生变化时(如由于采样目标重启引起的计数器复位)自动中断。该函数的返回结果不带有度量指标，只有标签列表。
 
 例如，以下表达式返回区间向量中每个时间序列过去 5 分钟内 HTTP 请求数的每秒增长率：
-```shell
+```
 rate(http_requests_total[5m])
 结果：
 {code="200",handler="label_values",instance="120.77.65.193:9090",job="prometheus",method="get"} 0
@@ -542,16 +535,14 @@ irate(v range-vector) 函数用于计算区间向量的增长率，但是其反�
 
 例如，以下表达式返回区间向量中每个时间序列过去 5 分钟内最后两个样本数据的 HTTP 请求数的增长率：
 
-```shell
+```
 irate(http_requests_total{job="api-server"}[5m])
 ```
 
 irate 只能用于绘制快速变化的计数器，在长期趋势分析或者告警中更推荐使用 rate 函数。因为使用 irate 函数时，速率的简短变化会重置 FOR 语句，形成的图形有很多波峰，难以阅读。
 
+6、sort()和sort_desc()
 
-
-
-##### 1.5 sort()和sort_desc()
 顾名思义，sort接收一个向量并根据样本值按升序排序，而sort_desc执行相同的函数，但按降序排序。
 
 
