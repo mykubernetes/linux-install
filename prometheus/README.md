@@ -63,21 +63,25 @@ PromQl的数据类型
 
 1、即时向量
 ```
-http_requests_total{job="prometheus",group="canary"}
+$ http_requests_total{job="prometheus",group="canary"}
 ```
 
 2、范围向量
-```
-http_requests_total{job="prometheus",group="canary"}[5m]
-```
 
-- ms -毫秒
-- s - 秒
-- m - 分钟
-- h - 小时
-- d - 天
-- w - 周
-- y - 年
+定义一个范围向量选择查询，必须设置一个即时向量选择器和使用`[]`追加一个范围。
+
+检查最后两分钟HTTP的响应代码是200的。
+```
+$ prometheus_http_requests_total{code="200"}[2m]
+```
+|缩写   |单位   |
+| ------------ | ------------ |
+|s   |Seconds   |
+|m   |Minutes   |
+|h   |Hours   |
+|d   |Days   |
+|w   |Weeks   |
+|y   |Years   |
 
 必须使用整数时间，且能够将多个不同级别的单位进行串联组合，以时间单位由大到小为顺序，例如1h30m，但不能使用1.5h
 
@@ -90,13 +94,31 @@ node_disk_bytes_written + node_disk_bytes_read
 node_memory_free_bytes_total / (1024 * 1024)
 ```
 
-偏移量修改器
+偏移量的修饰符
+---
+offset的修饰符查询过去的数据。可双选择相对于当前时间的多长时间以前。
+
+```
+查询1小时前的最后两分钟响应代码是200的。
+$ prometheus_http_requests_total{code="200"}[2m] offset 1h
+```
+
+子查询
 ---
 
-- 默认情况下，即时向量选择器和范围向量选择器都以当前时间为基准时间点，而偏移量修改器能够修改该基准；
-- 偏移量修改器的使用方法是紧跟在选择器表达式之后使用“offset”关键字指定
-  - “http_requests_total offset 5m”，表示获取以http_requests_total为指标名称的所有时间序列在过去5分钟之时的即时样本；
-  - “http_requests_total[5m] offset 1d”，表示获取距此刻1天时间之前的5分钟之内的所有样本；
+```
+max_over_time(rate(http_requests_total{handler="/health", instance="172.17.0.9:8000"}[5m])[1h:1m])
+```
+
+|组件   |描述   |
+| ------------ | ------------ |
+|rate(http_requests_total{handler="/health", instance="172.17.0.9:8000"}[5m])   |内部的查询，它将五分钟的数据聚合成一个即时向量。   |
+|[1h   |就像范围向量选择器一样，它定义了相对于查询求值时间的范围大小。   |
+|:1m]   |要使用的间隔值。如果没有定义，它默认为全局计算区间。   |
+|max_over_time   |子查询返回一个范围向量，随着时间的推移，这个范围向量现在可以成为这个聚合操作的参数。   |
+
+
+
 
 
 操作符
