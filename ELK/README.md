@@ -43,6 +43,7 @@ curl -XGET localhost:9200/_cat
 ```  
 你也可以后面加一个v，让输出内容表格显示表头  
 ```
+curl IP:PORT/_cat/indices?v
 name       component        version type url
 Prometheus analysis-mmseg   NA      j
 Prometheus analysis-pinyin  NA      j
