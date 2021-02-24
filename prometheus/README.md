@@ -229,6 +229,26 @@ method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:
 |topq   |k以上的元素   |请求使用一个(K)作为标尺 |
 |quantile   |计算元素的分位数   |Requires the quantile (0 ≤ φ ≤ 1) definition as a scalar |
 
+```
+1、使用以下查询的样本数据
+rate(prometheus_http_requests_total[5m])
+
+{code="200",handler="/metrics",instance="localhost:9090",job="prometheus"}	0.2
+{code="200",handler="/api/v1/query",instance="localhost:9090",job="prometheus"}	0.010169491525423728
+{code="400",handler="/api/v1/query",instance="localhost:9090",job="prometheus"}	0
+
+2、如果想所有请求的总和，可以应用以下表达式:
+sum(rate(prometheus_http_requests_total[5m]))
+
+{}	0.21355932203389832
+
+3、现在，如果添加by操作符，我们可以通过处理程序端点聚合:
+sum by (handler)(rate(prometheus_http_requests_total[5m]))
+
+{handler="/metrics"}	0.2
+{handler="/api/v1/query"}	0.01694915254237288
+```
+
 这些操作符被用于聚合所有标签维度，或者通过 without 或者 by 子语句来保留不同的维度。
 - without 用于从计算结果中移除列举的标签，而保留其它标签。
 - by 则正好相反，结果向量中只保留列出的标签，其余标签则移除。
