@@ -74,3 +74,25 @@ FFmpeg  摄像头推流
 ```
 ffmpeg -f dshow -i video="Integrated Camera" -vcodec libx264 -preset:v ultrafast -tune:vzerolatency -f flv rtmp://192.168.0.104/hls1/test
 ```
+
+
+ffmpeg格式转换
+```
+1、H264视频转ts视频流
+ffmpeg -i video.h264 -vcodec copy -f mpegts video.ts
+
+2、H264视频转mp4
+ffmpeg -i video.h264 -vcodec copy -f mp4 video.mp4
+
+3、ts视频转mp4
+ffmpeg -i video.ts -acodec copy -vcodec copy -f mp4 video.mp4
+
+4、mp4视频转flv
+ffmpeg -i video.mp4 -acodec copy -vcodec copy -f flv video.flv 
+
+5、转换文件为3GP格式 
+ffmpeg -y -i video.mpeg -bitexact -vcodec h263 -b 128 -r 15 -s 176x144 -acodec aac -ac 2 -ar 22500 -ab 24 -f 3gp video.3gp
+
+6、转换文件为3GP格式 v2
+ffmpeg -y -i videot.wmv -ac 1 -acodec libamr_nb -ar 8000 -ab 12200 -s 176x144 -b 128 -r 15 video.3gp
+```
