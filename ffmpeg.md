@@ -1,7 +1,7 @@
 
 官网http://ffmpeg.org/
 
-- ffmpeg ：该项目提供的一个工具，可用于格式转换、解码或电视卡即时编码等
+- ffmpeg ：可用于格式转换、解码或电视卡即时编码等
 - ffsever个 ：一个 HTTP  多媒体即时广播串流服务器；
 - ffplay ：是一个简单的播放器，使用 ffmpeg  库解析和解码，通过 SDL  显示
 
