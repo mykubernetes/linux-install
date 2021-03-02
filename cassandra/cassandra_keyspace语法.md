@@ -27,9 +27,8 @@ cqlsh> CREATE KEYSPACE test
 ... AND DURABLE_WRITES = false;
 ```
 - SimpleStrategy 简单策略(机架感知策略)
-- 旧网络拓扑策略(机架感知策略)
 - NetworkTopologyStrategy 网络拓扑策略(数据中心共享策略)
-
+-replication_factor 复制因子
 
 验证
 ```
