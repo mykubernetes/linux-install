@@ -26,6 +26,10 @@ cqlsh> CREATE KEYSPACE test
 ... WITH REPLICATION = { 'class' : 'NetworkTopologyStrategy', 'datacenter1' : 3 }
 ... AND DURABLE_WRITES = false;
 ```
+- SimpleStrategy 简单策略(机架感知策略)
+- 旧网络拓扑策略(机架感知策略)
+- NetworkTopologyStrategy 网络拓扑策略(数据中心共享策略)
+
 
 验证
 ```
