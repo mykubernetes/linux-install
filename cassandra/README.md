@@ -1,6 +1,8 @@
 nodetool常用命令
 ---
 
+https://cloud.tencent.com/developer/article/1772888?from=information.detail.Nodetool
+
 1、查看集群信息
 ```
 nodetool -u cassandra -pw cassandra describecluster
