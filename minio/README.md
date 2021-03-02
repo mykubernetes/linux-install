@@ -4,6 +4,8 @@ github网址： https://github.com/minio/minio/blob/master/docs/zh_CN/distribute
 
 中文文档： https://www.bookstack.cn/read/MinioCookbookZH/17.md
 
+https://yuweidong.blog.csdn.net/article/details/82385101
+
 kubernetes部署
 ```
 kubectl apply -f https://raw.githubusercontent.com/minio/minio-operator/master/minio-operator.yaml
