@@ -366,8 +366,28 @@ ansible 172.16.1.8 -m setup -a "filter=ansible_memtotal_mb" -i hosts
 ansible 172.16.1.8 -m setup -a "filter=ansible_default_ipv4"
 ```
 
+ansible-vault加密及解密
+--
+```
+ansible-vault create test.yml 加密创建新文件
+ansible-vault create --vault-password-file=file test.yml 指定密码加密创建新文件（file要先写好）
+
+ansible-vault view test.yml 查看加密的文件
+ansible-vault edit test.yml 编辑加密的文件
+
+ansible-vault encrypt test.yml 加密已经有的文件
+ansible-vault decrypt test.yml 解密
+
+ansible-vault rekey test.yml 更改密码
+ansible-vault rekey --new-vault password-file=file test.yml 指定密码文件更改密码
+
+ansible-playbook --vault-password-file=file test.yml 执行加密的playbook（方式一）
+ansible-playbook --vault-id @prompt test.yml 执行加密的playbook（方式二）
+```
+
 
 基本语法  
+---
 
 ansible变量相关
 ---
