@@ -728,7 +728,7 @@ handlers
 | > | 大于 |
 | <= | 小于等于 |
 | >= | 大于等于 |
-| !=不等于 |  |
+| != | 不等于 |
 | xxx is defined | 变量存在 |
 | xxx is not defined | 变量不存在 |
 | 1、true、yes | 布尔值true |
