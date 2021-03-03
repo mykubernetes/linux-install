@@ -892,6 +892,38 @@ handlers
 - is match 匹配到的
 - is not match 没有匹配到的
 
+交互是变量进行hash加密
+```
+利用encrypt关键字可以解决之前遇到的创建用户时指定密码字符串的问题，但是需要注意，
+
+- hosts: testB
+  remote_user: root
+  vars_prompt:
+    - name: "hash_string"                      # 哈希计算后的字符串会存入到"hash_string"变量中
+      prompt: "Enter something"
+      private: no
+      encrypt: "sha512_crypt"                  # encrypt表示对用户输入的信息进行哈希，"sha512_crypt"表示使用sha512算法对用户输入的信息进行哈希
+  tasks:
+   - name: Output the string after hash
+     debug:
+      msg: "{{hash_string}}"
+      
+--------------------------------------------------
+当使用"encrypt"关键字对字符串进行哈希时，ansible需要依赖passlib库完成哈希操作，如果未安装passlib库（一个用于哈希明文密码的python库），执行playbook时会报错
+为了能够正常执行上述playbook，需要先安装passlib库。
+
+此处通过pip安装passlib库，由于当前主机也没有安装pip，所以先下载安装pip
+# yum install wget -y
+# wget https://pypi.python.org/packages/source/s/setuptools/setuptools-0.6c11.tar.gz
+# tar zxf setuptools-0.6c11.tar.gz 
+# tar zxf pip-20.0.2.tar.gz 
+# cd pip-20.0.2
+# python setup.py install
+
+pip安装完成后，通过pip安装passlib库
+# pip install passlib
+
+```
 
 2、with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 ```
