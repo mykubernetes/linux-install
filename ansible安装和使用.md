@@ -848,6 +848,35 @@ handlers
   - debug:
       msg: "System release is not Centos"
     when: not ansible_distribution == "Centos"
+    
+8、交互式变量
+1）var_prompt提示用户输入信息并写入变量
+- hosts: testB
+  remote_user: root
+  vars_prompt:
+    - name: "your_name"
+      prompt: "What is your name"
+    - name: "your_age"
+      prompt: "How old are you"
+  tasks:
+   - name: output vars
+     debug:
+      msg: Your name is {{your_name}},You are {{your_age}} years old.
+
+2）交互式远程创建用户
+- hosts: testB
+  remote_user: root
+  vars_prompt:
+    - name: "user_name"
+      prompt: "Enter user name"
+      private: no
+    - name: "user_password"
+      prompt: "Enter user password"
+  tasks:
+   - name: create user
+     user:
+      name: "{{user_name}}"
+      password: "{{user_password}}"
 ```  
 - is match 匹配到的
 - is not match 没有匹配到的
