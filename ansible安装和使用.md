@@ -455,6 +455,17 @@ task控制:
      yum: name={{ pkgname }} state=latest
 ```
 
+一次性传入多个变量，变量之间用空格隔开
+```
+ansible-playbook bl_test6.yml  --extra-vars 'pass_var="redhat" num_var="westos"'
+ansible-playbook bl_test6.yml -e '{"pass_var":"test","num_var":"test1"}'
+
+ansible命令传递变量
+ansible testB -e "testvar=test" -m shell -a "echo {{testvar}}"
+```
+
+
+
 在playbook文件中的play使用变量
 ```
 # cat vars.yml 
