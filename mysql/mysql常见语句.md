@@ -3,6 +3,7 @@
 修改密码
 ```
 mysqladmin -u root password '123456'
+alter user 'root@localhost' IDENTIFIED BY '123456';
 ```
 
 刷新
