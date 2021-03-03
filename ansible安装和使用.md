@@ -740,6 +740,7 @@ handlers
 |-----|------|
 | or | 两个条件一个为真即可 |
 | and | 两个条件必须都为真 |
+| not | 取反 |
 
 1、when判断
 ```
@@ -820,8 +821,13 @@ handlers
         yum: name={{ my_service }}
 	when: my_service is defined
 
-
-
+7、取反，如果系统不是centos，则输出"System release is not centos"
+- hosts: testB
+  remote_user: root
+  tasks:
+  - debug:
+      msg: "System release is not Centos"
+    when: not ansible_distribution == "Centos"
 ```  
 - is match 匹配到的
 - is not match 没有匹配到的
