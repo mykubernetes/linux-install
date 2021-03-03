@@ -799,6 +799,29 @@ handlers
     - name: Httpd Restart 
       service: name=httpd state=restarted
       when: check_httpd.rc == 0
+      
+5、布尔型判断
+- name: Boolean test
+    hosts: all
+    vars:
+      run_my_task: true    #只有当变量为true时，才会执行
+    tasks:
+      - name: httpd is install
+        yum: name=httpd
+	when: run_my_task
+
+6、是否存在的或定义
+- name: Boolean test
+    hosts: all
+    vars:
+      my_service: httpd
+    tasks:
+      - name: {{ my_service }} is install
+        yum: name={{ my_service }}
+	when: my_service is defined
+
+
+
 ```  
 - is match 匹配到的
 - is not match 没有匹配到的
