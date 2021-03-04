@@ -383,6 +383,7 @@ ansible-vault rekey --new-vault password-file=file test.yml 指定密码文件�
 
 ansible-playbook --vault-password-file=file test.yml 执行加密的playbook（方式一）
 ansible-playbook --vault-id @prompt test.yml 执行加密的playbook（方式二）
+ansible-playbook --ask-vault-pass test.yml
 ```
 
 
