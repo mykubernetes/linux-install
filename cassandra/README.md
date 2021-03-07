@@ -240,15 +240,30 @@ nodetool -u cassandra -pw cassandra setlogginglevel ROOT DEBUG     #设置日志
 
 24、压缩相关操作
 ```
-nodetool -u cassandra -pw cassandra disableautocompaction             #禁用自动压缩
-nodetool -u cassandra -pw cassandra enableautocompaction              #启动自动压缩
-nodetool -u cassandra -pw cassandra compactionstats                   #压缩状态查看
-nodetool -u cassandra -pw cassandra compact --user-defined mc-103-big-Date.db       手动指定文件压缩
+#1、手动触发Major Compaction,用以优化读性能和清理被删除的数据释放空间。
+nodetool -u cassandra -pw cassandra compact --user-defined mc-103-big-Date.db
+
+#2、查看compaction任务压缩历史，保留7天。可以观察compaction效果，释放空间多少，以及数据重复情况。
+nodetool -u cassandra -pw cassandra compactionhistory
+
+#3、查看当前compaction任务进度
+nodetool -u cassandra -pw cassandra compactionstats
+
+#4、清理已经删除的数据，用以优化性能和释放空间,与compact命令区别是所需磁盘会少很多。会通过多个compaction task完成对SSTable的操作时间更久。清理效果不如Major compaction.
+nodetool garbagecollect [<keyspace> <tables>]
+
+#禁用自动压缩
+nodetool -u cassandra -pw cassandra disableautocompaction
+
+#启动自动压缩
+nodetool -u cassandra -pw cassandra enableautocompaction
+
+
 nodetool -u cassandra -pw cassandra setstreamthroughput 200           #设置streaming throughput 默认200Mb/s
 nodetool -u cassandra -pw cassandra getcompactionthroughput           #打印compaction throughput
 nodetool -u cassandra -pw cassandra setcompactionhroughput 100        #设置compaction throughput，默认100Mb/s
 nodetool -u cassandra -pw cassandra stop --COMPACTION                 #停止压缩，避免备份数据时sstable compaction 变化
-nodetool -u cassandra -pw cassandra compactionhistory                 #显示压缩操作历史
+
 ```
 
 25、移除节点
