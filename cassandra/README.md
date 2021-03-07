@@ -5,73 +5,187 @@ https://cloud.tencent.com/developer/article/1772888?from=information.detail.Node
 
 http://www.mamicode.com/info-detail-2723557.html
 
-1、查看集群信息
+1、列出nodetool所有可用的命令
 ```
-nodetool -u cassandra -pw cassandra describecluster
+nodetool help 
 ```
 
-2、查看集群节点状态
+2、列出指定command 的帮助内容
+```
+nodetool help command-name
+```
+
+3、查看集群信息
+```
+nodetool -u cassandra -pw cassandra describecluster
+Cluster Information:
+        Name: pttest
+        Snitch: org.apache.cassandra.locator.GossipingPropertyFileSnitch
+        DynamicEndPointSnitch: enabled
+        Partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+        Schema versions:
+                8560f200-adbb-3a18-8d5e-a1f7f7856194: [172.20.101.164, 172.20.101.165, 172.20.101.166, 172.20.101.167, 172.20.101.160, 172.20.101.157]
+```
+
+4、查看集群节点状态
 UN=UP&Normal  load表示每个节点维护的数据的字节数，owns列表示一个节点拥有的令牌的区间的有效百分比
 ```
 nodetool -u cassandra -pw cassandra status
+Datacenter: dc1
+===============
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address         Load       Tokens Owns (effective)  Host ID                               Rack
+UN  172.20.101.164  173.72 KiB  256    34.2%       dcbbad83-fe7c-4580-ade7-aa763b8d2c40  rack1
+UN  172.20.101.165  50.4 KiB    256    35.0%       cefe8a3b-918f-463b-8c7d-faab0b9351f9  rack1
+UN  172.20.101.166  95.5 KiB    256    34.1%       88e16e35-50dd-4ee3-aa1a-f10a8c61a3eb  rack1
+UN  172.20.101.167  50.4 KiB    256    32.3%       8808aaf7-690c-4f0c-be9b-ce655c1464d4  rack1
+UN  172.20.101.160  194.83 KiB  256    31.5%       57cc39fc-e47b-4c96-b9b0-b004f2b79242  rack1
+UN  172.20.101.157  176.67 KiB  256    33.0%       091ff0dc-415b-48a7-b4ce-e70c84bbfafc  rack1
 ```
 
-3、ring 确定环中节点（包括虚拟节点）状态
+5、ring 确定环中节点（包括虚拟节点）状态
 ```
 nodetool -u cassandra -pw cassandra ring
 ```
 
-4、info 获取指定节点信息
+6、info 获取指定节点信息
 ```
 nodetool -u cassandra -pw cassandra -h 10.224.0.3 info
+ID                     : 091ff0dc-415b-48a7-b4ce-e70c84bbfafc
+Gossip active          : true
+Thrift active          : false
+Native Transport active: true
+Load                   : 282.65 KiB
+Generation No          : 1561803589
+Uptime (seconds)       : 844997
+Heap Memory (MB)       : 354.14 / 3970.00
+Off Heap Memory (MB)   : 0.00
+Data Center            : dc1
+Rack                   : rack1
+Exceptions             : 0
+Key Cache              : entries 119, size 11.7 KiB, capacity 100 MiB, 435 hits, 596 requests, 0.730 recent hit rate, 14400 save period in seconds
+Row Cache              : entries 0, size 0 bytes, capacity 0 bytes, 0 hits, 0 requests, NaN recent hit rate, 0 save period in seconds
+Counter Cache          : entries 0, size 0 bytes, capacity 50 MiB, 0 hits, 0 requests, NaN recent hit rate, 7200 save period in seconds
+Chunk Cache            : entries 11, size 704 KiB, capacity 480 MiB, 1388 misses, 2253 requests, 0.384 recent hit rate, NaN microseconds miss latency
+Percent Repaired       : 100.0%
+Token                  : (invoke with -T/--tokens to see all 256 tokens)w
 ```
 
-5、tpstats Cassandra维护的线程池信息，上半部分表示cassandra线程池中任务的相关数据，下半部分给出了节点丢弃的消息数
+7、tpstats Cassandra维护的线程池信息，上半部分表示cassandra线程池中任务的相关数据，下半部分给出了节点丢弃的消息数
+
+active、pending以及完成的任务等Cassandra操作的每个阶段的状态
 ```
-nodetool -u cassandra -pw cassandra
+nodetool -u cassandra -pw cassandra tpstats
+Pool Name                         Active   Pending      Completed   Blocked  All time blocked
+ReadStage                              0         0            140         0                 0
+MiscStage                              0         0              0         0                 0
+CompactionExecutor                     0         0         491131         0                 0
+MutationStage                          0         0             45         0                 0
+MemtableReclaimMemory                  0         0            586         0                 0
+PendingRangeCalculator                 0         0             13         0                 0
+GossipStage                            0         0        3150790         0                 0
+.....
+PerDiskMemtableFlushWriter_0           0         0            586         0                 0
+ValidationExecutor                     0         0              0         0                 0
+.....
+
+Message type           Dropped
+READ                         0
+.........
+REQUEST_RESPONSE             0
+PAGED_RANGE                  0
+READ_REPAIR                  0
 ```
 
-6、查看keyspace和table的统计信息
+nodetool cfstats 显示了每个表和keyspace的统计数据；
+```
+# 1、创建keyspace
+create keyspace ptmind_test with replication = {'class':'NetworkTopologyStrategy','dc1':2} and durable_writes = true;
+
+# 2、创建表
+cassandra@cqlsh:ptmind_test> CREATE TABLE users (
+               ...   user_id text PRIMARY KEY,
+               ...   first_name text,
+               ...   last_name text,
+               ...   emails set<text>
+               ... );
+
+# 3、插入数据：
+INSERT INTO users (user_id, first_name, last_name, emails) VALUES('2', 'kevin', 'kevin', {'kevin@ptmind.com', 'kevin@gmail.com'});
+
+
+# 4、显示了每个表和keyspace的统计数据
+nodetool cfstats ptmind_test.users
+Total number of tables: 37
+----------------
+Keyspace : ptmind_test
+        Read Count: 0
+        Read Latency: NaN ms
+        Write Count: 0
+        Write Latency: NaN ms
+        Pending Flushes: 0
+                Table: users
+................................
+                Average live cells per slice (last five minutes): NaN
+                Maximum live cells per slice (last five minutes): 0
+                Average tombstones per slice (last five minutes): NaN
+                Maximum tombstones per slice (last five minutes): 0
+                Dropped Mutations: 0
+```
+
+
+8、查看keyspace和table的统计信息
 ```
 nodetool -u cassandra -pw cassandra tablestats {KEYSPACE_NAME}
 ```
 
-7、获取节点的网络连接信息，查看节点间网络传输
+9、获取节点的网络连接信息，查看节点间网络传输
 ```
-nodetool -u cassandra -pw cassandra netstats
+nodetool -u cassandra -pw cassandra netstats --human-readable
+Mode: NORMAL
+Not sending any streams.
+Read Repair Statistics:
+Attempted: 0
+Mismatch (Blocking): 0
+Mismatch (Background): 0
+Pool Name                    Active   Pending      Completed   Dropped
+Large messages                  n/a         0              0         0
+Small messages                  n/a         0            163         0
+Gossip messages                 n/a         0        3150335         0
 ```
 
-8、刷新输出
+10、刷新输出
 ```
 nodetool -u cassandra -pw cassandra flush
 ```
 
-9、清理节点上的旧数据
+11、清理节点上的旧数据
 ```
 nodetool -u cassandra -pw cassandra cleanup
 ```
 
-10、修复当前集群的一致性，全量修复，修改大量数据时，失败的概率很大，3.x版本的BUG
+12、修复当前集群的一致性，全量修复，修改大量数据时，失败的概率很大，3.x版本的BUG
 ```
 nodetool -u cassandra -pw cassandra repair --full --trace
 ```
 
-11、单节点修复
+13、单节点修复
 ```
 nodetool -u cassandra -pw cassandra repair -pr
 ```
 
-12、重建索引
+14、重建索引
 ```
 nodetool -u cassandra -pw cassandra rebuild_index
 ```
 
-13、移动token
+15、移动token
 ```
 nodetool -u cassandra -pw cassandra move token_value
 ```
 
-14、重启节点上cassandra
+16、重启节点上cassandra
 ```
 nodetool -u cassandra -pw cassandra disablegossip       #禁用gossip通讯，该节点停止与其他节点的gossip通讯，忽略从其他节点发来的请求
 nodetool -u cassandra -pw cassandra disablebinary       #禁止本地传输（二进制协议）binary CQL protocol
@@ -82,13 +196,13 @@ nodetool -u cassandra -pw cassandra stopdaemon          #停止cassandra进程�
 nodetool -u cassandra -pw cassandra status -r           #查看集群所有节点状态
 ```
 
-15、日志相关操作
+17、日志相关操作
 ```
 nodetool -u cassandra -pw cassandra getlogginglevels               #查看日志级别
 nodetool -u cassandra -pw cassandra setlogginglevel ROOT DEBUG     #设置日志级别为DEBUG
 ```
 
-16、压缩相关操作
+18、压缩相关操作
 ```
 nodetool -u cassandra -pw cassandra disableautocompaction             #禁用自动压缩
 nodetool -u cassandra -pw cassandra enableautocompaction              #启动自动压缩
@@ -101,13 +215,14 @@ nodetool -u cassandra -pw cassandra stop --COMPACTION                 #停止压
 nodetool -u cassandra -pw cassandra compactionhistory                 #显示压缩操作历史
 ```
 
-17、移除节点
+19、移除节点
 ```
 nodetool -u cassandra -pw cassandra decommission             #退服节点
 nodetool -u cassandra -pw cassandra removenode               #节点下线
 nodetool -u cassandra -pw cassandra assassinate node_ip      #强制删除节点
 ```
-18、快照备份
+
+20、快照备份
 ```
 nodetool -u cassandra -pw cassandra snapshot              #创建快照
 nodetool -u cassandra -pw cassandra listsnapshots         #查看快照列表
