@@ -234,8 +234,10 @@ nodetool -u cassandra -pw cassandra compactionhistory                 #显示压
 
 21、移除节点
 ```
+需要在删除的机器上执行
 nodetool -u cassandra -pw cassandra decommission             #退服节点
 nodetool -u cassandra -pw cassandra removenode               #节点下线
+
 nodetool -u cassandra -pw cassandra assassinate node_ip      #强制删除节点
 ```
 
