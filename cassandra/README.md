@@ -277,7 +277,7 @@ nodetool getstreamthroughput
 # 需要在删除的机器上执行，缩容数据会迁移到其他节点，执行后命令会一直开着，节点处于LEAVING状态，直到结束。可以提前中断因为实际过程server端异步执行
 nodetool -u cassandra -pw cassandra decommission                                         #退服节点
 
-#无法使用decommission时候才会用到此命令，功能类似decommission。比如要下线的目标节点down了，无法恢复
+# 需要在删除的机器上执行，无法使用decommission时候才会用到此命令，功能类似decommission。比如要下线的目标节点down了，无法恢复
 nodetool -u cassandra -pw cassandra removenode 88e16e35-50dd-4ee3-aa1a-f10a8c61a3eb      #节点下线
 
 nodetool -u cassandra -pw cassandra assassinate node_ip                                  #强制删除节点
