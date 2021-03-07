@@ -3,8 +3,51 @@ Cassandra管理之备份与恢复
 1、全量备份
 ```
 # nodetool snapshot
-Requested creating snapshot(s) for [all keyspaces] with snapshot name [1570691336948] and options {skipFlush=false} Snapshot directory: 1570691336948
+Requested creating snapshot(s) for [all keyspaces] with snapshot name [1570691336948] and options {skipFlush=false}
+Snapshot directory: 1570691336948
 ```
+
+```
+nodetool -h 服务器ip -p 端口号 snapshots -t 快照名称 -kt 数据库名.表名 #某个表快照
+nodetool -h 服务器ip -p 端口号 snapshots 数据库名 #全库快照
+
+# nodetool -h localhost -p 7199 snapshot -t xn_dolphin_1-20181010  xn_dolphin_1
+Requested creating snapshot(s) for [xn_dolphin_1] with snapshot name [xn_dolphin_1-20181010] and options {skipFlush=false}
+Snapshot directory: xn_dolphin_1-20181010
+
+# nodetool -h localhost -p 7199 snapshot   xn_dolphin_1
+Requested creating snapshot(s) for [xn_dolphin_1] with snapshot name [1539180816386] and options {skipFlush=false}
+Snapshot directory: 1539180816386
+
+# nodetool listsnapshots
+Snapshot Details:
+Snapshot name         Keyspace name Column family name               True size Size on disk
+1539180816386         xn_dolphin_1  dolphin_conversation_result      5.1 MiB   5.1 MiB
+1539180816386         xn_dolphin_1  dolphin_conversation_member      0 bytes   1.02 KiB
+1539180816386         xn_dolphin_1  dolphin_wchat_openid             0 bytes   895 bytes
+1539180816386         xn_dolphin_1  zoogate_login_info               0 bytes   1.02 KiB
+1539180816386         xn_dolphin_1  dolphin_conversation_list        0 bytes   946 bytes
+1539180816386         xn_dolphin_1  dolphin_leaving_msg              0 bytes   1.27 KiB
+1539180816386         xn_dolphin_1  dolphin_conversation             0 bytes   1.1 KiB
+1539180816386         xn_dolphin_1  dolphin_member_inout             0 bytes   1.05 KiB
+1539180816386         xn_dolphin_1  dolphin_conversation_message     0 bytes   1.18 KiB
+1539180816386         xn_dolphin_1  zoogate_blacklist                0 bytes   1.01 KiB
+1539180816386         xn_dolphin_1  dolphin_conversation_visitorinfo 0 bytes   1.2 KiB
+1539180816386         xn_dolphin_1  dolphin_conversation_statistics  0 bytes   1 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_conversation_result      5.1 MiB   5.1 MiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_conversation_member      0 bytes   1.02 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_wchat_openid             0 bytes   895 bytes
+xn_dolphin_1-20181010 xn_dolphin_1  zoogate_login_info               0 bytes   1.02 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_conversation_list        0 bytes   946 bytes
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_leaving_msg              0 bytes   1.27 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_conversation             0 bytes   1.1 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_member_inout             0 bytes   1.05 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_conversation_message     0 bytes   1.18 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  zoogate_blacklist                0 bytes   1.01 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_conversation_visitorinfo 0 bytes   1.2 KiB
+xn_dolphin_1-20181010 xn_dolphin_1  dolphin_conversation_statistics  0 bytes   1 KiB
+```
+
 
 2、查看快照列表
 ```
