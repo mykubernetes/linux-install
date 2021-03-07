@@ -3,10 +3,27 @@ http://cassandra.apache.org/doc/latest/configuration/cassandra_config_file.html
 
 一、安装java 8
 ```
-# java -version
-java version "1.8.0_111"
-Java(TM) SE Runtime Environment (build 1.8.0_111-b14)
-Java HotSpot(TM) 64-Bit Server VM (build 25.111-b14, mixed mode)
+1、解压缩
+# cd /usr/local/java
+# tar -zxvf  jdk-8u73-linux-x64.tar.gz
+
+2、配置环境变量
+# vim /etc/profile
+文件末尾追加如下配置
+export JAVA_HOME=/usr/local/java/jdk1.8.0_73
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib:$CLASSPATH
+export JAVA_PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin
+export PATH=${JAVA_PATH}:$PATH
+
+3、加载环境变量
+source /etc/profile
+
+4、验证
+java -version 
+java version "1.8.0_73"
+java(TM) SE Runtime Environment (build 1.8.0_73-b02)
+java HotSpot(TM) 64-Bit Server VM (build 25.73-b02,mixed mode)
 ```
 
 二、安装python 2
