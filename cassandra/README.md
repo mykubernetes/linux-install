@@ -296,6 +296,21 @@ nodetool toppartitions <keyspace> <cfname> <duration>
 nodetool toppartitions school students 100
 ```
 
+5、getendpoints 计算某个partition key会分布在那些节点上，分析热点或者过大的partition时，进一步定位受影响的节点，可以用来预测业务数据均衡情况
+```
+nodetool getendpoints <keyspace> <table> <key>
+```
+
+6、查看所有线程池的运行情况，可以观察某些任务是否有阻塞现象
+```
+nodetool tpstats
+```
+
+7、info
+```
+nodetool info
+```
+
 cqlsh命令
 ---
 
