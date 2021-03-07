@@ -7,17 +7,19 @@ https://cassandra.apache.org/
 https://docs.datastax.com/en/dse-trblshoot/doc/troubleshooting/trblLinuxTOC.html
  
  
- 1、启动： cassandra -R
- 
- 2、验证：
-      检查日志：
-         如果启动过程中没有什么异常的话，那么现在cassandra就已经启动成功了
-         如果没有报什么奇奇怪怪的ERROR，然后看到Node /x.x.x.x state jump to NORMAL,这样cassandra就算安装成功了。
-      查看集群状态：
-          nodetool status 
-          UN：表示该节点状态，运行中的。
-          DN：宕机
-          UL：离线中
+1、启动：
+cassandra -R
+
+2、验证：
+检查日志：
+如果启动过程中没有什么异常的话，那么现在cassandra就已经启动成功了
+如果没有报什么奇奇怪怪的ERROR，然后看到Node /x.x.x.x state jump to NORMAL,这样cassandra就算安装成功了。
+
+查看集群状态：
+nodetool status 
+UN：表示该节点状态，运行中的。
+DN：宕机
+UL：离线中
 ```
 
 监控
