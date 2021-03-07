@@ -252,18 +252,24 @@ nodetool -u cassandra -pw cassandra compactionstats
 #4、清理已经删除的数据，用以优化性能和释放空间,与compact命令区别是所需磁盘会少很多。会通过多个compaction task完成对SSTable的操作时间更久。清理效果不如Major compaction.
 nodetool garbagecollect [<keyspace> <tables>]
 
-#禁用自动压缩
+#5、禁用自动压缩
 nodetool -u cassandra -pw cassandra disableautocompaction
 
-#启动自动压缩
+#6、启动自动压缩
 nodetool -u cassandra -pw cassandra enableautocompaction
 
-
-nodetool -u cassandra -pw cassandra setstreamthroughput 200           #设置streaming throughput 默认200Mb/s
+#7、获取compact吞吐
 nodetool -u cassandra -pw cassandra getcompactionthroughput           #打印compaction throughput
-nodetool -u cassandra -pw cassandra setcompactionhroughput 100        #设置compaction throughput，默认100Mb/s
-nodetool -u cassandra -pw cassandra stop --COMPACTION                 #停止压缩，避免备份数据时sstable compaction 变化
 
+#8、设置compact吞吐
+nodetool -u cassandra -pw cassandra setcompactionhroughput 100        #设置compaction throughput，默认100Mb/s
+
+#9、停止压缩，避免备份数据时sstable compaction 变化
+nodetool -u cassandra -pw cassandra stop --COMPACTION
+
+#10、限制集群所有节点数据迁移流量，集群扩容使用
+nodetool -u cassandra -pw cassandra setstreamthroughput 200           #设置streaming throughput 默认200Mb/s
+nodetool getstreamthroughput
 ```
 
 25、移除节点
@@ -279,10 +285,17 @@ nodetool -u cassandra -pw cassandra assassinate node_ip                         
 
 26、快照备份
 ```
-nodetool -u cassandra -pw cassandra snapshot              #创建快照
-nodetool -u cassandra -pw cassandra listsnapshots         #查看快照列表
-nodetool -u cassandra -pw cassandra enbalebackup          #启动增量备份
-nodetool -u cassandra -pw cassandra clearsnapshot         #清空所有旧快照
+#创建快照
+nodetool -u cassandra -pw cassandra snapshot
+
+#查看快照列表
+nodetool -u cassandra -pw cassandra listsnapshots
+
+#启动增量备份
+nodetool -u cassandra -pw cassandra enbalebackup
+
+清楚本机上的snapshot，如果没有提供keyspace等信息，就清理本机全部的snapshot
+nodetool -u cassandra -pw cassandra clearsnapshot
 ```
 
 性能诊断工具
