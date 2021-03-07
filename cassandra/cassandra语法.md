@@ -148,7 +148,6 @@ cqlsh:tutorialspoint> DELETE emp_sal FROM emp WHERE emp_id=3;
 ```
 
 5、删除整行
----
 ```
 cqlsh:tutorialspoint> DELETE FROM emp WHERE emp_id=3;
 ```
