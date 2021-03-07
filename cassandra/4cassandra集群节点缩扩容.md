@@ -4,10 +4,11 @@
 1、 准备一个新节点
 
 2、 关闭所有节点压缩(可选)
+# 关闭所有节点的压缩
 nodetool disableautocompaction
+
+# 停止正在执行的压缩
 nodetool stop COMPACTION
-迁移完毕之后，再放开压缩功能
-nodetool enableautocompaction
 注：根据我们的经验，以上关闭压缩的步骤多余，反而会因为未及时压缩产生大量SSTABLE而影响性能。
              
 3、评估扩容时间：
@@ -18,7 +19,7 @@ nodetool setstreamthroughput 32 (注：32Mb/s = 4MB/s)
 nodetool getstreamthroughput 
 一般，若集群性能好，出流可以设置为8MB/s, 入流可设置70MB/s,  生产迁移过程中可从小到大调整，观察对性能是否有影响，没影响就适当调大。
 
-5、session超时设置（若已设置，忽略此步）,根据同步数据量计算需要大概多少时间能迁移完成。如：60G,传输速率4MB/s，大约需要4.26小时完成。
+5、session超时设置,根据同步数据量计算需要大概多少时间能迁移完成。如：60G,传输速率4MB/s，大约需要4.26小时完成。
 # vim cassandra.ymal
 streaming_socket_timeout_in_ms: 172800000     # 默认3600000（1H，生产环境明显不够），改成172800000（48H），保证有足够时间完成数据迁移
 
@@ -38,9 +39,8 @@ nodetool status                 # 集群情况，UJ：未完成，UN：已完成
 10、关闭所有节点数据迁移流量
 # nodetool setstreamthroughput 0
 
-11、数据迁移完成后清理数据
+11、数据迁移完成后清理数据,手动清理每一台老节点磁盘空间,一个完成后再清理下一个。
 nodetool cleanup
-节点一个个的清理，一个完成后再清理下一个。
 注：清理数据会大量消耗集群性能，对twcs，不必删除，经过一段时间后冗余数据会自动清理；
 ```
 
