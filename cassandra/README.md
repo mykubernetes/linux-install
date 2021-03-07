@@ -15,7 +15,7 @@ nodetool help
 nodetool help command-name
 ```
 
-3、查看集群信息
+3、查看集群信息，获取集群名称，检查各节点Schema是否一致
 ```
 nodetool -u cassandra -pw cassandra describecluster
 Cluster Information:
@@ -27,7 +27,8 @@ Cluster Information:
                 8560f200-adbb-3a18-8d5e-a1f7f7856194: [172.20.101.164, 172.20.101.165, 172.20.101.166, 172.20.101.167, 172.20.101.160, 172.20.101.157]
 ```
 
-4、查看集群节点状态
+4、查看集群节点状态，查看集群整体健康节点情况，查看数据分布容量，查看节点IP,部署位置等基本信息
+
 UN=UP&Normal  load表示每个节点维护的数据的字节数，owns列表示一个节点拥有的令牌的区间的有效百分比
 ```
 nodetool -u cassandra -pw cassandra status
@@ -49,12 +50,12 @@ UN  172.20.101.157  176.67 KiB  256    33.0%       091ff0dc-415b-48a7-b4ce-e70c8
 nodetool -u cassandra -pw cassandra ring
 ```
 
-6、describering 查看keyspace 数据分区详细信息
+6、describering 查看keyspace 数据分区详细信息，可以用来分析热点，知道热点数据的partition key分布后，可以进一步通过此命令知道数据会由哪些节点负责
 ```
 nodetool describering <keyspace>
 ```
 
-7、info 获取指定节点信息
+7、info 查看读Cache命中率，调优性能。如果名利率很低，业务可以通过提升命中率改善读延迟。如果命中率很高，可以尝试增加读cache获取更多收益
 ```
 nodetool -u cassandra -pw cassandra -h 10.224.0.3 info
 ID                     : 091ff0dc-415b-48a7-b4ce-e70c84bbfafc
@@ -69,10 +70,12 @@ Off Heap Memory (MB)   : 0.00
 Data Center            : dc1
 Rack                   : rack1
 Exceptions             : 0
+——————————————————————————和命中相关
 Key Cache              : entries 119, size 11.7 KiB, capacity 100 MiB, 435 hits, 596 requests, 0.730 recent hit rate, 14400 save period in seconds
 Row Cache              : entries 0, size 0 bytes, capacity 0 bytes, 0 hits, 0 requests, NaN recent hit rate, 0 save period in seconds
 Counter Cache          : entries 0, size 0 bytes, capacity 50 MiB, 0 hits, 0 requests, NaN recent hit rate, 7200 save period in seconds
 Chunk Cache            : entries 11, size 704 KiB, capacity 480 MiB, 1388 misses, 2253 requests, 0.384 recent hit rate, NaN microseconds miss latency
+——————————————————————————
 Percent Repaired       : 100.0%
 Token                  : (invoke with -T/--tokens to see all 256 tokens)w
 ```
@@ -157,7 +160,7 @@ Max             0.00              0.00              0.00               NaN      
 nodetool -u cassandra -pw cassandra tablestats {KEYSPACE_NAME}
 ```
 
-12、获取节点的网络连接信息，查看节点间网络传输
+12、获取节点的网络连接信息，查看节点间网络传输,应用场景新节点扩容后，查看节点状态，数据同步速度，也能查看消息处理情况，有没有堆积等
 ```
 nodetool -u cassandra -pw cassandra netstats --human-readable
 Mode: NORMAL
@@ -183,7 +186,7 @@ pending tasks: 0
 nodetool -u cassandra -pw cassandra flush
 ```
 
-15、清理节点上的旧数据
+15、清理节点上的旧数据，集群扩容后立即清理多余数据，扩容后新节点承担了原理的数据所以旧节点上的数据以及不归该节点管辖
 ```
 nodetool -u cassandra -pw cassandra cleanup
 ```
@@ -193,22 +196,32 @@ nodetool -u cassandra -pw cassandra cleanup
 nodetool -u cassandra -pw cassandra repair --full --trace
 ```
 
-17、单节点修复
+17、扩容时候可能会使⽤用write survey模式启动节点。之后再用该命令将write survey模式下节点加入集群。
+```
+nodetool join
+```
+
+18、单节点修复
 ```
 nodetool -u cassandra -pw cassandra repair -pr
 ```
 
-18、重建索引
+19、重建索引
 ```
 nodetool -u cassandra -pw cassandra rebuild_index
 ```
 
-19、移动token
+20、移动节点到指定的token,只能用在单个token的节点上，通俗讲就是换一个区间给该节点管理，会移动数据，一般是根据业务，自己设计了分区策略，自己计算token的时候可能会用到，默认每个节点随机256个token出来，用不到这个命令
 ```
-nodetool -u cassandra -pw cassandra move token_value
+nodetool -u cassandra -pw cassandra move <new token>
 ```
 
-20、重启节点上cassandra
+21、resetlocalschema 解决节点表Schema不一致问题
+```
+nodetool resetlocalschema
+```
+
+22、重启节点上cassandra
 ```
 nodetool -u cassandra -pw cassandra disablegossip       #禁用gossip通讯，该节点停止与其他节点的gossip通讯，忽略从其他节点发来的请求
 nodetool -u cassandra -pw cassandra disablebinary       #禁止本地传输（二进制协议）binary CQL protocol
@@ -219,13 +232,13 @@ nodetool -u cassandra -pw cassandra stopdaemon          #停止cassandra进程�
 nodetool -u cassandra -pw cassandra status -r           #查看集群所有节点状态
 ```
 
-21、日志相关操作
+23、日志相关操作
 ```
 nodetool -u cassandra -pw cassandra getlogginglevels               #查看日志级别
 nodetool -u cassandra -pw cassandra setlogginglevel ROOT DEBUG     #设置日志级别为DEBUG
 ```
 
-22、压缩相关操作
+24、压缩相关操作
 ```
 nodetool -u cassandra -pw cassandra disableautocompaction             #禁用自动压缩
 nodetool -u cassandra -pw cassandra enableautocompaction              #启动自动压缩
@@ -238,16 +251,18 @@ nodetool -u cassandra -pw cassandra stop --COMPACTION                 #停止压
 nodetool -u cassandra -pw cassandra compactionhistory                 #显示压缩操作历史
 ```
 
-23、移除节点
+25、移除节点
 ```
-需要在删除的机器上执行
+# 需要在删除的机器上执行，缩容数据会迁移到其他节点，执行后命令会一直开着，节点处于LEAVING状态，直到结束。可以提前中断因为实际过程server端异步执行
 nodetool -u cassandra -pw cassandra decommission                                         #退服节点
+
+#无法使用decommission时候才会用到此命令，功能类似decommission。比如要下线的目标节点down了，无法恢复
 nodetool -u cassandra -pw cassandra removenode 88e16e35-50dd-4ee3-aa1a-f10a8c61a3eb      #节点下线
 
 nodetool -u cassandra -pw cassandra assassinate node_ip                                  #强制删除节点
 ```
 
-24、快照备份
+26、快照备份
 ```
 nodetool -u cassandra -pw cassandra snapshot              #创建快照
 nodetool -u cassandra -pw cassandra listsnapshots         #查看快照列表
@@ -255,6 +270,31 @@ nodetool -u cassandra -pw cassandra enbalebackup          #启动增量备份
 nodetool -u cassandra -pw cassandra clearsnapshot         #清空所有旧快照
 ```
 
+性能诊断工具
+---
+
+1、proxyhistograms 从Coordinator视角查看最近读写延迟，可以用来诊断慢节点。Coordinator是负责接受用户请求，再并发读写其他集群内部节点的模块，类似proxy.每个节点都可以作为Coordinator
+```
+nodetool proxyhistograms
+```
+
+2、查看table级别延迟，统计的是本地执行，不是从Coordinator视角，也可以用来诊断Partition是否过大
+```
+nodetool tablehistograms <keyspace> <table> | <keyspace.table>
+nodetool tablehistograms school.students
+```
+
+3、tablestats 查看table资源使用情况，磁盘空间，内存等。查看table读写请求统计。查看tombstones数据，分析读性能表现太差的原因
+```
+nodetool tablestats [<keyspace.table>]
+nodetool tablestats school.students
+```
+
+4、toppartitions 分析热点用，通过抽样统计一段时间，得出最热的那些partition key,没请求的时候无法统计，统计不是完全精准的，是近似
+```
+nodetool toppartitions <keyspace> <cfname> <duration>
+nodetool toppartitions school students 100
+```
 
 cqlsh命令
 ---
