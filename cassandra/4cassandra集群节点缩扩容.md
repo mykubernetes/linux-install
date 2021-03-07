@@ -52,7 +52,7 @@ nodetool setstreamthroughput 32 (注：32Mb/s = 4MB/s)
 nodetool getstreamthroughput 
 一般，若集群性能好，出流可以设置为70MB/s, 入流可设置8MB/s,  生产迁移过程中可从小到大调整，观察对性能是否有影响，没影响就适当调大。
 
-4、执行下线命令
+4、需要删除的机器上执行下线命令
 nodetool decommission
 
 5、监控迁移情况
