@@ -1,4 +1,4 @@
-创建keyspace_table
+keyspace操作
 ---
 1、创建keyspace
 ```
@@ -63,7 +63,62 @@ cqlsh> DESCRIBE keyspaces;
 system system_traces
 ```
 
+表操作
+---
+1、Cqlsh创建表
+```
+cqlsh> USE tutorialspoint;
+cqlsh:tutorialspoint>; CREATE TABLE emp(
+   emp_id int PRIMARY KEY,
+   emp_name text,
+   emp_city text,
+   emp_sal varint,
+   emp_phone varint
+   );
+```
 
+2、修改表
+```
+1、添加列
+cqlsh:tutorialspoint> ALTER TABLE emp ADD emp_email text;
+
+2、删除列
+cqlsh:tutorialspoint> ALTER TABLE emp DROP emp_email;
+```
+
+3、删除表
+```
+cqlsh:tutorialspoint> DROP TABLE emp;
+```
+验证
+```
+cqlsh:tutorialspoint> DESCRIBE COLUMNFAMILIES;
+employee
+```
+
+4、截断表，使用TRUNCATE命令截断表。截断表时，表的所有行都将永久删除。
+```
+cqlsh:tp> TRUNCATE student;
+```
+
+5、创建索引，为emp的表中为列emp_name创建索引。
+```
+cqlsh:tutorialspoint> CREATE INDEX name ON emp1 (emp_name);
+```
+
+6、删除索引，删除表emp中的列名的索引。
+```
+cqlsh:tp> drop index name;
+```
+
+7、批处理语句
+```
+cqlsh:tutorialspoint> BEGIN BATCH
+... INSERT INTO emp (emp_id, emp_city, emp_name, emp_phone, emp_sal) values(  4,'Pune','rajeev',9848022331, 30000);
+... UPDATE emp SET emp_sal = 50000 WHERE emp_id =3;
+... DELETE emp_city FROM emp WHERE emp_id = 2;
+... APPLY BATCH;
+```
 
 数据增删改查操作
 ---
@@ -97,3 +152,4 @@ cqlsh:tutorialspoint> DELETE emp_sal FROM emp WHERE emp_id=3;
 ```
 cqlsh:tutorialspoint> DELETE FROM emp WHERE emp_id=3;
 ```
+
