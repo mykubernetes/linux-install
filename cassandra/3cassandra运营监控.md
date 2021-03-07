@@ -28,14 +28,12 @@ UL：离线中
 a、主机指标监控：CPU、内存、磁盘空间、IO等
  
 b、IO监控
-iostat -x -t 10
-关注： %iowait 超过1表示有IO等待；
-await(平均等待毫秒数) SSD < 10ms, 磁盘 < 200ms
+iostat -x -t 10         # %iowait 超过1表示有IO等待；await(平均等待毫秒数) SSD < 10ms, 磁盘 < 200ms
 
 c、内存
-free -h:可用内存
-nodetool info:cassandra 内存使用情况
-TOP -c:内存使用
+free -h                     # 可用内存
+nodetool info:cassandra     # 内存使用情况
+TOP -c                      # 内存使用
 
 d、磁盘
 df -h
@@ -53,7 +51,8 @@ nodetool tablehistograms           # 表直方图
 f、清理数据集（先确定数据是否不再需要，不需要再清理）
 清理snapshot，每个节点依次执行下面命令
 ./nodetool  clearsnapshot
- 清理空目录：递归清理
+
+清理空目录：递归清理
 rmdir -pv tree1/tree2/tree3
 rmdir -pv mon_*/*/*
 
