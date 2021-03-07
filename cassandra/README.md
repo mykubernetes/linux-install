@@ -254,41 +254,100 @@ cqlsh命令
 ---
 
 ```
-#连接到cassandra
+#1、连接到cassandra
 cqlsh -u cassandra -p cassandra
 
-#查看所有的keyspaces
+#2、查看所有的keyspaces
 DESCRIBE KEYSPACES
 
-#查看集群信息
+#3、查看创建语法
+DESCRIBE KEYSPACE keyspace_name;
+
+#4、显示当前级别CONSISTENCY
+CONSISTENCY 
+Current consistency level is ONE.
+
+#5、查看集群信息
 DESCRIBE CLUSTER
 
-#连接到指定keyspace
+#6、连接到指定keyspace
 USE sps_proxy
 
-#查看所有table
+#7、查看所有table
 DESCRIBE TABLES
 
-#查看keyspace信息
+#8、表的描述
+DESCRIBE TABLE tables_name
+
+#9、查看keyspace信息
 DESCRIBE KEYSPACE_NAME
 
-#查看table描述
+#10、查看table描述
 DESCRIBE TABLE TABLE_NAME
 
-#查看所有用户自定义数据类型（当前为空）
+#11、查看所有用户自定义数据类型（当前为空）
 DESCRIBE TYPES
 
-#查看用户自定义数据类型描述
+#12查看用户自定义数据类型描述
 DESCRIBE TYPE xxx
 
-#扩展输出，使用此命令前必须打开expand 命令
-EXPAND ON
-
-#显示当前cqlsh 会话信息
+#13、显示当前cqlsh 会话信息
 SHOW HOST
 
-#从文件执行命令
-source filename
+#14、扩展输出，使用此命令前必须打开expand 命令
+cqlsh:cqlsh> expand on;
+cqlsh:cqlsh> select * from users;
+cassandra@cqlsh:ptmind_test> select * from users;
+
+@ Row 1
+------------+-----------------------------------------
+ user_id    | 2
+ emails     | {'kevin@gmail.com', 'kevin@ptmind.com'}
+ first_name | kevin
+ last_name  | kevin
+
+@ Row 2
+------------+-----------------------------------------
+
+(2 rows)
+
+使用以下命令关闭展开选项。
+
+cqlsh:cqlsh> expand off;
+Disabled Expanded output.
+##################################################
+
+
+# 15、COPY 将数据从Cassandra复制到文件中
+cassandra@cqlsh:ptmind_test> COPY users (user_id, first_name, last_name, emails) TO 'kevinfile';
+Using 3 child processes
+
+Starting copy of ptmind_test.users with columns [user_id, first_name, last_name, emails].
+Processed: 2 rows; Rate:       1 rows/s; Avg. rate:       1 rows/s
+2 rows exported to 1 files in 1.472 seconds.
+
+验证：
+[root@kubm-01 ~]# more kevinfile 
+
+2,kevin,kevin,"{'kevin@gmail.com', 'kevin@ptmind.com'}"
+frodo,Frodo,Baggins,"{'baggins@gmail.com', 'f@baggins.com'}"
+
+
+##################################################
+
+# 16、source 从文件执行命令
+
+# more cqshell.source 
+select * from users;
+
+登陆执行；
+cassandra@cqlsh:ptmind_test> SOURCE '/root/cqshell.source'
+
+ user_id | emails                                  | first_name | last_name
+---------+-----------------------------------------+------------+-----------
+       2 | {'kevin@gmail.com', 'kevin@ptmind.com'} |      kevin |     kevin
+   frodo |  {'baggins@gmail.com', 'f@baggins.com'} |      Frodo |   Baggins
+
 ```
 
 常规命令选项
