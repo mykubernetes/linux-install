@@ -98,7 +98,7 @@ PAGED_RANGE                  0
 READ_REPAIR                  0
 ```
 
-nodetool cfstats 显示了每个表和keyspace的统计数据；
+8、nodetool cfstats 显示了每个表和keyspace的统计数据；
 ```
 # 1、创建keyspace
 create keyspace ptmind_test with replication = {'class':'NetworkTopologyStrategy','dc1':2} and durable_writes = true;
@@ -134,13 +134,25 @@ Keyspace : ptmind_test
                 Dropped Mutations: 0
 ```
 
+9、nodetool cfhistograms 显示表的统计数据，包括读写延迟，行大小，列的数量和SSTable的数量；
+```
+# nodetool cfhistograms ptmind_test.users
 
-8、查看keyspace和table的统计信息
+No SSTables exists, unable to calculate 'Partition Size' and 'Cell Count' percentiles
+ptmind_test/users histograms
+Percentile  SSTables     Write Latency      Read Latency    Partition Size        Cell Count
+                              (micros)          (micros)           (bytes)                  
+50%             0.00              0.00              0.00               NaN               NaN
+........
+Max             0.00              0.00              0.00               NaN               NaN
+```
+
+10、查看keyspace和table的统计信息
 ```
 nodetool -u cassandra -pw cassandra tablestats {KEYSPACE_NAME}
 ```
 
-9、获取节点的网络连接信息，查看节点间网络传输
+11、获取节点的网络连接信息，查看节点间网络传输
 ```
 nodetool -u cassandra -pw cassandra netstats --human-readable
 Mode: NORMAL
@@ -155,37 +167,42 @@ Small messages                  n/a         0            163         0
 Gossip messages                 n/a         0        3150335         0
 ```
 
-10、刷新输出
+nodetool compactionstats 显示当前正在压缩的任务进度
+```
+pending tasks: 0
+```
+
+12、刷新输出
 ```
 nodetool -u cassandra -pw cassandra flush
 ```
 
-11、清理节点上的旧数据
+13、清理节点上的旧数据
 ```
 nodetool -u cassandra -pw cassandra cleanup
 ```
 
-12、修复当前集群的一致性，全量修复，修改大量数据时，失败的概率很大，3.x版本的BUG
+14、修复当前集群的一致性，全量修复，修改大量数据时，失败的概率很大，3.x版本的BUG
 ```
 nodetool -u cassandra -pw cassandra repair --full --trace
 ```
 
-13、单节点修复
+15、单节点修复
 ```
 nodetool -u cassandra -pw cassandra repair -pr
 ```
 
-14、重建索引
+16、重建索引
 ```
 nodetool -u cassandra -pw cassandra rebuild_index
 ```
 
-15、移动token
+17、移动token
 ```
 nodetool -u cassandra -pw cassandra move token_value
 ```
 
-16、重启节点上cassandra
+18、重启节点上cassandra
 ```
 nodetool -u cassandra -pw cassandra disablegossip       #禁用gossip通讯，该节点停止与其他节点的gossip通讯，忽略从其他节点发来的请求
 nodetool -u cassandra -pw cassandra disablebinary       #禁止本地传输（二进制协议）binary CQL protocol
@@ -196,13 +213,13 @@ nodetool -u cassandra -pw cassandra stopdaemon          #停止cassandra进程�
 nodetool -u cassandra -pw cassandra status -r           #查看集群所有节点状态
 ```
 
-17、日志相关操作
+19、日志相关操作
 ```
 nodetool -u cassandra -pw cassandra getlogginglevels               #查看日志级别
 nodetool -u cassandra -pw cassandra setlogginglevel ROOT DEBUG     #设置日志级别为DEBUG
 ```
 
-18、压缩相关操作
+20、压缩相关操作
 ```
 nodetool -u cassandra -pw cassandra disableautocompaction             #禁用自动压缩
 nodetool -u cassandra -pw cassandra enableautocompaction              #启动自动压缩
@@ -215,14 +232,14 @@ nodetool -u cassandra -pw cassandra stop --COMPACTION                 #停止压
 nodetool -u cassandra -pw cassandra compactionhistory                 #显示压缩操作历史
 ```
 
-19、移除节点
+21、移除节点
 ```
 nodetool -u cassandra -pw cassandra decommission             #退服节点
 nodetool -u cassandra -pw cassandra removenode               #节点下线
 nodetool -u cassandra -pw cassandra assassinate node_ip      #强制删除节点
 ```
 
-20、快照备份
+22、快照备份
 ```
 nodetool -u cassandra -pw cassandra snapshot              #创建快照
 nodetool -u cassandra -pw cassandra listsnapshots         #查看快照列表
