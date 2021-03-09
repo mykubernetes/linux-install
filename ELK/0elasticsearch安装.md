@@ -775,6 +775,9 @@ curl 192.168.85.39:9002/_cat/repositories?
 # 查看全部快照
 curl -XGET http://192.168.85.39:9002/_snapshot？
 
+# 查看仓库信息
+curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810
+
 # 查看指定索引的快照
 curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810
 ```
