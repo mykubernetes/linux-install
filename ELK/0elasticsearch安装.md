@@ -123,20 +123,26 @@ $ cd /opt/module/elasticsearch-6.6.0/bin/
 9、curl访问方法  
 1)查看单记得点的工作状态  
 ``` curl -X GET 'http://node001:9200/?pretty' ```  
+
 2)查看cat支持的操作  
 ``` curl -X GET 'http://node001:9200/_cat' ```  
+
 3)查看集群有几个节点  
 ``` curl -X GET 'http://node001:9200/_cat/nodes' ```  
 ``` curl -X GET 'http://node001:9200/_cat/nodes?v' ```  
+
 4)查看集群健康状态  
 ```
 curl 'nofr001:9200/_cat/health?v'
 curl -X GET 'http://node001:9200/_cluster/health?pretty'
 ```  
+
 5）查看集群详细信息  
 ``` curl 'node001:9200/_cluster/state?pretty' ```  
+
 6)查看所有索引信息  
 ``` curl 'node001:9200/_cat/indices?v' ```  
+
 7)计算集群中文档的数量
 ```
 curl  -H "Content-Type: application/json"  -XGET 'http://localhost:9200/_count?pretty' -d '
