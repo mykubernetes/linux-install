@@ -208,7 +208,6 @@ netstat -ntlp
 http://192.168.101.66:9100/
 
 
-
 ES常用命令
 ---
 
@@ -616,4 +615,202 @@ curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test6' -d'{"m
 
 # 操作已存在的索引（修改）：
 curl -H "Content-Type: application/json" -XPOST http://master:9200/test6/user/_mapping -d '{"properties":{"name":{"type":"text","analyzer":"ik_max_word"}}}'
+```
+
+索引数据快照备份和恢复
+===
+
+一.搭建NFS共享存储服务器
+
+1.安装 nfs服务
+```
+yum install -y nfs-utils
+```
+
+2.开机启动
+```
+systemctl enable rpcbind.service
+systemctl enable nfs-server.service
+```
+
+3.分别启动rpcbind和nfs服务：
+```
+systemctl start rpcbind.service
+systemctl start nfs-server.service
+```
+
+4.firewalld 防火墙针对es节点内网ip开放NFS服务监听端口：
+```
+111 udp端口    20048 tcp端口    2049 tcp 和 udp全开
+```
+
+5.创建本地数据共享目录 并设置权限  
+```
+mkdir /data/db/elasticsearch/backup
+chmod 777 /data/db/elasticsearch/backup
+chown -R elasticsearch:elasticsearch /data/db/elasticsearch/backup
+```
+
+6.配置NFS目录访问权限
+```
+vim etc/exports
+/data/db/elasticsearch/backup 192.168.85.39(rw,sync,all_squash)     192.168.85.33(rw,sync,all_squash) 192.168.85.36(rw,sync,all_squash)
+exports -r //生效
+exports -s //查看
+```
+
+7.es节点上安装客户端
+```
+yum -y install showmount
+开启服务：
+systemctl enable rpcbind.service
+systemctl start rpcbind.service
+```
+
+8.创建挂载目录
+```
+mkdir /mnt/elasticsearch
+chmod 777 elasticsearch
+
+挂载共享目录到本地
+mount -t nfs 192.168.5.63:/data/db/elasticsearch/backup  /mnt/elasticsearch
+
+df -h //查看确认是否成功挂载
+```
+
+二、创建快照仓库
+```
+curl -XPUT http://192.168.85.39:9002/_snapshot/backup -d'
+{
+"type": "fs",
+"settings": {
+"location": "/mnt/elasticsearch/backup",
+"compress": true,
+"max_snapshot_bytes_per_sec" : "50mb",
+"max_restore_bytes_per_sec" : "50mb"
+}
+}'
+
+备注说明：
+1.可在es任一节点操作
+2.backup: 指定仓库名称为backup  ,生成的备份文件存放路径为/mnt/elasticsearch/backup
+3.max_snapshot_bytes_per_sec,max_restore_bytes_per_sec 限定备份和恢复的数据字节内容大小为50mb,
+为了防止磁盘IO过高。数值越大,备份恢复速度越快。50mb为推荐值，IO性能高的机器可不限制
+
+curl -XPUT http://192.168.85.39:9002/_snapshot/backup -d '
+{
+    "type": "fs",
+    "settings": {
+        "location": "/mnt/elasticsearch/backup",
+        "compress": true
+    }
+}'
+```
+
+三、创建快照备份
+
+1.针对全索引快照备份
+```
+curl -XPUT 192.168.85.39:9002/_snapshot/backup/snapshot_all?pretty
+```
+- 指定备份到仓库backup
+- 快照名称为 snapshot_all
+
+2.针对指定某个单独索引快照备份（为了区分不同索引备份目录,建议仓库用索引名称命名）
+```
+单独快照备份user_event_201810这个索引
+
+2.1先针对索引创建仓库
+curl -XPUT http://192.168.85.39:9002/_snapshot/user_event_201810 -d'
+{
+"type": "fs",
+"settings": {
+"location": "/mnt/elasticsearch/user_event_201810",
+"compress": true,
+"max_snapshot_bytes_per_sec" : "50mb",
+"max_restore_bytes_per_sec" : "50mb"
+}
+}'
+
+
+2.2 快照备份索引user_event_201810操作
+curl -XPUT http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810?wait_for_completion=true -d '
+{
+"indices":"user_event_201810",
+"ignore_unavailable": "true",
+"include_global_state": false
+}'
+```
+- 创建的仓库名为user_event_201810
+- 存放的文件目录为/mnt/elasticsearch/user_event_201810
+- indices:指定索引源为user_event_201810
+- 增加?wait_for_completion=true参数是为了执行完成返回结果状态
+
+四.恢复快照备份数据到es集群
+
+1.针对全索引快照备份的恢复操作
+```
+curl -XPOST http://192.168.85.39:9200/_snapshot/backup/snapshot_all/_restore
+```
+- 指定仓库名称backup
+- 指定快照备份名称snapshot_all
+
+2.针对某个指定索引的快照备份恢复操作
+```
+针对索引user_event_201810快照恢复
+curl -XPOST http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810/_restore
+```
+- 指定仓库名称user_event_201810
+- 指定快照备份名称user_event_201810
+
+五:辅助操作命令
+
+1.查看已存在仓库
+```
+curl 192.168.85.39:9002/_cat/repositories?
+```
+
+2.查看已存在快照
+```
+# 查看全部快照
+curl -XGET http://192.168.85.39:9002/_snapshot？
+
+# 查看指定索引的快照
+curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810
+```
+
+3.删除快照
+```
+# 删除快照user_event_201810
+curl -XDELETE http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810
+```
+
+4.删除仓库
+```
+# 删除仓库user_event_201810
+curl -XDELETE http://192.168.85.39:9002/_snapshot/user_event_201810
+```
+
+六、elasticsearch其中一节点配置文件
+```
+cluster.name: my-application1
+node.name: node-3
+path.data: /data/db/elasticsearch
+path.logs: /data/log/elasticsearch/logs
+path.repo: ["/mnt/elasticsearch"]
+network.host: 192.168.85.33
+http.port: 9002
+transport.tcp.port: 9102
+node.master: true
+node.data: true
+discovery.zen.ping.unicast.hosts: ["192.168.85.39:9102","192.168.85.36:9102","192.168.85.33:9102"]
+discovery.zen.minimum_master_nodes: 2
+indices.query.bool.max_clause_count: 10240
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+```
+
+NFS
+```
+mount -t nfs 192.168.5.63:/data/db/elasticsearch/backup /mnt/elasticsearch
 ```
