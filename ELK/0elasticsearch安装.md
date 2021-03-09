@@ -748,20 +748,51 @@ curl -XPUT http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_2018
 
 四.恢复快照备份数据到es集群
 
-1.针对全索引快照备份的恢复操作
+1.恢复前准备
+```
+1、在需要恢复的机器上执行
+mkdir /mnt/elasticsearch/user_event_201810
+
+2、修改目录权限
+chown -R es:es /mnt/elasticsearch/user_event_201810
+chmod -R 777 /mnt/elasticsearch/user_event_201810
+
+3、修改配置文件
+vim elasticsearch.yml
+path.repo: "/mnt/elasticsearch/user_event_201810"             #仓库路径
+
+4、创建索引仓库
+curl -XPUT http://192.168.85.40:9002/_snapshot/user_event_201810 -d'
+{
+"type": "fs",
+"settings": {
+"location": "/mnt/elasticsearch/user_event_201810",
+"compress": true,
+"max_snapshot_bytes_per_sec" : "50mb",
+"max_restore_bytes_per_sec" : "50mb"
+}
+}'
+```
+
+2.针对全索引快照备份的恢复操作
 ```
 curl -XPOST http://192.168.85.39:9200/_snapshot/backup/snapshot_all/_restore
 ```
 - 指定仓库名称backup
 - 指定快照备份名称snapshot_all
 
-2.针对某个指定索引的快照备份恢复操作
+3.针对某个指定索引的快照备份恢复操作
 ```
 针对索引user_event_201810快照恢复
 curl -XPOST http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810/_restore
 ```
 - 指定仓库名称user_event_201810
 - 指定快照备份名称user_event_201810
+
+4.查看快照状态
+```
+curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810/_status
+```
 
 五:辅助操作命令
 
