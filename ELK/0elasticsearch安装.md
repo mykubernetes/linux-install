@@ -679,6 +679,16 @@ df -h //查看确认是否成功挂载
 ```
 
 二、创建快照仓库
+
+| 参数 | 含义 |
+|------|------|
+| location | 快照存储位置 |
+| compress | 是否压缩源文件，默认为true |
+| chunk_size | 如果有需要，可以将大文件分解为多个小文件，默认不开启 |
+| max_restore_bytes_per_sec | 指定数据恢复速度，默认为 40m/s |
+| max_snapshot_bytes_per_sec | 指定创建快照时的速度，默认为 40m/s |
+| readonly | 设置为只读仓库，默认为false |
+
 ```
 curl -XPUT http://192.168.85.39:9002/_snapshot/backup -d'
 {
@@ -691,13 +701,13 @@ curl -XPUT http://192.168.85.39:9002/_snapshot/backup -d'
 }
 }'
 
-备注说明：
 1.可在es任一节点操作
 2.backup: 指定仓库名称为backup  ,生成的备份文件存放路径为/mnt/elasticsearch/backup
 3.max_snapshot_bytes_per_sec,max_restore_bytes_per_sec 限定备份和恢复的数据字节内容大小为50mb,
 为了防止磁盘IO过高。数值越大,备份恢复速度越快。50mb为推荐值，IO性能高的机器可不限制
 
-curl -XPUT http://192.168.85.39:9002/_snapshot/backup -d '
+在创建一个仓库时，会即刻在集群所有节点验证确保其功能在所有节点可用,verify 参数可以用来取消该验证
+curl -XPUT http://192.168.85.39:9002/_snapshot/backup/_verify -d '
 {
     "type": "fs",
     "settings": {
@@ -720,7 +730,7 @@ curl -XPUT 192.168.85.39:9002/_snapshot/backup/snapshot_all?pretty
 ```
 单独快照备份user_event_201810这个索引
 
-2.1先针对索引创建仓库
+1.先针对索引创建仓库
 curl -XPUT http://192.168.85.39:9002/_snapshot/user_event_201810 -d'
 {
 "type": "fs",
@@ -733,18 +743,73 @@ curl -XPUT http://192.168.85.39:9002/_snapshot/user_event_201810 -d'
 }'
 
 
-2.2 快照备份索引user_event_201810操作
+2.快照备份索引user_event_201810操作
 curl -XPUT http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810?wait_for_completion=true -d '
 {
 "indices":"user_event_201810",
 "ignore_unavailable": "true",
 "include_global_state": false
 }'
+
+3.对多个索引创建快照
+curl -XPUT http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810?wait_for_completion=true -d '
+{
+"indices":"user_event_201810","user_event_201811","user_event_201811"
+"ignore_unavailable": "true",
+"include_global_state": false
+}'
 ```
 - 创建的仓库名为user_event_201810
 - 存放的文件目录为/mnt/elasticsearch/user_event_201810
+- ?wait_for_completion=true 执行完成返回结果状态
 - indices:指定索引源为user_event_201810
-- 增加?wait_for_completion=true参数是为了执行完成返回结果状态
+- ignore_unavailable: 在创建快照时会忽略不存在的索引
+- include_global_state: 阻止集群全局状态信息被保存为快照的一部分,默认情况下，如果一个快照中的一个或者多个索引没有所有主分片可用，整个快照创建会失败
+
+3.查看快照信息
+
+| 状态 | 含义 |
+|-----|-------|
+| IN_PROGRESS | 正在创建快照 |
+| SUCCESS | 快照创建成功 |
+| FAILED | 快照创建完成，但是有错误，数据不会保存 |
+| PARTIAL | 整个集群备份完成，但是至少有一个shard数据存贮失败，会有更具体报错信息 |
+| INCOMPATIBLE | 创建快照的es版本和当前集群es版本不一致 |
+
+```
+curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810
+```
+
+4.查看已存在仓库
+```
+curl 192.168.85.39:9002/_cat/repositories?v
+```
+
+5.查看快照
+```
+1、查看全部快照
+curl -XGET http://192.168.85.39:9002/_snapshot？
+curl -XGET http://192.168.85.39:9002/_snapshot/_all
+
+2、查看仓库信息
+curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810
+
+3、查看指定索引的快照
+curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810
+
+4、查看当前正在运行的快照
+curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810/_current
+
+5、删除快照user_event_201810
+curl -XDELETE http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810
+
+6、删除仓库user_event_201810
+curl -XDELETE http://192.168.85.39:9002/_snapshot/user_event_201810
+
+7、删除所有仓库
+curl -XDELETE http://192.168.85.39:9002/_snapshot
+curl -XDELETE http://192.168.85.39:9002/_snapshot/_all
+```
 
 四.恢复快照备份数据到es集群
 
@@ -792,49 +857,33 @@ curl -XPOST http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201
 - 指定仓库名称user_event_201810
 - 指定快照备份名称user_event_201810
 
-4.查看快照状态
+4、针对多个指定索引的快照备份恢复操作
+```
+curl -XPOST http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810/_restore -d {
+  "indices": "index_1,index_2",
+  "ignore_unavailable": true,
+  "include_global_state": true,
+  "rename_pattern": "index_(.+)",
+  "rename_replacement": "restored_index_$1"
+}
+```
+- include_global_state 指定要恢复的索引和允许恢复集群全局状态
+- 索引列表支持多索引语法。rename_pattern 和 rename_replacement 选项在恢复时通过正则表达式来重命名索引
+- include_aliases 为 false 可以防止与索引关联的别名被一起恢复
+
+
+5.查看快照状态
 ```
 curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810/_status
 ```
 
-五:辅助操作命令
-
-1.查看已存在仓库
-```
-curl 192.168.85.39:9002/_cat/repositories?
-```
-
-2.查看已存在快照
-```
-# 查看全部快照
-curl -XGET http://192.168.85.39:9002/_snapshot？
-
-# 查看仓库信息
-curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810
-
-# 查看指定索引的快照
-curl -XGET http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810
-```
-
-3.删除快照
-```
-# 删除快照user_event_201810
-curl -XDELETE http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_201810
-```
-
-4.删除仓库
-```
-# 删除仓库user_event_201810
-curl -XDELETE http://192.168.85.39:9002/_snapshot/user_event_201810
-```
-
-六、elasticsearch其中一节点配置文件
+五、elasticsearch其中一节点配置文件
 ```
 cluster.name: my-application1
 node.name: node-3
 path.data: /data/db/elasticsearch
 path.logs: /data/log/elasticsearch/logs
-path.repo: ["/mnt/elasticsearch"]
+path.repo: ["/mnt/elasticsearch"]           #快照路径
 network.host: 192.168.85.33
 http.port: 9002
 transport.tcp.port: 9102
