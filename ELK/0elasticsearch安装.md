@@ -750,6 +750,9 @@ curl -XPUT http://192.168.85.39:9002/_snapshot/user_event_201810/user_event_2018
 
 1.恢复前准备
 ```
+0、挂载之前部署的NFS或者将之前备份的镜像打包执行1、2、两步
+mount -t nfs 192.168.5.63:/data/db/elasticsearch/backup /mnt/elasticsearch
+
 1、在需要恢复的机器上执行
 mkdir /mnt/elasticsearch/user_event_201810
 
