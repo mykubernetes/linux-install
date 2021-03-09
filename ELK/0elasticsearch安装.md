@@ -125,11 +125,16 @@ $ cd /opt/module/elasticsearch-6.6.0/bin/
 ``` curl -X GET 'http://node001:9200/?pretty' ```  
 
 2)查看cat支持的操作  
-``` curl -X GET 'http://node001:9200/_cat' ```  
+``` 
+curl -X GET 'http://node001:9200/_cat'
+```
 
-3)查看集群有几个节点  
-``` curl -X GET 'http://node001:9200/_cat/nodes' ```  
-``` curl -X GET 'http://node001:9200/_cat/nodes?v' ```  
+3)查看节点信息  
+```
+curl -X GET 'http://node001:9200/_cat/nodes?v' 
+curl -X GET 'http://node001:9200/_nodes/process?pretty'
+、
+```
 
 4)查看集群健康状态  
 ```
@@ -219,8 +224,23 @@ ES常用命令
 
 1、创建索引库
 ```
-curl -XPUT 'http://master:9200/test/'
+curl -XPUT 'master:9200/test?pretty' -H 'Content-Type: application/json' -d '
+{
+    "settings": {
+        "number_of_shards": 3,
+        "number_of_replicas": 1
+    }
+}
+'
+```
 
+2、查看所有分片
+```
+curl -XGET '101.201.34.96:9200/_cat/shards?pretty'
+
+```
+
+```
 创建数据
 PUT请求,PUT是幂等方法，所以PUT用于更新操作,PUT，DELETE操作是幂等的,幂等是指不管进行多少次操作，结果都一样。
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/1 -d '{"name" : "jack","age" : 28}'
