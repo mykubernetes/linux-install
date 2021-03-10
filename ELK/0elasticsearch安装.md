@@ -245,10 +245,10 @@ curl -XGET '101.201.34.96:9200/_cat/shards?pretty'
 ```
 1、PUT请求,PUT是幂等方法，所以PUT用于更新操作,PUT，DELETE操作是幂等的,幂等是指不管进行多少次操作，结果都一样。
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/1 -d '{"name" : "jack","age" : 28}'
-curl -H "Content-Type: application/json" -XPUT http://master:9200/test/_doc/1 -d '{"name" : "jack","age" : 28}'
+curl -H "Content-Type: application/json" -XPUT http://master:9200/test/_doc/1 -d '{"name" : "jack","age" : 28}'     #指定id
 
 2、POST请求,POST用于新增操作比较合适,POST操作不是幂等的,多次发出同样的POST请求后，其结果是创建出了若干的资源。使用自增ID（post）
-curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/ -d '{"name" : "jack","age" : 28}'
+curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/ -d '{"name" : "jack","age" : 28}'     #自动生成id
 
 3、通过文件导入
 wget https://raw.githubusercontent.com/elastic/elasticsearch/master/docs/src/test/resources/accounts.json
@@ -258,12 +258,18 @@ curl -H "Content-Type: application/json" -XPOST "localhost:9200/bank/_doc/_bulk?
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/2?op_type=create -d '{"name":"lucy","age":18}'
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_create -d '{"name":"lily","age":28}'
 ```
-- _create创建数据
+- _create创建数据也可以用?op_type=create替代,也可以不加_create，不存在则创建存在则覆盖
 - put请求必须带id,如果id不存在则为创建，如果id存在则为更新
 - post请求不用带id,如果id不存在则为创建，如果id存在则为更新
 
 
-4、查询索引
+4、查看索引文档数量
+```
+curl -XGET '101.201.34.96:9200/test/_count?pretty'
+```
+
+
+5、查询索引
 ```
 1、根据id查询
 curl -XGET http://master:9200/test/user/1
@@ -279,14 +285,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
   ]
 }
 '
-```
-- _search 查询
-- q=* ES批量索引中的所有文档
-- sort=account_number:asc 表示根据account_number按升序对结果排序
-- match_all：匹配所有文档。默认查询
 
-
-```
 检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
@@ -298,13 +297,16 @@ curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty=true‘
 或者
 curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
 ```
+- _search 查询
+- q=* ES批量索引中的所有文档
+- sort=account_number:asc 表示根据account_number按升序对结果排序
+- match_all：匹配所有文档。默认查询
 
-3、DSL 查询  
+
+
+6、DSL 查询 搜索
 Domain Specific Language领域特定语言
 ```
-新添加一个文档
-curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/4/_create -d '{"name":"qiqi","age":17}'
-
 DSL查询
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"qiqi"}}}'
 
@@ -356,7 +358,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": { "match_all": {} },
-  "from": 10,
+  "from": 1,
   "size": 10
 }
 '
@@ -378,7 +380,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 
 
 ```
-# 查询包含mill和lane的所有账户：
+# 查询包含mill和lane的所有账户，该bool must指定了所有必须为真才匹配。
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
@@ -391,9 +393,9 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
   }
 }
 '
-该bool must指定了所有必须为真才匹配。
 
-# 查询包含mill或lane的所有账户：
+
+# 查询包含mill或lane的所有账户
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
@@ -406,8 +408,12 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
   }
 }
 '
-
 ```
+- must 条件必须都满足，会进行打分
+- must_not 条件必须都不满足
+- should 如果满足任意条件，将增加 _score ，否则无任何影响。主要用于修正每个文档的相关性得分
+- filter 条件必须都满足，不进行打分，效率高，还会进行缓存
+
 
 高亮显示
 ```
@@ -427,7 +433,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
 }'
 ```
 
-聚合
+聚合搜索
 ```
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
 {
