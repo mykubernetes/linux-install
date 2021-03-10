@@ -325,11 +325,11 @@ curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
 6、DSL 查询 搜索
 Domain Specific Language领域特定语言
 ```
-DSL查询
+1、查找name是qiqi的
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"qiqi"}}}'
 
 
-DSL查询男性，年龄大于30
+2、查询男性，年龄大于30
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d '
 {
    "query": {
@@ -350,7 +350,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
    }
 }'
 
-# 查询余额大于或等于20000且小于等于30000的账户
+3、查询余额大于或等于20000且小于等于30000的账户
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
@@ -369,23 +369,20 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 }
 '
 
-
-
-
-# 返回10-19的文档：
+4、查询所有文档，返回10-19页：
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": { "match_all": {} },
-  "from": 1,
-  "size": 10
+  "from": 10,
+  "size": 19
 }
 '
 
-# DSL全文搜索 "张三" "李四"
+5、全文搜索 "张三" "李四"
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"张三 李四"}}}'
 
 
-# 返回_source字段中的几个字段：
+6、返回_source字段中的几个字段：
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": { "match_all": {} },
@@ -393,6 +390,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 }
 '
 ```
+- 通过 from 和 size 进行分页，默认最多10000条数据
 - from未指定，默认为0
 - size未指定，默认为10
 
@@ -424,6 +422,61 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
       ]
     }
   }
+}
+'
+
+match_phrase
+curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+    "query": {
+        "match_phrase": {
+            "address": "北京 昌平"
+        }
+    }
+}
+'
+
+term
+curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+    "query": {
+        "term": {
+            "age": 22
+        }
+    }
+}
+'
+
+
+
+curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+    "query": {
+        "bool": {
+            "must": {
+                "match": {
+                    "address": "北京 昌平"
+                }
+            },
+            "must_not": {
+                "term": {
+                    "age": 40
+                }
+            },
+            "should": {
+                "term": {
+                    "age": 20
+                }
+            },
+            "filter": {
+                "range": {
+                    "age": {
+                        "gt": 12
+                    }
+                }
+            }
+        }
+    }
 }
 '
 ```
