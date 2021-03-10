@@ -67,6 +67,7 @@ network.host: 192.168.101.66         #监听的ip地址，如果是0.0.0.0，则
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]   #默认使用9300，如果修改可node001:9300
 discovery.zen.ping_timeout: 10s
 discovery.zen.minimum_master_nodes: 3
+discovery.zen.ping.multicast.enabled: false        #如果是不同网段的节点如何组成es集群禁用自动发现机制
 
 # 允许跨域请求
 http.cors.enabled: true
@@ -229,20 +230,25 @@ curl -XPUT 'master:9200/test?pretty' -H 'Content-Type: application/json' -d '
 {
     "settings": {
         "number_of_shards": 3,
-        "number_of_replicas": 1
+        "number_of_replicas": 2
     }
 }
 '
 
+查看
+curl -XGET http://master:9200/test/_settings?pretty
 
-2、删除索引
+2、修改索引策略
+curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test5/_settings' -d'{"index":{"number_of_replicas":1}}'
+
+3、删除索引
 curl -XDELETE http://master:9200/test/user/1
 
 
-3、删除索引中的一行数据
+5、删除索引中的一行数据
 curl -XDELETE http://master:9200/test/user/1
 
-4、获取删除后的索引状态
+6、获取删除后的索引状态
 curl -XGET http://master:9200/test/user/1
 
 如果文档存在，result属性值为deleted，_version属性的值+1
@@ -255,9 +261,7 @@ curl -XGET http://master:9200/test/user/1
 2、查看所有分片
 ```
 curl -XGET '101.201.34.96:9200/_cat/shards?pretty'
-
 ```
-
 
 3、导入数据
 ```
@@ -280,19 +284,17 @@ curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_c
 - put请求必须带id,如果id不存在则为创建，如果id存在则为更新
 - post请求不用带id,如果id不存在则为创建，如果id存在则为更新
 
-
 4、查看索引文档数量
 ```
 curl -XGET '101.201.34.96:9200/test/_count?pretty'
 ```
-
 
 5、查询索引
 ```
 1、根据id查询
 curl -XGET http://master:9200/test/user/1
 
-1、查询索引并排序
+2、查询索引并排序
 curl -X GET "localhost:9200/bank/_search?q=*&sort=account_number:asc&pretty"
 
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
@@ -320,10 +322,7 @@ curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
 - sort=account_number:asc 表示根据account_number按升序对结果排序
 - match_all：匹配所有文档。默认查询
 
-
-
 6、DSL 查询 搜索
-Domain Specific Language领域特定语言
 ```
 1、查找name是qiqi的
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"qiqi"}}}'
@@ -486,7 +485,7 @@ curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: appli
 - filter 条件必须都满足，不进行打分，效率高，还会进行缓存
 
 
-高亮显示
+7、高亮显示
 ```
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
 {
@@ -504,7 +503,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
 }'
 ```
 
-聚合搜索
+8、聚合搜索
 ```
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
 {
@@ -518,50 +517,35 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
  }
 ```
 
-4、MGET 查询  
+9、MGET 查询  
 使用mget API获取多个文档
 ```
-先新建一个库
-curl -XPUT 'http://master:9200/test2/'
-curl -H "Content-Type: application/json" -XPOST http://master:9200/test2/user/1 -d '{"name" : "marry","age" : 16}'
-
-查询不同_index的数据
+1、查询不同_index的数据
 curl -H "Content-Type: application/json" -XGET http://master:9200/_mget?pretty -d '{"docs":[{"_index":"test","_type":"user","_id":2,"_source":"name"},{"_index":"test2","_type":"user","_id":1}]}'
 
-如果需要的文档在同一个_index或者同一个_type中，可以在URL中指定一个默认的/_index或者/_index/_type。
+2、如果需要的文档在同一个_index或者同一个_type中，可以在URL中指定一个默认的/_index或者/_index/_type。
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"docs":[{"_id":1},{"_id":2}]}‘
 
-如果所有的文档拥有相同的_index 以及_type，直接在请求中添加ids的数组即可。
+3、如果所有的文档拥有相同的_index 以及_type，直接在请求中添加ids的数组即可。
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"ids":["1","2"]}'
 ```
 
-5、HEAD 的使用  
+10、HEAD 的使用  
 如果只想检查一下文档是否存在，可以使用HEAD来替代GET方法，这样就只会返回HTTP头文件
 ```
 curl -i -XHEAD http://master:9200/test/user/1
 ```
 
-6、ES 更新  
+11、ES 更新  
 ES可以使用PUT或者POST对文档进行更新(全部更新)，如果指定ID的文档已经存在，则执行更新操作  
-注意:执行更新操作的时候  
-- ES首先将旧的文档标记为删除状态
-- 然后添加新的文档
-- 旧的文档不会立即消失，但是你也无法访问
-- ES会在你继续添加更多数据的时候在后台清
-- 理已经标记为删除状态的文档
-
+```
 局部更新，可以添加新字段或者更新已有字段（必须使用POST）
-```
 curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/1/_update -d '{"doc":{"name":"baby","age":27}}‘
-
-curl -XGET http://master:9200/test/user/1?pretty
 ```
 
-
-8、ES 批量操作-bulk  
+12、ES 批量操作-bulk  
 bulk API可以帮助我们同时执行多个请求
 ```
-格式：
 action：index/create/update/delete
 metadata：_index,_type,_id
 request body：_source(删除操作不需要)
@@ -574,17 +558,15 @@ create 和index的区别,如果数据存在，使用create操作失败，会提�
 ```
 
 ```
-使用文件的方式新建一个requests文件
-vi requests
+1、使用文件的方式新建一个requests文件
+vim requests
 {"index":{"_index":"test","_type":"user","_id":"6"}}
 {"name":"mayun","age":51}
 {"update":{"_index":"test","_type":"user","_id":"6"}}
 {"doc":{"age":52}}
 
-执行批量操作
+2、执行批量操作
 curl -H "Content-Type: application/json" -XPOST http://master:9200/_bulk --data-binary @requests;
-
-curl -XGET http://master:9200/test/user/6?pretty
 ```
 
 bulk请求可以在URL中声明/_index 或者/_index/_type.  
@@ -595,7 +577,7 @@ bulk一次最大处理多少数据量
 - https://www.elastic.co/guide/en/elasticsearch/reference/6.6/modules-http.html
 
 
-9、ES 版本控制  
+13、ES 版本控制  
 普通关系型数据库使用的是（悲观并发控制（PCC））当我们在修改一个数据前先锁定这一行，然后确保只有读取到数据的这个线程可以修改这一行数据.
 
 ES使用的是（乐观并发控制（OCC））ES不会阻止某一数据的访问，然而，如果基础数据在我们读取和写入的间隔中发生了变化，更新就会失败，这时候就由程序来决定如何处理这个冲突。它可以重新读取新数据来进行更新，又或者将这一情况直接反馈给用户。
@@ -611,87 +593,8 @@ curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/2/_
 如果传递的版本号和待更新的文档的版本号不一致，则会更新失败
 ```
 
-cluster
----
-- 集群中有多个节点，其中有一个为主节点，这个主节点是可以通过选举产生的。es是去中心化的，与任何一个节点的通信和与整个es集群通信是等价的。
-- 主节点的职责是负责管理集群状态，包括管理分片的状态和副本的状态，以及节点的发现和删除。
-- 注意：主节点不负责对数据的增删改查请求进行处理，只负责维护集群的相关状态信息。
-集群状态查看
-```
-http://192.168.20.210:9200/_cluster/health?pretty
-```
+14、Mapping
 
-
-Shards
----
-- 代表索引分片，es可以把一个完整的索引分成多个分片，这样的好处是可以。把一个大的索引水平拆分成多个，分布到不同的节点上。构成分布式搜索，提高性能和吞吐量。
-- 分片的数量只能在创建索引库时指定，索引库创建后不能更改。
-```
-curl -H "Content-Type: application/json" -XPUT 'master:9200/test3/' -d'{"settings":{"number_of_shards":3}}'
-```
-默认是一个索引库有5个分片，每个分片中最多存储2,147,483,519条数据
-
-https://www.elastic.co/guide/en/elasticsearch/reference/6.6/getting-started-concepts.html
-
-
-Replicas
----
-es可以给索引分片设置副本，副本的作用：
-- 一是提高系统的容错性，当某个节点某个分片损坏或丢失时可以从副本中恢复。
-- 二是提高es的查询效率，es会自动对搜索请求进行负载均衡。
-- 副本的数量可以随时修改
-```
-可以在创建索引库的时候指定
-curl -H "Content-Type: application/json" -XPUT 'master:9200/test4/' -d'{"settings":{"number_of_replicas":3}}'
-```
-默认是一个分片有1个副本
-```
-index.number_of_replicas: 1
-```
-注意：主分片和副本不会存在一个节点中
-
-recovery
----
-- 数据恢复或叫数据重新分布，es在有节点加入或退出时会根据机器的负载对索引分片进行重新分配，挂掉的节点重新启动时也会进行数据恢复。
-
-Gateway
----
-- es索引的持久化存储方式，es默认是先把索引存放到内存中，当内存满了时再持久化到硬盘。当es集群关闭再重新启动时就会从gateway中读取索引数据。es支持多种类型的gateway，有本地文件系统（默认），分布式文件系统，Hadoop的HDFS和Amazon的s3云存储服务。
-
-Discovery.zen
----
-代表es的自动发现节点机制，es是一个基于p2p的系统，它先通过广播寻找存在的节点，再通过多播协议来进行节点之间的通信，同时也支持点对点的交互。
-```
-如果是不同网段的节点如何组成es集群禁用自动发现机制
-discovery.zen.ping.multicast.enabled: false
-```
-
-```
-设置新节点被启动时能够发现的主节点列表
-discovery.zen.ping.unicast.hosts: ["192.168.20.210","192.168.20.211", "192.168.20.212"]
-```
-
-Transport
----
-- es内部节点或集群与客户端的交互方式，默认内部是使用tcp协议进行交互，同时它支持http协议（json格式）、thrift、servlet、memcached、zeroMQ等的传输协议（通过插件方式集成）。
-
-settings
----
-https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html  
-例如：分片数量，副本数量
-```
-查看
-curl -XGET http://master:9200/test/_settings?pretty
-
-# 操作不存在索引(创建)：
-curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test5/' -d'{"settings":{"number_of_shards":3,"number_of_replicas":2}}'
-
-# 操作已存在索引（修改）：
-curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test5/_settings' -d'{"index":{"number_of_replicas":1}}'
-```
-
-Mapping
----
 https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
 
 ```
