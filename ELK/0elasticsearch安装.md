@@ -263,6 +263,7 @@ curl -XGET http://master:9200/test/user/1
 curl -XGET '101.201.34.96:9200/_cat/shards?pretty'
 ```
 
+
 3、导入数据
 ```
 1、PUT请求,PUT是幂等方法，所以PUT用于更新操作,PUT，DELETE操作是幂等的,幂等是指不管进行多少次操作，结果都一样。
@@ -284,12 +285,27 @@ curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_c
 - put请求必须带id,如果id不存在则为创建，如果id存在则为更新
 - post请求不用带id,如果id不存在则为创建，如果id存在则为更新
 
-4、查看索引文档数量
+4、检查一个文档是否存在  
+```
+curl -i -XHEAD http://master:9200/test/user/1
+```
+
+5、获取一个文档
+```
+curl -XGET '101.201.34.96:9200/test/_doc/2?pretty'
+```
+
+6、查看索引文档数量
 ```
 curl -XGET '101.201.34.96:9200/test/_count?pretty'
 ```
 
-5、查询索引
+7、删除一个文档
+```
+curl -XDELETE '101.201.34.96:9200/test/_doc/7xkbPm8BCYmbEjHUXwA-?pretty'
+```
+
+8、查询索引
 ```
 1、根据id查询
 curl -XGET http://master:9200/test/user/1
@@ -305,6 +321,9 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
   ]
 }
 '
+
+搜索所有文档
+curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty'
 
 检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
@@ -322,7 +341,7 @@ curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
 - sort=account_number:asc 表示根据account_number按升序对结果排序
 - match_all：匹配所有文档。默认查询
 
-6、DSL 查询 搜索
+8、DSL 查询 搜索
 ```
 1、查找name是qiqi的
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"qiqi"}}}'
@@ -392,6 +411,45 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 - 通过 from 和 size 进行分页，默认最多10000条数据
 - from未指定，默认为0
 - size未指定，默认为10
+
+match、match_phrase、term
+```
+curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+    "query": {
+        "match": {
+            "address": "北京 昌平"
+        }
+    },
+    "from": 1,
+    "size": 2
+}
+'
+# 通过 from 和 size 进行分页，默认最多10000条数据
+
+
+curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+    "query": {
+        "match_phrase": {
+            "address": "北京 昌平"
+        }
+    }
+}
+'
+
+
+curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+    "query": {
+        "term": {
+            "age": 22
+        }
+    }
+}
+'
+
+```
 
 
 ```
@@ -528,12 +586,6 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mge
 
 3、如果所有的文档拥有相同的_index 以及_type，直接在请求中添加ids的数组即可。
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"ids":["1","2"]}'
-```
-
-10、HEAD 的使用  
-如果只想检查一下文档是否存在，可以使用HEAD来替代GET方法，这样就只会返回HTTP头文件
-```
-curl -i -XHEAD http://master:9200/test/user/1
 ```
 
 11、ES 更新  
