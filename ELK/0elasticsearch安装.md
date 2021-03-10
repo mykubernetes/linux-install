@@ -240,33 +240,35 @@ curl -XGET '101.201.34.96:9200/_cat/shards?pretty'
 
 ```
 
+
+3、导入数据
 ```
-创建数据
-PUT请求,PUT是幂等方法，所以PUT用于更新操作,PUT，DELETE操作是幂等的,幂等是指不管进行多少次操作，结果都一样。
+1、PUT请求,PUT是幂等方法，所以PUT用于更新操作,PUT，DELETE操作是幂等的,幂等是指不管进行多少次操作，结果都一样。
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/1 -d '{"name" : "jack","age" : 28}'
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/_doc/1 -d '{"name" : "jack","age" : 28}'
 
-POST请求,POST用于新增操作比较合适,POST操作不是幂等的,多次发出同样的POST请求后，其结果是创建出了若干的资源。
-使用自增ID（post）
+2、POST请求,POST用于新增操作比较合适,POST操作不是幂等的,多次发出同样的POST请求后，其结果是创建出了若干的资源。使用自增ID（post）
 curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/ -d '{"name" : "jack","age" : 28}'
 
-在url后面添加参数,下面两种方法都可以
+3、通过文件导入
+wget https://raw.githubusercontent.com/elastic/elasticsearch/master/docs/src/test/resources/accounts.json
+curl -H "Content-Type: application/json" -XPOST "localhost:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@accounts.json"
+
+4、在url后面添加参数,下面两种方法都可以
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/2?op_type=create -d '{"name":"lucy","age":18}'
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_create -d '{"name":"lily","age":28}'
 ```
-创建操作可以使用POST，也可以使用PUT，区别在于POST是作用在一个集合资源之上的（/articles），而PUT操作是作用在一个具体资源之上的（/articles/123）比如说很多资源使用数据库自增主键作为标识信息，而创建的资源的标识信息到底是什么只能由服务端提供，这个时候就必须使用POST
+- _create创建数据
 - put请求必须带id,如果id不存在则为创建，如果id存在则为更新
 - post请求不用带id,如果id不存在则为创建，如果id存在则为更新
 
-导入数据
+
+4、查询索引
 ```
-wget https://raw.githubusercontent.com/elastic/elasticsearch/master/docs/src/test/resources/accounts.json
+1、根据id查询
+curl -XGET http://master:9200/test/user/1
 
-# 导入数据
-curl -H "Content-Type: application/json" -XPOST "localhost:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@accounts.json"
-
-curl "localhost:9200/_cat/indices?v"
-
+1、查询索引并排序
 curl -X GET "localhost:9200/bank/_search?q=*&sort=account_number:asc&pretty"
 
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
@@ -277,18 +279,14 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
   ]
 }
 '
-
 ```
 - _search 查询
 - q=* ES批量索引中的所有文档
 - sort=account_number:asc 表示根据account_number按升序对结果排序
 - match_all：匹配所有文档。默认查询
 
-2、查询索引
-```
-根据id查询
-curl -XGET http://master:9200/test/user/1
 
+```
 检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
