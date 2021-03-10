@@ -222,8 +222,9 @@ http://192.168.101.66:9100/
 ES常用命令
 ---
 
-1、创建索引库
+1、添加和删除索引
 ```
+1、创建索引库
 curl -XPUT 'master:9200/test?pretty' -H 'Content-Type: application/json' -d '
 {
     "settings": {
@@ -232,6 +233,23 @@ curl -XPUT 'master:9200/test?pretty' -H 'Content-Type: application/json' -d '
     }
 }
 '
+
+
+2、删除索引
+curl -XDELETE http://master:9200/test/user/1
+
+
+3、删除索引中的一行数据
+curl -XDELETE http://master:9200/test/user/1
+
+4、获取删除后的索引状态
+curl -XGET http://master:9200/test/user/1
+
+如果文档存在，result属性值为deleted，_version属性的值+1
+
+如果文档不存在，result属性值为not_found，但是_version属性的值依然会+1，这个就是内部管理的一部分，它保证了我们在多个节点间的不同操作的顺序都被正确标记了
+
+注意：删除一个文档也不会立即生效，它只是被标记成已删除。Elasticsearch将会在你之后添加更多索引的时候才会在后台进行删除内容的清理。
 ```
 
 2、查看所有分片
@@ -485,19 +503,6 @@ curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/1/_
 
 curl -XGET http://master:9200/test/user/1?pretty
 ```
-
-7、ES 删除  
-删除操作
-```
-curl -XDELETE http://master:9200/test/user/1
-curl -XGET http://master:9200/test/user/1
-```
-如果文档存在，result属性值为deleted，_version属性的值+1
-
-如果文档不存在，result属性值为not_found，但是_version属性的值依然会+1，这个就是内部管理的一部分，它保证了我们在多个节点间的不同操作的顺序都被正确标记了
-
-注意：删除一个文档也不会立即生效，它只是被标记成已删除。Elasticsearch将会在你之后添加更多索引的时候才会在后台进行删除内容的清理。
-
 
 
 8、ES 批量操作-bulk  
