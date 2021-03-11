@@ -6,6 +6,7 @@ Promtail + Loki + Grafana 构建日志监控告警系统
 
 https://blog.csdn.net/m0_38075425/article/details/108386005
 
+https://www.freesion.com/article/41801004511/
 
 https://blog.csdn.net/yangbosos/article/details/88903846
 
