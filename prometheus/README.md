@@ -2,6 +2,19 @@ https://blog.csdn.net/han949417140/article/details/112462319
 
 https://www.jianshu.com/p/c21d399c140a?utm_campaign=haruki&utm_content=note&utm_medium=reader_share&utm_source=weixin
 
+| 名称 | 地址 | 说明 |
+|-----|------|-----|
+| 官方采集组件 | https://prometheus.io/download/ | 包含prometheus、alertmanager、blackbox_exporter、consul_exporter、graphite_exporter、haproxy_exporter、memcached_exporter、mysqld_exporter、node_exporter、pushgateway、statsd_exporter等组件 |
+| 其他采集组件 | https://prometheus.io/docs/instrumenting/exporters/ | 上面不包含的组件都可以来这里查找 |
+| grafana dashboards json模板 | https://grafana.com/grafana/dashboards?search=kafka | 搜索grafana图形化展示prometheus监控数据模板 |
+| prometheus中文文档1	| https://www.prometheus.wang/exporter/use-promethues-monitor-mysql.html | |
+| prometheus中文文档2 | https://prometheus.fuckcloudnative.io/di-san-zhang-prometheus/storage | |
+
+
+
+
+
+
 Metric类型
 ---
 Prometheus会将所有采集到的样本数据以时间序列（time-series）的方式保存在内存数据库TSDB中，并且定时保存到硬盘上。time-series是按照时间戳和值的序列顺序存放的，我们称之为向量(vector)。每条time-series通过指标名称(metrics name)和一组标签集(labelset)命名。
