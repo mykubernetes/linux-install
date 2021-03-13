@@ -18,6 +18,20 @@ http://www.jwsblog.com/archives/59.html
 
 https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
 
+ES  内置的REST 接口
+| URL | 说明 |
+|-----|------|
+| /index/_search | 搜索指定索引下的数据 |
+| /_aliases | 获取或者操作索引下的别名 |
+| /index/ | 查看指定索引下的详细信息 |
+| /index/type/ | 创建或者操作类型 |
+| /index/mapping | 创建或者操作mapping |
+| /index/settings | 创建或者操作settings |
+| /index/_open | 打开指定索引 |
+| /index/_close | 关闭指定索引 |
+| /index/_refresh | 刷新索引（使新增加内容对搜索可见，不保证数据被写入磁盘） |
+| /index/_flush | 刷新索引（会触发Lucene提交数据） |
+
 一、使用_cat系列  
 _cat系列提供了一系列查询elasticsearch集群状态的接口。  
 ```
