@@ -123,7 +123,9 @@ $ cd /opt/module/elasticsearch-6.6.0/bin/
 
 9、curl访问方法  
 1)查看单记得点的工作状态  
-``` curl -X GET 'http://node001:9200/?pretty' ```  
+```
+curl -X GET 'http://node001:9200/?pretty'
+```
 
 2)查看cat支持的操作  
 ``` 
@@ -134,20 +136,23 @@ curl -X GET 'http://node001:9200/_cat'
 ```
 curl -X GET 'http://node001:9200/_cat/nodes?v' 
 curl -X GET 'http://node001:9200/_nodes/process?pretty'
-、
 ```
 
 4)查看集群健康状态  
 ```
-curl 'nofr001:9200/_cat/health?v'
+curl 'node001:9200/_cat/health?v'
 curl -X GET 'http://node001:9200/_cluster/health?pretty'
 ```  
 
 5）查看集群详细信息  
-``` curl 'node001:9200/_cluster/state?pretty' ```  
+```
+curl 'node001:9200/_cluster/state?pretty'
+```
 
 6)查看所有索引信息  
-``` curl 'node001:9200/_cat/indices?v' ```  
+```
+curl 'node001:9200/_cat/indices?v'
+```
 
 7)计算集群中文档的数量
 ```
@@ -223,6 +228,13 @@ http://192.168.101.66:9100/
 ES常用命令
 ---
 
+REST API可以作用
+- 1.检查集群,节点,索引的健康,状态,统计
+- 2.管理集群,节点,索引的数据和元数据
+- 3.执行CRUD和搜索操作
+- 4.执行高级搜索操作,比如分页,排序,过滤,脚本,聚合等
+
+
 1、添加和删除索引
 ```
 1、创建索引库
@@ -235,15 +247,14 @@ curl -XPUT 'master:9200/test?pretty' -H 'Content-Type: application/json' -d '
 }
 '
 
-查看
+2、查看索引设置
 curl -XGET http://master:9200/test/_settings?pretty
 
-2、修改索引策略
+3、修改索引策略
 curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test5/_settings' -d'{"index":{"number_of_replicas":1}}'
 
-3、删除索引
+4、删除索引
 curl -XDELETE http://master:9200/test
-
 
 5、删除索引中的一行数据
 curl -XDELETE http://master:9200/test/user/1
@@ -284,53 +295,40 @@ curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_c
 - put请求必须带id,如果id不存在则为创建，如果id存在则为更新
 - post请求不用带id,如果id不存在则为创建，如果id存在则为更新
 
-4、检查一个文档是否存在  
+
+4、查询索引
 ```
+1、检查一个文档是否存在  
 curl -i -XHEAD http://master:9200/test/user/1
-```
 
-5、获取一个文档
-```
-curl -XGET '101.201.34.96:9200/test/_doc/2?pretty'
-```
-
-6、查看索引文档数量
-```
+2、查看索引文档数量
 curl -XGET '101.201.34.96:9200/test/_count?pretty'
-```
 
-7、删除一个文档
-```
-curl -XDELETE '101.201.34.96:9200/test/_doc/7xkbPm8BCYmbEjHUXwA-?pretty'
-```
+3、获取一个文档
+curl -XGET 'http://master:9200/test/user/1?pretty'
 
-8、查询索引
-```
-1、根据id查询
-curl -XGET http://master:9200/test/user/1
-
-2、检索文档中的一部分，如果只需要显示指定字段
+4、检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
-3、查询指定索引库指定类型所有数据
+5、查询指定索引库指定类型所有数据
 curl -XGET http://master:9200/test/user/_search?pretty
 
-4、根据条件进行查询
+6、根据条件进行查询
 curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
 
-5、查询后结果进行排序
+7、查询后结果进行排序
 curl -X GET "master:9200/test/user/_search?q=*&sort=account_number:asc&pretty"
 
-6、搜索所有文档
+8、搜索所有文档
 curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty'
 
-7、检索文档中的一部分，如果只需要显示指定字段
+9、检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
-8、查询指定索引库指定类型所有数据
+10、查询指定索引库指定类型所有数据
 curl -XGET http://master:9200/test/user/_search?pretty
 
-9、根据条件进行查询name=john的
+11、根据条件进行查询name=john的
 curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty=true‘
 或者
 curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
@@ -340,7 +338,7 @@ curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
 - sort=account_number:asc 表示根据account_number按升序对结果排序
 - match_all：匹配所有文档。默认查询
 
-8、DSL 查询 搜索
+5、DSL 查询 搜索
 ```
 1、查看所有文档
 curl -X GET "master:9200/test/_search" -H 'Content-Type: application/json' -d'
@@ -552,7 +550,7 @@ curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: appli
 - filter 条件必须都满足，不进行打分，效率高，还会进行缓存
 
 
-7、高亮显示
+6、高亮显示
 ```
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
 {
@@ -570,7 +568,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
 }'
 ```
 
-8、聚合搜索
+7、聚合搜索
 ```
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
 {
@@ -584,7 +582,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
  }
 ```
 
-9、MGET 查询  
+8、MGET 查询  
 使用mget API获取多个文档
 ```
 1、查询不同_index的数据
@@ -597,14 +595,14 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mge
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"ids":["1","2"]}'
 ```
 
-11、ES 更新  
+9、ES 更新  
 ES可以使用PUT或者POST对文档进行更新(全部更新)，如果指定ID的文档已经存在，则执行更新操作  
 ```
 局部更新，可以添加新字段或者更新已有字段（必须使用POST）
 curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/1/_update -d '{"doc":{"name":"baby","age":27}}‘
 ```
 
-12、ES 批量操作-bulk  
+10、ES 批量操作-bulk  
 bulk API可以帮助我们同时执行多个请求
 ```
 action：index/create/update/delete
@@ -638,7 +636,7 @@ bulk一次最大处理多少数据量
 - https://www.elastic.co/guide/en/elasticsearch/reference/6.6/modules-http.html
 
 
-13、ES 版本控制  
+11、ES 版本控制  
 普通关系型数据库使用的是（悲观并发控制（PCC））当我们在修改一个数据前先锁定这一行，然后确保只有读取到数据的这个线程可以修改这一行数据.
 
 ES使用的是（乐观并发控制（OCC））ES不会阻止某一数据的访问，然而，如果基础数据在我们读取和写入的间隔中发生了变化，更新就会失败，这时候就由程序来决定如何处理这个冲突。它可以重新读取新数据来进行更新，又或者将这一情况直接反馈给用户。
@@ -654,7 +652,7 @@ curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/2/_
 如果传递的版本号和待更新的文档的版本号不一致，则会更新失败
 ```
 
-14、Mapping
+12、Mapping
 
 https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
 
