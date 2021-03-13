@@ -242,7 +242,7 @@ curl -XGET http://master:9200/test/_settings?pretty
 curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test5/_settings' -d'{"index":{"number_of_replicas":1}}'
 
 3、删除索引
-curl -XDELETE http://master:9200/test/user/1
+curl -XDELETE http://master:9200/test
 
 
 5、删除索引中的一行数据
