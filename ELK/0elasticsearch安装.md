@@ -309,28 +309,28 @@ curl -XDELETE '101.201.34.96:9200/test/_doc/7xkbPm8BCYmbEjHUXwA-?pretty'
 1、根据id查询
 curl -XGET http://master:9200/test/user/1
 
-2、查询索引并排序
-curl -X GET "localhost:9200/bank/_search?q=*&sort=account_number:asc&pretty"
-
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
-{
-  "query": { "match_all": {} },
-  "sort": [
-    { "account_number": "asc" }
-  ]
-}
-'
-
-搜索所有文档
-curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty'
-
-检索文档中的一部分，如果只需要显示指定字段
+2、检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
-查询指定索引库指定类型所有数据
+3、查询指定索引库指定类型所有数据
 curl -XGET http://master:9200/test/user/_search?pretty
 
-根据条件进行查询name=john的
+4、根据条件进行查询
+curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
+
+5、查询后结果进行排序
+curl -X GET "master:9200/test/user/_search?q=*&sort=account_number:asc&pretty"
+
+6、搜索所有文档
+curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty'
+
+7、检索文档中的一部分，如果只需要显示指定字段
+curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
+
+8、查询指定索引库指定类型所有数据
+curl -XGET http://master:9200/test/user/_search?pretty
+
+9、根据条件进行查询name=john的
 curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty=true‘
 或者
 curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
@@ -342,11 +342,21 @@ curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
 
 8、DSL 查询 搜索
 ```
-1、查找name是qiqi的
+1、查看所有文档
+curl -X GET "master:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": { "match_all": {} },
+  "sort": [
+    { "account_number": "asc" }
+  ]
+}
+'
+
+2、查找name是qiqi的
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"qiqi"}}}'
 
 
-2、查询男性，年龄大于30
+3、查询男性，年龄大于30
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d '
 {
    "query": {
@@ -367,7 +377,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
    }
 }'
 
-3、查询余额大于或等于20000且小于等于30000的账户
+4、查询余额大于或等于20000且小于等于30000的账户
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
@@ -386,7 +396,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 }
 '
 
-4、查询所有文档，返回10-19页：
+5、查询所有文档，返回10-19页：
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": { "match_all": {} },
@@ -395,11 +405,11 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 }
 '
 
-5、全文搜索 "张三" "李四"
+6、全文搜索 "张三" "李四"
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"张三 李四"}}}'
 
 
-6、返回_source字段中的几个字段：
+7、返回_source字段中的几个字段：
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": { "match_all": {} },
