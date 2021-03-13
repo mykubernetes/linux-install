@@ -47,7 +47,7 @@ POOLS:
 # ceph auth list
 ```
 
-6、检查Mon状态
+6、检查Mon状态  
 MON 状态表
 ---
 | 状态 | 说明 |
@@ -63,7 +63,7 @@ MON 状态表
 # ceph quorum_status -f json-pretty
 ```  
 
-7、OSD查看
+7、OSD查看  
 OSD状态表
 ---
 | 状态 | 说明 |
