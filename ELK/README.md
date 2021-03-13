@@ -432,19 +432,18 @@ response:
 9、使用REST API搜索文档
 ```
 搜索所有文档,结果按account_number升序排序
-http://192.168.0.128:9200/bank/_search?q=*&sort=account_number:asc&pretty
+curl -XGET http://192.168.0.128:9200/bank/_search?q=*&sort=account_number:asc&pretty
+
 等价的写法:
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search -d
+'{
   "query": { "match_all": {} },
   "sort": [
     { "account_number": "asc" }
   ],
   "from" : 5, //从第5条开始,默认是0
   "size" : 1 //返回1条,默认是10条
-}
+}'
  
 response:
 {
@@ -487,14 +486,12 @@ response:
  
 ------------------------------------------
 搜索所有的文档,返回前2条,并显示指定的fields
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search -d
+'{
   "query": { "match_all": {} },
   "_source" : ["account_number","balance","email"], //返回指定的字段
   "size" : 2
-}
+}'
  
 response:
 {
@@ -537,21 +534,17 @@ response:
  
 ------------------------------------
 搜索account_number为20的文档
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search -d
+'{
   "query": { "match": {"account_number" : 20} }
-}
+}'
  
 ------------------------------
 搜索address中含有mill的所有文档
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search -d
+'{
  "query": { "match": {"address" : "mill"} }
-}
+}'
  
 ---------------------------------
 使用match_phrase匹配address中含有"mill lane"短语的文档
@@ -565,10 +558,8 @@ params:
 ---------------------------------
  
 使用bool query匹配address中同时含有"mill "和"lane"短语的文档,must:and
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search -d
+'{
   "query": {
     "bool": {
       "must": [
@@ -577,7 +568,7 @@ params:
       ]
     }
   }
-}
+}'
  
 与之类似的:
 should:or关系
@@ -587,10 +578,8 @@ bool query可以同时包含must,should,must_not组成复杂的查询
 
 10 文档score:根据搜索条件估算一个文档匹配程度的相对的数值.得分越高,文档越有价值;反之,价值越低.有些情况不需要score(比如"filter""),es会检测自动优化查询,不计算得分.
 ```
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search  -d
+'{
   "query": {
     "bool": {
       "must": { "match_all": {} }, //查询所有的文档
@@ -604,16 +593,14 @@ params:
       }
     }
   }
-}
+}'
 ```
 
 11 执行聚合:es提供了分组和统计的能力,这就是聚合.可以认为就是sql中的group by和aggregate 功能.es在聚合时同时返回搜索的文档和聚合两部分.
 ```
 按state分组聚合,不返回搜索的文档
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search -d
+'{
   "size": 0,//不返回搜索的文档
   "aggs": {//聚合
     "group_by_state": {
@@ -622,7 +609,7 @@ params:
       }
     }
   }
-}
+}'
  
 response:
 {
@@ -660,10 +647,8 @@ response:
 --------------------------------------------------
  
 按state分组,统计每个state的平均工资,并降序排序
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search -d
+'{
   "size": 0,
   "aggs": {
     "group_by_state": {
@@ -682,14 +667,12 @@ params:
       }
     }
   }
-}   
+}'
  
- -------------------------------------------------
+-------------------------------------------------
 按年龄段分组,然后按性别分组,统计每个年龄段中不同性别的平均工资
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
+curl -XPOST http://192.168.0.128:9200/bank/_search -d
+'{
  "size": 0,
  "aggs": {
    "group_by_age": {
@@ -726,5 +709,5 @@ params:
      }
    }
  }
-}
+}'
 ```
