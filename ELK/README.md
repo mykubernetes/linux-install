@@ -89,10 +89,34 @@ Onyxx      bigdesk          NA      s    /_plugin/bigdesk/
 1、查询设置集群状态  
 ```
 curl -XGET localhost:9200/_cluster/health?pretty=true
-pretty=true表示格式化输出
-level=indices 表示显示索引状态
-level=shards 表示显示分片信息
-```  
+{
+  "cluster_name" : "jiankunking-log",
+  "status" : "green",
+  "timed_out" : false,
+  "number_of_nodes" : 3,                        #集群内的总节点数   
+  "number_of_data_nodes" : 3,                   #集群内的总数据节点数
+  "active_primary_shards" : 2722,               #集群内所有索引的主分片总数
+  "active_shards" : 5444,                       #集群内所有索引的分片总数
+  "relocating_shards" : 0,                      #正在迁移中的分片数
+  "initializing_shards" : 0,                    #正在初始化的分片数
+  "unassigned_shards" : 0,                      #未分配到具体节点上的分片数
+  "delayed_unassigned_shards" : 0,              #延时待分配到具体节点上的分片数
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 100.0
+}
+
+curl -XGET localhost:9200/_cluster/health?pretty=true         #表示格式化输出
+curl -XGET localhost:9200/_cluster/health?level=indices       #表示显示索引状态
+curl -XGET localhost:9200/_cluster/health?level=shards        #表示显示分片信息
+```
+- green 绿灯，所有分片都正确运行，集群非常健康。
+- yellow 黄灯，所有主分片都正确运行，但是有副本分片缺失。
+- red 红灯，有主分片缺失。这部分数据完全不可用。
+
+
+
 2、显示集群系统信息，包括CPU JVM等等  
 ```
 curl -XGET localhost:9200/_cluster/stats?pretty=true
