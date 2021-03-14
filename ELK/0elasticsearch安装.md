@@ -546,7 +546,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
 
 7、聚合搜索
 ```
-curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d '
 {
    "aggs": {
       "all_interests": {
@@ -558,7 +558,8 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
  }
 
 # 匹配地址包含mill，且年龄在20~30之间的
-curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d' {"query":
+curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d '
+{"query":
       {"bool":
           { "must":{"match":{"address":"mill"}},
            "filter":{"range":{"age":{"gte":20,"lte":30}}}
@@ -568,7 +569,7 @@ curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_searc
 
 
 # 按照state分组，count递减排序
-curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d'
+curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d '
  { "size":0,
    "aggs":
         {"group_by_state":
@@ -577,7 +578,7 @@ curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_searc
   }'  #默认递减
 
 # 按state计算平均账户余额
-curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d' 
+curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d ' 
 {
  "size":0, 
  "aggs":{ 
@@ -593,20 +594,37 @@ curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_searc
 使用mget API获取多个文档
 ```
 1、查询不同_index的数据
-curl -H "Content-Type: application/json" -XGET http://master:9200/_mget?pretty -d '{"docs":[{"_index":"test","_type":"user","_id":2,"_source":"name"},{"_index":"test2","_type":"user","_id":1}]}'
+curl -H "Content-Type: application/json" -XGET http://master:9200/_mget?pretty -d '
+{
+  "docs":[{"_index":"test","_type":"user","_id":2,"_source":"name"},
+  {"_index":"test2","_type":"user","_id":1}]
+}'
 
 2、如果需要的文档在同一个_index或者同一个_type中，可以在URL中指定一个默认的/_index或者/_index/_type。
-curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"docs":[{"_id":1},{"_id":2}]}‘
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '
+{
+  "docs":[{"_id":1},
+    {"_id":2}]
+}'
 
 3、如果所有的文档拥有相同的_index 以及_type，直接在请求中添加ids的数组即可。
-curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '{"ids":["1","2"]}'
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mget?pretty -d '
+{
+  "ids":["1","2"]
+}'
 ```
 
 9、ES 更新  
 ES可以使用PUT或者POST对文档进行更新(全部更新)，如果指定ID的文档已经存在，则执行更新操作  
 ```
 局部更新，可以添加新字段或者更新已有字段（必须使用POST）
-curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/1/_update -d '{"doc":{"name":"baby","age":27}}‘
+curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/1/_update -d '
+{
+  "doc":{
+    "name":"baby",
+    "age":27
+  }
+}'
 ```
 
 10、ES 批量操作-bulk  
@@ -634,29 +652,21 @@ vim requests
 2、执行批量操作
 curl -H "Content-Type: application/json" -XPOST http://master:9200/_bulk --data-binary @requests;
 ```
-
-bulk请求可以在URL中声明/_index 或者/_index/_type.  
 bulk一次最大处理多少数据量
-- bulk会把将要处理的数据载入内存中，所以数据量是有限制的.
-- 最佳的数据量不是一个确定的数值，它取决于你的硬件，你的文档大小以及复杂性，你的索引以及搜索的负载.
-- 一般建议是1000-5000个文档，如果你的文档很大，可以适当减少队列，大小建议是5-15MB，默认不能超过100M，可以在es的配置文件中修改这个值http.max_content_length: 100mb.
+- bulk会把将要处理的数据载入内存中，所以数据量是有限制.
+- 最佳的数据量取决于硬件，文档大小以及复杂性，索引以及搜索的负载.
+- 一般建议是1000-5000个文档，如果文档很大，可以适当减少队列，大小建议是5-15MB，默认不能超过100M，可以在es的配置文件中修改这个值http.max_content_length: 100mb.
 - https://www.elastic.co/guide/en/elasticsearch/reference/6.6/modules-http.html
 
 
 11、ES 版本控制  
-普通关系型数据库使用的是（悲观并发控制（PCC））当我们在修改一个数据前先锁定这一行，然后确保只有读取到数据的这个线程可以修改这一行数据.
-
-ES使用的是（乐观并发控制（OCC））ES不会阻止某一数据的访问，然而，如果基础数据在我们读取和写入的间隔中发生了变化，更新就会失败，这时候就由程序来决定如何处理这个冲突。它可以重新读取新数据来进行更新，又或者将这一情况直接反馈给用户。
-
-ES如何实现版本控制(使用es内部版本号)
 ```
-首先得到需要修改的文档，获取版本(_version)号
+1、首先得到需要修改的文档，获取版本(_version)号
 curl -XGET http://master:9200/test/user/2
 
-在执行更新操作的时候把版本号传过去
+2、在执行更新操作的时候把版本号传过去，如果传递的版本号和待更新的文档的版本号不一致，则会更新失败
 curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/2?version=1 -d '{"name":"john","age":29}'
 curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/2/_update?version=2 -d'{"doc":{"age":30}}'
-如果传递的版本号和待更新的文档的版本号不一致，则会更新失败
 ```
 
 12、Mapping
@@ -668,10 +678,30 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
 curl -XGET http://master:9200/test/user/_mapping?pretty
 
 # 操作不存在的索引（创建）：
-curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test6' -d'{"mappings":{"user":{"properties":{"name":{"type":"text","analyzer": "ik_max_word"}}}}}'
+curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test6' -d '
+{
+  "mappings":{
+    "user":{
+      "properties":{
+        "name":{
+          "type":"text",
+          "analyzer": "ik_max_word"
+        }
+      }
+    }
+  }
+}'
 
 # 操作已存在的索引（修改）：
-curl -H "Content-Type: application/json" -XPOST http://master:9200/test6/user/_mapping -d '{"properties":{"name":{"type":"text","analyzer":"ik_max_word"}}}'
+curl -H "Content-Type: application/json" -XPOST http://master:9200/test6/user/_mapping -d '
+{
+"properties":{
+  "name":{
+    "type":"text",
+    "analyzer":"ik_max_word"
+    }
+  }
+}'
 ```
 
 索引数据快照备份和恢复
