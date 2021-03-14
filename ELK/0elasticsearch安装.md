@@ -512,7 +512,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 
 
 match_phrase
-match不区分大小写，match_phrase区分大小写
+match不区分大小写且匹配的结果可以不在一起，match_phrase区分大小写且匹配的结果和检索一致
 curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
 {
     "query": {
