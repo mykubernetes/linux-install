@@ -399,7 +399,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 {
   "query": { "match_all": {} },
   "from": 10,
-  "size": 19
+  "size": 10
 }
 '
 
@@ -416,10 +416,10 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 '
 ```
 - 通过 from 和 size 进行分页，默认最多10000条数据
-- from未指定，默认为0
-- size未指定，默认为10
+- from 从哪开始显示，未指定，默认为0
+- size 显示的数量，未指定，默认为10
 
-match、match_phrase、term
+
 ```
 curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
 {
@@ -455,12 +455,19 @@ curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type
     }
 }
 '
-
 ```
 
-
+match、match_phrase、term
 ```
-# 查询包含mill和lane的所有账户，该bool must指定了所有必须为真才匹配。
+# 指定显示的字段："_source":["field1","field2"]
+curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d'
+ { "query":{"match_all":{}}, 
+   "sort":[{"balance":"desc"}], 
+   "_source":["balance","firstname","account_number"] }'
+
+
+
+# 与的关系，同时匹配
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
@@ -474,8 +481,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 }
 '
 
-
-# 查询包含mill或lane的所有账户
+# 或的关系，匹配任意一个
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
@@ -489,7 +495,24 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 }
 '
 
+# 既不包含A也不包含B
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        { "match": { "address": "mill" } },
+        { "match": { "address": "lane" } }
+      ]
+    }
+  }
+}
+'
+
+
+
 match_phrase
+match不区分大小写，match_phrase区分大小写
 curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
 {
     "query": {
@@ -580,6 +603,37 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
        }
     }
  }
+
+# 匹配地址包含mill，且年龄在20~30之间的
+curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d' {"query":
+      {"bool":
+          { "must":{"match":{"address":"mill"}},
+           "filter":{"range":{"age":{"gte":20,"lte":30}}}
+          }
+      }, 
+ "_source":["address","age"] }'
+
+
+# 按照state分组，count递减排序
+curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d'
+ { "size":0,
+   "aggs":
+        {"group_by_state":
+            {"terms":{"field":"state.keyword"}}
+        } 
+  }'  #默认递减
+
+# 按state计算平均账户余额
+curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d' 
+{
+ "size":0, 
+ "aggs":{ 
+      "group_by_state": 
+             { "terms": {"field":"state.keyword"}, 
+               "aggs":{"average_balance":{"avg":{"field":"balance"}}}
+             }
+        }
+}'
 ```
 
 8、MGET 查询  
