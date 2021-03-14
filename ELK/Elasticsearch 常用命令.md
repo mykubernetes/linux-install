@@ -296,10 +296,10 @@ curl --location --request PUT 'http://10.163.204.80:9200/_cluster/settings' \
 
 
 remote cluster info
-``
+```
 curl --location --request GET 'http://10.133.0.86:9201/_remote/info' \
 --header 'Authorization: Basic ZWxhc3RpYzplbGFzdGlj'
-``
+```
 
 
 修改索引number_of_replicas
