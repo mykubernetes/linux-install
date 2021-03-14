@@ -347,14 +347,109 @@ curl -X GET "master:9200/test/_search" -H 'Content-Type: application/json' -d'
   "sort": [
     { "account_number": "asc" }
   ]
+}'
+
+2、查询所有文档，返回10-19页，
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": { "match_all": {} },
+  "from": 10,
+  "size": 10
+}'
+#from 从第几行开始，未指定，默认为0
+#size 显示的行数，未指定，默认为10
+
+3、查找name是qiqi的
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
+{
+  "query":{
+    "match":{
+      "name":"qiqi"
+     }
+   }
+}'
+
+4、全文搜索 "张三"和"李四"以空格为分隔
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
+{
+  "query":{
+    "match":{
+      "name":"张三 李四"
+    }
+  }
+}'
+```
+
+match、match_phrase、term
+表达式
+```
+1、与的关系，同时匹配
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "address": "mill" } },
+        { "match": { "address": "lane" } }
+      ]
+    }
+  }
 }
 '
 
-2、查找name是qiqi的
-curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"qiqi"}}}'
+2、或的关系，匹配任意一个
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "address": "mill" } },
+        { "match": { "address": "lane" } }
+      ]
+    }
+  }
+}
+'
 
+3、既不包含A也不包含B
+curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        { "match": { "address": "mill" } },
+        { "match": { "address": "lane" } }
+      ]
+    }
+  }
+}
+'
 
-3、查询男性，年龄大于30
+4、match不区分大小写且匹配的结果可以不在一起，match_phrase区分大小写且匹配的结果和检索一致
+curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+    "query": {
+        "match_phrase": {
+            "address": "北京 昌平"
+        }
+    }
+}
+'
+
+5、term
+curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+    "query": {
+        "term": {
+            "age": 22
+        }
+    }
+}'
+```
+
+组合查询
+```
+1、查询男性，年龄大于30
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d '
 {
    "query": {
@@ -375,7 +470,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
    }
 }'
 
-4、查询余额大于或等于20000且小于等于30000的账户
+2、查询余额大于或等于20000且小于等于30000的账户
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
@@ -391,151 +486,9 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
       }
     }
   }
-}
-'
+}'
 
-5、查询所有文档，返回10-19页：
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
-{
-  "query": { "match_all": {} },
-  "from": 10,
-  "size": 10
-}
-'
-
-6、全文搜索 "张三" "李四"
-curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'{"query":{"match":{"name":"张三 李四"}}}'
-
-
-7、返回_source字段中的几个字段：
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
-{
-  "query": { "match_all": {} },
-  "_source": ["account_number", "balance"]
-}
-'
-```
-- 通过 from 和 size 进行分页，默认最多10000条数据
-- from 从哪开始显示，未指定，默认为0
-- size 显示的数量，未指定，默认为10
-
-
-```
-curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
-{
-    "query": {
-        "match": {
-            "address": "北京 昌平"
-        }
-    },
-    "from": 1,
-    "size": 2
-}
-'
-# 通过 from 和 size 进行分页，默认最多10000条数据
-
-
-curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
-{
-    "query": {
-        "match_phrase": {
-            "address": "北京 昌平"
-        }
-    }
-}
-'
-
-
-curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
-{
-    "query": {
-        "term": {
-            "age": 22
-        }
-    }
-}
-'
-```
-
-match、match_phrase、term
-```
-# 指定显示的字段："_source":["field1","field2"]
-curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d'
- { "query":{"match_all":{}}, 
-   "sort":[{"balance":"desc"}], 
-   "_source":["balance","firstname","account_number"] }'
-
-
-
-# 与的关系，同时匹配
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "match": { "address": "mill" } },
-        { "match": { "address": "lane" } }
-      ]
-    }
-  }
-}
-'
-
-# 或的关系，匹配任意一个
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
-{
-  "query": {
-    "bool": {
-      "should": [
-        { "match": { "address": "mill" } },
-        { "match": { "address": "lane" } }
-      ]
-    }
-  }
-}
-'
-
-# 既不包含A也不包含B
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
-{
-  "query": {
-    "bool": {
-      "must_not": [
-        { "match": { "address": "mill" } },
-        { "match": { "address": "lane" } }
-      ]
-    }
-  }
-}
-'
-
-
-
-match_phrase
-match不区分大小写且匹配的结果可以不在一起，match_phrase区分大小写且匹配的结果和检索一致
-curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
-{
-    "query": {
-        "match_phrase": {
-            "address": "北京 昌平"
-        }
-    }
-}
-'
-
-term
-curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
-{
-    "query": {
-        "term": {
-            "age": 22
-        }
-    }
-}
-'
-
-
-
+3、多条件组合
 curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
 {
     "query": {
