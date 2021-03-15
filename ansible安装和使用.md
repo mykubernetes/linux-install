@@ -5,6 +5,7 @@ ansible安装和使用
 示例参考：https://github.com/ansible/ansible-examples  
 http://www.zsythink.net/archives/category/%e8%bf%90%e7%bb%b4%e7%9b%b8%e5%85%b3/ansible/
 
+https://www.cnblogs.com/clsn/p/7743792.html#auto-id-66
 
 1、安装ansible
 --
