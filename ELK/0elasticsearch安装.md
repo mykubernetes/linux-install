@@ -312,65 +312,59 @@ curl -XGET 'http://master:9200/test/user/1?pretty'
 4、检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
-5、查询指定索引库指定类型所有数据
-curl -XGET http://master:9200/test/user/_search?pretty
-
-6、根据条件进行查询
-curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
-
-7、查询后结果进行排序
+5、查询后结果进行排序
 curl -X GET "master:9200/test/user/_search?q=*&sort=account_number:asc&pretty"
 
-8、搜索所有文档
+6、搜索所有文档
 curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty'
 
-9、检索文档中的一部分，如果只需要显示指定字段
+7、检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
-10、查询指定索引库指定类型所有数据
+8、查询指定索引库指定类型所有数据
 curl -XGET http://master:9200/test/user/_search?pretty
 
-#查询所有的属性中只要包含2012的所有的数据，泛查询
+9、查询所有的属性中只要包含2012的所有的数据，泛查询
 curl -XGET 'http://master:9200/test/_search?q=2012 
 
-#查询title中包含2012的所有的数据，df(default field)
+10、查询title中包含2012的所有的数据，df(default field)
 curl -XGET 'http://master:9200/test/_search?q=2012&df=title 
 curl -XGET 'http://master:9200/test/_search?q=title:2012
 
-#查询title中包含2012，从第10条开始，查询8条 数据
+11、查询title中包含2012，从第10条开始，查询8条 数据
 curl -XGET 'http://master:9200/test/_search?q=title:2012&from=10&size=8
 
-#查询title中包含Beautiful或者Mind的所有的数据+号可以省略
+12、查询title中包含Beautiful或者Mind的所有的数据+号可以省略
 curl -XGET 'http://master:9200/test/_search?q=title:Beautiful Mind
 curl -XGET 'http://master:9200/test/_search?q=title:(Beautiful Mind)
 curl -XGET 'http://master:9200/test/_search?q=title:(+Beautiful +Mind)
 
-#查询title中包含 "Beautiful Mind"这个短语的所 有的数据
+13、查询title中包含 "Beautiful Mind"这个短语的所 有的数据
 curl -XGET 'http://master:9200/test/_search?q=title:"Beautiful Mind" 
 
-#查询title中既包含Mind又包含Beautiful的所有 的数据，与顺序没有关系
+14、查询title中既包含Mind又包含Beautiful的所有 的数据，与顺序没有关系
 curl -XGET 'http://master:9200/test/_search?q=title:(Mind AND Beautiful) 
 
-#查询title中包含Beautiful但是不包含mind的所有的数据，两种方法
+15、查询title中包含Beautiful但是不包含mind的所有的数据，两种方法
 curl -XGET 'http://master:9200/test/_search?q=title:(Beautiful NOT Mind)
 curl -XGET 'http://master:9200/test/_search?q=title:(Beautiful -Mind)
 
-#查询title中包含Beautiful且时间在2012年之后的所有的数据
+16、查询title中包含Beautiful且时间在2012年之后的所有的数据
 curl -XGET 'http://master:9200/test/_search?q=title:Beautiful AND year:>=2012
 
-查询2018年之的数据
+17、查询2018年之的数据
 curl -XGET 'http://master:9200/test/_search?q=year:>=2018
 
-查询在2012到2017年的数据
+18、查询在2012到2017年的数据
 curl -XGET 'http://master:9200/test/_search?q=year:(>=2012 AND <2018)
 
-查询2016到2017的数据，必须以 ] 结尾
+19、查询2016到2017的数据，必须以 ] 结尾
 curl -XGET 'http://master:9200/test/_search?q=year:{2015 TO 2017]
 
-12、通配符？代表一个字母
+20、通配符？代表一个字母
 curl -XGET 'http://master:9200/test/_search?q=title:Min?x'
 
-13、通配符*查询title中包含以 Min开头的字母
+21、通配符*查询title中包含以 Min开头的字母
 curl -XGET 'http://master:9200/test/_search?q=title:Min*'
 
 ```
