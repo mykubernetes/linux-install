@@ -312,7 +312,7 @@ curl -XGET 'http://master:9200/test/user/1?pretty'
 4、检索文档中的一部分，如果只需要显示指定字段
 curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 
-5、查询后结果进行排序
+5、查询后结果进行排序，q=* ES批量索引中的所有文档
 curl -X GET "master:9200/test/user/_search?q=*&sort=account_number:asc&pretty"
 
 6、搜索所有文档
@@ -368,58 +368,274 @@ curl -XGET 'http://master:9200/test/_search?q=title:Min?x'
 curl -XGET 'http://master:9200/test/_search?q=title:Min*'
 
 ```
-- _search 查询
-- q=* ES批量索引中的所有文档
-- sort=account_number:asc 表示根据account_number按升序对结果排序
-- match_all：匹配所有文档。默认查询
 
 5、DSL 查询 搜索
+
+term、terms表达式
 ```
-1、查看所有文档
-curl -X GET "master:9200/test/_search" -H 'Content-Type: application/json' -d'
+Term查询不会对输入进行分词处理，将输入作为一个整体，在倒排索引中查找准确的词项。
+
+1、查询名字中包含有 beautiful 这个单词的所有的数据，用于查询的单词不会进行分词的处理
+curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
 {
-  "query": { "match_all": {} },
-  "sort": [
-    { "account_number": "asc" }
+  "query": {
+    "term": {
+      "title": {
+        "value": "beautiful"
+      }
+    }
+  }
+}'
+
+2、查询电影名字中包含有 beautiful 或者 mind 这两个单词的所有的电影，用于查询的单词不会进行分词的处理
+curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+  "query": {
+    "terms": {
+      "title": [
+        "beautiful",
+        "mind"
+      ]
+    }
+  }
+}'
+```
+
+range 查询在2016到2018年的的数据，再根据时间的倒序进行排序
+```
+curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+  "query": {
+    "range": {
+      "year": {
+        "gte": 2016,
+        "lte": 2018
+      }
+   }
+},
+  "sort": [
+    {
+      "year": {
+        "order": "desc"
+      }
+    }
   ]
+}
+```
+
+Constant Score 查询title中包含有beautiful的所有的数据，不进行相关性算分，查询的数据进行缓存，提高效率
+```
+curl -XGET 'localhost:9200/test/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "term": {
+          "title": "beautiful"
+        }
+      }
+    }
+  }
+}'
+```
+
+match
+```
+1、查询名字中包含有beautiful的所有数据，每页十条，取第二页的数据
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "match": {
+      "title": "beautiful"
+    }
+  },
+  "from": 10,
+  "size": 10
 }'
 
-2、查询所有文档，返回10-19页，
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
-{
-  "query": { "match_all": {} },
-  "from": 10,
-  "size": 10
-}'
-#from 从第几行开始，未指定，默认为0
-#size 显示的行数，未指定，默认为10
 
-3、查找name是qiqi的
-curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
+2、查询名字中包含有 beautiful 或者 mind 的所有的数据，但是只查询title和id两个属性
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
 {
-  "query":{
-    "match":{
-      "name":"qiqi"
-     }
-   }
-}'
-
-4、全文搜索 "张三"和"李四"以空格为分隔
-curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
-{
-  "query":{
-    "match":{
-      "name":"张三 李四"
+  "_source": ["title", "id"],
+    "query": {
+      "match": {
+        "title": "beautiful mind"
     }
   }
 }'
 ```
 
-match、match_phrase、term
-表达式
+match_phrase 查询名字中包含有 "beautiful mind" 这个短语的所有的数据
+```
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "match_phrase": {
+      "title": "beautiful mind"
+    }
+  }
+}'
+```
+
+multi_match 查询title或genre中包含有beautiful或者Adventure的所有的数据
+```
+{
+  "query": {
+    "multi_match": {
+      "query": "beautiful Adventure",
+      "fields": ["title", "genre"]
+    }
+  }
+}
+```
+
+match_all 
+```
+1、查看所有文档
+curl -X GET "master:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": { 
+    "match_all": {}
+  }
+}'
+
+2、查询所有文档，返回10-19页，
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": { "match_all": {} },
+  "from": 10,
+  "size": 10
+}'
+```
+
+query_string 查询title中包含有beautiful和mind的所有的数据
+```
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "query_string": {
+      "default_field": "title",
+      "query": "mind AND beautiful"
+    }
+  }
+}'
+
+
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "query_string": {
+      "default_field": "title",
+      "query": "mind beautiful",
+      "default_operator": "AND"
+    }
+  }
+}'
+```
+
+simple_query_string 覆盖了很多其他查询的用法
+```
+1、查询 title 中包含有 beautiful 和 mind 的所有的电影
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "simple_query_string": {
+      "query": "beautiful + mind",
+      "fields": ["title"]
+    }
+  }
+}'
+
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "simple_query_string": {
+      "query": "beautiful mind",
+      "fields": ["title"],
+      "default_operator": "AND"
+    }
+  }
+}'
+
+
+2、查询title中包含 "beautiful mind" 这个短语的所有的数 (用法和match_phrase类似)
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "simple_query_string": {
+      "query": "\"beautiful mind\"",
+      "fields": ["title"]
+    }
+  }
+}'
+
+3、查询title或genre中包含有 beautiful mind romance 这个三个单词的所有的数据 （与multi_match类似）
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "simple_query_string": {
+      "query": "beautiful mind Romance",
+      "fields": ["title", "genre"]
+    }
+  }
+}'
+
+4、查询title中包含 “beautiful mind” 或者 "Modern Romance" 这两个短语的所有的数据
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "simple_query_string": {
+      "query": "\"beautiful mind\" | \"Modern Romance\"",
+      "fields": ["title"]
+    }
+  }
+}'
+
+5、查询title或者genre中包含有 beautiful + mind 这个两个词，或者Comedy + Romance + Musical + Drama + Children 这个五个词的所有的数据
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "simple_query_string": {
+      "query": "(beautiful + mind) | (Comedy + Romance + Musical + Drama + Children)",
+      "fields": ["title","genre"]
+    }
+  }
+}'
+
+6、查询 title 中包含 beautiful 和 people 但是不包含 Animals 的所有的数据
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "simple_query_string": {
+      "query": "beautiful + people + -Animals",
+      "fields": ["title"]
+    }
+  }
+}'
+```
+
+模糊搜索 
+```
+查询title中从第6个字母开始只要最多纠正一次，就与 neverendign 匹配的所有的数据
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "fuzzy": {
+      "title": {
+        "value": "neverendign",
+        "fuzziness": 1,
+        "prefix_length": 5
+      }
+    }
+  }
+}'
+```
+
+多条件查询
 ```
 1、与的关系，同时匹配
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
     "bool": {
@@ -471,15 +687,6 @@ curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type
 }
 '
 
-5、term
-curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
-{
-    "query": {
-        "term": {
-            "age": 22
-        }
-    }
-}'
 ```
 
 组合查询
