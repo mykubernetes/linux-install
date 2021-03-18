@@ -22,30 +22,55 @@ Hello a World, the world is beautifu
 
 Standard Analyzer
 ```
-curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '{  "analyzer": "standard",  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening" }'
+curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '
+{
+  "analyzer": "standard", 
+  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening"
+}'
 ```
 
 Simple Analyzer
 ```
-curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '{  "analyzer": "simple",  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening" }'
+curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '
+{
+  "analyzer": "simple",
+  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening"
+
+}'
 ```
 
-Stop Analyzer 
+Stop Analyzer
 ```
-curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '{  "analyzer": "stop",  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening" }'
-```
-
-Whitespace Analyzer 
-```
-curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '{  "analyzer": "whitespace",  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening" }'
-```
-
-Keyword Analyzer 
-```
-curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '{  "analyzer": "keyword",  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening" }'
+curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '
+{
+  "analyzer": "stop",
+  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening"
+}'
 ```
 
-Pattern Analyzer 
+Whitespace Analyzer
 ```
-curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '{  "analyzer": "pattern",  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening" }'
+curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '
+{
+  "analyzer": "whitespace",
+  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening"
+}'
+```
+
+Keyword Analyzer
+```
+curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '
+{
+  "analyzer": "keyword",
+  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening"
+}'
+```
+
+Pattern Analyzer
+```
+curl -H "Content-Type: application/json" -XGET 'http://master:9200/_analyze?pretty=true' -d '
+{
+  "analyzer": "pattern",
+  "text": "2 Running quick brown-foxes leap over lazy dog in the summer evening"
+}'
 ```
