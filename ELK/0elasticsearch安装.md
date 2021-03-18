@@ -783,6 +783,27 @@ curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: appli
 - filter 条件必须都满足，不进行打分，效率高，还会进行缓存
 
 
+6、推荐搜索
+```
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "suggest": {
+    # title_suggestion为自定义的名字
+    "title_suggestion": {
+      "text": "drema",
+      "term": {
+        "field": "title",
+        "suggest_mode": "popular"
+      }
+    }
+  }
+}'
+```
+suggest_mode，有三个值：popular、missing、always
+- 1.popular 是推荐词频更高的一些搜索。
+- 2.missing 是当没有要搜索的结果的时候才推荐。
+- 3.always无论什么情况下都进行推荐。
+
 6、高亮显示
 ```
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
@@ -847,6 +868,7 @@ curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d
 - 自动补全的功能对性能的要求极高，用户每发送输入一个字符就要发送一个请求去查找匹配项。ES采取了不同的数据结构来实现，并不是通过倒排索引来实现的；需要将对应的数据类型设置为
 completion ; 所以在将数据索引进ES之前需要先定义 mapping 信息。
 ```
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
 {
   "movies" : {
     "mappings" : {
@@ -888,7 +910,7 @@ completion ; 所以在将数据索引进ES之前需要先定义 mapping 信息�
       }
     }
   }
-}
+}'
 ```
 
 8、聚合搜索
@@ -902,7 +924,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
           }
        }
     }
- }
+ }'
 
 # 匹配地址包含mill，且年龄在20~30之间的
 curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_search?pretty' -d '
