@@ -330,11 +330,6 @@ curl -XGET 'http://master:9200/test/user/1?_source=name&pretty'
 10、查询指定索引库指定类型所有数据
 curl -XGET http://master:9200/test/user/_search?pretty
 
-11、根据条件进行查询name=john的
-curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty=true‘
-或者
-curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
-
 #查询所有的属性中只要包含2012的所有的数据，泛查询
 curl -XGET 'http://master:9200/test/_search?q=2012 
 
