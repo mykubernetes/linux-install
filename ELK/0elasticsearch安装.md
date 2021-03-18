@@ -334,6 +334,50 @@ curl -XGET http://master:9200/test/user/_search?pretty
 curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty=true‘
 或者
 curl -XGET 'http://master:9200/test/user/_search?q=name:john&pretty'
+
+#查询所有的属性中只要包含2012的所有的数据，泛查询
+curl -XGET 'http://master:9200/test/_search?q=2012 
+
+#查询title中包含2012的所有的电影，df(default field)
+curl -XGET 'http://master:9200/test/_search?q=2012&df=title 
+curl -XGET 'http://master:9200/test/_search?q=title:2012
+
+#查询title中包含2012，从第10条开始，查询8条 数据
+curl -XGET 'http://master:9200/test/_search?q=title:2012&from=10&size=8
+
+#查询title中包含Beautiful或者Mind的所有的数据+号可以省略
+curl -XGET 'http://master:9200/test/_search?q=title:Beautiful Mind
+curl -XGET 'http://master:9200/test/_search?q=title:(Beautiful Mind)
+curl -XGET 'http://master:9200/test/_search?q=title:(+Beautiful +Mind)
+
+#查询title中包含 "Beautiful Mind"这个短语的所 有的数据
+curl -XGET 'http://master:9200/test/_search?q=title:"Beautiful Mind" 
+
+#查询title中既包含Mind又包含Beautiful的所有 的数据，与顺序没有关系
+curl -XGET 'http://master:9200/test/_search?q=title:(Mind AND Beautiful) 
+
+#查询title中包含Beautiful但是不包含mind的所有的数据，两种方法
+curl -XGET 'http://master:9200/test/_search?q=title:(Beautiful NOT Mind)
+curl -XGET 'http://master:9200/test/_search?q=title:(Beautiful -Mind)
+
+#查询title中包含Beautiful且电影上映时间 在2012年之后的所有的数据
+curl -XGET 'http://master:9200/test/_search?q=title:Beautiful AND year:>=2012
+
+查询2018年之后上映的电影
+curl -XGET 'http://master:9200/test/_search?q=year:>=2018
+
+查询在2012到2017年上映的电影
+curl -XGET 'http://master:9200/test/_search?q=year:(>=2012 AND <2018)
+
+查询2016年到2017年上映的电影，必须以 ] 结尾
+curl -XGET 'http://master:9200/test/_search?q=year:{2015 TO 2017]
+
+12、通配符？代表一个字母
+curl -XGET 'http://master:9200/test/_search?q=title:Min?x'
+
+13、通配符*查询title中包含以 Min开头的字母的电影
+curl -XGET 'http://master:9200/test/_search?q=title:Min*'
+
 ```
 - _search 查询
 - q=* ES批量索引中的所有文档
