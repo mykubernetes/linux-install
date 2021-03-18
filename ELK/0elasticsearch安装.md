@@ -5,8 +5,7 @@ ELK
 | ES | 关系型数据库（比如Mysql） |
 | :------: | :--------: |
 | Index | Database |
-| Type(在7.0之后type为固定值_doc)
- | Table |
+| Type(在7.0之后type为固定值_doc) | Table |
 | Document | Row |
 | Field | Column |
 | Mapping | Schema |
