@@ -5,9 +5,12 @@ ELK
 | ES | 关系型数据库（比如Mysql） |
 | :------: | :--------: |
 | Index | Database |
-| Type | Table |
+| Type(在7.0之后type为固定值_doc)
+ | Table |
 | Document | Row |
 | Field | Column |
+| Mapping | Schema |
+| DSL(Descriptor Structure Language) | SQL |
 
 - Node：运行单个ES实例的服务器
 - Cluster：一个或多个节点构成集群
