@@ -676,22 +676,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
 }
 '
 
-4、match不区分大小写且匹配的结果可以不在一起，match_phrase区分大小写且匹配的结果和检索一致
-curl -XGET '101.201.34.96:9200/mtestindex3/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
-{
-    "query": {
-        "match_phrase": {
-            "address": "北京 昌平"
-        }
-    }
-}
-'
-
-```
-
-组合查询
-```
-1、查询男性，年龄大于30
+4、查询男性，年龄大于30
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d '
 {
    "query": {
@@ -712,7 +697,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
    }
 }'
 
-2、查询余额大于或等于20000且小于等于30000的账户
+5、查询余额大于或等于20000且小于等于30000的账户
 curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
@@ -730,7 +715,7 @@ curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d
   }
 }'
 
-3、多条件组合
+6、多条件组合
 curl -XGET '101.201.34.96:9200/test/_doc/_search?pretty' -H 'Content-Type: application/json' -d '
 {
     "query": {
