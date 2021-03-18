@@ -333,7 +333,7 @@ curl -XGET http://master:9200/test/user/_search?pretty
 #查询所有的属性中只要包含2012的所有的数据，泛查询
 curl -XGET 'http://master:9200/test/_search?q=2012 
 
-#查询title中包含2012的所有的电影，df(default field)
+#查询title中包含2012的所有的数据，df(default field)
 curl -XGET 'http://master:9200/test/_search?q=2012&df=title 
 curl -XGET 'http://master:9200/test/_search?q=title:2012
 
@@ -355,22 +355,22 @@ curl -XGET 'http://master:9200/test/_search?q=title:(Mind AND Beautiful)
 curl -XGET 'http://master:9200/test/_search?q=title:(Beautiful NOT Mind)
 curl -XGET 'http://master:9200/test/_search?q=title:(Beautiful -Mind)
 
-#查询title中包含Beautiful且电影上映时间 在2012年之后的所有的数据
+#查询title中包含Beautiful且时间在2012年之后的所有的数据
 curl -XGET 'http://master:9200/test/_search?q=title:Beautiful AND year:>=2012
 
-查询2018年之后上映的电影
+查询2018年之的数据
 curl -XGET 'http://master:9200/test/_search?q=year:>=2018
 
-查询在2012到2017年上映的电影
+查询在2012到2017年的数据
 curl -XGET 'http://master:9200/test/_search?q=year:(>=2012 AND <2018)
 
-查询2016年到2017年上映的电影，必须以 ] 结尾
+查询2016到2017的数据，必须以 ] 结尾
 curl -XGET 'http://master:9200/test/_search?q=year:{2015 TO 2017]
 
 12、通配符？代表一个字母
 curl -XGET 'http://master:9200/test/_search?q=title:Min?x'
 
-13、通配符*查询title中包含以 Min开头的字母的电影
+13、通配符*查询title中包含以 Min开头的字母
 curl -XGET 'http://master:9200/test/_search?q=title:Min*'
 
 ```
