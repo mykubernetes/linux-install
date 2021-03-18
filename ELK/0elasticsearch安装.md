@@ -230,6 +230,8 @@ http://192.168.101.66:9100/
 ES常用命令
 ---
 
+https://www.elastic.co/guide/en/elasticsearch/reference/6.6/modules-http.html
+
 REST API可以作用
 - 1.检查集群,节点,索引的健康,状态,统计
 - 2.管理集群,节点,索引的数据和元数据
@@ -296,6 +298,34 @@ curl -H "Content-Type: application/json" -XPUT http://master:9200/test/user/3/_c
 - _create创建数据也可以用?op_type=create替代,也可以不加_create，不存在则创建存在则覆盖
 - put请求必须带id,如果id不存在则为创建，如果id存在则为更新
 - post请求不用带id,如果id不存在则为创建，如果id存在则为更新
+
+批量操作-bulk  
+```
+action：index/create/update/delete
+metadata：_index,_type,_id
+request body：_source(删除操作不需要)
+{ action: { metadata }}
+{ request body }
+{ action: { metadata }}
+{ request body }
+
+create 和index的区别,如果数据存在，使用create操作失败，会提示文档已经存在，使用index则可以成功执行。
+```
+
+```
+1、使用文件的方式新建一个requests文件
+vim requests
+{"index":{"_index":"test","_type":"user","_id":"6"}}
+{"name":"mayun","age":51}
+{"update":{"_index":"test","_type":"user","_id":"6"}}
+{"doc":{"age":52}}
+
+2、执行批量操作
+curl -H "Content-Type: application/json" -XPOST http://master:9200/_bulk --data-binary @requests;
+```
+- bulk会把将要处理的数据载入内存中，所以数据量是有限制
+- 一般建议是1000-5000个文档，如果文档很大，可以适当减少队列，大小建议是5-15MB，默认不能超过100M，可以在es的配置文件中修改这个值http.max_content_length: 100mb.
+
 
 
 4、查询索引
@@ -698,7 +728,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
 }'
 
 5、查询余额大于或等于20000且小于等于30000的账户
-curl -X GET "localhost:9200/bank/_search" -H 'Content-Type: application/json' -d'
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
 {
   "query": {
     "bool": {
@@ -771,7 +801,97 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_sea
 }'
 ```
 
-7、聚合搜索
+```
+curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d'
+{
+  "query": {
+    "match": {
+      "title": "beautiful"
+    }
+  },
+  "highlight": {
+    "post_tags": "</span>",
+    "pre_tags": "<span color='red'>",
+    "fields": {
+      "title": {}
+    }
+  }
+}'
+```
+- pre_tags: 是需要高亮文本的前置 html 内容。
+- post_tags: 是需要高亮的后置html内容。
+- fields: 是需要高亮的属性。
+
+
+7、前缀搜索
+```
+curl -X GET "localhost:9200/test/_search" -H 'Content-Type: application/json' -d'
+{
+  "_source": ["title"],
+  "suggest": {
+    "prefix_suggestion": {
+      "prefix": "Lan",                      #需要自动提示的内容
+      "completion": {
+        "field": "title",
+        "skip_duplicates": true,
+        "size": 10
+      }
+    }
+  }
+}'
+```
+- skip_duplicates: 表示忽略掉重复。
+- size: 表示返回多少条数据。
+
+8、自动补全
+- 自动补全的功能对性能的要求极高，用户每发送输入一个字符就要发送一个请求去查找匹配项。ES采取了不同的数据结构来实现，并不是通过倒排索引来实现的；需要将对应的数据类型设置为
+completion ; 所以在将数据索引进ES之前需要先定义 mapping 信息。
+```
+{
+  "movies" : {
+    "mappings" : {
+      "properties" : {
+        "@version" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "genre" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "id" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "title" : {
+          # 需要自动提示的属性类型必须是 completion
+          "type" : "completion"
+        },
+        "year" : {
+          "type" : "long"
+        }
+      }
+    }
+  }
+}
+```
+
+8、聚合搜索
 ```
 curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_search -d '
 {
@@ -817,7 +937,7 @@ curl -H "Content-Type: application/json" -XGET '192.168.149.129:9200/bank/_searc
 }'
 ```
 
-8、MGET 查询  
+9、MGET 查询  
 使用mget API获取多个文档
 ```
 1、查询不同_index的数据
@@ -841,7 +961,7 @@ curl -H "Content-Type: application/json" -XGET http://master:9200/test/user/_mge
 }'
 ```
 
-9、ES 更新  
+10、ES 更新  
 ES可以使用PUT或者POST对文档进行更新(全部更新)，如果指定ID的文档已经存在，则执行更新操作  
 ```
 局部更新，可以添加新字段或者更新已有字段（必须使用POST）
@@ -853,38 +973,6 @@ curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/1/_
   }
 }'
 ```
-
-10、ES 批量操作-bulk  
-bulk API可以帮助我们同时执行多个请求
-```
-action：index/create/update/delete
-metadata：_index,_type,_id
-request body：_source(删除操作不需要)
-{ action: { metadata }}
-{ request body }
-{ action: { metadata }}
-{ request body }
-
-create 和index的区别,如果数据存在，使用create操作失败，会提示文档已经存在，使用index则可以成功执行。
-```
-
-```
-1、使用文件的方式新建一个requests文件
-vim requests
-{"index":{"_index":"test","_type":"user","_id":"6"}}
-{"name":"mayun","age":51}
-{"update":{"_index":"test","_type":"user","_id":"6"}}
-{"doc":{"age":52}}
-
-2、执行批量操作
-curl -H "Content-Type: application/json" -XPOST http://master:9200/_bulk --data-binary @requests;
-```
-bulk一次最大处理多少数据量
-- bulk会把将要处理的数据载入内存中，所以数据量是有限制.
-- 最佳的数据量取决于硬件，文档大小以及复杂性，索引以及搜索的负载.
-- 一般建议是1000-5000个文档，如果文档很大，可以适当减少队列，大小建议是5-15MB，默认不能超过100M，可以在es的配置文件中修改这个值http.max_content_length: 100mb.
-- https://www.elastic.co/guide/en/elasticsearch/reference/6.6/modules-http.html
-
 
 11、ES 版本控制  
 ```
@@ -898,38 +986,41 @@ curl -H "Content-Type: application/json" -XPOST http://master:9200/test/user/2/_
 
 12、Mapping
 
-https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+mapping类似于数据库中的schema
+- 1. 定义索引中的字段类型；
+- 2. 定义字段的数据类型，例如：布尔、字符串、数字、日期.....
+- 3. 字段倒排索引的设置
 
+1、数据类型
+| 类型名 | 描述 |
+|-------|------|
+| Text/Keyword | 字符串， Keyword的意思是字符串的内容不会被分词处理，输入是什么内容，存储在ES中就是什么内容。Text类型ES会自动的添加一个Keyword类型的子字段 |
+| Date | 日期类型 |
+| Integer/Float/Long | 数字类型 |
+| Boolean | 布尔类型 |
+- ES中还有 "对象类型/嵌套类型"、"特殊类型（geo_point/geo_shape）"
+
+2、Mapping的定义
 ```
-# 查询索引库的mapping信息：
-curl -XGET http://master:9200/test/user/_mapping?pretty
-
-# 操作不存在的索引（创建）：
-curl -H "Content-Type: application/json" -XPUT 'http://master:9200/test6' -d '
 {
-  "mappings":{
-    "user":{
-      "properties":{
-        "name":{
-          "type":"text",
-          "analyzer": "ik_max_word"
-        }
-      }
-    }
-  }
-}'
-
-# 操作已存在的索引（修改）：
-curl -H "Content-Type: application/json" -XPOST http://master:9200/test6/user/_mapping -d '
-{
-"properties":{
-  "name":{
-    "type":"text",
-    "analyzer":"ik_max_word"
-    }
-  }
-}'
+  "mappings": {
+    // define your mappings here
+ }
+}
 ```
+- 定义mapping的建议方式: 写入一个样本文档到临时索引中，ES会自动生成mapping信息，通过访问mapping信息的api查询mapping的定义，修改自动生成的mapping成为我们需要方式，创建索引，删除临时索引，简而言之就是 “卸磨杀驴” 。
+
+
+
+3、常见参数
+```
+index
+可以给属性添加一个布尔类型的index属性，标识该属性是否能被倒排索引，也就是说是否能通过该字段进行搜索。
+
+null_value
+在数据索引进ES的时候，当某些数据为null的时候，该数据是不能被搜索的，可以使用null_value属性指定一个值，当属性的值为null的时候，转换为一个通过null_value指定的值。null_value属性只能用于Keyword类型的属性
+```
+
 
 索引数据快照备份和恢复
 ===
