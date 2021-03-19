@@ -1356,6 +1356,154 @@ curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d
 }'
 ```
 
+15、以直方图的方式以每5000元为一个区间查看工资信息
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "sal_info": {
+      "histogram": {
+        "field": "sal",
+        "interval": 5000,
+        "extended_bounds": {
+          "min": 0,
+          "max": 30000
+        }
+      }
+    }
+  }
+}'
+```
+- interval: 以指定的值为一个区间。
+- extended_bounds: 可以指定区间的范围，如果超出了区间范围以实际为准，如果没有超出其他区 间的数据依然显示。
+
+16、查询平均工资大最低的工种
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "job_info": {
+      "terms": {
+        "field": "job"
+      },
+      "aggs": {
+        "job_avg_sal": {
+          "avg": {
+            "field": "sal"
+          }
+        }
+      }
+    },
+    "min_sal_job": {
+      "min_bucket": {
+        "buckets_path": "job_info>job_avg_sal"
+      }
+    }
+  }
+}'
+```
+
+17、求工资和工种的信息
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "job_inf": {
+      "terms": {
+        "field": "job"
+      }
+    },
+    "sal_info": {
+      "stats": {
+        "field": "sal"
+      }
+    }
+  }
+}'
+```
+
+18、查询年龄大于30岁的员工的平均工资
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "age": {
+        "gte": 30
+      }
+    }
+  },
+  "aggs": {
+    "avg_sal": {
+      "avg": {
+        "field": "sal"
+      }
+    }
+  }
+}'
+```
+
+19、查询Java员工的平均工资
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "query": {
+    "constant_score": {
+      "filter": {
+        "term": {
+          "job": "java"
+        }
+      },
+      "boost": 1.2
+    }
+  },
+  "aggs": {
+    "avg_sal": {
+      "avg": {
+        "field": "sal"
+      }
+    }
+  }
+}'
+```
+
+20、求30岁以上的员工的平均工资和所有员工的平均工资
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "older_emp": {
+      "filter": {
+        "range": {
+          "age": {
+            "gte": 30
+          }
+        }
+      },
+      "aggs": {
+        "avg_sal": {
+          "avg": {
+            "field": "sal"
+          }
+        }
+      }
+    },
+    "job_info": {
+      "terms": {
+        "field": "job"
+      }
+    }
+  }
+}'
+
+```
+
 索引数据快照备份和恢复
 ===
 
