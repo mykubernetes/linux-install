@@ -139,6 +139,12 @@ curl -H 'Content-Type:application/json' -XGET http://master:9200/_analyze?pretty
 
 
 
+pinyin 分词器
+---
+https://github.com/medcl/elasticsearch-analysis-pinyin/releases
 
-
-
+```
+mkdir ES_HOME/plugins/pinyin
+cp target/releases/elasticsearch-analysis-ik-*.zip 到 elasticsearch 插件目录：ES_HOME/plugins/pinyin
+unzip elasticsearch-analysis-pinyin-*.zip
+```
