@@ -14,6 +14,8 @@ https://blog.csdn.net/weixin_39409615/article/details/101519438
 
 https://www.jianshu.com/p/83e46d70dd92
 
+语句  
+http://tinkerpop.apache.org/docs/current/reference/#traversal
 
 基础语句
 | 用法 | 说明 |
