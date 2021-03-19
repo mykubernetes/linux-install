@@ -1043,6 +1043,23 @@ null_value
 在数据索引进ES的时候，当某些数据为null的时候，该数据是不能被搜索的，可以使用null_value属性指定一个值，当属性的值为null的时候，转换为一个通过null_value指定的值。null_value属性只能用于Keyword类型的属性
 ```
 
+index为false则不能被索引
+```
+curl -X PUT "localhost:9200/user" -H 'Content-Type: application/json' -d'
+{
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "test",
+        "index": false
+      }
+    }
+  }
+}'
+```
+
+
+
 1、给users索引创建mapping信息
 ```
 curl -X GET "localhost:9200/user" -H 'Content-Type: application/json' -d'
