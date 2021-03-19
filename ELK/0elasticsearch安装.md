@@ -1043,6 +1043,318 @@ null_value
 在数据索引进ES的时候，当某些数据为null的时候，该数据是不能被搜索的，可以使用null_value属性指定一个值，当属性的值为null的时候，转换为一个通过null_value指定的值。null_value属性只能用于Keyword类型的属性
 ```
 
+1、给users索引创建mapping信息
+```
+curl -X GET "localhost:9200/user" -H 'Content-Type: application/json' -d'
+{
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "integer"
+      }, 
+      "name": {
+        "type": "keyword"
+      },
+      "job": {
+        "type": "keyword"
+      },
+      "age": {
+        "type": "integer"
+      },
+      "gender": {
+        "type": "keyword"
+      }
+    }
+  }
+}'
+```
+
+2、往 users 索引中写入数据
+```
+# curl -X GET "localhost:9200/user/_bulk " -H 'Content-Type: application/json' --data-binary @users
+
+# vim users
+{"index": {"_id": 1}}
+{"id": 1, "name": "Bob", "job": "java", "age": 21, "sal": 8000, "gender": "female"}
+{"index": {"_id": 2}}
+{"id": 2, "name": "Rod", "job": "html", "age": 31, "sal": 18000, "gender": "female"}
+{"index": {"_id": 3}}
+{"id": 3, "name": "Gaving", "job": "java", "age": 24, "sal": 12000, "gender": "male"}
+{"index": {"_id": 4}}
+{"id": 4, "name": "King", "job": "dba", "age": 26, "sal": 15000, "gender": "female"}
+{"index": {"_id": 5}}
+{"id": 5, "name": "Jonhson", "job": "dba", "age": 29, "sal": 16000, "gender": "male"}
+{"index": {"_id": 6}}
+{"id": 6, "name": "Douge", "job": "java", "age": 41, "sal": 20000, "gender": "female"}
+{"index": {"_id": 7}}
+{"id": 7, "name": "cutting", "job": "dba", "age": 27, "sal": 7000, "gender": "male"}
+{"index": {"_id": 8}}
+{"id": 8, "name": "Bona", "job": "html", "age": 22, "sal": 14000, "gender": "female"}
+{"index": {"_id": 9}}
+{"id": 9, "name": "Shyon", "job": "dba", "age": 20, "sal": 19000, "gender": "female"}
+{"index": {"_id": 10}}
+{"id": 10, "name": "James", "job": "html", "age": 18, "sal": 22000, "gender": "male"}
+{"index": {"_id": 11}}
+{"id": 11, "name": "Golsling", "job": "java", "age": 32, "sal": 23000, "gender": "female"}
+{"index": {"_id": 12}}
+{"id": 12, "name": "Lily", "job": "java", "age": 24, "sal": 2000, "gender": "male"}
+{"index": {"_id": 13}}
+{"id": 13, "name": "Jack", "job": "html", "age": 23, "sal": 3000, "gender": "female"}
+{"index": {"_id": 14}}
+{"id": 14, "name": "Rose", "job": "java", "age": 36, "sal": 6000, "gender": "female"}
+{"index": {"_id": 15}}
+{"id": 15, "name": "Will", "job": "dba", "age": 38, "sal": 4500, "gender": "male"}
+{"index": {"_id": 16}}
+{"id": 16, "name": "smith", "job": "java", "age": 32, "sal": 23000, "gender": "male"}
+```
+
+单值的输出 
+- ES中大多数的数学计算只输出一个值，如：min、max、sum、avg、cardinality
+
+3、查询工资的总和
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0, 
+  "aggs": {
+    "other_info": {
+      "sum": {
+        "field": "sal"
+      }
+    }
+  }
+}'
+```
+
+4、查询员工的平均工资
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "other_aggs_info": {
+      "avg": {
+        "field": "sal"
+      }
+    }
+  }
+}'
+```
+
+5、查询总共有多少个岗位, cardinality的值类似于sql中的 count distinct,即去重统计总数
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "job_count": {
+      "cardinality": {
+        "field": "job"
+      }
+    }
+  }
+}'
+```
+
+6、查询航班票价的最高值、平均值、最低值
+```
+curl -X GET "localhost:9200/kibana_sample_data_flights/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "max_price": {
+      "max": {
+        "field": "AvgTicketPrice"
+      }
+    },
+    "min_price": {
+      "min": {
+        "field": "AvgTicketPrice"
+      }
+    },
+    "avg_price": {
+      "avg": {
+        "field": "AvgTicketPrice"
+      }
+    }
+  }
+}'
+```
+
+多值的输出
+- ES还有些函数，可以一次性输出很多个统计的数据: terms、stats
+
+7、查询工资的信息
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "sal_info": {
+      "stats": {
+        "field": "sal"
+      }
+    }
+  }
+}'
+```
+
+8、查询到达不同城市的航班数量
+```
+curl -X GET "localhost:9200/kibana_sample_data_flights/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "flight_dest": {
+      "terms": {
+        "field": "DestCountry"
+      }
+    }
+  }
+}'
+```
+
+9、查询每个岗位有多少人
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "job_count": {
+      "terms": {
+        "field": "job"
+      }
+    }
+  }
+}'
+```
+
+10、查询目标地的航班次数以及天气信息
+```
+curl -X GET "localhost:9200/kibana_sample_data_flights/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "dest_city": {
+      "terms": {
+        "field": "DestCityName"
+      },
+      "aggs": {
+        "whether_info": {
+          "terms": {
+            "field": "DestWeather"
+          }
+        }
+      }
+    }
+  }
+}'
+```
+
+11、查询每个岗位下工资的信息(平均工资、最高工资、最少工资等)
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "job_inf": {
+      "terms": {
+        "field": "job"
+      },
+      "aggs": {
+        "sal_info": {
+          "stats": {
+            "field": "sal"
+          }
+        }
+      }
+    }
+  }
+}'
+```
+
+12、查询不同工种的男女员工数量、然后统计不同工种下男女员工的工资信息
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "job_info": {
+      "terms": {
+        "field": "job"
+      },
+      "aggs": {
+        "gender_info": {
+          "terms": {
+            "field": "gender"
+          },
+          "aggs": {
+            "sal_info": {
+              "stats": {
+                "field": "sal"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+```
+
+13、查询年龄最大的两位员工的信息
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "top_age_2": {
+      "top_hits": {
+        "size": 2,
+        "sort": [
+          {
+            "age": {
+              "order": "desc"
+            }
+          }
+        ]
+      }
+    }
+  }
+}'
+```
+
+14、查询不同区间员工工资的统计信息
+```
+curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "sal_info": {
+      "range": {
+        "field": "sal",
+        "ranges": [
+          {
+            "key": "0 <= sal <= 5000",
+            "from": 0,
+            "to": 5000
+          },
+          {
+            "key": "5001 <= sal <= 10000",
+            "from": 5001,
+            "to": 10000
+          },
+          {
+            "key": "10001 <= sal <= 15000",
+            "from": 10001,
+            "to": 15000
+          }
+        ]
+      }
+    }
+  }
+}'
+```
 
 索引数据快照备份和恢复
 ===
