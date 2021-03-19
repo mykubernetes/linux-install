@@ -1201,7 +1201,7 @@ curl -X GET "localhost:9200/kibana_sample_data_flights/_search" -H 'Content-Type
 多值的输出
 - ES还有些函数，可以一次性输出很多个统计的数据: terms、stats
 
-7、查询工资的信息
+7、查询工资的信息，stats显示总数，最大值，最小值，平均值等信息
 ```
 curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d'
 {
@@ -1216,7 +1216,7 @@ curl -X GET "localhost:9200/user/_search" -H 'Content-Type: application/json' -d
 }'
 ```
 
-8、查询到达不同城市的航班数量
+8、查询到达不同城市的航班数量，terms将数据进行分组后再统计分组后的数量
 ```
 curl -X GET "localhost:9200/kibana_sample_data_flights/_search" -H 'Content-Type: application/json' -d'
 {
