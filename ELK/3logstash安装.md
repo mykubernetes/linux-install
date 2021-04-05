@@ -6,6 +6,60 @@ wget https://artifacts.elastic.co/downloads/logstash/logstash-6.6.1.rpm
 yum install -y logstash-6.6.1.rpm
 ```  
 
+| 命令 | 详解 |
+|----------------------|------------------|
+| -f, --path.config CONFIG_PATH | 指定配置文件。使用文件，目录，或者通配符加载配置信息，如果指定目录或者通配符，按字符顺序加载。 |
+| -e, --config.string CONFIG_STRING | 指定字符串输入 |
+| -w, --pipeline.workers COUNT | 指定管道数量，默认3 |
+| --log.level LEVEL | 指定Logstash日志级别,fatal/error/warn/info/debug/trace |
+| -r，--config.reload.automatic | 配置文件自动重新加载。默认每3s检查一次配置文件更改。--config.reload.interval <interval> 修改时间间隔。如果没有启用自动加载，也可以向Logstash进程发送SIGHUP（信号挂起）信号重启管道，例如：kill -1 14175 |
+| -t, --config.test_and_exit | 检查配置文件是否正确 |
+
+
+条件判断
+- 使用条件来决定filter和output处理特定的事件
+
+比较操作
+|语法|说明|
+|----|-----|
+| == | 等于 |
+| != | 不等于 |
+| < | 小于 |
+| > | 大于 |
+| <= | 小于等于 |
+| >= | 大于等于 |
+| =~ | 匹配正则 |
+| !~ | 不匹配正则 |
+| in | 包含 |
+| not in | 不包含 |
+
+布尔操作
+| 语法 | 说明 |
+|-----|----|
+| and | 与 |
+| or | 或 |
+| nand | 非与 |
+| xor | 非或 |
+
+一元运算符
+| 语法 | 说明 |
+|-----|----|
+| ! | 取反 |
+| () | 复合表达式 |
+| !() | 对复合表达式结果取反 |
+
+
+条件if判断、多分支，嵌套
+```
+if EXPRESSION {
+  ...
+} else if EXPRESSION {
+  ...
+} else {
+  ...
+}
+```
+
 2、测试logstash是否可用
 ```
 /usr/share/logstash/bin/logstash -e 'input { stdin{} } output { stdout { codec => rubydebug}}'
