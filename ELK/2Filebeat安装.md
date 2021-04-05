@@ -71,4 +71,55 @@ systemctl  restart filebeat
 nohup ./filebeat -c filebeat_console.yml >/dev/null 2>&1 &
 ```  
 
+nginx
+```
+filebeat.prospectors:
+- type: log
+  paths:
+    - /usr/local/nginx/logs/access.log
+  # tags: ["access"]
+  fields:
+    app: www
+    type: nginx-access
+  fields_under_root: true
+  
+- type: log
+  paths:
+    - /usr/local/nginx/logs/error.log
+  # ags: ["error"]
+  fields:
+    app: www
+    type: nginx-error
+  fields_under_root: true
 
+output.redis:
+  hosts: ["192.168.0.215"]
+  password: "123456"
+  key: "filebeat"
+  db: 0
+  datatype: list
+```
+
+tomcat
+```
+filebeat.prospectors:
+- type: log
+  paths:
+    - /usr/local/tomcat/logs/catalina.out
+  # tags: ["tomcat"]
+  fields:
+    app: www
+    type: tomcat-catalina
+  fields_under_root: true
+  multiline:
+    pattern: '^\['
+    negate: true
+    match: after
+
+output.redis:
+  hosts: ["192.168.0.215"]
+  password: "123456"
+  key: "filebeat"
+  db: 0
+  datatype: list
+```
