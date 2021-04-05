@@ -489,3 +489,62 @@ output {
   }
 }
 ```  
+
+过滤器插件（Filter）
+---
+- Filter：过滤，将日志格式化。有丰富的过滤插件：Grok正则捕获、date时间处理、JSON编解码、数据修改Mutate等。
+
+所有的过滤器插件都支持以下配置选项
+| Setting	| Input type | Required	| Default	| Description |
+|---------|-------------|---------|---------|--------------|
+| add_field | hash | No | {} | 如果过滤成功，添加任何field到这个事件。例如：add_field => [ "foo_%{somefield}", "Hello world, from %{host}" ]，如果这个事件有一个字段somefiled，它的值是hello，那么我们会增加一个字段foo_hello，字段值则用%{host}代替。 |
+| add_tag | array | No | [] | 过滤成功会增加一个任意的标签到事件例如：add_tag => [ "foo_%{somefield}" ] |
+| enable_metric | boolean | No | true | |
+| id | string | No | | |	
+| periodic_flush | boolean | No | false | 定期调用过滤器刷新方法 |
+| remove_field | array | No | [] | 过滤成功从该事件中移除任意filed。例：remove_field => [ "foo_%{somefield}" ] |
+| remove_tag | array | No | [] | 过滤成功从该事件中移除任意标签，例如：remove_tag => [ "foo_%{somefield}" ] |
+
+1、json
+- JSON解析过滤器，接收一个JSON的字段，将其展开为Logstash事件中的实际数据结构。当事件解析失败时，这个插件有一个后备方案，那么事件将不会触发，而是标记为_jsonparsefailure，可以使用条件来清楚数据。也可以使用tag_on_failure
+
+```
+input {
+  stdin {
+  }
+}
+
+filter {
+  json {
+    source => "message"
+    target => "content"
+  }
+}
+output {
+  stdout{codec => rubydebug }
+}
+```
+
+2、kv
+- 自动解析key=value。也可以任意字符串分割数据。field_split  一串字符，指定分隔符分析键值对
+
+```
+filter {
+  kv {
+     field_split => "&?"             #根据&和?分隔
+  }
+}
+```
+
+3、grok
+- grok是将非结构化数据解析为结构化。这个工具非常适于系统日志，mysql日志，其他Web服务器日志以及通常人类无法编写任何日志的格式。
+
+```
+filter {
+  grok {
+    match => { 
+       "message" => "%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes} %{NUMBER:duration}" 
+    }
+  }
+}
+```
