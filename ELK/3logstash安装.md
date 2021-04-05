@@ -1,10 +1,6 @@
 四、安装Logstash  
 https://github.com/logstash-plugins  
-1、下载安装包  
-``` 
-wget https://artifacts.elastic.co/downloads/logstash/logstash-6.6.1.rpm
-yum install -y logstash-6.6.1.rpm
-```  
+
 
 | 命令 | 详解 |
 |----------------------|------------------|
@@ -59,6 +55,12 @@ if EXPRESSION {
   ...
 }
 ```
+
+1、下载安装包  
+``` 
+wget https://artifacts.elastic.co/downloads/logstash/logstash-6.6.1.rpm
+yum install -y logstash-6.6.1.rpm
+```  
 
 2、测试logstash是否可用
 ```
