@@ -67,6 +67,72 @@ yum install -y logstash-6.6.1.rpm
 /usr/share/logstash/bin/logstash -e 'input { stdin{} } output { stdout { codec => rubydebug}}'
 ```
 
+示例
+```
+# 1、Stdin
+input {
+  stdin {
+
+  }
+}
+filter {
+
+}
+output {
+  stdout{codec => rubydebug }
+}
+
+# 2、file
+# https://www.elastic.co/guide/en/logstash/current/plugins-inputs-file.html
+input {
+  file {
+     path =>"/var/log/messages"
+     tags =>"nginx"
+     tags =>"access"
+     type =>"syslog"
+  }
+}
+filter {
+
+}
+output {
+  stdout{codec => rubydebug }
+}
+
+# 3、TCP
+# 通过TCP套接字读取事件。与标准输入和文件输入一样，每个事件都被定位一行文本。
+input {
+  tcp {
+     port =>12345
+     type =>"nc"
+  }
+}
+filter {
+
+}
+output {
+  stdout{codec => rubydebug }
+}
+
+# nc 192.168.1.196 12345
+
+# 4、Beats
+# 从Elastic Beats框架接收事件
+input {
+  beats {
+    port => 5044
+  }
+}
+ 
+filter {
+ 
+}
+
+output {
+  stdout { codec => rubydebug }
+}
+```
+
 3、基本配置说明
 ```
 # cat /etc/logstash/conf.d/system-log.conf 
