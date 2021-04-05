@@ -204,6 +204,68 @@ output {
 }
 ```
 
+multline匹配多行
+---
+| Setting | Input type | Required | Default | Description |
+|---------|------------|----------|---------|-------------|
+| auto_flush_interval | number | No | | |
+| charset | string | No | UTF-8	| 输入使用的字符编码 |
+| max_bytes | bytes	| No | 10M | 如果事件边界未明确定义，则事件的的积累可能会导致logstash退出，并出现内存不足。与max_lines组合使用 |
+| max_lines | number | No | 500	| 如果事件边界未明确定义，则事件的的积累可能会导致logstash退出，并出现内存不足。与max_bytes组合使用 |
+| multiline_tag | string | No	| multiline	| 给定标签标记多行事件 |
+| negate | boolean | No | false | 正则表达式模式，设置正向匹配还是反向匹配。默认正向 |
+| pattern | string | Yes | | 正则表达式匹配 |
+| patterns_dir | array | No | [] | 默认带的一堆模式 |
+| what | string, one of ["previous", "next"] | Yes | 无 | 设置未匹配的内容是向前合并还是向后合并 |
+
+```
+input {
+  stdin {
+    codec => multiline {
+      pattern => "pattern, a regexp"
+      negate => "true" or "false"
+      what => "previous" or "next"
+    }
+  }
+}
+```
+
+将JAVA堆栈跟踪是多行的，通常从最左边开始，每个后续行都缩进
+```
+input {
+  stdin {
+    codec => multiline {
+      pattern => "^\s"
+      what => "previous"
+    }
+  }
+}
+```
+
+```
+input {
+  stdin {
+    codec => multiline {
+      pattern => "^\["
+      negate => true
+      what => "previous"
+    }
+  }
+}
+```
+
+```
+input {
+  stdin {
+    codec => multiline {
+      # Grok pattern names are valid! :)
+      pattern => "^%{TIMESTAMP_ISO8601} "
+      negate => true
+      what => "previous"
+    }
+  }
+}
+```
 
 nginx日志转换成json格式
 ---
