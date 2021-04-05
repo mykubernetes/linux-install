@@ -239,8 +239,8 @@ input {
     db => "0"
     key => "tomcat-accesslog-node01"
     data_type => "list"
-password => "123456"
-codec  => "json" #对于json格式的日志定义编码格式
+    password => "123456"
+    codec  => "json" #对于json格式的日志定义编码格式
  } 
 }
 
