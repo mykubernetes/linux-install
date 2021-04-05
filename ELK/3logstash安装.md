@@ -185,7 +185,28 @@ output {
 systemctl start logstash
 ```
 
-6、nginx日志转换成json格式  
+json/json_lines
+---
+该解码器可用于解码（Input）和编码（Output）JSON消息。如果发送的数据是JSON数组，则会创建多个事件（每个元素一个）如果传输JSON消息以\n分割，就需要使用json_lines。
+```
+input {
+  stdin {
+     codec =>json {
+        charset => ["UTF-8"]
+     }
+  }
+}
+filter {
+
+}
+output {
+  stdout{codec => rubydebug }
+}
+```
+
+
+nginx日志转换成json格式
+---
 ```
 # vim  conf/nginx.conf
 log_format access_json '{"@timestamp":"$time_iso8601",'
@@ -224,14 +245,18 @@ output {
   }}
 }
 ```  
-7、tomcat日志转换成json格式  
+
+tomcat日志转换成json格式
+---
+1、把tomcat日志格式转换成json
 ```
 vim conf/server.xml
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="tomcat_access_log" suffix=".log"
                pattern="{&quot;clientip&quot;:&quot;%h&quot;,&quot;ClientUser&quot;:&quot;%l&quot;,&quot;authenticated&quot;:&quot;%u&quot;,&quot;AccessTime&quot;:&quot;%t&quot;,&quot;method&quot;:&quot;%r&quot;,&quot;status&quot;:&quot;%s&quot;,&quot;SendBytes&quot;:&quot;%b&quot;,&quot;Query?string&quot;:&quot;%q&quot;,&quot;partner&quot;:&quot;%{Referer}i&quot;,&quot;AgentVersion&quot;:&quot;%{User-Agent}i&quot;}"/> 
 ```  
-配置logstash收集tomcat日志  
+
+2、配置logstash收集tomcat日志  
 ```
 # cat /etc/logstash/conf.d/tomcat.conf 
 input {
@@ -253,11 +278,13 @@ output {
 }
 ```  
 
-8、验证日志是否json格式：
+验证日志是否json格式
+---
 http://www.kjson.com/
 
 
-6、配置logstash服务并收集beats日志  
+配置logstash服务并收集beats日志
+---
 ```
 # cat beats-node01.conf 
 input {
@@ -289,7 +316,9 @@ output {
 }
 
 ```  
-7、配置logstash收集redis并发生到elasticsearch
+
+配置logstash收集redis并发生到elasticsearch
+---
 ```
 # cat  redis-es.conf
 input {
@@ -327,7 +356,7 @@ output {
 ```
 
 将日志写入kafka，并取出写入elasticsearch
-
+---
 ```
 input {
   file {
