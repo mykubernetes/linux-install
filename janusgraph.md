@@ -66,6 +66,19 @@ http://tinkerpop.apache.org/docs/current/reference/#traversal
 
 # 安装JanusGraph
 
+
+1. Cassandra 安装
+```
+docker run --name cassandra-3.11.3 -p 7000:7000 -p 7001:7001 -p 7199:7199 -p 9042:9042 -p 9160:9160 -d cassandra:3.11.3
+```
+
+2. Elasticsearch 安装
+```
+docker run --name es-5.5.2 -p 9200:9200 -p 9300:9300 -d elasticsearch:5.5.2
+```
+
+安装JanusGraph
+
 1、下载JanusGraph
 ```
 wget https://github.com/JanusGraph/janusgraph/releases/download/v0.3.0/janusgraph-0.3.2-hadoop2.zip
