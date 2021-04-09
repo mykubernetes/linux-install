@@ -108,9 +108,14 @@ unzip janusgraph-0.3.2-hadoop2.zip
 host: 0.0.0.0                                                                    #监听地址             
 port: 8182                                                                       #监听端口号
 scriptEvaluationTimeout: 30000                                                   #指单次查询最长的时间，默认是30s
-channelizer: org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer    #设置使用WebSocketChannelizer还是HttpChannelizer
+channelizer: org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer
+# 服务类型，可选以下内容 
+# - WebSocketChannelizer 提供WebSocket服务 
+# - HttpChannelizer 提供Http服务 
+# - WsAndHttpChannelizer 推荐，同时提供WebSocket和Http服务，从0.2.0版本开始支持
+
 graphs: {
-  graph: conf/gremlin-server/janusgraph-cql-es-server.properties                 #指向JanusGraph的具体配置文件
+  graph: conf/gremlin-server/janusgraph-cql-es-server.properties                 # 所要用到的配置文件路径，可自定义
 }
 scriptEngines: {
   gremlin-groovy: {
@@ -172,4 +177,74 @@ index.search.elasticsearch.client-only=true
 5、启动janusgraph
 ```
 bin/gremlin-server.sh ./conf/gremlin-server/gremlin-server.yaml
+```
+
+6、测试 WebSocket,运行 bin/gremlin.sh 。
+```
+[admin@localhost janusgraph]$ bin/gremlin.sh
+
+         \,,,/
+         (o o)
+-----oOOo-(3)-oOOo-----
+plugin activated: janusgraph.imports
+plugin activated: tinkerpop.server
+plugin activated: tinkerpop.utilities
+plugin activated: tinkerpop.hadoop
+plugin activated: tinkerpop.spark
+plugin activated: tinkerpop.tinkergraph
+gremlin> :remote connect tinkerpop.server conf/remote.yaml
+==>Configured localhost/127.0.0.1:8182
+gremlin> :> g.V().count()
+==>0
+gremlin>
+如能正常响应，则表示部署成功。
+```
+
+7、测试 Http,运行如下命令测试 http 能否正常响应。
+```
+curl -XPOST -Hcontent-type:application/json -d '{"gremlin":"g.V().count()"}' http://localhost:8182
+应有类似如下返回内容，则为正常。
+
+{
+  "requestId": "47608dd1-275d-4708-acf7-fa1e6355328b",
+  "status": {
+    "message": "",
+    "code": 200,
+    "attributes": { "@type": "g:Map", "@value": [] }
+  },
+  "result": {
+    "data": {
+      "@type": "g:List",
+      "@value": [{ "@type": "g:Int64", "@value": 0 }]
+    },
+    "meta": { "@type": "g:Map", "@value": [] }
+  }
+}
+```
+
+8、守护进程配置 systemd
+```
+# vim /etc/systemd/system/janusgraph.service
+[Unit]
+Description=JanusGraph Server
+
+[Service]
+ExecStart=/root/janusgraph/bin/gremlin-server.sh /root/janusgraph/conf/gremlin-server/gremlin-server.yaml
+ExecReload=/bin/kill -HUP $MAINPID
+Type=simple
+User=root
+Group=root
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+9、常用命令
+```
+sudo service janusgraph start
+sudo service janusgraph stop
+sudo service janusgraph restart
+sudo systemctl enable janusgraph
+sudo systemctl disable janusgraph
 ```
