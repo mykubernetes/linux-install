@@ -92,6 +92,10 @@ unzip janusgraph-0.3.2-hadoop2.zip
 ```
 
 4、配置启动配置文件conf/gremlin-server/gremlin-server.yaml
+
+配置文件  
+https://links.jianshu.com/go?to=https%3A%2F%2Fdocs.janusgraph.org%2Fbasics%2Fconfiguration-reference%2F%23configuration-namespaces-and-options
+
 ```
 # Copyright 2019 JanusGraph Authors
 #
