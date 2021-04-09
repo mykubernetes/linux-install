@@ -89,6 +89,76 @@ wget https://github.com/JanusGraph/janusgraph/releases/download/v0.3.0/janusgrap
 3、解压JanusGraph
 ```
 unzip janusgraph-0.3.2-hadoop2.zip
+
+# ls
+bin  conf  data  examples  ext  javadocs  lib  LICENSE.txt  NOTICE.txt  scripts
+
+# tree bin/
+bin/
+├── gremlin.bat
+├── gremlin-server.bat
+├── gremlin-server.sh
+└── gremlin.sh
+
+0 directories, 4 files
+
+# tree conf/
+conf/
+├── gremlin-server
+│   ├── gremlin-server-berkeleyje-es.yaml
+│   ├── gremlin-server-berkeleyje.yaml
+│   ├── gremlin-server-configuration.yaml
+│   ├── gremlin-server-cql-es.yaml
+│   ├── gremlin-server.yaml
+│   ├── janusgraph-berkeleyje-es-server.properties
+│   ├── janusgraph-berkeleyje-server.properties
+│   ├── janusgraph-cassandra-es-server.properties
+│   ├── janusgraph-cql-es-server.properties
+│   └── log4j-server.properties
+├── hadoop-graph
+│   ├── hadoop-graphson.properties
+│   ├── hadoop-gryo.properties
+│   ├── hadoop-load.properties
+│   ├── hadoop-script.properties
+│   ├── read-cassandra.properties
+│   ├── read-cassandra-standalone-cluster.properties
+│   ├── read-cql.properties
+│   ├── read-cql-standalone-cluster.properties
+│   ├── read-hbase.properties
+│   ├── read-hbase-snapshot.properties
+│   └── read-hbase-standalone-cluster.properties
+├── janusgraph-berkeleyje-es.properties
+├── janusgraph-berkeleyje-lucene.properties
+├── janusgraph-berkeleyje.properties
+├── janusgraph-berkeleyje-solr.properties
+├── janusgraph-cassandra-configurationgraph.properties
+├── janusgraph-cassandra-es.properties
+├── janusgraph-cassandra.properties
+├── janusgraph-cassandra-solr.properties
+├── janusgraph-cql-configurationgraph.properties
+├── janusgraph-cql-es.properties
+├── janusgraph-cql.properties
+├── janusgraph-cql-solr.properties
+├── janusgraph-hbase-es.properties
+├── janusgraph-hbase.properties
+├── janusgraph-hbase-solr.properties
+├── janusgraph-inmemory.properties
+├── log4j-console.properties
+├── logback.xml
+├── remote-graph.properties
+├── remote-objects.yaml
+├── remote.yaml
+└── solr
+    ├── currency.xml
+    ├── lang
+    │   └── stopwords_en.txt
+    ├── protwords.txt
+    ├── schema.xml
+    ├── solrconfig.xml
+    ├── stopwords.txt
+    └── synonyms.txt
+
+4 directories, 49 files
 ```
 
 4、配置启动配置文件conf/gremlin-server/gremlin-server.yaml
