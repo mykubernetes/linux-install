@@ -79,17 +79,19 @@ docker run --name es-5.5.2 -p 9200:9200 -p 9300:9300 -d elasticsearch:5.5.2
 
 安装JanusGraph
 
-1、下载JanusGraph
+1、安装java
+
+2、下载JanusGraph
 ```
 wget https://github.com/JanusGraph/janusgraph/releases/download/v0.3.0/janusgraph-0.3.2-hadoop2.zip
 ```
 
-2、解压JanusGraph
+3、解压JanusGraph
 ```
 unzip janusgraph-0.3.2-hadoop2.zip
 ```
 
-3、配置启动配置文件conf/gremlin-server/gremlin-server.yaml
+4、配置启动配置文件conf/gremlin-server/gremlin-server.yaml
 ```
 # Copyright 2019 JanusGraph Authors
 #
@@ -155,7 +157,7 @@ writeBufferLowWaterMark: 32768
 writeBufferHighWaterMark: 65536
 ```
 
-4、配置janusgraph-cql-es-server.properties
+5、配置janusgraph-cql-es-server.properties
 ```
 # 存储后端
 storage.backend=cql
@@ -174,14 +176,14 @@ index.search.hostname=127.0.0.1
 index.search.elasticsearch.client-only=true
 ```
 
-5、启动janusgraph
+6、启动janusgraph
 ```
 bin/gremlin-server.sh ./conf/gremlin-server/gremlin-server.yaml
 ```
 
-6、测试 WebSocket,运行 bin/gremlin.sh 。
+7、测试 WebSocket,运行 bin/gremlin.sh 。
 ```
-[admin@localhost janusgraph]$ bin/gremlin.sh
+$ bin/gremlin.sh
 
          \,,,/
          (o o)
@@ -197,10 +199,9 @@ gremlin> :remote connect tinkerpop.server conf/remote.yaml
 gremlin> :> g.V().count()
 ==>0
 gremlin>
-如能正常响应，则表示部署成功。
 ```
 
-7、测试 Http,运行如下命令测试 http 能否正常响应。
+8、测试 Http,运行如下命令测试 http 能否正常响应。
 ```
 curl -XPOST -Hcontent-type:application/json -d '{"gremlin":"g.V().count()"}' http://localhost:8182
 应有类似如下返回内容，则为正常。
@@ -222,7 +223,7 @@ curl -XPOST -Hcontent-type:application/json -d '{"gremlin":"g.V().count()"}' htt
 }
 ```
 
-8、守护进程配置 systemd
+9、守护进程配置 systemd
 ```
 # vim /etc/systemd/system/janusgraph.service
 [Unit]
@@ -240,7 +241,7 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-9、常用命令
+10、常用命令
 ```
 sudo service janusgraph start
 sudo service janusgraph stop
