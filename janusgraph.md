@@ -137,7 +137,7 @@ writeBufferLowWaterMark: 32768
 writeBufferHighWaterMark: 65536
 ```
 
-4、janusgraph-cql-es-server.properties
+4、配置janusgraph-cql-es-server.properties
 ```
 # 存储后端
 storage.backend=cql
@@ -154,4 +154,9 @@ cache.db-cache-size = 0.25
 index.search.backend=elasticsearch
 index.search.hostname=127.0.0.1
 index.search.elasticsearch.client-only=true
+```
+
+5、启动janusgraph
+```
+bin/gremlin-server.sh ./conf/gremlin-server/gremlin-server.yaml
 ```
