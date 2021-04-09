@@ -689,7 +689,7 @@ declare 变量名 类型 [default 值];
 3、使用
 select 变量名;
 
-
+```
 
 
 
