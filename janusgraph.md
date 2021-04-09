@@ -179,6 +179,7 @@ index.search.elasticsearch.client-only=true
 6、启动janusgraph
 ```
 bin/gremlin-server.sh ./conf/gremlin-server/gremlin-server.yaml
+[gremlin-server-boss-1] INFO org.apache.tinkerpop.gremlin.server.GremlinServer - Channel started at port 8182.
 ```
 
 7、测试 WebSocket,运行 bin/gremlin.sh 。
