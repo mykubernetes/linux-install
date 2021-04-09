@@ -254,3 +254,54 @@ sudo service janusgraph restart
 sudo systemctl enable janusgraph
 sudo systemctl disable janusgraph
 ```
+
+## 安全认证
+1、HTTP 认证
+
+在 gremlin-server-xxx.yaml 中配置：
+```
+authentication: {
+  authenticator: org.janusgraph.graphdb.tinkerpop.gremlin.server.auth.JanusGraphSimpleAuthenticator,
+  authenticationHandler: org.apache.tinkerpop.gremlin.server.handler.HttpBasicAuthenticationHandler,
+  config: {
+    defaultUsername: user,
+    defaultPassword: password,
+    credentialsDb: conf/janusgraph-credentials-server.properties
+   }
+}
+```
+访问：
+```
+curl -v -XPOST http://localhost:8182 -d '{"gremlin": "g.V().count()"}' -u user:password
+```
+
+2、WebSocket 认证
+
+使用 SASL 身份验证，在 gremlin-server-xxx.yaml 中配置：
+```
+authentication: {
+  authenticator: org.janusgraph.graphdb.tinkerpop.gremlin.server.auth.JanusGraphSimpleAuthenticator,
+  authenticationHandler: org.apache.tinkerpop.gremlin.server.handler.SaslAuthenticationHandler,
+  config: {
+    defaultUsername: user,
+    defaultPassword: password,
+    credentialsDb: conf/janusgraph-credentials-server.properties
+  }
+}
+```
+
+3、HTTP 和 WebSocket 认证
+
+使用 HMAC token 认证方式，在 gremlin-server-xxx.yaml 中配置：
+```
+authentication: {
+  authenticator: org.janusgraph.graphdb.tinkerpop.gremlin.server.auth.SaslAndHMACAuthenticator,
+  authenticationHandler: org.janusgraph.graphdb.tinkerpop.gremlin.server.handler.SaslAndHMACAuthenticationHandler,
+  config: {
+    defaultUsername: user,
+    defaultPassword: password,
+    hmacSecret: secret,
+    credentialsDb: conf/janusgraph-credentials-server.properties
+  }
+}
+```
