@@ -147,6 +147,11 @@ tar -xvf etcd-v3.1.5-linux-amd64.tar.gz
 mv etcd-v3.1.5-linux-amd64/etcd* /usr/local/bin  
 ```
 
+创建etcd的工作目录
+```
+mkdir -p /var/lib/etcd
+```
+
 4、service配置文件
 ```
 vim /usr/lib/systemd/system/etcd.service, 三台机器配置不一样，需要替换为相应的IP和name。
@@ -260,3 +265,43 @@ client: etcd cluster is unavailable or misconfigured; error #0: x509: certificat
 e281e4e43dceb752: name=master3 peerURLs=https://192.168.255.133:2380 clientURLs=https://192.168.255.133:2379 isLeader=false  
 ea5e4f12ed162d4b: name=master1 peerURLs=https://192.168.255.131:2380 clientURLs=https://192.168
 ``` 
+
+
+# ETCD数据目录介绍
+
+指定了数据存放目录/var/lib/etcd，查看这个目录下的内容，目录下存在两个子目录snap和wal目录，具体如下：
+```
+[root@k8s001 ~]# ls /var/lib/etcd/member
+snap  wal
+```
+
+- snap
+  - 存放快照数据，存储etcd的数据状态
+  - etcd防止WAL文件过多而设置的快照
+- wal
+  - 存放预写式日志
+  - 最大的作用是记录了整个数据变化的全部历程
+  - 在etcd中，所有数据的修改在提交前，都要先写入到WAL中。
+```
+[root@k8s001 etcd]# tree member
+member
+├── snap
+│   ├── 0000000000000006-000000000056f9d9.snap
+│   ├── 0000000000000006-000000000058807a.snap
+│   ├── 0000000000000006-00000000005a071b.snap
+│   ├── 0000000000000006-00000000005b8dbc.snap
+│   ├── 0000000000000006-00000000005d145d.snap
+│   └── db
+└── wal
+    ├── 0000000000000065-00000000005a0f54.wal
+    ├── 0000000000000066-00000000005adeea.wal
+    ├── 0000000000000067-00000000005bae72.wal
+    ├── 0000000000000068-00000000005c7dfd.wal
+    ├── 0000000000000069-00000000005d4d81.wal
+    └── 1.tmp
+
+2 directories, 12 files
+```
+使用WAL进行数据的存储使得etcd拥有两个重要功能，那就是故障快速恢复和数据回滚/重做。故障快速恢复就是当你的数据遭到破坏时，就可以通过执行所有WAL中记录的修改操作，快速从最原始的数据恢复到数据损坏前的状态。数据回滚重做就是因为所有的修改操作都被记录在WAL中，需要回滚或重做，只需要方向或正向执行日志中的操作即可。
+既然有了WAL实时存储了所有的变更，为什么还需要snapshot呢？随着使用量的增加，WAL存储的数据会暴增。为了防止磁盘很快就爆满，etcd默认每10000条记录做一次snapshot操作，经过 snapshot 以后的WAL文件就可以删除。而通过API可以查询的历史etcd操作默认为 1000 条。
+首次启动时，etcd会把启动的配置信息存储到data-dir参数指定的数据目录中。配置信息包括本地节点的ID、集群ID和初始时集群信息。用户需要避免etcd从一个过期的数据目录中重新启动，因为使用过期的数据目录启动的节点会与集群中的其他节点产生不一致。所以，为了最大化集群的安全性，一旦有任何数据损坏或丢失的可能性，你就应该把这个节点从集群中移除，然后加入一个不带数据目录的新节点。
