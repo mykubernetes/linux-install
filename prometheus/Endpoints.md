@@ -1,10 +1,6 @@
 #### 1. Endpoints
 
-在Prometheus中，有`/-/healthy`和`/-ready`端点。
-
-
-可以在测试环境中运行以下命令并检查它们的输出以及它们的HTTP状态码。
-
+查看健康状态和就绪状态
 ```
 $ curl -w "%{http_code}\n" http://localhost:9090/-/healthy
 Prometheus is Healthy.
