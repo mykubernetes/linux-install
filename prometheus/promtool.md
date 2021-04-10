@@ -28,7 +28,7 @@ Checking /etc/prometheus/first_rules.yml
 `check metrics`子命令验证传递给它的度量在一致性和正确性方面是否遵循普罗米修斯准则。
 
 ```
-~$ curl -s http://prometheus:9090/metrics | promtool check metrics
+$ curl -s http://prometheus:9090/metrics | promtool check metrics
 prometheus_tsdb_storage_blocks_bytes_total non-counter metrics should not have "_total" suffix
 ```
 
@@ -125,22 +125,22 @@ trace.pb
 $ pprof -svg heap.pb > /vagrant/cache/heap.svg
 ```
 
-在主机上，在./cache/ 路径(相对于存储库根)下的代码存储库中，您现在应该有一个可伸缩的向量图形文件heap。可由浏览器打开以供查看。下面的截图显示了你可能会看到什么时，看看由上述例子产生的文件:
+在主机上，在./cache/ 路径(相对于存储库根)下的代码存储库中，现在应该有一个可伸缩的向量图形文件heap。可由浏览器打开以供查看。
 
-![](../uploads/y20191113/images/m_40b83a418def32464ab3f89369f10e7e_r.png)
+
 
 ##### 2、debug metrics
 此子命令下载提供的普罗米修斯实例在压缩归档中公开的度量。调试指标并不常用，因为/metrics Prometheus端点对于任何能够运行此命令的人都是可用的;它的存在是为了在需要时更容易地向外部援助(例如普罗米修斯的维护者)提供普罗米修斯实例的当前状态。这个子命令可以使用如下:
 
 ```
-vagrant@prometheus:~$ promtool debug metrics 'http://prometheus:9090'
+$ promtool debug metrics 'http://prometheus:9090'
 collecting: http://prometheus:9090/metrics
 Compiling debug information complete, all files written in "debug.tar.gz".
 
-vagrant@prometheus:~$ tar xzvf debug.tar.gz 
+$ tar xzvf debug.tar.gz 
 metrics.txt
 
-vagrant@prometheus:~$ tail -n 5 metrics.txt 
+$ tail -n 5 metrics.txt 
 # HELP promhttp_metric_handler_requests_total Total number of scrapes by HTTP status code.
 # TYPE promhttp_metric_handler_requests_total counter
 promhttp_metric_handler_requests_total{code="200"} 284
@@ -152,7 +152,7 @@ promhttp_metric_handler_requests_total{code="503"} 0
 该选项将之前的调试子命令聚合为一条指令，如下例所示:
 
 ```
-vagrant@prometheus:~$ promtool debug all 'http://prometheus:9090'
+$ promtool debug all 'http://prometheus:9090'
 collecting: http://prometheus:9090/debug/pprof/threadcreate
 collecting: http://prometheus:9090/debug/pprof/profile?seconds=30
 collecting: http://prometheus:9090/debug/pprof/block
