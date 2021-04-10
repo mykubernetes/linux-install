@@ -204,6 +204,29 @@ WantedBy=multi-user.target
   
 所有以--initial 开头的配置都是在 bootstrap（引导） 集群的时候才会用到，后续节点重启时会被忽略。  
 
+# etcd常用配置阐述
+| 配置参数 | 参数说明 |
+|----------|---------|
+| --name | 指定节点名称 |
+| --data-dir | 指定节点数据存储目录，用于保存日志和快照 |
+| --add | 公布IP地址和端口；默认为127.0.0.1:2379 |
+| --bind-dir | 用于客户端连接的监听地址；默认为--addr配置 |
+| --peers | 集群成员逗号分隔的列表；列如127.0.0.1:2380，127.0.0.1:2381 |
+| --peer-addr | 集群服务同学的公布的IP地址；默认为127.0.0.1:2380 |
+| --peer-bind-addr | 集群服务通讯的监听地址；默认为--peer-addr配置 |
+| --wal-dir | 指定节点的wal文件的存储魔力，若指定了该参数wal文件会和其他数据文件分开存储 |
+| --listen-client-urls | 监听URL;用于客户端通讯 |
+| --listen-peer-urls | 监听URL;用于与其他节点通讯 |
+| --initial-advertise-peer-urls | 告知集群其他节点URL |
+| --advertise-client-urls | 告知客户端URL |
+| --initial-cluster-token | 集群的ID |
+| --initial-cluster | 集群中所有节点 |
+| --initial-cluster-state | new表示从无到有搭建etcd集群 |
+| --discovery-srv | 用于DNS动态服务发现，指定DNS SRV域名 |
+| --discovery | 用于etcd动态发现，指定etcd发现服务的URL |
+
+
+
 5、创建存放etcd数据的目录，启动 etcd
 ```
 mkdir /var/lib/etcd  
