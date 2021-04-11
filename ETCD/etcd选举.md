@@ -52,7 +52,6 @@ etcdctl --write-out=table --endpoints=$ENDPOINTS endpoint status
 - 102(91d63231b87fadda)发送给 挂掉的101 和 另一个100，希望他们也投给自己
 ```
 91d63231b87fadda [logterm: 7, index: 4340153] sent MsgVote request to 8a4bb0af2f19bd46 at term 8
-
 91d63231b87fadda [logterm: 7, index: 4340153] sent MsgVote request to 9feab580a25dd270 at term 8
 ```
 
@@ -137,12 +136,18 @@ The majority side becomes the available cluster and the minority side is unavail
 ```
 
 以网络分区导致脑裂为例，一开始有5个节点, Node 5 为 Leader
-
-
+```
+  etcd1        etcd2       etcd4
+  
+      etcd3         etcd5-leader
+```
 
 由于出现网络故障，124 成为一个分区，35 成为一个分区， Node 5 的 leader 任期还没结束的一段时间内，仍然认为自己是当前leader，但是此时另外一边的分区，因为124无法连接 5，于是选出了新的leader 1，网络分区形成。
-
-
+```
+  etcd1-leader     etcd2       etcd4
+  ------------------------------
+      etcd3             etcd5-leader
+```
 
 35分区是否可用？如果写入了1而读取了 5，是否会读取旧数据(stale read)?
 
