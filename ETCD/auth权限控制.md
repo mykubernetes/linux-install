@@ -91,6 +91,7 @@ Error:  etcdserver: permission denied
 $ etcdctl user list --user=mengyuan
 Password: 
 Error:  etcdserver: permission denied
+
 为新用户添加root的角色后就能执行user list命令了，注意命令中第一个root是角色，第二个root是用户
 
 $ etcdctl user grant-role mengyuan root --user=root
