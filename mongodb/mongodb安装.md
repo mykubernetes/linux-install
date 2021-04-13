@@ -226,11 +226,17 @@ readWriteAnyDatabase：授予在所有数据库上读写数据的权限
 userAdminAnyDatabase：授予在所有数据库上管理User的权限
 dbAdminAnyDatabase：授予管理所有数据库的权限
 
-集群管理角色
+# 集群管理角色
 clusterAdmin：授予管理集群的最高权限
 clusterManager：授予管理和监控集群的权限，A user with this role can access the config and local databases, which are used in sharding and replication, respectively.
 clusterMonitor：授予监控集群的权限，对监控工具具有readonly的权限
 hostManager：管理Server
+
+# 超级用户角色
+root 
+
+# 内部角色
+__system: 提供对数据库中的任何对象执行任何操作的权限
 ```
 
 mong使用use 后对这个库设置账户即对当前库拥有权限
@@ -290,3 +296,67 @@ WARNING: You are running this process as the root user, which is not
 # su - mongodb 
 $ mongod -f /opt/mongodb/conf/mongodb.conf
 ```  
+
+
+自定义角色格式
+```
+# 自定义角色(对config库所有表可以增删改查,对users库usersCollection表更新,插入,删除,对所有数据库有查找权限)
+> use admin
+switched to db admin
+> db.createRole(
+   {
+     role: "wuhan123",       # 角色名
+     privileges: [
+       { resource: { db: "config", collection: "" }, actions: [ "find", "update", "insert", "remove" ] },
+       { resource: { db: "users", collection: "usersCollection" }, actions: [ "update", "insert", "remove" ] },
+       { resource: { db: "", collection: "" }, actions: [ "find" ] }
+     ],
+     roles: [
+       { role: "read", db: "admin" }
+     ]
+   }
+)
+>
+```
+
+列出角色和删除角色
+```
+# 显示当前库所有角色
+> db.getRoles()
+
+# 显示单个角色信息(wuhan123是角色名)
+> db.getRole("wuhan123")
+
+# 删除角色
+> db.dropRole("wuhan123");
+true
+
+# 删除所有角色
+> db.dropAllRoles();
+NumberLong(1)
+```
+
+
+查看用户和添加删除用户
+```
+# 查看当前数据库所有用户
+> db.getUsers(); 
+
+# 查看指定用户
+> db.getUser("u_tong"); 
+
+# 删除单个用户
+> db.dropUser("u_tong");    
+true
+
+# 删除当前库所有用户
+> db.dropAllUsers();       
+NumberLong(1)
+```
+
+将角色授权给用户
+```
+> db.grantRolesToUser(
+   "u_tong",[ "readWrite" , { role: "read", db: "tong" } ],
+> )
+```
