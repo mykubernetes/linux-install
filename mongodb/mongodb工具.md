@@ -1,4 +1,16 @@
 1、Mongostat 实用程序可以快速概览当前正在运行的 mongod 或 mongos 实例的状态，mongostat 在功能上类似于 UNIX / Linux 文件系统实用程序 vmstat，但提供有关的数据 mongod 和 mongos 实例  
+
+| 参数 | 参数说明 |
+|------|----------|
+| insert | 每秒插入量 |
+| query | 每秒查询量 |
+| update | 每秒更新量 |
+| delete | 每秒删除量 |
+| conn | 当前连接数 |
+| qr|qw | 客户端查询排队长度（读|写）最好为0，如果有堆积，数据库处理慢。 |
+| ar|aw | 活跃客户端数量（读|写） |
+| time | 当前时间 |
+
 ```
 $ mongostat 
 insert query update delete getmore command dirty used flushes vsize   res qrw arw net_in net_out conn                time
