@@ -311,7 +311,49 @@ group.initial.rebalance.delay.ms=0
 test
 ```
 
-3、查看topic详细信息
+3、往topic发送消息
+```
+$ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
+>hello world
+>kafka  kafka
+```
+
+4、从topic消费消息
+```
+# 老版本
+$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic test
+$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --from-beginning --topic test
+
+#新版本
+$ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic test
+
+# 创建hncscwc消费者组, 并从 2号分区 偏移量为1的位置开始消费 2条消息
+$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --group hncscwc --partition 2 --offset 1 --max-messages 2
+```
+- --from-beginning 读取主题中所有的数据
+-  --partition 从指定的分区消费消息
+- --offset 从指定的偏移位置消费消息
+- --group 以指定消费者组的形式消费消息
+- --max-messages 指定消费消息的最大个数
+- --zookeeper已经被弃用 改为 --bootstrap-server参数
+
+5、增加partitions分区数
+```
+# kafka-topics.sh --zookeeper node001:2181 --alter --topic test --partitions 40
+WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
+Adding partitions succeeded!
+```
+
+6、删除topic
+```
+# kafka-topics.sh --zookeeper node001:2181 --delete --topic test
+Topic test is marked for deletion.
+Note: This will have no impact if delete.topic.enable is not set to true.
+```  
+- 需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
+
+
+7、查看topic的分区及副本
 ```
 kafka-topics.sh --zookeeper node001:2181 --describe --topic test
 Topic:test  PartitionCount:20  ReplicationFactor:3  Configs:
@@ -341,22 +383,8 @@ Topic: test  Partition: 19     Leader: 0            Replicas: 0,2,3Isr: 0,2,3
 - Replicas:表示该topic的每个分区在那些borker中保存
 - Isr:表示当前有效的broker, Isr是Replicas的子集
 
-4、增加partitions分区数
-```
-# kafka-topics.sh --zookeeper node001:2181 --alter --topic test --partitions 40
-WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
-Adding partitions succeeded!
-```
 
-5、删除topic
-```
-# kafka-topics.sh --zookeeper node001:2181 --delete --topic test
-Topic test is marked for deletion.
-Note: This will have no impact if delete.topic.enable is not set to true.
-```  
-- 需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
-
-6、查看topic消费到的offset
+8、查看topic消费到的offset
 ```
 # kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list node001:9092 --topic test0 --time -1
 test0:17:0
@@ -379,10 +407,23 @@ test0:12:0
 test0:15:0
 test0:6:0
 test0:0:
-```
-- 注： time为-1时表示最大值，time为-2时表示最小值
 
-检查 consumer  位置
+# 注1 结果格式为： topic名称:partition分区号:分区的offset
+# 注2 --time 为 -1时用来请求分区最新的offset
+#     --time 为 -2时用来请求分区最早有效的offset
+```
+
+9、显示所有消费者
+```
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+# 结果如下
+Note: This will not show information about old Zookeeper-based consumers.
+ 
+console-consumer-22568
+hncscwc
+```
+
+10、检查 consumer  位置
 ```
 # 这将仅显示使⽤Java consumer API（基于⾮ZooKeeper的 consumer）的 consumer 的信息。
 > bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
@@ -401,32 +442,13 @@ my-topic                      1         2    
 my-topic                      2         2              3              1         my-group_consumer-2
 ```
 
-7、发送消息
+11、增加、删除配置项
 ```
-$ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
->hello world
->kafka  kafka
-```
-
-8、消费消息    
-```
-老版本
-$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic test
-$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --from-beginning --topic test
-新版本
-$ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic test
-```
-- --from-beginning 读取主题中所有的数据  
-注意： --zookeeper已经被弃用 改为 --bootstrap-server参数  
-
-
-9、增加、删除配置项
-```
-# bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --add-config x=y
-# bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --delete-config x
+# bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --add-config x=y
+# bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --delete-config x
 ```
 
-10、常用创建topic参数
+12、常用创建topic参数
 ```
 bin/kafka-topics.sh --create \
 --zookeeper $zookeeper_address \
@@ -440,10 +462,7 @@ bin/kafka-topics.sh --create \
 - --config retention.ms=86400000 #topic过期时间，86400000 为一天，单位是毫秒
 - --config retention.bytes=1073741824 # 日志数据存储的最大字节数。超过这个时间会根据policy处理数据。
 
-显示所有消费者
-```
-./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
-```
+
 
 六、kafka manager安装配置
 ---
