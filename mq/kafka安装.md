@@ -440,6 +440,11 @@ bin/kafka-topics.sh --create \
 - --config retention.ms=86400000 #topic过期时间，86400000 为一天，单位是毫秒
 - --config retention.bytes=1073741824 # 日志数据存储的最大字节数。超过这个时间会根据policy处理数据。
 
+显示所有消费者
+```
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+```
+
 六、kafka manager安装配置
 ---
 常用的kafka管理工具
@@ -789,6 +794,11 @@ test-foo                      0         1    
 
 # 使⽤⽼的⾼级 consumer 并在 ZooKeeper 中存储组元数据
 > bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
+```
+
+显示所有消费者
+```
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 ```
 
 查看topic消费进度
