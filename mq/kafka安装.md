@@ -792,7 +792,7 @@ test-foo                      0         1    
 ```
 
 查看topic消费进度
-
+- 显示出consumer group的offset情况， 必须参数为--group， 不指定--topic，默认为所有topic
 ```
 # bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker
 required argument: [group] 
