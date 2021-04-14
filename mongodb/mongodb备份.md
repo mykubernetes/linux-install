@@ -1,3 +1,5 @@
+mongoexport和mongoimport
+===
 
 跨版本备份，支持json和csv两种格式
 ---
@@ -90,15 +92,30 @@ mongodump的参数与mongoexport的参数基本一致
 | --gzip | 备份时压缩 |
 | --oplog | 备份的同时备份oplog |
 
+
+1、全库备份
 ```
-备份所有库
-mongodump -uroot -p123456 --port 27017--authenticationDatabase admin -o /monggodb/backup/
+mongodump -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin  -o /home/mongod/backup/full
+```
 
-备份单个库
-mongodump -uroot -p123456 --port 27017  --authenticationDatabase admin -d DB_NAME -o /monggodb/backup/
+2、备份test库
+```
+mongodump -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin  -d test -o /home/mongod/backup/
+```
 
-备份单个表
-mongodump -uroot -p123456 --port 27017 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME -o /monggodb/backup/mongo_201507021701.bak
+3、备份test库下的vast集合
+```
+mongodump -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin  -d test -c vast -o /home/mongod/backup/
+```
+
+4、压缩备份库
+```
+mongodump -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin  -d test -o /home/mongod/backup/ --gzip
+```
+
+5、压缩备份单表
+```
+mongodump -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin  -d test -c vast -o /home/mongod/backup/ --gzip
 ```
 
 
@@ -120,17 +137,28 @@ mongorestore与mongoimport参数类似
 | --oplog | use oplog for taking a point-in-time snapshot |
 | --drop | 恢复的时候把之前的集合drop掉（慎用） |
 
+1、全库备份中恢复单库（基于之前的全库备份）
 ```
-恢复所有库：
-mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin /monggodb/backup/
-
-恢复单个库：
-mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin -d DB_NAME /monggodb/backup/DB_NAME/
-
-恢复单表
-mongorestore -uroot -p 123456 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME /monggodb/backup/DN_NAME/TABLES_NAME.bson
+mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d test --drop  /home/mongod/backup/full/test/
 ```
 
+2、恢复test库
+```
+mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d test /home/mongod/backup/test/
+```
+
+3、恢复test库下的vast集合
+```
+mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d test -c vast /home/mongod/backup/test/vast.bson
+```
+
+4、--drop参数实践恢复
+```
+# 恢复单库
+mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d test --drop /home/mongod/backup/test/
+# 恢复单表
+mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d test -c vast --drop /home/mongod/backup/test/vast.bson
+```
 
 ```
 备份所有库推荐使用添加--oplog参数的命令，这样的备份是基于某一时间点的快照，只能用于备份全部库时才可用，单库和单表不适用：
