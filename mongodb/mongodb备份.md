@@ -58,9 +58,15 @@ mongoimport -uroot -p12456 -c test --type -f uid,name,age,date --authenticationa
 
 备份mysql数据为csv格式,默认空格为分隔符，改为指定逗号分隔
 ```
-select * from t100w into outfile "/opt.t100w.csv" fields terminated by ',';
+select user,host,password from mysql.user
+into outfile '/tmp/user.csv'                 # 导出文件位置
+fields terminated by ','                     # 字段间以,号分隔
+optionally enclosed by '"'                   # 字段用"号括起
+escaped by '"'                               # 字段中使用的转义符为"
+lines terminated by '\r\n';                  # 行以\r\n结束
 
-mongoimport -uroot -p12456 -d mysqltest -c test --type -f id,num,k1,k2,dt --authenticationatabase admin /opt.t100w.csv
+
+mongoimport -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d app -c user -f user,host,password  --type=csv --file /tmp/user.csv
 ```
 
 
@@ -69,16 +75,20 @@ mongob备份bson格式
 ---
 mongodump数据库的备份，备份所有库 
 
-mongodump
-- -h 指明数据库宿主机的IP 
-- -u 指明数据库的用户名
-- -p 指明数据库的密码
-- -d 指明数据库的名字
-- -c 指明collection的名字
-- -o 指明要导出的文件名
-- -q 指明导出的数据库过滤条件
-- -j 并发
---oplog 备份的同时备份oplog
+mongodump的参数与mongoexport的参数基本一致
+| 参数 | 参数说明 |
+|-----|----------|
+| -h | 指明数据库宿主机的IP |
+| -u | 指明数据库的用户名 |
+| -p | 指明数据库的密码 |
+| -d | 指明数据库的名字 |
+| -c | 指明collection的名字 |
+| -o | 指明到要导出的文件名 |
+| -q | 指明导出数据的过滤条件 |
+| -j | 并发 |
+| --authenticationDatabase | 验证数据的名称 |
+| --gzip | 备份时压缩 |
+| --oplog | 备份的同时备份oplog |
 
 ```
 备份所有库
@@ -90,7 +100,7 @@ mongodump -uroot -p123456 --port 27017  --authenticationDatabase admin -d DB_NAM
 备份单个表
 mongodump -uroot -p123456 --port 27017 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME -o /monggodb/backup/mongo_201507021701.bak
 ```
-- --gzip压缩备份
+
 
 mongorestore数据库的恢复  
 ```
