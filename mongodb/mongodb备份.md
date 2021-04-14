@@ -160,15 +160,6 @@ mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d
 mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d test -c vast --drop /home/mongod/backup/test/vast.bson
 ```
 
-备份恢复--oplog
-```
-备份所有库推荐使用添加--oplog参数的命令，这样的备份是基于某一时间点的快照，只能用于备份全部库时才可用，单库和单表不适用：
-mongodump -h 127.0.0.1 --port 27017 --oplog -o /root/bak 
-
-同时，恢复时也要加上--oplogReplay参数，具体命令如下(下面是恢复单库的命令)：
-mongorestore -d swrd --oplogReplay /home/mongo/swrdbak/swrd/
-```
-
 
 全量恢复加oplog恢复
 ---
@@ -205,9 +196,115 @@ mongorestore --port 27017 --oplogReplay --oplogLimit "1563957100:3" --drop /mong
 ```
 
 
+模拟一个不断有插入操作的集合foo，
+```
+use clsn
+for(var i = 0; i < 10000; i++) {
+    db.clsn.insert({a: i});
+}
+```
+
+【模拟】mongodump使用
+---
+1、然后在插入过程中模拟一次mongodump并指定--oplog。
+```
+$ mongodump -h 10.0.0.152 --port 28021  --oplog  -o /home/mongod/backup/oplog
+```
+注意：--oplog选项只对全库导出有效，所以不能指定-d选项。因为整个实例的变更操作都会集中在local库中的oplog.rs集合中。
+
+从dump开始的时间系统将记录所有的oplog到oplog.bson中，所以得到这些文件：
+```
+$ ll /home/mongod/backup/oplog 
+total 8
+drwxrwxr-x 2 mongod mongod   4096 Jan  8 16:49 admin
+drwxrwxr-x 2 mongod mongod   4096 Jan  8 16:49 clsn
+-rw-rw-r-- 1 mongod mongod  77256 Jan  8 16:49 oplog.bson
+```
+
+2、查看oplog.bson中第一条和最后一条内容
+```
+$ bsondump oplog.bson  >/tmp/oplog.bson.tmp
+
+$ head -1 /tmp/oplog.bson.tmp 
+{"ts":{"$timestamp":{"t":1515401553,"i":666}},"t":{"$numberLong":"5"},"h":{"$numberLong":"5737315465472464503"},"v":2,"op":"i","ns":"clsn.clsn1","o":{"_id":{"$oid":"5a533151cc075bd0aa461327"},"a":3153.0}}
+
+$ tail -1 /tmp/oplog.bson.tmp 
+{"ts":{"$timestamp":{"t":1515401556,"i":34}},"t":{"$numberLong":"5"},"h":{"$numberLong":"-7438621314956315593"},"v":2,"op":"i","ns":"clsn.clsn1","o":{"_id":{"$oid":"5a533154cc075bd0aa4615de"},"a":3848.0}}
+```
+最终dump出的数据既不是最开始的状态，也不是最后的状态，而是中间某个随机状态。这正是因为集合不断变化造成的。
+
+3、使用mongorestore来恢复
+```
+[mongod@MongoDB oplog]$ mongorestore -h 10.0.0.152 --port 28021  --oplogReplay  --drop   /home/mongod/backup/oplog
+2018-01-08T16:59:18.053+0800    building a list of dbs and collections to restore from /home/mongod/backup/oplog dir
+2018-01-08T16:59:18.066+0800    reading metadata for clsn.clsn from /home/mongod/backup/oplog/clsn/clsn.metadata.json
+2018-01-08T16:59:18.157+0800    restoring clsn.clsn from /home/mongod/backup/oplog/clsn/clsn.bson
+2018-01-08T16:59:18.178+0800    reading metadata for clsn.clsn1 from /home/mongod/backup/oplog/clsn/clsn1.metadata.json
+2018-01-08T16:59:18.216+0800    restoring clsn.clsn1 from /home/mongod/backup/oplog/clsn/clsn1.bson
+2018-01-08T16:59:18.669+0800    restoring indexes for collection clsn.clsn1 from metadata
+2018-01-08T16:59:18.679+0800    finished restoring clsn.clsn1 (3165 documents)               # clsn.clsn1集合中恢复了3165个文档
+2018-01-08T16:59:19.850+0800    restoring indexes for collection clsn.clsn from metadata     # 重放了oplog中的所有操作
+2018-01-08T16:59:19.851+0800    finished restoring clsn.clsn (10000 documents)
+2018-01-08T16:59:19.851+0800    replaying oplog
+2018-01-08T16:59:19.919+0800    done
+```
+从日志可以看出clsn.clsn1集合中恢复了3165个文档，重放了oplog中的所有操作。所以理论上clsn1应该有16857个文档（3165个来自clsn.bson，剩下的来自oplog.bson）。验证一下：
+```
+sh1:PRIMARY> db.clsn1.count()
+3849
+```
+这就是带oplog的mongodump的真正作用。
+
+模拟生产环境
+---
+
+1、模拟一个不断有插入操作
+```
+for(i=0;i<300000;i++){ db.oplog.insert({"id":i,"name":"shenzheng","age":70,"date":new Date()}); }
+```
+
+2、插入数据的同时备份
+```
+mongodump -h 10.0.0.152 --port 28021  --oplog  -o /home/mongod/backup/config
+```
+
+3、备份完成后进行次错误的操作
+```
+db.oplog.remove({});
+```
+
+4、备份oplog.rs文件
+```
+mongodump -h 10.0.0.152 --port 28021 -d local -c oplog.rs -o  /home/mongod/backup/config/oplog
+```
+
+5、恢复之前备份的数据
+```
+mongorestore -h 10.0.0.152 --port 28021--oplogReplay /home/mongod/backup/config
+```
+
+6、截取oplog，找到发生误删除的时间点
+```
+bsondump oplog.rs.bson |egrep "\"op\":\"d\"\,\"ns\":\"test\.oplog\"" |head -1 
+"t":1515379110,"i":1
+```
+
+7、复制oplog到备份目录
+```
+cp  /home/mongod/backup/config/oplog/oplog.rs.bson   /home/mongod/backup/config/oplog.bson
+```
+
+8、进行恢复，添加之前找到的误删除的点（limt）
+```
+mongorestore -h 10.0.0.152 --port 28021 --oplogReplay --oplogLimit "1515379110:1"  /home/mongod/backup/
+```
 
 
+备份恢复--oplog
+```
+备份所有库推荐使用添加--oplog参数的命令，这样的备份是基于某一时间点的快照，只能用于备份全部库时才可用，单库和单表不适用：
+mongodump -h 127.0.0.1 --port 27017 --oplog -o /root/bak 
 
-
-
-
+同时，恢复时也要加上--oplogReplay参数，具体命令如下(下面是恢复单库的命令)：
+mongorestore -d swrd --oplogReplay /home/mongo/swrdbak/swrd/
+```
