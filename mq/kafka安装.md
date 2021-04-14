@@ -380,6 +380,7 @@ test0:15:0
 test0:6:0
 test0:0:
 ```
+- 注： time为-1时表示最大值，time为-2时表示最小值
 
 检查 consumer  位置
 ```
@@ -789,6 +790,35 @@ test-foo                      0         1    
 # 使⽤⽼的⾼级 consumer 并在 ZooKeeper 中存储组元数据
 > bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
 ```
+
+查看topic消费进度
+
+```
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker
+required argument: [group] 
+Option Description 
+------ ----------- 
+--broker-info Print broker info 
+--group Consumer group. 
+--help Print this message. 
+--topic Comma-separated list of consumer 
+   topics (all topics if absent). 
+--zkconnect ZooKeeper connect string. (default: localhost:2181)
+Example,
+
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group pv
+
+Group           Topic              Pid Offset   logSize    Lag    Owner 
+pv              page_visits        0   21       21         0      none 
+pv              page_visits        1   19       19         0      none 
+pv              page_visits        2   20       20         0      none
+```
+- topic：创建时topic名称
+- pid：分区编号
+- offset：表示该parition已经消费了多少条message
+- logSize：表示该partition已经写了多少条message
+- Lag：表示有多少条message没有被消费。
+- Owner：表示消费者
 
 Kafka  监控
 ===
