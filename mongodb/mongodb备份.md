@@ -173,6 +173,13 @@ mongorestore -d swrd --oplogReplay /home/mongo/swrdbak/swrd/
 全量恢复加oplog恢复
 ---
 
+oplog相关的参数
+
+| 参数| 参数说明 |
+|-----|---------|
+| --oplogReplay | 重放oplog.bson中的操作内容 |
+| --oplogLimit | 与--oplogReplay一起使用时，可以限制重放到的时间点 |
+
 ```
 1、全量备份,然后删除库
 mongodump --port27017 --oplog -o /monggodb/backup/
