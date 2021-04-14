@@ -442,13 +442,48 @@ my-topic                      1         2    
 my-topic                      2         2              3              1         my-group_consumer-2
 ```
 
-11、增加、删除配置项
+11、显示所有消费者
+```
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+```
+
+12、查看topic消费进度
+- 显示出consumer group的offset情况， 必须参数为--group， 不指定--topic，默认为所有topic
+```
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker
+required argument: [group] 
+Option Description 
+------ ----------- 
+--broker-info Print broker info 
+--group Consumer group. 
+--help Print this message. 
+--topic Comma-separated list of consumer 
+   topics (all topics if absent). 
+--zkconnect ZooKeeper connect string. (default: localhost:2181)
+Example,
+
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group pv
+
+Group           Topic              Pid Offset   logSize    Lag    Owner 
+pv              page_visits        0   21       21         0      none 
+pv              page_visits        1   19       19         0      none 
+pv              page_visits        2   20       20         0      none
+```
+- topic：创建时topic名称
+- pid：分区编号
+- offset：表示该parition已经消费了多少条message
+- logSize：表示该partition已经写了多少条message
+- Lag：表示有多少条message没有被消费。
+- Owner：表示消费者
+
+
+13、增加、删除配置项
 ```
 # bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --add-config x=y
 # bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --delete-config x
 ```
 
-12、常用创建topic参数
+14、常用创建topic参数
 ```
 bin/kafka-topics.sh --create \
 --zookeeper $zookeeper_address \
@@ -815,39 +850,6 @@ test-foo                      0         1    
 > bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
 ```
 
-显示所有消费者
-```
-./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
-```
-
-查看topic消费进度
-- 显示出consumer group的offset情况， 必须参数为--group， 不指定--topic，默认为所有topic
-```
-# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker
-required argument: [group] 
-Option Description 
------- ----------- 
---broker-info Print broker info 
---group Consumer group. 
---help Print this message. 
---topic Comma-separated list of consumer 
-   topics (all topics if absent). 
---zkconnect ZooKeeper connect string. (default: localhost:2181)
-Example,
-
-# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group pv
-
-Group           Topic              Pid Offset   logSize    Lag    Owner 
-pv              page_visits        0   21       21         0      none 
-pv              page_visits        1   19       19         0      none 
-pv              page_visits        2   20       20         0      none
-```
-- topic：创建时topic名称
-- pid：分区编号
-- offset：表示该parition已经消费了多少条message
-- logSize：表示该partition已经写了多少条message
-- Lag：表示有多少条message没有被消费。
-- Owner：表示消费者
 
 Kafka  监控
 ===
