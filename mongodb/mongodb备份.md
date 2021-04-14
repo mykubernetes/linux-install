@@ -2,15 +2,18 @@
 跨版本备份，支持json和csv两种格式
 ---
 mongoexport 
-- -h 指明数据库宿主机的IP 
-- -u 指明数据库的用户名
-- -p 指明数据库的密码
-- -d 指明数据库的名字
-- -c 指明collection的名字
-- -f 指明要导出哪些列
-- -o 指明要导出的文件名
-- -q 指明导出数据库的过滤条件
-- --authenticationatabase admin
+| 参数 | 参数说明 |
+|------|---------|
+| -h | 指明数据库宿主机的IP |
+| -u | 指明数据库的用户名 |
+| -p | 指明数据库的密码 |
+| -d | 指明数据库的名字 |
+| -c | 指明collection的名字 |
+| -f | 指明要导出那些列 |
+| -o | 指明到要导出的文件名 |
+| -q | 指明导出数据的过滤条件 |
+| --type  指定文件类型 |
+| --authenticationDatabase | 验证数据的名称 |
 
 备份
 ```
@@ -22,14 +25,21 @@ mongoexport -uroot -p12456 -c log --type=csv -f uid,name,date --authenticationat
 ```
 
 mongoimport
+| 参数 | 参数说明 |
+|------|------------|
+| -h | 指明数据库宿主机的IP |
+| -u | 指明数据库的用户名 |
+| -p | 指明数据库的密码 |
+| -d | 指明数据库的名字 |
+| -c | 指明collection的名字 |
+| -f | 指明要导出那些列 |
+| -o | 指明到要导出的文件名 |
+| -q | 指明导出数据的过滤条件 |
+| --drop | 插入之前先删除原有的 |
+| --headerline | 指明第一行是列名，不需要导入。 |
+| -j, --numInsertionWorker=<number> | 同时运行的插入操作数（默认为1），并行 |
+| --authenticationDatabase | 验证数据的名称
 
-- -h 指明数据库宿主机的IP 
-- -u 指明数据库的用户名
-- -p 指明数据库的密码
-- -d 指明数据库的名字
-- -c 指明collection的名字
-- -f 指明要导出哪些列
-- -j, --numInsertionWorker=<number> number of insert operation to run concurrently (default to 1) 并发导入
 
 还原
 ```
