@@ -160,6 +160,7 @@ mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d
 mongorestore -h 10.0.0.152:27017 -uroot -proot --authenticationDatabase admin -d test -c vast --drop /home/mongod/backup/test/vast.bson
 ```
 
+备份恢复--oplog
 ```
 备份所有库推荐使用添加--oplog参数的命令，这样的备份是基于某一时间点的快照，只能用于备份全部库时才可用，单库和单表不适用：
 mongodump -h 127.0.0.1 --port 27017 --oplog -o /root/bak 
