@@ -172,6 +172,8 @@ mongorestore -d swrd --oplogReplay /home/mongo/swrdbak/swrd/
 
 全量恢复加oplog恢复
 ---
+- MongoDB 的Replication是通过一个日志来存储写操作的，这个日志就叫做oplog。
+- 在默认情况下,oplog分配的是5%的空闲磁盘空间。通常而言,这是一种合理的设置。可以通过mongod --oplogSize来改变oplog的日志大小。
 
 oplog相关的参数
 
