@@ -102,7 +102,24 @@ mongodump -uroot -p123456 --port 27017 --authenticationDatabase admin -d DB_NAME
 ```
 
 
-mongorestore数据库的恢复  
+mongorestore数据库的恢复
+
+mongorestore与mongoimport参数类似 
+
+| 参数 | 参数说明 |
+|------|---------|
+| -h | 指明数据库宿主机的IP |
+| -u | 指明数据库的用户名 |
+| -p | 指明数据库的密码 |
+| -d | 指明数据库的名字 |
+| -c | 指明collection的名字 |
+| -o | 指明到要导出的文件名 |
+| -q | 指明导出数据的过滤条件 |
+| --authenticationDatabase | 验证数据的名称 |
+| --gzip | --gzip格式备份的还原也需要加此参数 |
+| --oplog | use oplog for taking a point-in-time snapshot |
+| --drop | 恢复的时候把之前的集合drop掉（慎用） |
+
 ```
 恢复所有库：
 mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin /monggodb/backup/
@@ -113,8 +130,7 @@ mongorestore -uroot -p 123456 --port 27017 --authenticationDatabase admin -d DB_
 恢复单表
 mongorestore -uroot -p 123456 --authenticationDatabase admin -d DB_NAME -c TABLE_NAME /monggodb/backup/DN_NAME/TABLES_NAME.bson
 ```
-- --drop恢复的时候把之前的合计drop掉（慎用）
-- --gzip格式备份的还原也需要加此参数
+
 
 ```
 备份所有库推荐使用添加--oplog参数的命令，这样的备份是基于某一时间点的快照，只能用于备份全部库时才可用，单库和单表不适用：
