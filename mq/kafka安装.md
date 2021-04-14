@@ -312,16 +312,6 @@ test
 ```
 
 3、往topic发送消息
-
-生产者测试参数
-| 参数 | 说明 |
-|------|-----|
-| --topic | 指定生产者发送消息的主题 |
-| --num-records | 测试时发送消息的总记录数 |
-| --throughput | 最大消息吞吐量 |
-| --producer-props | 通过键值对的方式指定配置属性，多组配置属性用空格分隔 |
-| --produces.config | 加载生产者配置文件 |
-| --record-size | 每条消息字节大小 |
 ```
 $ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
 >hello world
@@ -329,19 +319,6 @@ $ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
 ```
 
 4、从topic消费消息
-
-消费者测试参数
-| 参数 | 说明 |
-|------|------|
-| --topic | 指定消费者读取消息的主题 |
-| --zookeeper | 指定字符串连接zookeeper集群来读取kafka集群元数据信息 |
-| --threads | 指定线程数 |
-| --messages | 读取消费记录数 |
-| --group | 指定消费者组 |
-| --batch-size | 执行批处理大小 |
-
-
-
 ```
 # 老版本
 $ bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic test
