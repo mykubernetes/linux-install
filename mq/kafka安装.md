@@ -357,26 +357,26 @@ Note: This will have no impact if delete.topic.enable is not set to true.
 ```
 kafka-topics.sh --zookeeper node001:2181 --describe --topic test
 Topic:test  PartitionCount:20  ReplicationFactor:3  Configs:
-Topic: test  Partition: 0      Leader: 3            Replicas: 3,0,2Isr: 3,0,2
-Topic: test  Partition: 1      Leader: 0            Replicas: 0,2,3Isr: 0,2,3
-Topic: test  Partition: 2      Leader: 2            Replicas: 2,3,0Isr: 2,3,0
-Topic: test  Partition: 3      Leader: 3            Replicas: 3,2,0Isr: 3,2,0
-Topic: test  Partition: 4      Leader: 0            Replicas: 0,3,2Isr: 0,3,2
-Topic: test  Partition: 5      Leader: 2            Replicas: 2,0,3Isr: 2,0,3
-Topic: test  Partition: 6      Leader: 3            Replicas: 3,0,2Isr: 3,0,2
-Topic: test  Partition: 7      Leader: 0            Replicas: 0,2,3Isr: 0,2,3
-Topic: test  Partition: 8      Leader: 2            Replicas: 2,3,0Isr: 2,3,0
-Topic: test  Partition: 9      Leader: 3            Replicas: 3,2,0Isr: 3,2,0
-Topic: test  Partition: 10     Leader: 0            Replicas: 0,3,2Isr: 0,3,2
-Topic: test  Partition: 11     Leader: 2            Replicas: 2,0,3Isr: 2,0,3
-Topic: test  Partition: 12     Leader: 3            Replicas: 3,0,2Isr: 3,0,2
-Topic: test  Partition: 13     Leader: 0            Replicas: 0,2,3Isr: 0,2,3
-Topic: test  Partition: 14     Leader: 2            Replicas: 2,3,0Isr: 2,3,0
-Topic: test  Partition: 15     Leader: 3            Replicas: 3,2,0Isr: 3,2,0
-Topic: test  Partition: 16     Leader: 0            Replicas: 0,3,2Isr: 0,3,2
-Topic: test  Partition: 17     Leader: 2            Replicas: 2,0,3Isr: 2,0,3
-Topic: test  Partition: 18     Leader: 3            Replicas: 3,0,2Isr: 3,0,2
-Topic: test  Partition: 19     Leader: 0            Replicas: 0,2,3Isr: 0,2,3
+Topic: test  Partition: 0      Leader: 3            Replicas: 3,0,2   Isr: 3,0,2
+Topic: test  Partition: 1      Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
+Topic: test  Partition: 2      Leader: 2            Replicas: 2,3,0   Isr: 2,3,0
+Topic: test  Partition: 3      Leader: 3            Replicas: 3,2,0   Isr: 3,2,0
+Topic: test  Partition: 4      Leader: 0            Replicas: 0,3,2   Isr: 0,3,2
+Topic: test  Partition: 5      Leader: 2            Replicas: 2,0,3   Isr: 2,0,3
+Topic: test  Partition: 6      Leader: 3            Replicas: 3,0,2   Isr: 3,0,2
+Topic: test  Partition: 7      Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
+Topic: test  Partition: 8      Leader: 2            Replicas: 2,3,0   Isr: 2,3,0
+Topic: test  Partition: 9      Leader: 3            Replicas: 3,2,0   Isr: 3,2,0
+Topic: test  Partition: 10     Leader: 0            Replicas: 0,3,2   Isr: 0,3,2
+Topic: test  Partition: 11     Leader: 2            Replicas: 2,0,3   Isr: 2,0,3
+Topic: test  Partition: 12     Leader: 3            Replicas: 3,0,2   Isr: 3,0,2
+Topic: test  Partition: 13     Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
+Topic: test  Partition: 14     Leader: 2            Replicas: 2,3,0   Isr: 2,3,0
+Topic: test  Partition: 15     Leader: 3            Replicas: 3,2,0   Isr: 3,2,0
+Topic: test  Partition: 16     Leader: 0            Replicas: 0,3,2   Isr: 0,3,2
+Topic: test  Partition: 17     Leader: 2            Replicas: 2,0,3   Isr: 2,0,3
+Topic: test  Partition: 18     Leader: 3            Replicas: 3,0,2   Isr: 3,0,2
+Topic: test  Partition: 19     Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
 ```
 - 第一行，列出了topic的名称，分区数(PartitionCount),副本数(ReplicationFactor)以及其他的配置(Configs) 
 - Leader:1 表示为做为读写的broker的编号
