@@ -150,7 +150,8 @@ vim /usr/local/tomcat/conf/context.xml
 <Manager className="org.redisson.tomcat.RedissonSessionManager"
   configPath="${catalina.base}/redisson.conf"
   readMode="REDIS" updateMode="DEFAULT" broadcastSessionEvents="false"
-  keyPrefix=""/> 
+  keyPrefix=""
+/> 
 
 4、创建redisson.conf配置文件
 # vim /usr/local/tomcat/conf/redisson.conf
@@ -184,7 +185,8 @@ Resource修改为如下内容
             auth="Container"
             factory="org.redisson.JndiRedissonFactory"
             configPath="${catalina.base}/conf/redisson.yaml"
-            closeMethod="shutdown"/>
+            closeMethod="shutdown"
+/>
 
 6、创建redisson.yaml配置文件
 vim /usr/local/tomcat/conf/redisson.yaml
