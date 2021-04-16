@@ -199,6 +199,11 @@ security:                          #认证
 
 6、启动mongodb数据库
 # mongo 127.0.0.1:27017 -u admin -p
+
+
+或者
+# mongo 
+> db.auth("admin","123456")
 ```  
 - user: 用户名
 - pwd: 密码
