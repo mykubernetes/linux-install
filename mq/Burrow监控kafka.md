@@ -250,3 +250,6 @@ $GOPATH/bin/Burrow --config-dir /data/goconfig
 
 
 https://github.com/panubo/docker-burrow-exporter
+
+
+https://github.com/ignatev/burrow-kafka-dashboard
