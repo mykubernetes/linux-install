@@ -115,6 +115,51 @@ group-blacklist="^not-this-group$"
 #@第二个用来获取消费组和消费组offset及Lag。
 ```
 
+```
+[zookeeper]
+servers=["zookeeper-default:2181"]
+timeout=6
+root-path="/burrow"
+
+[client-profile.client]
+client-id="burrow-client"
+kafka-version="0.10.0"
+sasl="saslprofile"
+
+[sasl.saslprofile]
+username="KAFKA_USERNAME"
+password="KAFKA_PASSWORD"
+handshake-first=true
+
+[cluster.kafka-default]
+class-name="kafka"
+servers=[ "kafka-default:9092"]
+topic-refresh=60
+offset-refresh=30
+client-profile="client"
+
+[consumer.kafka-default]
+class-name="kafka"
+cluster="kafka-default"
+servers=[ "kafka-default:9092"]
+group-blacklist=""
+group-whitelist=""
+client-profile="client"
+
+[consumer.kafka-default-zk]
+class-name="kafka_zk"
+cluster="kafka-default"
+servers=["zookeeper-default:2181"]
+zookeeper-path="/tracking_kafka"
+zookeeper-timeout=30
+group-blacklist=""
+group-whitelist=""
+[httpserver.default]
+address=":8000"
+Events:  <none>
+```
+
+
 4、运行
 ```
 $GOPATH/bin/Burrow --config-dir /data/goconfig
@@ -202,3 +247,6 @@ $GOPATH/bin/Burrow --config-dir /data/goconfig
   }
 }
 ```
+
+
+https://github.com/panubo/docker-burrow-exporter
