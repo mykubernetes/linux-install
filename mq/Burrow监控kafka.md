@@ -416,10 +416,6 @@ scrape_configs:
 ```
 
 
-
-https://github.com/panubo/docker-burrow-exporter
-
-
 https://github.com/ignatev/burrow-kafka-dashboard
 
 https://www.jianshu.com/p/92ae7e5992e2?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation
