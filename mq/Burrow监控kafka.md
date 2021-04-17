@@ -47,7 +47,7 @@ $ go install
 # /etc/init.d/burrow start
 ```
 
-3、配置
+3、配置说明
 
 burrow配置文件主要由多个配置段组成
 - 1、[general]配置中包含了日志文件的位置和PID文件，以及一些kafka集群的共享配置。
@@ -59,84 +59,6 @@ burrow配置文件主要由多个配置段组成
 - 7、[lagcheck]配置设置关于内部滞后检查算法的配置。
 - 8、[httpserver]配置burrow的HTTP endpoint
 - 9、[Notifiers]用于在消费者组处于不良状态时将电子邮件发送到指定的地址。可以为单个电子邮件地址配置多个组，并且可以根据每个电子邮件地址配置检查状态的时间间隔。可以在burrow配置文件中配置多个email通知，每个通知有自己的配置段，必须将enable=true通知器才能执行，必须在子标题部分指定发送email通知的地址
-```
-# vim /data/goconfig/burrow.toml
-
-#基础选项
-[general]
-pidfile="burrow.pid"
-stdout-logfile="logs/burrow.out"
-access-control-allow-origin="mysite.example.com"
-
-#日志选项
-[logging]
-filename="logs/burrow.log"
-level="info"
-maxsize=100
-maxbackups=30
-maxage=10
-use-localtime=false
-use-compression=true
-
-#zookeeper选项，这个zookeeper使用burrow自己用的
-[zookeeper]
-servers=["10.128.0.2:2181", ]
-timeout=6
-root-path="/burrow"
-
-#burrow作为客户端的配置
-[client-profile.burrowclient]
-client-id="burrowclient"
-kafka-version="0.10.0"
-
-#HTTP监听配置，可以使用HTTPS
-[httpserver.default]
-address=":8000"
-
-#存储选项
-[storage.default]
-class-name="inmemory"
-workers=20
-intervals=15
-expire-group=604800
-min-distance=1
-
-#报警选项
-[notifier.default]
-class-name="email"
-interval=30
-threshold=2
-group-whitelist="^important-group-prefix.*$"
-group-blacklist="^not-this-group$"
-template-open="config/default-email.tmpl"
-server="127.0.0.1"
-port=25
-from="root@localhost.com"
-to="hello@ipcpu.com"
-#
-# kafka cluster config here
-
-#接下来是Kafka相关的内容
-#
-[cluster.bu-agent-kafka]
-class-name="kafka"
-servers=[ "10.128.0.65:9092", "10.128.0.66:9092", "10.128.0.67:9092" ]
-client-profile="burrowclient"
-topic-refresh=300
-offset-refresh=60
-[consumer.bu-agent-kafka]
-class-name="kafka"
-cluster="bill-kafka"
-servers=[ "10.128.0.65:9092", "10.128.0.66:9092", "10.128.0.67:9092" ]
-client-profile="burrowclient"
-offsets-topic="__consumer_offsets"
-start-latest=true
-group-whitelist=".*"
-group-blacklist="^not-this-group$"
-#@注意这里使用了cluster.kafkaname和consumer.kafkaname两个配置组，
-#@第一个用来获取topic和最新offset信息，
-#@第二个用来获取消费组和消费组offset及Lag。
-```
 
 ```
 [general]
@@ -217,7 +139,93 @@ interval=60                              #检查consumer group的时间间隔
 enable=true                              #是否开启email通知
 ```
 
+4、配置
+```
+# vim /data/goconfig/burrow.toml
 
+#基础选项
+[general]
+pidfile="burrow.pid"
+stdout-logfile="logs/burrow.out"
+access-control-allow-origin="mysite.example.com"
+
+#日志选项
+[logging]
+filename="logs/burrow.log"
+level="info"
+maxsize=100
+maxbackups=30
+maxage=10
+use-localtime=false
+use-compression=true
+
+#zookeeper选项，这个zookeeper使用burrow自己用的
+[zookeeper]
+servers=["10.128.0.2:2181", ]
+timeout=6
+root-path="/burrow"
+
+#burrow作为客户端的配置
+[client-profile.burrowclient]
+client-id="burrowclient"
+kafka-version="0.10.0"
+
+#HTTP监听配置，可以使用HTTPS
+[httpserver.default]
+address=":8000"
+
+#存储选项
+[storage.default]
+class-name="inmemory"
+workers=20
+intervals=15
+expire-group=604800
+min-distance=1
+
+#报警选项
+[notifier.default]
+class-name="email"
+interval=30
+threshold=2
+group-whitelist="^important-group-prefix.*$"
+group-blacklist="^not-this-group$"
+template-open="config/default-email.tmpl"
+server="127.0.0.1"
+port=25
+from="root@localhost.com"
+to="hello@ipcpu.com"
+#
+# kafka cluster config here
+
+#接下来是Kafka相关的内容
+#
+[cluster.bu-agent-kafka]
+class-name="kafka"
+servers=[ "10.128.0.65:9092", "10.128.0.66:9092", "10.128.0.67:9092" ]
+client-profile="burrowclient"
+topic-refresh=300
+offset-refresh=60
+[consumer.bu-agent-kafka]
+class-name="kafka"
+cluster="bill-kafka"
+servers=[ "10.128.0.65:9092", "10.128.0.66:9092", "10.128.0.67:9092" ]
+client-profile="burrowclient"
+offsets-topic="__consumer_offsets"
+start-latest=true
+group-whitelist=".*"
+group-blacklist="^not-this-group$"
+#@注意这里使用了cluster.kafkaname和consumer.kafkaname两个配置组，
+#@第一个用来获取topic和最新offset信息，
+#@第二个用来获取消费组和消费组offset及Lag。
+```
+
+运行
+```
+$GOPATH/bin/Burrow --config-dir /data/goconfig
+```
+
+
+5、k8s配置
 ```
 [general]
 pidfile="/var/run/burrow.pid"
@@ -324,10 +332,7 @@ Events:  <none>
 ```
 
 
-4、运行
-```
-$GOPATH/bin/Burrow --config-dir /data/goconfig
-```
+
 
 
 5、简单使用
