@@ -8,6 +8,7 @@ Burrow的特点如下
 - Burrow支持http, email类型的报警
 - Burrow默认只提供HTTP接口(HTTP endpoint)，数据为json格式，没有web UI
 
+https://github.com/ignatev/burrow-kafka-dashboard
 
 https://blog.csdn.net/weixin_39553352/article/details/111262485
 
