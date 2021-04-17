@@ -9,6 +9,8 @@ Burrow的特点如下
 - Burrow默认只提供HTTP接口(HTTP endpoint)，数据为json格式，没有web UI
 
 
+https://blog.csdn.net/weixin_39553352/article/details/111262485
+
 1、安装go，将go安装到/opt/soft下：
 ```
 # cd /opt/soft
