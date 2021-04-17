@@ -412,18 +412,38 @@ $GOPATH/bin/Burrow --config-dir /data/goconfig
 }
 ```
 
+常用
+```
+GET /v3/kafka/(cluster)/consumer                       #获取所有消费者列表
+GET /v3/kafka/(cluster)/consumer/(group)/status        #获取指定消费者状态
+GET /v3/kafka/(cluster)/consumer/(group)/lag           #获取指定延迟
+GET /v3/kafka/(cluster)/topic                          #获取topic列表
+GET /v3/kafka/(cluster)/topic/(topic)                  #获取topic offsets信息
+```
+
+```
+消费组健康状态的接口含义如下：
+
+NOTFOUND – 消费组未找到
+OK   – 消费组状态正常
+WARN   – 消费组处在WARN状态，例如offset在移动但是Lag不停增长。 the offsets are moving but lag is increasing
+ERR   – 消费组处在ERR状态。例如，offset停止变动，但Lag非零。 the offsets have stopped for one or more partitions but lag is non-zero
+STOP   – 消费组处在ERR状态。例如offset长时间未提交。the offsets have not been committed in a log period of time
+STALL   – 消费组处在STALL状态。例如offset已提交但是没有变化，Lag非零。the offsets are being committed, but they are not changing and the lag is non-zero
+```
+
 ```
 健康检查：/burrow/admin
-列出kafka集群：/v2/kafka
-列出zk集群：/v2/zookeeper
-列出单个kafka集群的详情：/v2/kafka/(cluster)
-列出单个kafka集群的消费者：/v2/kafka/(cluster)/consumer
-删除某个kafka集群的消费者group：/v2/kafka/(cluster)/consumer/(group)
-列出单个kafka集群某个消费者group的topic：/v2/kafka/(cluster)/consumer/(group)/topic
-列出单个kafka集群某个消费者group的topic详情：/v2/kafka/(cluster)/consumer/(group)/topic/(topic)
+列出kafka集群：/v3/kafka
+列出zk集群：/v3/zookeeper
+列出单个kafka集群的详情：/v3/kafka/(cluster)
+列出单个kafka集群的消费者：/v3/kafka/(cluster)/consumer
+删除某个kafka集群的消费者group：/v3/kafka/(cluster)/consumer/(group)
+列出单个kafka集群某个消费者group的topic：/v3/kafka/(cluster)/consumer/(group)/topic
+列出单个kafka集群某个消费者group的topic详情：/v3/kafka/(cluster)/consumer/(group)/topic/(topic)
 返回仅包含处于不良状态的分区的对象：/v2/kafka/(cluster)/consumer/(group)/status 
-返回包含消费者的所有分区的对象，而不管分区的评估状态如何：/v2/kafka/(cluster)/consumer/(group)/lag
-列出单个kafka集群的topic：/v2/kafka/(cluster)/topic
+返回包含消费者的所有分区的对象，而不管分区的评估状态如何：/v3/kafka/(cluster)/consumer/(group)/lag
+列出单个kafka集群的topic：/v3/kafka/(cluster)/topic
 列出单个kafka集群的单个topic详情：/v2/kafka/(cluster)/topic/(topic)
 ```
 
