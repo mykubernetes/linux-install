@@ -35,6 +35,18 @@ $ cd $GOPATH/src/github.com/linkedin/Burrow
 $ go install
 ```
 
+二进制包的方式
+```
+# wget https://github.com/linkedin/Burrow/releases/download/v1.1.0/Burrow_1.1.0_linux_amd64.tar.gz 
+# mkdir burrow
+# tar -xf Burrow_1.1.0_linux_amd64.tar.gz -C burrow
+# cp burrow/burrow /usr/bin/
+# mkdir /etc/burrow
+# cp burrow/config/* /etc/burrow/
+# chkconfig --add burrow
+# /etc/init.d/burrow start
+```
+
 3、配置
 
 burrow配置文件主要由多个配置段组成
@@ -205,6 +217,68 @@ interval=60                              #检查consumer group的时间间隔
 enable=true                              #是否开启email通知
 ```
 
+
+```
+[general]
+pidfile="/var/run/burrow.pid"
+stdout-logfile="/var/log/burrow.log"
+access-control-allow-origin="mysite.example.com"
+
+[logging]
+filename="/var/log/burrow.log"
+level="info"
+maxsize=512
+maxbackups=30
+maxage=10
+use-localtime=true
+use-compression=true
+
+[zookeeper]
+servers=[ "test1.localhost:2181","test2.localhost:2181" ]
+timeout=6
+root-path="/burrow"
+
+[client-profile.prod]
+client-id="burrow-lagchecker"
+kafka-version="0.10.0"
+
+[cluster.production]
+class-name="kafka"
+servers=[ "test1.localhost:9092","test2.localhost:9092" ]
+client-profile="prod"
+topic-refresh=180
+offset-refresh=30
+
+[consumer.production_kafka]
+class-name="kafka"
+cluster="production"
+servers=[ "test1.localhost:9092","test2.localhost:9092" ]
+client-profile="prod"
+start-latest=false
+group-blacklist="^(console-consumer-|python-kafka-consumer-|quick-|test).*$"
+group-whitelist=""
+
+[consumer.production_consumer_zk]
+class-name="kafka_zk"
+cluster="production"
+servers=[ "test1.localhost:2181","test2.localhost:2181" ]
+#zookeeper-path="/"
+# If specified, this is the root of the Kafka cluster metadata in the Zookeeper ensemble. If not specified, the root path is used.
+zookeeper-timeout=30
+group-blacklist="^(console-consumer-|python-kafka-consumer-|quick-|test).*$"
+group-whitelist=""
+
+[httpserver.default]
+address=":8000"
+
+[storage.default]
+class-name="inmemory"
+workers=20
+intervals=15
+expire-group=604800
+min-distance=1
+```
+
 ```
 [zookeeper]
 servers=["zookeeper-default:2181"]
@@ -352,6 +426,27 @@ $GOPATH/bin/Burrow --config-dir /data/goconfig
 列出单个kafka集群的topic：/v2/kafka/(cluster)/topic
 列出单个kafka集群的单个topic详情：/v2/kafka/(cluster)/topic/(topic)
 ```
+
+```
+[Unit]
+Description=Burrow - Kafka consumer LAG Monitor
+After=network.target
+
+
+[Service]
+Type=simple
+RestartSec=20s
+ExecStart=/usr/bin/burrow --config-dir /etc/burrow
+PIDFile=/var/run/burrow/burrow.pid
+User=burrow
+Group=burrow
+Restart=on-abnormal
+
+
+[Install]
+WantedBy=multi-user.target
+```
+
 
 https://github.com/panubo/docker-burrow-exporter
 
