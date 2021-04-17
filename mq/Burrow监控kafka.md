@@ -341,13 +341,28 @@ Events:  <none>
 5、简单使用
 | Request	| Method | URL Format |
 |---------|--------|------------|
-| List Clusters	| GET	| /v3/kafka |
-| Kafka Cluster	|  Detail	| GET	| /v3/kafka/(cluster) |
-| List Consumers	| GET	| /v3/kafka/(cluster)/consumer |
-| List Cluster Topics	| GET	| /v3/kafka/(cluster)/topic |
-| Get Consumer Detail	| GET	| /v3/kafka/(cluster)/consumer/(group) |
-| Consumer Group Status	| GET	| /v3/kafka/(cluster)/consumer/(group)/status |
-| Consumer Group Lag	| GET	| /v3/kafka/(cluster)/consumer/(group)/lag |
+| Healthcheck |	GET |	/burrow/admin |
+| List Clusters | GET |	/v3/kafka |
+| Kafka Cluster Detail | GET |	/v3/kafka/(cluster) |
+| List Consumers | GET | /v3/kafka/(cluster)/consumer |
+| List Cluster Topics |	GET |	/v3/kafka/(cluster)/topic |
+| Get Consumer Detail |	GET |	/v3/kafka/(cluster)/consumer/(group) |
+| Consumer Group Status |	GET |	/v3/kafka/(cluster)/consumer/(group)/status /v3/kafka/(cluster)/consumer/(group)/lag |
+| Remove Consumer Group |	DELETE | /v3/kafka/(cluster)/consumer/(group) |
+| Get Topic Detail |	GET |	/v3/kafka/(cluster)/topic/(topic) |
+| Get General Config | GET | /v3/config |
+| List Cluster Modules | GET | /v3/config/cluster |
+| Get Cluster Module Config |	GET |	/v3/config/cluster/(name) |
+| List Consumer Modules |	GET |	/v3/config/consumer |
+| Get Consumer Module Config | GET | /v3/config/consumer/(name) |
+| List Notifier Modules |	GET |	/v3/config/notifier |
+| Get Notifier Module Config | GET | /v3/config/notifier/(name) |
+| List Evaluator Modules | GET | /v3/config/evaluator |
+| Get Evaluator Module Config |	GET | /v3/config/evaluator/(name) |
+| List Storage Modules | GET | /v3/config/storage |
+| Get Storage Module Config |	GET |	/v3/config/storage/(name) |
+| Get Log Level |	GET |	/v3/admin/loglevel |
+| Set Log Level |	POST | /v3/admin/loglevel |
 
 ```
 #@列出所有监控的Kafka集群
@@ -474,6 +489,21 @@ Restart=on-abnormal
 [Install]
 WantedBy=multi-user.target
 ```
+
+
+启动burrow-exporter
+```
+nohup ./burrow-exporter --burrow-addr="http://10.10.0.18:8000" --metrics-addr="0.0.0.0:9254" --interval="15" --api-version="3" &
+```
+
+配置prometheus
+```
+scrape_configs:
+  - job_name: kafka
+    static_configs:
+      - targets: ["192.168.112.129:9254"]
+```
+
 
 
 https://github.com/panubo/docker-burrow-exporter
