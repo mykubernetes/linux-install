@@ -228,7 +228,7 @@ $GOPATH/bin/Burrow --config-dir /data/goconfig
 ```
 
 
-
+5、常用配置，简洁配置
 ```
 [general]
 pidfile="/var/run/burrow.pid"
@@ -290,7 +290,7 @@ expire-group=604800
 min-distance=1
 ```
 
-5、k8s配置
+6、k8s配置
 ```
 [zookeeper]
 servers=["zookeeper-default:2181"]
