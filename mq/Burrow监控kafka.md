@@ -12,6 +12,8 @@ https://github.com/ignatev/burrow-kafka-dashboard
 
 https://github.com/danielqsj/kafka_exporter
 
+https://zhuanlan.zhihu.com/p/135410203?from_voters_page=true
+
 https://blog.csdn.net/weixin_39553352/article/details/111262485
 
 1、安装go，将go安装到/opt/soft下：
