@@ -10,6 +10,8 @@ Burrow的特点如下
 
 https://github.com/ignatev/burrow-kafka-dashboard
 
+https://github.com/danielqsj/kafka_exporter
+
 https://blog.csdn.net/weixin_39553352/article/details/111262485
 
 1、安装go，将go安装到/opt/soft下：
