@@ -407,6 +407,9 @@ WantedBy=multi-user.target
 
 
 11、启动burrow-exporter
+
+https://github.com/jirwin/burrow_exporter/
+
 ```
 nohup ./burrow-exporter --burrow-addr="http://10.10.0.18:8000" --metrics-addr="0.0.0.0:9254" --interval="15" --api-version="3" &
 ```
