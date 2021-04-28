@@ -137,8 +137,8 @@ $ node_cpu_seconds_total{cpu="0"}
 
 3、查询cpu不等于0的结果。
 $ node_cpu_seconds_total{cpu!="0"}
-`=~`和`!~`支持RE2类型的正则表达式
 
+=~和!~支持RE2类型的正则表达式
 4、比如只对`mode="user"`和`mode="system"`的感兴趣,那么可以执行如下：
 $ node_cpu_seconds_total{mode=~"(system|user)"}
 
