@@ -16,7 +16,7 @@ https://www.jianshu.com/p/c21d399c140a?utm_campaign=haruki&utm_content=note&utm_
 
 
 Metric类型
----
+===
 Prometheus会将所有采集到的样本数据以时间序列（time-series）的方式保存在内存数据库TSDB中，并且定时保存到硬盘上。time-series是按照时间戳和值的序列顺序存放的，我们称之为向量(vector)。每条time-series通过指标名称(metrics name)和一组标签集(labelset)命名。
 
 可以将time-series理解为一个以时间为Y轴的数字矩阵
@@ -49,7 +49,7 @@ http_request_total{status="200", method="POST"}@1434417561287 => 4785
 
 
 Prometheus定义了4中不同的指标类型(metric type):
----
+===
 - Counter 计数器,只增不减，除非重置（例如服务器或进程重启）
 - Gauge 仪表盘，可增可减的数据。
 - Histogram 直方图，将时间范围内的数据划分成不同的时段，并各自评估其样本个数及样本值之和，因而可计算出分位数
