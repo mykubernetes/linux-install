@@ -204,13 +204,20 @@ $ node_cpu_seconds_total{cpu="0"}
 3、查询cpu不等于0的结果。
 $ node_cpu_seconds_total{cpu!="0"}
 
-=~和!~支持RE2类型的正则表达式
-4、比如只对`mode="user"`和`mode="system"`的感兴趣,那么可以执行如下：
+
+# =~和!~支持RE2类型的正则表达式
+1、比如只对`mode="user"`和`mode="system"`的感兴趣,那么可以执行如下：
 $ node_cpu_seconds_total{mode=~"(system|user)"}
+$ http_requests_total{environment=~"staging|testing|development",method!="GET"}
 
-
-5、查询和上一条相反的结果
+2、查询和上一条相反的结果
 $ node_cpu_seconds_total{mode!~"(system|user)"}
+
+
+$ node_cpu_seconds_total{job=~".*"}               # 非法！
+
+$ node_cpu_seconds_total{job=~".+"}               # 合法！
+$ node_cpu_seconds_total{job=~".*",method="get"}  # 合法！
 ```
 - =：选择正好相等的字符串标签
 - !=：选择不相等的字符串标签
