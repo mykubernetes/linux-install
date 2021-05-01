@@ -1,13 +1,17 @@
-官方中文文档http://docs.ceph.org.cn/architecture/
-=====================================
-书https://github.com/mykubernetes/gitbook-ceph/blob/master/SUMMARY.md  
----
+| ceph 书籍 | 网址 |
+|-----------|------|
+| 官方中文文档 | http://docs.ceph.org.cn/architecture/ |
+| Ceph实践 | https://github.com/frank6866/gitbook-ceph |
+| ceph运维手册 | https://github.com/lihaijing/ceph-handbook |
+| 博客 | https://blog.51cto.com/michaelkang/category9.html |
+| ceph运维手册 | https://lihaijing.gitbooks.io/ceph-handbook/content/ |
 
-书https://lihaijing.gitbooks.io/ceph-handbook/content/
----
-https://github.com/lihaijing/ceph-handbook
 
-https://blog.51cto.com/michaelkang/category9.html
+
+
+
+
+
 
 # Ceph核心概念
 ## RADOS
