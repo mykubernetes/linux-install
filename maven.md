@@ -31,3 +31,8 @@ package、install、deploy区别
 - mvn tomcat:run 启动tomcat服务
 - mvn clean package -Dmaven.test.skip=true:清除以前的包后重新打包，跳过测试类
 - mvn dependency:tree -Dverbose -Dincludes=asm:asm 查询包的依赖树结构
+
+
+```
+mvn clean package -Dmaven.test.skip=true
+```
