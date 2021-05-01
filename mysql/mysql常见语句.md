@@ -583,6 +583,12 @@ INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0', '
 ```
 - 降低日志刷盘的数据量和频率，从而提高效率。通过合并SQL语句，同时也能减少SQL语句解析的次数，减少网络传输的IO。
 
+
+插入user表user和passwd,如果存在就修改，如果不存在就创建
+```
+INSERT INTO user(username,password) VALUES('admin','passwd') ON DUPLICATE KEY UPDATE password = 'passwd';
+```
+
 2、在事务中进行插入处理  
 把插入修改成：
 ```
