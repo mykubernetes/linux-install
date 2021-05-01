@@ -9,7 +9,11 @@ https://www.jianshu.com/p/c21d399c140a?utm_campaign=haruki&utm_content=note&utm_
 | grafana dashboards json模板 | https://grafana.com/grafana/dashboards?search=kafka | 搜索grafana图形化展示prometheus监控数据模板 |
 | prometheus中文文档1	| https://www.prometheus.wang/exporter/use-promethues-monitor-mysql.html | |
 | prometheus中文文档2 | https://prometheus.fuckcloudnative.io/di-san-zhang-prometheus/storage | |
-
+| prometheus中文文档3 | https://fuckcloudnative.io/prometheus/ | |
+| prometheus-book | https://yunlzheng.gitbook.io/prometheus-book/ | |
+| prometheus实战 | https://songjiayang.gitbooks.io/prometheus/content/ | |
+| Prometheus操作指南 | https://www.bookstack.cn/read/prometheus-book/README.md | |
+| Prometheus 非官方中文手册 | https://github.com/1046102779/prometheus | |
 
 
 
