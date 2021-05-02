@@ -1,5 +1,3 @@
-http://archive.apache.org/dist/
-
 https://www.cnblogs.com/arjenlee
 
 https://www.cnblogs.com/ckh2014/
