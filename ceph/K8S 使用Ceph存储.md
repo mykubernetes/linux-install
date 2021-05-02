@@ -106,18 +106,23 @@ kubectl apply -f external-storage-rbd-provisioner.yaml
 1、创建pod时，kubelet需要使用rbd命令去检测和挂载pv对应的ceph image，所以要在所有的worker节点安装ceph客户端ceph-common。
 将ceph的ceph.client.admin.keyring和ceph.conf文件拷贝到master的/etc/ceph目录下
 yum -y install ceph-common
+
 2、创建 osd pool 在ceph的mon或者admin节点
 ceph osd pool create kube 128 128 
 ceph osd pool ls
+
 3、创建k8s访问ceph的用户 在ceph的mon或者admin节点
 ceph auth get-or-create client.kube mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=kube' -o ceph.client.kube.keyring
+
 4、查看key 在ceph的mon或者admin节点
 ceph auth get-key client.admin
 ceph auth get-key client.kube
+
 5、创建 admin secret
 kubectl create secret generic ceph-secret --type="kubernetes.io/rbd" \
 --from-literal=key=AQCtovZdgFEhARAAoKhLtquAyM8ROvmBv55Jig== \
 --namespace=kube-system
+
 6、在 default 命名空间创建pvc用于访问ceph的 secret
 kubectl create secret generic ceph-user-secret --type="kubernetes.io/rbd" \
 --from-literal=key=AQAM9PxdEFi3AhAAzvvhuyk1AfN5twlY+4zNMA== \
@@ -342,26 +347,30 @@ spec:
 EOF
 kubectl apply -f external-storage-cephfs-provisioner.yaml
 ```
+
 2、查看状态 等待running之后 再进行后续的操作
 ```
 kubectl get pod -n kube-system
 ```
+
 ## 配置 storageclass
 1、查看key 在ceph的mon或者admin节点
 ```
 ceph auth get-key client.admin
 ```
+
 2、创建 admin secret
 ```
 kubectl create secret generic ceph-secret --type="kubernetes.io/rbd" \
 --from-literal=key=AQCtovZdgFEhARAAoKhLtquAyM8ROvmBv55Jig== \
 --namespace=kube-system
-
 ```
+
 3、查看 secret
 ```
 kubectl get secret ceph-secret -n kube-system -o yaml
 ```
+
 4、配置 StorageClass
 ```
 cat >storageclass-cephfs.yaml<<EOF
@@ -378,10 +387,12 @@ parameters:
     claimRoot: /volumes/kubernetes
 EOF
 ```
+
 5、创建
 ```
 kubectl apply -f storageclass-cephfs.yaml
 ```
+
 6、查看
 ```
 kubectl get sc
@@ -404,11 +415,13 @@ spec:
 EOF
 kubectl apply -f cephfs-pvc-test.yaml
 ```
+
 2、查看
 ```
 kubectl get pvc
 kubectl get pv
 ```
+
 3、创建 nginx pod 挂载测试
 ```
 cat >nginx-pod.yaml<<EOF
@@ -435,18 +448,22 @@ spec:
 EOF
 kubectl apply -f nginx-pod.yaml
 ```
- 4、查看
- ```
+ 
+4、查看
+```
 kubectl get pods -o wide
- ```
- 5、修改文件内容
- ```
+```
+
+5、修改文件内容
+```
 kubectl exec -ti nginx-pod2 -- /bin/sh -c 'echo This is from CephFS!!! > /usr/share/nginx/html/index.html'
 ```
+
 6、访问pod测试
 ```
 curl http://$podip
 ```
+
 7、清理
 ```
 kubectl delete -f nginx-pod.yaml
