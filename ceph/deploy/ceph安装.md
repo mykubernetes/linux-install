@@ -118,7 +118,7 @@ cat ceph.conf
 .....
 public network = 192.168.101.0/24
 cluster network = 192.168.101.0/24
-osd pool default size = 3            # osd副本数设置，默认为3个
+osd_pool_default_size = 3            # osd副本数设置，默认为3个
 ```  
 
 # 安装ceph相关包
