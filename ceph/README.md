@@ -4,13 +4,6 @@
 | Ceph实践 | https://github.com/frank6866/gitbook-ceph |
 | ceph运维手册 | https://github.com/lihaijing/ceph-handbook |
 | 博客 | https://blog.51cto.com/michaelkang/category9.html |
-| ceph运维手册 | https://lihaijing.gitbooks.io/ceph-handbook/content/ |
-
-
-
-
-
-
 
 
 # Ceph核心概念
