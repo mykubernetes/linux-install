@@ -22,6 +22,7 @@
 | rbd info  | 查看块设备信息 |
 | rbd diff  | 可以统计 rbd 使用量 |
 | rbd map  | 映射块设备 |
+| rbd unmap | 取消映射 |
 | rbd showmapped  | 查看已映射块设备 |
 | rbd remove  | 删除块设备 |
 | rbd resize  | 更改块设备的大小 |
