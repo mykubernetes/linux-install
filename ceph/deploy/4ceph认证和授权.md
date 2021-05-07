@@ -1,6 +1,6 @@
 一、认证
 ---
-1、关闭认证  
+1、关闭认证
 ```
 # vim /etc/ceph/ceph.conf
 auth cluster required = none
@@ -8,7 +8,7 @@ auth service required = none
 auth client required = none
 ```  
 
-2、开启人在  
+2、开启认证
 ```
 # vim /etc/ceph/ceph.conf
 auth cluster required = cephx
