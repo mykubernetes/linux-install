@@ -1,5 +1,9 @@
 官网：https://docs.influxdata.com/influxdb/v1.7/supported_protocols/prometheus/
 
+获取prometheus连接远端存储的一个插件  
+https://github.com/prometheus/prometheus/tree/main/documentation/examples/remote_storage/remote_storage_adapter
+
+
 1.部署 InfluxDB 时间序列数据库
 
 方文档: https://docs.influxdata.com/influxdb/v1.7
