@@ -91,6 +91,15 @@ Pool、PG和OSD的关系：
 | mimic | 13.2.7 | 　2018年5月 |
 | nautilus | 14.2.5 | 　2019年2月 |
 
+
+Ceph常用端口
+| 端口号 | 用途 |
+|--------|-------|
+| tcp/6789 | monitor之间进6789端口行通信 |
+| tcp/6800-7300 | osd进程会在这个范围内使用可用的端口号 |
+| tcp/7480 | rgw的endpoint端口 |
+
+
 ## Luminous新版本特性
 - Bluestore
   * ceph-osd的新后端存储BlueStore已经稳定，是新创建的OSD的默认设置。
