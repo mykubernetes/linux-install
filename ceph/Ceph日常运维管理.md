@@ -34,12 +34,44 @@ cluster:
 ~]$ ceph -w
 ~]$ ceph health detail
 ```
+
 ### PG状态
 查看pg状态查看通常使用下面两个命令即可，dump可以查看更详细信息，如。
 ```
+# 查看pg组的映射信息
 ~]$ ceph pg dump
+
+# 查看PG状态
 ~]$ ceph pg stat
+
+# 查看一个PG的map
+~]$ ceph pg map 0.3f 
+osdmap e88 pg 0.3f (0.3f) -> up [0,2] acting [0,2] #其中的[0,2]代表存储在osd.0、osd.2节点，osd.0代表主副本的存储位置
+
+# 查询一个pg的详细信息
+~]$ ceph pg 0.26 query
+
+# 查看pg中stuck的状态
+~]$ ceph pg dump_stuck unclean 
+ok 
+~]$ ceph pg dump_stuck inactive 
+ok 
+~]$ ceph pg dump_stuck stale 
+ok
+
+# 显示一个集群中的所有的pg统计
+ceph pg dump -format plain
 ```
+
+### pg操作
+```
+# 恢复一个丢失的pg
+ceph pg {pg-id} mark_unfound_lost revert
+
+# 显示非正常状态的pg
+ceph pg dump_stuck inactive|unclean|stale
+```
+
 ### Pool状态
 ```
 ~]$ ceph osd pool stats
