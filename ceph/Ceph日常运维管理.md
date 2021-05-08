@@ -47,11 +47,64 @@ cluster:
 ```
 ### OSD状态
 ```
+# 查看ceph osd运行状态
 ~]$ ceph osd stat
+
+# 查看osd映射信息
 ~]$ ceph osd dump
+
+查看osd的目录树
 ~]$ ceph osd tree
+
+查看osd使用容量
 ~]$ ceph osd df
 ```
+
+### osd操作
+```
+# down掉一个osd硬盘
+~]$ ceph osd down 0      #down掉osd.0节点
+
+# 在集群中删除一个osd硬盘
+~]$ ceph osd rm 0 
+
+# 在集群中删除一个osd 硬盘 crush map
+~]$ ceph osd crush rm osd.0
+
+# 在集群中删除一个osd的host节点
+~]$ ceph osd crush rm node1 
+
+# 查看最大osd的个数
+~]$ ceph osd getmaxosd 
+
+# 设置最大的osd的个数（当扩大osd节点的时候必须扩大这个值）
+~]$ ceph osd setmaxosd 10
+
+# 设置osd crush的权重为1.0
+~]$ ceph osd crush set 3 1.0 host=node4
+~]$ ceph osd crush reweight osd.3 1.0          # ceph osd crush set {id} {weight} [{loc1} [{loc2} …]]
+
+# 设置osd的权重
+~]$ ceph osd reweight 3 0.5
+
+# 把一个osd节点逐出集群
+~]$ ceph osd out osd.3
+
+
+# 把逐出的osd加入集群
+~]$ ceph osd in osd.3
+
+# 暂停osd （暂停后整个集群不再接收数据）
+~]$ ceph osd pause
+
+# 再次开启osd （开启后再次接收数据）
+~]$ ceph osd unpause
+
+# 查看一个集群osd.2参数的配置
+~]$ ceph –admin-daemon /var/run/ceph/ceph-osd.2.asok config show | less
+```
+
+
 ### Monitor状态和查看仲裁状态
 ```
 ~]$ ceph mon stat
