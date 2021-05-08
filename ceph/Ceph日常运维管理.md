@@ -139,10 +139,42 @@ ceph pg dump_stuck inactive|unclean|stale
 
 ### Monitor状态和查看仲裁状态
 ```
+# 查看mon的状态信息
 ~]$ ceph mon stat
+
+# 查看mon的映射信息
 ~]$ ceph mon dump
+
+# 查看mon的选举状态
 ~]$ ceph quorum_status
 ```
+
+### mon操作
+```
+# 删除一个mon节点
+~]$ ceph mon remove node1 
+
+# 获得一个正在运行的mon map，并保存在1.txt文件中
+~]$ ceph mon getmap -o 1.txt 
+
+# 查看上面获得的map
+~]$ monmaptool -print 1.txt 
+
+# 把上面的mon map注入新加入的节点
+~]$ ceph-mon -i node4 –inject-monmap 1.txt
+
+# 查看mon的amin socket
+~]$ ceph-conf –name mon.node1 –show-config-value admin_socket
+
+# 查看mon的详细状态
+~]$ ceph daemon mon.node1 mon_status
+
+# 删除一个mon节点
+~]$ ceph mon remove os-node1
+```
+
+
+
 ### 集群空间用量
 ```
 ~]$ ceph df
