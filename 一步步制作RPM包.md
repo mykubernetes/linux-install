@@ -376,8 +376,201 @@ tengine-1.4.2-1.el6.x86_64.rpm:
 rpm --import RPM-GPG-KEY-LaoGuang 
 ```
 7.验证
-````
+```
 rpm --checksig tengine-1.4.2-1.el6.x86_64.rpm  
      
 tengine-1.4.2-1.el6.x86_64.rpm: rsa sha1 (md5) pgp md5 OK 
 ```
+
+
+CentOS 7 定制 OpenSSL RPM 包
+===
+
+一、环境准备
+---
+1.1 安装RPM打包、测试必备开发工具
+```
+$ yum install -y rpm-build rpmlint rpmdevtools
+```
+
+1.2 安装打包、编译所需的依赖软件
+```
+$ yum install -y gcc gcc-c++ make perl perl-WWW-Curl
+```
+ 
+二、制作 OpenSSL 的 RPM 包
+---
+注意：
+
+切记！不要使用 root 用户来执行打包操作。因为这十分危险，所有二进制文件都会在打包前安装至系统中，因此您应该以普通用户身份打包，以防止系统被破坏。
+
+2.1 配置 rpmbuild 工作目录
+```
+$ mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+
+$ echo "%_topdir %{getenv:HOME}/rpmbuild" > ~/.rpmmacros
+```
+
+2.2 下载源码包到 ~/rpmbuild/SOURCES 目录
+```
+$ wget -O ~/rpmbuild/SOURCES/openssl-1.1.1k.tar.gz https://www.openssl.org/source/openssl-1.1.1k.tar.gz
+```
+
+2.3 编写 openssl 1.1.1k 软件库包的spec文件
+```
+$ vim ~/rpmbuild/SPECS/openssl.spec
+
+Name:       openssl     
+Version:    1.1.1k
+Release:    1%{?dist}
+Summary:    Utilities from the general purpose cryptography library with TLS implementation
+Group:      System Environment/Libraries
+License:    GPLv2+
+URL:        https://www.openssl.org/
+Source0:    https://www.openssl.org/source/%{name}-%{version}.tar.gz
+BuildRequires:  make gcc perl perl-WWW-Curl 
+Requires:   %{name} = %{version}-%{release}
+BuildRoot:  %_topdir/BUILDROOT
+
+%global openssldir /usr/openssl
+
+%description
+The OpenSSL toolkit provides support for secure communications between
+machines. OpenSSL includes a certificate management tool and shared
+libraries which provide various cryptographic algorithms and
+protocols.
+
+%prep
+%setup -q
+
+%build
+./config --prefix=%{openssldir} --openssldir=%{openssldir}
+make %{?_smp_mflags}
+
+%install
+[ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
+%make_install
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_libdir}
+ln -sf %{openssldir}/lib/libssl.so.1.1 %{buildroot}%{_libdir}
+ln -sf %{openssldir}/lib/libcrypto.so.1.1 %{buildroot}%{_libdir}
+ln -sf %{openssldir}/bin/openssl %{buildroot}%{_bindir}
+
+%clean
+[ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
+
+%files
+%{openssldir}
+%defattr(-,root,root)
+%{_bindir}/openssl
+%{_libdir}/libcrypto.so.1.1
+%{_libdir}/libssl.so.1.1
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+%changelog
+* Sat May 08 2021 Hebin Wan <wanhebin@outlook.com> - 1.1.1k
+- Rebuilt for https://www.openssl.org/source/openssl-1.1.1k.tar.gz 
+```
+
+2.4 使用 rpmlint 测试
+
+为避免常见错误，请先使用 rpmlint 查找 SPEC 文件的错误：
+```
+$ rpmlint ~/rpmbuild/SPECS/openssl.spec
+0 packages and 1 specfiles checked; 0 errors, 0 warnings.
+```
+如果返回错误/警告，使用 "-i" 选项查看更详细的信息。
+
+2.5 从 SPEC 构建 RPM 包
+```
+$ rpmbuild -D "version 1.1.1k" -ba ~/rpmbuild/SPECS/openssl.spec
+```
+- -ba 构建源代码rpm包和二进制rpm包
+- -bb 只构建二进制rpm包
+- -bs 只构建源代码rpm包
+- -bp 执行至％prep阶段（解压源并应用补丁）
+- -bc 执行至％build阶段（％prep，然后编译）
+- -bi 执行至％install阶段（％prep，％build，然后安装）
+- -bl 验证％files部分，查看文件是否存在
+
+- 构建完成后，有类似下面的返回内容时，说明 RPM 包构建成功了
+```
+Checking for unpackaged file(s): /usr/lib/rpm/check-files /root/rpmbuild/BUILDROOT/openssl-1.1.1k-1.el7.centos.x86_64
+Wrote: /root/rpmbuild/SRPMS/openssl-1.1.1k-1.el7.centos.src.rpm
+Wrote: /root/rpmbuild/RPMS/x86_64/openssl-1.1.1k-1.el7.centos.x86_64.rpm
+Wrote: /root/rpmbuild/RPMS/x86_64/openssl-debuginfo-1.1.1k-1.el7.centos.x86_64.rpm
+Executing(%clean): /bin/sh -e /var/tmp/rpm-tmp.vMwlta
++ umask 022
++ cd /root/rpmbuild/BUILD
++ cd openssl-1.1.1k
++ '[' /root/rpmbuild/BUILDROOT/openssl-1.1.1k-1.el7.centos.x86_64 '!=' / ']'
++ /usr/bin/rm -rf /root/rpmbuild/BUILDROOT/openssl-1.1.1k-1.el7.centos.x86_64
++ exit 0
+```
+
+- 查看构建成功的 RPM 包
+```
+$ tree ~/rpmbuild/*RPMS
+/root/rpmbuild/RPMS
+└── x86_64
+    ├── openssl-1.1.1k-1.el7.centos.x86_64.rpm
+    └── openssl-debuginfo-1.1.1k-1.el7.centos.x86_64.rpm
+/root/rpmbuild/SRPMS
+└── openssl-1.1.1k-1.el7.centos.src.rpm
+
+1 directory, 3 files
+```
+
+在RPMS文件夹下生成了 RPM 包，在 x86_64 下，表示所应用的架构，由于没有指定arch为 noarch ，所以默认用本机架构。在SRPMS文件夹下生成了源码 RPM 包。
+
+2.6 使用 rpmlint 测试已构建的 RPM 包
+
+rpmlint 用于检查 SPEC/RPM/SRPM 是否存在错误。你需要在发布软件包之前，解决这些警告。此页面 提供一些常见问题的解释。
+```
+$ rpmlint ~/rpmbuild/SPECS/openssl.spec \
+          ~/rpmbuild/RPMS/x86_64/openssl-1.1.1k-1.el7.x86_64.rpm \
+          ~/rpmbuild/SRPMS/openssl-1.1.1k-1.el7.src.rpm
+```
+一般情况下，检测到的都是一些WARN信息，不影响软件使用，可以忽略。如果有ERROR信息，或许也不影响使用，但建议按照提示进行调整、修复。
+
+ 
+三、安装升级 OpenSSL
+---
+一般情况下，系统都已经有openssl了，所以我们直接升级即可。
+
+注意：
+
+切记！在做openssl升级时，请先从测试机中操作，升级后，确定没有任何问题时，在根据线上环境陆续升级。
+
+3.1 检查系统当前OpenSSL版本
+
+查看当前系统中openssl的版本
+```
+$ openssl version
+OpenSSL 1.0.2k-fips  26 Jan 2017
+```
+
+卸载openssl
+```
+$ rpm -e openssl --nodeps
+```
+
+3.2 升级OpenSSL版本
+
+安装我们刚刚打包好的openssl 1.1.1k版本
+```
+$ rpm -ivh ~/rpmbuild/RPMS/x86_64/openssl-1.1.1k-2.el7.x86_64.rpm --nodeps
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:openssl-1.1.1k-2.el7             ################################# [100%]
+```
+
+再次查看系统中openssl版本
+```
+$ openssl version
+OpenSSL 1.1.1k  25 Mar 2021
+```
+很幸运，成功升级！
