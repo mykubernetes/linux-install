@@ -204,6 +204,23 @@ ZooKeeper -server host:port cmd args
 ```
 create [-s] [-e] path data acl 选项介绍： -s用来指定节点特性为顺序节点；顺序节点：是创建时唯一且被独占的递增性整数作为其节点号码，此号码会被叠加在路径之后。 -e用来指定特性节点为临时节点,临时节点不允许有子目录；关于持久节点和临时节点请看上篇文章 若不指定，则表示持久节点 acl用来做权限控制
 
+
+数据的属性说明
+---
+| 属性 | 描述 |
+|------|------|
+| czxid | 节点被创建的Zxid值 |
+| mzxid | 节点被修改的Zxid值 |
+| ctime | 节点被创建的时间 |
+| mtime | 节点最后一次被修改的时间 |
+| versoin | 节点被修改的版本号 |
+| cversion | 节点的所拥有子节点被修改的版本号 |
+| aversion | 节点的ACL被修改的版本号 |
+| emphemeralOwner | 如果此节点为临时节点，那么它的值为这个节点拥有者的会话ID；否则，它的值为0 |
+| dataLength | 节点数据域的长度 |
+| numChildren | 节点拥有的子节点个数 |
+
+
 创建ZooKeeper持久节点
 ```
 #创建持久节点permanent，关联字符串permanent
