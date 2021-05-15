@@ -1,5 +1,7 @@
 https://linuxops.org/blog/linux/openvpn.html
 
+http://www.zhangblog.com/2020/05/09/openvpn01/
+
 1.安装epel扩展源  
 ---
 ``` # yum -y install epel-release ```  
