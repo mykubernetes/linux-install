@@ -258,11 +258,11 @@ zkCli.sh客户端连接
 #使用?号或者help可以获取帮助命令
 [zk: localhost:2181(CONNECTED) 0] ?
 ZooKeeper -server host:port cmd args
-        stat path [watch]                       #获取节点数据内容和属性信息
+        stat path [watch]                       #获取节点数据内容和属性信息,[watch] 观察模式，有改变则会被通知，watch一次有效一次
         set path data [version]                 #更新节点数据内容
-        ls path [watch]                         #列出节点
+        ls path [watch]                         #列出节点,[watch] 观察模式，有改变则会被通知，watch一次有效一次
         delquota [-n|-b] path
-        ls2 path [watch]                        #列出节点数据内容和属性信息
+        ls2 path [watch]                        #列出节点数据内容和属性信息,[watch] 观察模式，有改变则会被通知，watch一次有效一次
         setAcl path acl                         #设置ACL访问控制权限
         setquota -n|-b val path
         history                                 #获取历史命令记录
@@ -272,8 +272,8 @@ ZooKeeper -server host:port cmd args
         sync path                               #同步节点
         listquota path
         rmr path                                #删除节点，忽略节点下的子节点
-        get path [watch]                        #读取数据内容和属性信息
-        create [-s] [-e] path data acl          #创建节点命令
+        get path [watch]                        #读取数据内容和属性信息,[watch] 观察模式，有改变则会被通知，watch一次有效一次
+        create [-s] [-e] path data acl          #创建节点命令 -s 序列化【避免重复】 -e 临时数据【常用】 
         addauth scheme auth
         quit                                    #退出当前ZK连接
         getAcl path                             #获取节点ACL策略信息
