@@ -302,13 +302,13 @@ gpg --gen-key
      
 Your selection?1<Enter>                       ##默认即可
 What keysize do you want? (2048) 1024<Enter>  ##密钥长度
-Key is valid for? (0) 1y<Enter>  ##有效期
-Is this correct? (y/N) y<Enter>  ##确认
-Real name: LaoGuang<Enter>       ##密钥名称
-Email address: ibuler@qq.com<Enter>  ##邮件
-Comment: GPG-RPM-KEY<Enter>      ##备注
+Key is valid for? (0) 1y<Enter>               ##有效期
+Is this correct? (y/N) y<Enter>               ##确认
+Real name: LaoGuang<Enter>                    ##密钥名称
+Email address: ibuler@qq.com<Enter>           ##邮件
+Comment: GPG-RPM-KEY<Enter>                   ##备注
 Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O<ENTER> 
-Enter passphrase  OK <Enter>     ##使用空密码，也可以输入                              
+Enter passphrase  OK <Enter>                  ##使用空密码，也可以输入                              
 <Take this one anyway> <Enter> 
 <Take this one anyway> <Enter> 
 ```
