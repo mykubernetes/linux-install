@@ -1,46 +1,8 @@
 https://www.jianshu.com/p/dd8183937106
 
-一.RPM制作步骤
 
-我们在企业中有的软件基本都是编译的，我们每次安装都得编译，那怎么办呢？那就根据我们的需求制作RPM安装包吧。先来说说基本布骤:
-
-1.Planning what you want             计划做什么rpm包。软件的？库的？
-
-2.Gathering the software to package  收集原材料，即收集源码包
-
-3.Patch the software as need         如果需要打补丁，收集补丁文件。此布骤不是必须
-
-4.Outling any dependenies	     确定依赖关系包
-
-------------------  上述动作可由我们手动编译一次软件来确定  -------------------
-
-5.Building RPMs                      开始动手制作RPM包
-
-5.1 Set up the directory stucture 设定好目录结构，我们在这些目录中制作我们的RPM包，我们需要下列目录
-
-	BUILD	源代码解压后的存放目录
-
-	RPMS    制作完成后的RPM包存放目录，里面有与平台相关的子目录
-
-	SOURCES 收集的源材料，补丁的存放位置
-
-	SPECS   SPEC文件存放目录
-
-	SRMPS   存放SRMPS生成的目录
-
-5.2 Place the Sources in the right directory   把源材料放到正确的位置
-
-5.3 Create a spec file that tell rpmbuild command what to do 创建spec文件，这是纲领文件，rpmbuild命令根据spec文件来制作合适的rpm包
-
-5.4 Build the source and binary RPMS 制作src或二进制rpm包
-
-6.Test RPMS 测试制作的PRM包
-
-7.Add signature for RPM  为RPM包签名
-
-二.RPM包制作实例
-
-我还是用连贯的话为大家叙述一遍吧，我们首先确实我们要为什么做rpm包，通常我们是为一些软件，比如httpd,nginx等，然后去收集这些软件包的源代码，如果有需要的话也收集这些补丁文件，手动编译安装一下这个软件(当然如果是不需要编译的就不用演练了)，确定依赖的软件包，并记录下来，下面开始准备制作tengine的PRM包吧：
+RPM包制作实例
+===
 
 安装制作rpm工具
 ```
@@ -76,6 +38,12 @@ mkdir ~/rpmbuild
 cd ~/rpmbuild  
 mkdir -pv {BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} 
 ```
+- BUILD   源代码解压后的存放目录
+- RPMS    制作完成后的RPM包存放目录，里面有与平台相关的子目录
+- SOURCES 收集的源材料，补丁的存放位置
+- SPECS   SPEC文件存放目录
+- SRMPS   存放SRMPS生成的目录
+
 4.把收集的源码放到SOURCES下
 ```
 cp /tmp/tengine-1.4.2.tar.gz SOURCES   ##事先放好的
