@@ -1,4 +1,4 @@
-https://www.jianshu.com/p/dd8183937106
+https://blog.csdn.net/get_set/article/details/53453320
 
 
 RPM包制作实例
