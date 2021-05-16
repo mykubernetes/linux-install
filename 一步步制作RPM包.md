@@ -33,6 +33,7 @@ vi ~/.rpmmacros
      
 mkdir ~/rpmbuild  
 ```
+
 3.在topdir下建立需要的目录
 ```
 cd ~/rpmbuild  
@@ -48,11 +49,13 @@ mkdir -pv {BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 ```
 cp /tmp/tengine-1.4.2.tar.gz SOURCES   ##事先放好的
 ```
+
 5.在SPECS下建立重要的spec文件
 ```
 cd SPECS 
 vi tengine.spec          ##内容见后讲解，rhel6.3会自动生成模板 
 ```
+
 6.用rpmbuild命令制作rpm包，rpmbuild命令会根据spec文件来生成rpm包 
 ```
 rpmbuild  
@@ -232,7 +235,6 @@ rm -rf %{buildroot}
 *  Fri Dec 29 2012 laoguang <ibuler@qq.com> - 1.0.14-1 
 - Initial version 
 ```
-到此一个简单的tengine RPM包制作好了。
 
 https://github.com/happyfish100/libfastcommon/blob/master/libfastcommon.spec
 
