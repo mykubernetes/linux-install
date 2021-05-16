@@ -238,6 +238,20 @@ Created /permanent/zk_node2
 [zookeeper, permanent]
 [zk: localhost:2181(CONNECTED) 4] ls /permanent
 [zk_node1, zk_node2]
+
+[zk: localhost:2181(CONNECTED) 4] get /permanent
+yang01
+cZxid = 0x100000018
+ctime = Sat May 26 15:33:47 CST 2018
+mZxid = 0x100000018
+mtime = Sat May 26 15:33:47 CST 2018
+pZxid = 0x100000018
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0                     # 代表持久节点 
+dataLength = 6
+numChildren = 0
 ```
 
 创建ZooKeeper顺序节点
@@ -274,6 +288,19 @@ Ephemerals cannot have children: /temp/two_temp     #你会发现创建子目录
 [zk: localhost:2181(CONNECTED) 18] ls /temp         #查看临时节点/temp下，并没有我们所创建的two_temp子目录
 []
 
+[zk: localhost:2181(CONNECTED) 19] get /temp
+temp
+cZxid = 0x100000019
+ctime = Sat May 26 15:33:55 CST 2018
+mZxid = 0x100000019
+mtime = Sat May 26 15:33:55 CST 2018
+pZxid = 0x100000019
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x1639b3087ac0002                   # 代表临时节点  
+dataLength = 6
+numChildren = 0
 
 #测试临时节点
 #创建的临时节点如果当前客户端断开了连接后临时节点会自动消失，而持久节点和顺序节点则需要使用删除命令来消失
