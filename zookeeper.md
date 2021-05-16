@@ -343,18 +343,18 @@ get path [watch]
 get读取数据内容和属性信息
 可以看到get不像ls2一样更够列出/下的文件名称，只显示当前节点的属性信息
 [zk: localhost:2181(CONNECTED) 12] get /permanent
-permanent
-cZxid = 0x2e
-ctime = Sat Jun 22 21:00:00 CST 2019
-mZxid = 0x2e
-mtime = Sat Jun 22 21:00:00 CST 2019
-pZxid = 0x30
-cversion = 2
-dataVersion = 0
-aclVersion = 0
-ephemeralOwner = 0x0
-dataLength = 9
-numChildren = 2
+permanent                                        # 内容
+cZxid = 0x2e                                     # 创建数据时的事物编号
+ctime = Sat Jun 22 21:00:00 CST 2019             # 创建时间
+mZxid = 0x2e                                     # 修改数据时的事物编号
+mtime = Sat Jun 22 21:00:00 CST 2019             # 修改时间
+pZxid = 0x30                                     # 持久化事物编号
+cversion = 2                                     # 创建版本号
+dataVersion = 0                                  # 数据版本
+aclVersion = 0                                   # 权限版本
+ephemeralOwner = 0x0                             # 持久接待
+dataLength = 9                                   # 数据长度
+numChildren = 2                                  # 子节点数
 
 获取/的数据内容和属性信息
 [zk: localhost:2181(CONNECTED) 13] get /
