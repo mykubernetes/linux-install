@@ -125,7 +125,7 @@ Version:        1.4.2                              #版本号，一定要与tar�
 Release:        1%{?dist}                          #释出号，也就是第几次制作rpm 
 Summary:        tengine from TaoBao                #软件包简介，最好不要超过50字符 
      
-Group:          System Environment/Daemons  #组名，可以通过less /usr/share/doc/rpm-4.8.0/GROUPS 选择合适组 
+Group:          System Environment/Daemons         #组名，可以通过less /usr/share/doc/rpm-4.8.0/GROUPS 选择合适组 
 License:        GPLv2                              #许可，GPL还是BSD等  
 URL:            http://laoguang.blog.51cto.com     #可以写一个网址 
 Packager:       Laoguang <ibuler@qq.com>           #制作者<邮箱>
@@ -177,28 +177,28 @@ It is a Nginx from Taobao.                         #描述内容
   --http-uwsgi-temp-path=/var/tmp/nginx/uwsgi \ 
   --http-scgi-temp-path=/var/tmp/nginx/scgi \ 
   --with-pcre 
-make %{?_smp_mflags}          #make后面的意思是：如果就多处理器的话make时并行编译 
+make %{?_smp_mflags}                               #make后面的意思是：如果就多处理器的话make时并行编译 
      
 ###  4.Install section  安装阶段 
 %install                                
-rm -rf %{buildroot}                #先删除原来的安装的，如果你不是第一次安装的话 
+rm -rf %{buildroot}                                #先删除原来的安装的，如果你不是第一次安装的话 
 make install DESTDIR=%{buildroot} 
 #DESTDIR指定安装的目录，而不是真实的安装目录，%{buildroot}你应该知道是指的什么了 
-# %{__install} -p -d -m 0755 %{buildroot}/var/log/nginx    #创建空目录
+# %{__install} -p -d -m 0755 %{buildroot}/var/log/nginx                         #创建空目录
 # %{__install} -p -D -m 0755 %{SOURCE1} %{buildroot}/etc/rc.d/init.d/nginx      #将文件拷贝到路径下
 
 ###  4.1 scripts section #没必要可以不写 
-%pre        #rpm安装前制行的脚本 
-if [ $1 == 1 ];then    #$1==1 代表的是第一次安装，2代表是升级，0代表是卸载 
-        /usr/sbin/useradd -r nginx 2> /dev/null  ##其实这个脚本写的不完整
+%pre                                                 #rpm安装前制行的脚本 
+if [ $1 == 1 ];then                                  #$1==1 代表的是第一次安装，2代表是升级，0代表是卸载 
+        /usr/sbin/useradd -r nginx 2> /dev/null      ##其实这个脚本写的不完整
 fi 
 
-%post       #安装后执行的脚本 
+%post                                                #安装后执行的脚本 
 if [ $1 == 1]; then
         /sbin/chkconfig --add %{name}
 fi
 
-%preun      #卸载前执行的脚本 
+%preun                                               #卸载前执行的脚本 
 if [ $1 == 0 ];then 
         /usr/sbin/userdel -r nginx 2> /dev/null 
 fi 
@@ -208,7 +208,7 @@ if [ $1 == 0 ]; then
         /sbin/chkconfig --del %{name}
 fi
 
-%postun     #卸载后执行的脚本 
+%postun                                              #卸载后执行的脚本 
 
 
 ###  5.clean section 清理段,删除buildroot 
@@ -218,13 +218,13 @@ rm -rf %{buildroot}
          
 ###  6.file section 要包含的文件 
 %files  
-%defattr (-,root,root,0755)   #设定默认权限，如果下面没有指定权限，则继承默认 
-/etc/           #下面的内容要根据你在%{rootbuild}下生成的来写     
+%defattr (-,root,root,0755)                           #设定默认权限，如果下面没有指定权限，则继承默认 
+/etc/                                                 #下面的内容要根据你在%{rootbuild}下生成的来写     
 /usr/ 
 /var/
-# %dir /var/run/nginx  #生成空目录
-# %dir /var/log/nginx  #生成空目录
-# %dir /etc/nginx      #生成空目录
+# %dir /var/run/nginx                                 #生成空目录
+# %dir /var/log/nginx                                 #生成空目录
+# %dir /etc/nginx                                     #生成空目录
 # %doc API CHANGES COPYING CREDITS README axelrc.examlpe 文档文件会被安装到 /usr/share/doc/生成当前软件包名+版本号名
 # %config(noreplace) %{_sysconfdir}/axelrc 配置文件，noreplace不替换原来的
 # /usr/local/bin/axel 包含的所有文件，可以直接写目录
