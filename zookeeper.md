@@ -32,7 +32,17 @@ zookeeper数据结构
 - 3、节点Znode可以包含数据和子节点（但是EPHEMERAL类型的节点不能有子节点）
 - 4、客户端应用可以在节点上设置监视器
 
-
+节点类型
+- 1、Znode有两种类型：
+  - 短暂（ephemeral）（断开连接zookeeper自己删除记录）
+  - 持久（persistent）（断开连接不删除）
+- 2、Znode有四种形式的目录节点（默认是persistent ）
+  - PERSISTENT
+  - PERSISTENT_SEQUENTIAL（持久序列/test0000000019 ）
+  - EPHEMERAL
+  - EPHEMERAL_SEQUENTIAL
+- 3、创建znode时设置顺序标识，znode名称后会附加一个值，顺序号是一个单调递增的计数器，由父节点维护
+- 4、在分布式系统中，顺序号可以被用于为所有的事件进行全局排序，这样客户端可以通过顺序号推断事件的顺序
 
 分布式安装部署  
 =============
