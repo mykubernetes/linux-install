@@ -14,7 +14,11 @@ yum install rpm-build -y
 useradd ibuler 
 su - ibuler 
 ```
-2.确定我们在哪个目录下制作RPM，通常这个目录我们topdir,这个需要在宏配置文件中指定，这个配置文件称为macrofiles，它们通常为 /usr/lib/rpm/macros:/usr/lib/rpm/macros.*:~/.rpmmacros,这个在rhel 5.8中可以通过rpmbuild --showrc | grep macrofiles  查看，6.3的我使用这个找不到，但使用是一样的。你可以通过rpmbuild --showrc | grep topdir 查看你系统默认的工作车间 
+
+2.查看哪个目录下制作RPM，这个配置文件称为macrofiles，/usr/lib/rpm/macros:/usr/lib/rpm/macros.*:~/.rpmmacros,
+- centos5.8 通过rpmbuild --showrc | grep macrofiles  
+- centos6.3 通过rpmbuild --showrc | grep topdir
+
 ```
 rpmbuild --showrc | grep topdir 
      
@@ -26,7 +30,8 @@ rpmbuild --showrc | grep topdir
 -14: _srcrpmdir %{_topdir}/SRPMS 
 -14: _topdir    %{getenv:HOME}/rpmbuild 
 ```
-我们还是自定义工作目录(或车间)吧
+
+自定义工作目录
 ```
 vi ~/.rpmmacros 
 %_topdir        /home/ibuler/rpmbuild    ##目录可以自定义 
@@ -35,15 +40,20 @@ mkdir ~/rpmbuild
 ```
 
 3.在topdir下建立需要的目录
+
+| 默认位置 | 宏代码 | 名称 | 用途 |
+|---------|-------|------|-----|
+| ~/rpmbuild/SPECS | %_specdir | Spec 文件目录 | 保存 RPM 包配置（.spec）文件 |
+| ~/rpmbuild/SOURCES | %_sourcedir | 源代码目录 | 保存源码包（如 .tar 包）和所有 patch 补丁 |
+| ~/rpmbuild/BUILD | %_builddir | 构建目录 | 源码包被解压至此，并在该目录的子目录完成编译 |
+| ~/rpmbuild/BUILDROOT | %_buildrootdir	最终安装目录 | 	保存 %install 阶段安装的文件 |
+| ~/rpmbuild/RPMS | %_rpmdir | 标准 RPM 包目录 | 生成/保存二进制 RPM 包 |
+| ~/rpmbuild/SRPMS | %_srcrpmdir | 源代码 RPM 包目录 | 生成/保存源码 RPM 包(SRPM) |
+
 ```
 cd ~/rpmbuild  
 mkdir -pv {BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} 
 ```
-- BUILD   源代码解压后的存放目录
-- RPMS    制作完成后的RPM包存放目录，里面有与平台相关的子目录
-- SOURCES 收集的源材料，补丁的存放位置
-- SPECS   SPEC文件存放目录
-- SRMPS   存放SRMPS生成的目录
 
 4.把收集的源码放到SOURCES下
 ```
@@ -58,16 +68,18 @@ vi tengine.spec          ##内容见后讲解，rhel6.3会自动生成模板
 
 6.用rpmbuild命令制作rpm包，rpmbuild命令会根据spec文件来生成rpm包 
 ```
-rpmbuild  
--ba 既生成src.rpm又生成二进制rpm 
--bs 只生成src的rpm 
--bb 只生二进制的rpm 
--bp 执行到pre 
--bc 执行到 build段 
--bi 执行install段 
--bl 检测有文件没包含 
+基本格式：rpmbuild [options] [spec文档|tarball包(或者压缩包—以.gz或.xz或.bz2结尾的)|源码包]
+options有下面的几种选择：
+1.-bp #只执行spec的%pre段(解开源码包并打补丁,即只做准备)
+2.-bc #执行spec的%pre和%build 段(准备并编译)
+3.-bi #执行spec中%pre,%build与%install(准备,编译并安装)
+4.-bl #检查spec中的%file段(查看文件是否齐全)
+5.-ba #建立源码与二进制包(常用):即编译后做成*.rpm和*.src.rpm
+6.-bb #只建立二进制包(常用):即编译后做成*.rpm
+7.-bs #只建立源码包:即只做成*.src.rpm
+-tc -ti -ta -tb -ts 的功能类似，只是所需参数由spec文件变成tar包。
 ```
-我们可以一步步试，先rpmbuild -bp ,再-bc 再-bi 如果没问题，rpmbuild -ba 生成src包与二进制包吧
+
 
 7.安装测试有没有问题，能否正常安装运行，能否正常升级，卸载有没有问题
 
