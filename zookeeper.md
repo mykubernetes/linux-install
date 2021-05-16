@@ -273,15 +273,13 @@ ZooKeeper -server host:port cmd args
         listquota path
         rmr path                                #删除节点，忽略节点下的子节点
         get path [watch]                        #读取数据内容和属性信息,[watch] 观察模式，有改变则会被通知，watch一次有效一次
-        create [-s] [-e] path data acl          #创建节点命令 -s 序列化【避免重复】 -e 临时数据【常用】 
+        create [-s] [-e] path data acl          #创建节点命令 -s 序列化【避免重复】 -e 临时数据【常用】 ,acl权限控制
         addauth scheme auth
         quit                                    #退出当前ZK连接
         getAcl path                             #获取节点ACL策略信息
         close                                   #断开当前ZK连接，但不退出窗口
         connect host:port                       #断开当前ZK连接后，可使用connect加参数来连接指定ZK节点
 ```
-create [-s] [-e] path data acl 选项介绍： -s用来指定节点特性为顺序节点；顺序节点：是创建时唯一且被独占的递增性整数作为其节点号码，此号码会被叠加在路径之后。 -e用来指定特性节点为临时节点,临时节点不允许有子目录；关于持久节点和临时节点请看上篇文章 若不指定，则表示持久节点 acl用来做权限控制
-
 
 数据的属性说明
 ---
