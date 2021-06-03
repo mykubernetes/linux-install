@@ -18,6 +18,8 @@ http://www.jwsblog.com/archives/59.html
 
 https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
 
+https://github.com/chenryn/ELKstack-guide-cn/tree/master/elasticsearch/monitor/api
+
 ES  内置的REST 接口
 | URL | 说明 |
 |-----|------|
@@ -221,6 +223,46 @@ yellow open   index 4BAj2ycsSGyosLYPmTQEZw   5   1          0            0      
 - docs.deleted 删除文档的总数
 - store.size 总存储空间，包含副本的空间
 - pri.store.size 主分片存储的空间
+
+查看分片状态
+```
+# curl -XGET http://127.0.0.1:9200/_cat/shards?v
+index                             shard prirep state            docs    store ip        node
+logstash-mweibo-h5view-2015.06.10 20    p      STARTED       4690968  679.2mb 127.0.0.1 10.19.0.108
+logstash-mweibo-h5view-2015.06.10 20    r      STARTED       4690968  679.4mb 127.0.0.1 10.19.0.39
+logstash-mweibo-h5view-2015.06.10 2     p      STARTED       4725961  684.3mb 127.0.0.1 10.19.0.53
+logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 127.0.0.1 10.19.0.102
+```
+- prirep
+  - p 主分别
+  - r 复副本
+
+查看unassigned shards
+```
+# curl -XGET http://127.0.0.1:9200/_cat/shards?j=index,shard,prirep,state,unassigned,reason |grep UNASSIGNED
+```
+
+查看 allocation issue
+```
+# curl -XGET http://127.0.0.1:9200/_cluster/allocation/explain?pretty
+```
+
+查看 snspshots
+```
+# curl -XGET http://127.0.0.1:9200/_cat/snapshots/{repository}
+```
+
+重启es集群
+```
+# curl -XGET http://127.0.0.1:9200/_cluster/update -d '{
+"cluster_name": "mycluster",
+"operator": "xxx",
+"restart_type": "full_cluster_restart"
+}'
+```
+- rolling_restart 滚动重启
+- full_cluster_restart 全量重启
+- no_restart 不重启
 
 4、创建一个customer的index
 ```
