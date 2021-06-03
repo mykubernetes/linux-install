@@ -245,7 +245,7 @@ logstash-mweibo-h5view-2015.06.10 2     p      STARTED       4725961  684.3mb 12
 logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 127.0.0.1 10.19.0.102
 ```
 - prirep
-  - p 主分别
+  - p 主分片
   - r 复副本
 
 查看unassigned shards
