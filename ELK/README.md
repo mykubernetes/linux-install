@@ -18,7 +18,7 @@ http://www.jwsblog.com/archives/59.html
 
 https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
 
-https://github.com/chenryn/ELKstack-guide-cn/tree/master/elasticsearch/monitor/api
+https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md
 
 ES  内置的REST 接口
 | URL | 说明 |
