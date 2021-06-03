@@ -124,6 +124,17 @@ curl -XGET localhost:9200/_cluster/health?level=shards        #表示显示分�
 curl -XGET localhost:9200/_cluster/stats?pretty=true
 ```
 
+查看集群JVM内存大小，如果超过80%，则集群写入会不正常
+```
+curl -XGET localhost:9200/_nodes/stats/jvm?pretty |grep heap_used_percent
+```
+
+集群空间检查
+```
+curl -XGET localhost:9200/_cat/allocation?v
+```
+
+
 3、集群的详细信息。包括节点、分片等。  
 ```
 curl -XGET localhost:9200/_cluster/state?pretty=true
