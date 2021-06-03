@@ -93,18 +93,18 @@ curl -XGET localhost:9200/_cluster/health?pretty=true
   "cluster_name" : "jiankunking-log",
   "status" : "green",
   "timed_out" : false,
-  "number_of_nodes" : 3,                        #集群内的总节点数   
+  "number_of_nodes" : 3,                        #集群内的总节点数
   "number_of_data_nodes" : 3,                   #集群内的总数据节点数
   "active_primary_shards" : 2722,               #集群内所有索引的主分片总数
   "active_shards" : 5444,                       #集群内所有索引的分片总数
   "relocating_shards" : 0,                      #正在迁移中的分片数
   "initializing_shards" : 0,                    #正在初始化的分片数
-  "unassigned_shards" : 0,                      #未分配到具体节点上的分片数
+  "unassigned_shards" : 0,                      #未分配到具体节点上的分片数      重要
   "delayed_unassigned_shards" : 0,              #延时待分配到具体节点上的分片数
   "number_of_pending_tasks" : 0,
   "number_of_in_flight_fetch" : 0,
   "task_max_waiting_in_queue_millis" : 0,
-  "active_shards_percent_as_number" : 100.0
+  "active_shards_percent_as_number" : 100.0     #分片比例正常是100%，处在恢复阶段比例在增加直到100
 }
 
 curl -XGET localhost:9200/_cluster/health?pretty=true         #表示格式化输出
@@ -195,11 +195,14 @@ red:有些数据不可用,但是集群部分功能可用;
 
 2、集群节点列表api
 ```
-http://192.168.0.128:9200/_cat/nodes?v
+curl -XGET http://192.168.0.128:9200/_cat/nodes?v
  
 ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
 192.168.0.128           19          72  58                          mdi       *      master
+
+curl -XGET http://192.168.0.128:9200/_nodes/process?pretty
 ```
+-  heap.percent 查看内存是否爆表
 
 3、列出集群中所有的索引
 ```
@@ -212,6 +215,12 @@ yellow open   book  -rZ8v4AfTDyPPTm3oZ_qLQ   5   1         16            0     6
 yellow open   index 4BAj2ycsSGyosLYPmTQEZw   5   1          0            0       795b           795b
 ```
 上面health都为yellow是因为只有一个node,es默认创建一个副本,等待其他的节点加入
+- pri 索引的分配个数
+- rep 索引的副本个数
+- docs.count 所有文档的总数
+- docs.deleted 删除文档的总数
+- store.size 总存储空间，包含副本的空间
+- pri.store.size 主分片存储的空间
 
 4、创建一个customer的index
 ```
