@@ -828,7 +828,7 @@ ACL 权限控制，使用：schema:id:permission 来标识，主要涵盖 3 个�
 一、权限相关命令
 | 命令 | 使用方式 | 描述 |
 |-----|----------|-----|
-| getAcl | getAcl <path> | 读取ACL权限 |
-| setAcl | setAcl <path> <acl> | 设置ACL权限 |
-| addauth | addauth <scheme> <auth> | 添加认证用户 |
+| getAcl | `getAcl <path>` | 读取ACL权限 |
+| setAcl | `setAcl <path> <acl>` | 设置ACL权限 |
+| addauth | `addauth <scheme> <auth>` | 添加认证用户 |
 
