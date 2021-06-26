@@ -797,7 +797,7 @@ ACL 权限控制，使用：`schema:id:permission` 来标识，主要涵盖 3 �
 - 每个znode支持设置多种权限控制方案和多个权限
 - 子节点不会继承父节点的权限，客户端无权访问某节点，但可能可以访问它的子节点
 
-1、schema：ZooKeeper内置了一些权限控制方案，可以用以下方案为每个节点设置权限：
+schema：ZooKeeper内置了一些权限控制方案，可以用以下方案为每个节点设置权限：
 | 方案 | 描述 |
 |------|-----|
 | world | world下只有一个id,即只有一个用户，也就是anyone,那么组合的写法就是`world:anyone:[permissions]` |
@@ -807,7 +807,7 @@ ACL 权限控制，使用：`schema:id:permission` 来标识，主要涵盖 3 �
 | super | 代表超级管理员，拥有所有权限 |
 - auth与digest区别是auth是明文密码digest是密文密码，`setAcl /path auth:lee:lee:cdrwa`与`setAcl /path digest:leeBASE64(SHA1(password)):cdrwa`是等价的addauth digest lee:lee后等能操作指定节点的权限
 
-2、权限permission：权限字符串缩写crdwa
+权限permission：权限字符串缩写crdwa
 | 权限 | ACL简写 | 描述 |
 |-----|---------|------|
 | CREATE | c | 可以创建子节点 |
@@ -817,10 +817,129 @@ ACL 权限控制，使用：`schema:id:permission` 来标识，主要涵盖 3 �
 | ADMIN | a | 可以设置节点访问控制列表权限 |
 
 
-一、权限相关命令
+权限相关命令
 | 命令 | 使用方式 | 描述 |
 |-----|----------|-----|
 | getAcl | `getAcl <path>` | 读取ACL权限 |
 | setAcl | `setAcl <path> <acl>` | 设置ACL权限 |
 | addauth | `addauth <scheme> <auth>` | 添加认证用户 |
 
+1.word方式
+```
+[zk: localhost:2181(CONNECTED) 9] create /test1 test1-value    
+Created /test1
+[zk: localhost:2181(CONNECTED) 10] getAcl /test1                     #创建的默认是所有用户都可以进行cdrwa
+'world,'anyone
+: cdrwa
+[zk: localhost:2181(CONNECTED) 11] setAcl /test1 world:anyone:acd    #修改为所有人可以acd
+cZxid = 0x400000007
+ctime = Tue Mar 12 14:46:55 CST 2019
+mZxid = 0x400000007
+mtime = Tue Mar 12 14:46:55 CST 2019
+pZxid = 0x400000007
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 11
+numChildren = 0
+[zk: localhost:2181(CONNECTED) 12] getAcl /test1
+'world,'anyone
+: cda
+```
+
+2、Auth方式，明文方式
+```
+[zk: localhost:2181(CONNECTED) 44] create /t4 44
+Created /t4
+[zk: localhost:2181(CONNECTED) 45] addauth digest qlq:111222     #增加授权用户,明文用户名和密码
+[zk: localhost:2181(CONNECTED) 46] setAcl /t4 auth:qlq:cdwra　　 #授予权限
+cZxid = 0x40000001d
+ctime = Tue Mar 12 15:16:56 CST 2019
+mZxid = 0x40000001d
+mtime = Tue Mar 12 15:16:56 CST 2019
+pZxid = 0x40000001d
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 2
+numChildren = 0
+[zk: localhost:2181(CONNECTED) 48] getAcl /t4
+'digest,'qlq:JWNEexxIoeVompjU7O5pZzTU+VQ=                        #用户和密码
+: cdrwa
+
+#如果重新连接之后获取会报没权限，需要添加授权用户
+[zk: localhost:2181(CONNECTED) 4] get /t4
+Authentication is not valid : /t4
+[zk: localhost:2181(CONNECTED) 6] addauth digest qlq:111222
+[zk: localhost:2181(CONNECTED) 7] get /t4
+44
+cZxid = 0x40000001d
+ctime = Tue Mar 12 15:16:56 CST 2019
+mZxid = 0x40000001d
+mtime = Tue Mar 12 15:16:56 CST 2019
+pZxid = 0x40000001d
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 2
+numChildren = 0
+```
+
+3、Digest方式,密文方式
+```
+[zk: localhost:2181(CONNECTED) 1]setAcl /test digest:qlq:JWNEexxIoeVompjU7O5pZzTU+VQ=:cdrwa
+cZxid = 0x40000001d
+ctime = Tue Mar 12 15:16:56 CST 2019
+mZxid = 0x40000001d
+mtime = Tue Mar 12 15:16:56 CST 2019
+pZxid = 0x40000001d
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 2
+numChildren = 0
+```
+
+4、IP的方式
+```
+[zk: localhost:2181(CONNECTED) 13] create /test2 test2-value
+Created /test2
+[zk: localhost:2181(CONNECTED) 14] setAcl /test2 ip:127.0.0.1:crwda   #修改此IP具有所有权限
+cZxid = 0x400000009
+ctime = Tue Mar 12 14:51:58 CST 2019
+mZxid = 0x400000009
+mtime = Tue Mar 12 14:51:58 CST 2019
+pZxid = 0x400000009
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 11
+numChildren = 0
+[zk: localhost:2181(CONNECTED) 15] getAcl /test2
+'ip,'127.0.0.1
+: cdrwa
+
+#当然可以设置IP的时候使用多个ip的方式，比如:
+[zk: localhost:2181(CONNECTED) 42] setAcl /t3 ip:192.168.0.164:cdwra,ip:127.0.0.1:cdwra
+cZxid = 0x400000018
+ctime = Tue Mar 12 15:12:59 CST 2019
+mZxid = 0x400000018
+mtime = Tue Mar 12 15:12:59 CST 2019
+pZxid = 0x400000018
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 2
+numChildren = 0
+[zk: localhost:2181(CONNECTED) 43] getAcl /t3
+'ip,'192.168.0.164
+: cdrwa
+'ip,'127.0.0.1
+: cdrwa
+```
