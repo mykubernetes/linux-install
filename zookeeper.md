@@ -783,3 +783,52 @@ zk_open_file_descriptor_count   37      #打开文件描述符数量
 zk_max_file_descriptor_count    65536   #最大文件描述符数量
 Ncat: Broken pipe.
 ```
+
+ACL
+===
+
+ACL 权限控制，使用：schema:id:permission 来标识，主要涵盖 3 个方面：
+- 权限模式（Schema）：鉴权的策略
+- 授权对象（ID）
+- 权限（Permission）
+
+其特性如下：
+- ZooKeeper的权限控制是基于每个znode节点的，需要对每个节点设置权限
+- 每个znode支持设置多种权限控制方案和多个权限
+- 子节点不会继承父节点的权限，客户端无权访问某节点，但可能可以访问它的子节点
+
+1、schema：ZooKeeper内置了一些权限控制方案，可以用以下方案为每个节点设置权限：
+| 方案 | 描述 |
+|------|-----|
+| world | 只有一个用户：anyone，代表所有人（默认） |
+| ip | 使用IP地址认证 |
+| auth | 使用已添加认证的用户认证 |
+| digest | 使用“用户名:密码”方式认证 |
+
+2、id：
+| 权限模式 | 授权对象 |
+|---------|---------|
+| IP | 通常是一个IP地址或一个ip段，列入"192.168.0.110"或"192.168.0.1/24" |
+| Digest | 自定义，通常是"username:BASE64(SHA-1(username:password))",列如"foo:kWN6aNSbjcKWPqjiV7cg0N24raU=" |
+| World | 只有一个ID: "anyone" |
+| Super | 与Digest模式一致 |
+
+
+3、权限permission：
+| 权限 | ACL简写 | 描述 |
+|-----|---------|------|
+| CREATE | c | 可以创建子节点 |
+| DELETE | d | 可以删除子节点（仅下一级节点） |
+| READ | r | 可以读取节点数据及显示子节点列表 |
+| WRITE | w | 可以设置节点数据 |
+| ADMIN | a | 可以设置节点访问控制列表权限 |
+
+
+
+一、权限相关命令
+| 命令 | 使用方式 | 描述 |
+|-----|----------|-----|
+| getAcl | getAcl <path> | 读取ACL权限 |
+| setAcl | setAcl <path> <acl> | 设置ACL权限 |
+| addauth | addauth <scheme> <auth> | 添加认证用户 |
+
