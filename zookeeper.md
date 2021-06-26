@@ -765,7 +765,7 @@ Ncat: Broken pipe.
 mntr 列出一些监控信息
 ```
 nc localhost 2181
-mntr                                    #输入mntr，得到一些监控信息
+mntr                                    #输入mntr，得到一监控信息
 zk_version      3.4.10-39d3a4f269333c922ed3db283be479f9deacaa0f, built on 03/23/2017 10:13 GMT      #ZK版本及构建时间
 zk_avg_latency  0                       #ZK平均延时
 zk_max_latency  10                      #ZK最大延时
@@ -801,7 +801,7 @@ ACL 权限控制，使用：`schema:id:permission` 来标识，主要涵盖 3 �
 | 方案 | 描述 |
 |------|-----|
 | world | world下只有一个id,即只有一个用户，也就是anyone,那么组合的写法就是`world:anyone:[permissions]` |
-| ip | 使用IP地址认证 |
+| ip | 当设置为ip指定的ip地址，此时限制ip进行访问，比如`ip:192.168.1.1:[permissions]` |
 | auth | 代表认证登录，需要注册用户有权限就可以，形式为`auth:user:password:[permissions]` |
 | digest | 需要对密码加密才能访问，组合形式为`digest:username:BASE64(SHA1(password)):[permissions]` |
 - auth与digest区别是auth是明文密码digest是密文密码，`setAcl /path auth:lee:lee:cdrwa`与`setAcl /path digest:leeBASE64(SHA1(password)):cdrwa`是等价的addauth digest lee:lee后等能操作指定节点的权限
