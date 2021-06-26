@@ -787,10 +787,10 @@ Ncat: Broken pipe.
 ACL
 ===
 
-ACL 权限控制，使用：schema:id:permission 来标识，主要涵盖 3 个方面：
-- 权限模式（Schema）：鉴权的策略
-- 授权对象（ID）
-- 权限（Permission）
+ACL 权限控制，使用：`schema:id:permission` 来标识，主要涵盖 3 个方面：
+- 权限模式（Schema）：代表采用的某种权限机制
+- 授权对象（ID）: 代表允许访问的用户
+- 权限（Permission）: 权限组合字符串
 
 其特性如下：
 - ZooKeeper的权限控制是基于每个znode节点的，需要对每个节点设置权限
@@ -822,7 +822,6 @@ ACL 权限控制，使用：schema:id:permission 来标识，主要涵盖 3 个�
 | READ | r | 可以读取节点数据及显示子节点列表 |
 | WRITE | w | 可以设置节点数据 |
 | ADMIN | a | 可以设置节点访问控制列表权限 |
-
 
 
 一、权限相关命令
