@@ -804,19 +804,10 @@ ACL 权限控制，使用：`schema:id:permission` 来标识，主要涵盖 3 �
 | ip | 当设置为ip指定的ip地址，此时限制ip进行访问，比如`ip:192.168.1.1:[permissions]` |
 | auth | 代表认证登录，需要注册用户有权限就可以，形式为`auth:user:password:[permissions]` |
 | digest | 需要对密码加密才能访问，组合形式为`digest:username:BASE64(SHA1(password)):[permissions]` |
+| super | 代表超级管理员，拥有所有权限 |
 - auth与digest区别是auth是明文密码digest是密文密码，`setAcl /path auth:lee:lee:cdrwa`与`setAcl /path digest:leeBASE64(SHA1(password)):cdrwa`是等价的addauth digest lee:lee后等能操作指定节点的权限
 
-
-2、id：
-| 权限模式 | 授权对象 |
-|---------|---------|
-| IP | 通常是一个IP地址或一个ip段，列入"192.168.0.110"或"192.168.0.1/24" |
-| Digest | 自定义，通常是"username:BASE64(SHA-1(username:password))",列如"foo:kWN6aNSbjcKWPqjiV7cg0N24raU=" |
-| World | 只有一个ID: "anyone" |
-| Super | 与Digest模式一致 |
-
-
-3、权限permission：
+2、权限permission：权限字符串缩写crdwa
 | 权限 | ACL简写 | 描述 |
 |-----|---------|------|
 | CREATE | c | 可以创建子节点 |
