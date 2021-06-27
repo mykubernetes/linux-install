@@ -645,13 +645,13 @@ Clients:            #以下是已连接的客户端的节点信息
  /10.150.50.40:22297[1](queued=0,recved=1348114,sent=1348114)
  /0:0:0:0:0:0:0:1:51498[0](queued=0,recved=1,sent=0)
  /10.150.50.38:59631[1](queued=0,recved=206435,sent=206435)
-Latency min/avg/max: 0/0/10     #延迟分别是最小值、平均值、最大值
-Received: 1967678               #收到的请求数
-Sent: 1967679                   #返回发出的请求数
-Connections: 5                  #已连接当前ZK的客户端主机数量
+Latency min/avg/max: 0/0/10         #延迟分别是最小值、平均值、最大值
+Received: 1967678                   #收到的请求数
+Sent: 1967679                       #返回发出的请求数
+Connections: 5                      #已连接当前ZK的客户端主机数量
 Outstanding: 0
-Zxid: 0x1e000002a7              #事物ID
-Mode: follower                  #当前节点的集群状态为follower
+Zxid: 0x1e000002a7                  #事物ID
+Mode: follower                      #当前节点的集群状态为follower
 Node count: 365                 
 Ncat: Broken pipe.
 ```
@@ -824,122 +824,261 @@ schema：ZooKeeper内置了一些权限控制方案，可以用以下方案为�
 | setAcl | `setAcl <path> <acl>` | 设置ACL权限 |
 | addauth | `addauth <scheme> <auth>` | 添加认证用户 |
 
-1.word方式
+getAcl:获取某个节点的acl权限信息
+---
 ```
-[zk: localhost:2181(CONNECTED) 9] create /test1 test1-value    
-Created /test1
-[zk: localhost:2181(CONNECTED) 10] getAcl /test1                     #创建的默认是所有用户都可以进行cdrwa
+#获取节点权限信息默认为 world:cdrwa任何人都可以访问
+[zk: localhost:2181(CONNECTED) 34] getAcl /merryyou
 'world,'anyone
 : cdrwa
-[zk: localhost:2181(CONNECTED) 11] setAcl /test1 world:anyone:acd    #修改为所有人可以acd
-cZxid = 0x400000007
-ctime = Tue Mar 12 14:46:55 CST 2019
-mZxid = 0x400000007
-mtime = Tue Mar 12 14:46:55 CST 2019
-pZxid = 0x400000007
-cversion = 0
-dataVersion = 0
-aclVersion = 1
-ephemeralOwner = 0x0
-dataLength = 11
-numChildren = 0
-[zk: localhost:2181(CONNECTED) 12] getAcl /test1
+[zk: localhost:2181(CONNECTED) 35] 
+```
+
+setAcl 设置权限
+---
+```
+[zk: localhost:2181(CONNECTED) 35] create /merryyou/test test
+Created /merryyou/test
+[zk: localhost:2181(CONNECTED) 36] getAcl /merryyou/test
 'world,'anyone
-: cda
+: cdrwa
+
+#设置节点权限 crwa 不允许删除
+[zk: localhost:2181(CONNECTED) 37] setAcl /merryyou/test world:anyone:crwa
+cZxid = 0x200000018
+ctime = Sat Jun 02 16:18:18 UTC 2018
+mZxid = 0x200000018
+mtime = Sat Jun 02 16:18:18 UTC 2018
+pZxid = 0x200000018
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 4
+numChildren = 0
+
+#查询刚才设置的acl权限信息 crwa 没有删除权限
+[zk: localhost:2181(CONNECTED) 38] getAcl /merryyou/test
+'world,'anyone
+: crwa
+[zk: localhost:2181(CONNECTED) 39] 
+[zk: localhost:2181(CONNECTED) 39] create /merryyou/test/abc abc
+Created /merryyou/test/abc
+
+#删除子节点的时候提交权限不足
+[zk: localhost:2181(CONNECTED) 40] delete /merryyou/test/abc
+Authentication is not valid : /merryyou/test/abc
+
+#设置节点的权限信息为rda
+[zk: localhost:2181(CONNECTED) 41] setAcl /merryyou/test world:anyone:rda 
+cZxid = 0x200000018
+ctime = Sat Jun 02 16:18:18 UTC 2018
+mZxid = 0x200000018
+mtime = Sat Jun 02 16:18:18 UTC 2018
+pZxid = 0x20000001a
+cversion = 1
+dataVersion = 0
+aclVersion = 2
+ephemeralOwner = 0x0
+dataLength = 4
+numChildren = 1
+[zk: localhost:2181(CONNECTED) 42] getAcl /merryyou/test
+'world,'anyone
+: dra
+
+#可以成功删除
+[zk: localhost:2181(CONNECTED) 43] delete /merryyou/test/abc             
+[zk: localhost:2181(CONNECTED) 46] ls /merryyou/test
+[]
+[zk: localhost:2181(CONNECTED) 47] 
+
+#设置节点信息为a admin
+[zk: localhost:2181(CONNECTED) 47] setAcl /merryyou/test world:anyone:a  
+cZxid = 0x200000018
+ctime = Sat Jun 02 16:18:18 UTC 2018
+mZxid = 0x200000018
+mtime = Sat Jun 02 16:18:18 UTC 2018
+pZxid = 0x20000001d
+cversion = 2
+dataVersion = 0
+aclVersion = 3
+ephemeralOwner = 0x0
+dataLength = 4
+numChildren = 0
+
+#获取 设置都提示权限不足
+[zk: localhost:2181(CONNECTED) 49] get /merryyou/test
+Authentication is not valid : /merryyou/test
+[zk: localhost:2181(CONNECTED) 50] set /merryyou/test 123
+Authentication is not valid : /merryyou/test
+[zk: localhost:2181(CONNECTED) 51] 
 ```
 
-2、Auth方式，明文方式
+acl Auth 密码明文设置
+---
 ```
-[zk: localhost:2181(CONNECTED) 44] create /t4 44
-Created /t4
-[zk: localhost:2181(CONNECTED) 45] addauth digest qlq:111222     #增加授权用户,明文用户名和密码
-[zk: localhost:2181(CONNECTED) 46] setAcl /t4 auth:qlq:cdwra　　 #授予权限
-cZxid = 0x40000001d
-ctime = Tue Mar 12 15:16:56 CST 2019
-mZxid = 0x40000001d
-mtime = Tue Mar 12 15:16:56 CST 2019
-pZxid = 0x40000001d
+[zk: localhost:2181(CONNECTED) 53] create /niocoder/merryyou merryyou
+Created /niocoder/merryyou
+
+#查询默认节点权限信息
+[zk: localhost:2181(CONNECTED) 54] getAcl /niocoder/merryyou
+'world,'anyone
+: cdrwa
+[zk: localhost:2181(CONNECTED) 55] 
+
+#使用auth设置节点权限信息
+[zk: localhost:2181(CONNECTED) 2] setAcl /niocoder/merryyou auth:test:test:cdrwa  
+Acl is not valid : /niocoder/merryyou
+
+# 注册test:test 账号密码
+[zk: localhost:2181(CONNECTED) 3] addauth digest test:test
+[zk: localhost:2181(CONNECTED) 4] setAcl /niocoder/merryyou auth:test:test:cdrwa
+cZxid = 0x200000020
+ctime = Sat Jun 02 16:32:08 UTC 2018
+mZxid = 0x200000020
+mtime = Sat Jun 02 16:32:08 UTC 2018
+pZxid = 0x200000020
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 8
+numChildren = 0
+
+#查询节点权限信息 密码为密文格式
+[zk: localhost:2181(CONNECTED) 5] getAcl /niocoder/merryyou
+'digest,'test:V28q/NynI4JI3Rk54h0r8O5kMug=
+: cdrwa
+[zk: localhost:2181(CONNECTED) 6] 
+```
+
+acl digest 密码密文设置
+---
+```
+[zk: localhost:2181(CONNECTED) 13] create /names test
+Created /names
+[zk: localhost:2181(CONNECTED) 14] getAcl /names
+'world,'anyone
+: cdrwa
+
+#使用digest设置节点的权限信息 密码为test密文
+[zk: localhost:2181(CONNECTED) 15] setAcl /names digest:test:V28q/NynI4JI3Rk54h0r8O5kMug=:cdra
+cZxid = 0x400000006
+ctime = Sun Jun 03 01:01:17 UTC 2018
+mZxid = 0x400000006
+mtime = Sun Jun 03 01:01:17 UTC 2018
+pZxid = 0x400000006
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 4
+numChildren = 0
+
+#查询节点权限信息
+[zk: localhost:2181(CONNECTED) 16] getAcl /names
+'digest,'test:V28q/NynI4JI3Rk54h0r8O5kMug=
+: cdra
+
+#获取节点信息提示权限不足
+[zk: localhost:2181(CONNECTED) 5] get /names
+Authentication is not valid : /names
+
+# 注册账户
+[zk: localhost:2181(CONNECTED) 4] addauth digest test:test
+
+# 可以正常获取
+[zk: localhost:2181(CONNECTED) 17] get /names          
+test
+cZxid = 0x400000006
+ctime = Sun Jun 03 01:01:17 UTC 2018
+mZxid = 0x400000006
+mtime = Sun Jun 03 01:01:17 UTC 2018
+pZxid = 0x400000006
+cversion = 0
+dataVersion = 0
+aclVersion = 1
+ephemeralOwner = 0x0
+dataLength = 4
+numChildren = 0
+
+#由于没有设置写权限不能修改节点 w
+[zk: localhost:2181(CONNECTED) 18] set /names 111
+Authentication is not valid : /names
+[zk: localhost:2181(CONNECTED) 19] delete /names
+[zk: localhost:2181(CONNECTED) 20] 
+```
+
+acl ip 控制客户端
+---
+```
+[zk: localhost:2181(CONNECTED) 22] create /niocoder/ip aa
+Created /niocoder/ip
+[zk: localhost:2181(CONNECTED) 23] get /niocoder/ip
+aa
+cZxid = 0x40000000a
+ctime = Sun Jun 03 01:06:47 UTC 2018
+mZxid = 0x40000000a
+mtime = Sun Jun 03 01:06:47 UTC 2018
+pZxid = 0x40000000a
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 2
+numChildren = 0
+# 添加ip控制的权限信息
+[zk: localhost:2181(CONNECTED) 24] setAcl /niocoder/ip ip:192.168.0.68:cdrwa
+cZxid = 0x40000000a
+ctime = Sun Jun 03 01:06:47 UTC 2018
+mZxid = 0x40000000a
+mtime = Sun Jun 03 01:06:47 UTC 2018
+pZxid = 0x40000000a
 cversion = 0
 dataVersion = 0
 aclVersion = 1
 ephemeralOwner = 0x0
 dataLength = 2
 numChildren = 0
-[zk: localhost:2181(CONNECTED) 48] getAcl /t4
-'digest,'qlq:JWNEexxIoeVompjU7O5pZzTU+VQ=                        #用户和密码
+[zk: localhost:2181(CONNECTED) 25] getAcl /niocoder/ip
+'ip,'192.168.0.68
 : cdrwa
+[zk: localhost:2181(CONNECTED) 26] 
+```
 
-#如果重新连接之后获取会报没权限，需要添加授权用户
-[zk: localhost:2181(CONNECTED) 4] get /t4
-Authentication is not valid : /t4
-[zk: localhost:2181(CONNECTED) 6] addauth digest qlq:111222
-[zk: localhost:2181(CONNECTED) 7] get /t4
-44
-cZxid = 0x40000001d
-ctime = Tue Mar 12 15:16:56 CST 2019
-mZxid = 0x40000001d
-mtime = Tue Mar 12 15:16:56 CST 2019
-pZxid = 0x40000001d
+acl super超级管理员
+---
+```
+使用super权限需要修改zkServer.sh，添加super管理员，重启zkServer.sh
+
+"-Dzookeeper.DigestAuthenticationProvider.superDigest=test:V28q/NynI4JI3Rk54h0r8O5kMug="
+ nohup "$JAVA" "-Dzookeeper.log.dir=${ZOO_LOG_DIR}" "-Dzookeeper.root.logger=${ZOO_LOG4J_PROP}" "-Dzookeeper.DigestAuthenticationprovider.superDigest=test:V28q/NynI4JI3Rk54h0r8O5kMug=" \
+    -cp "$CLASSPATH" $JVMFLAGS $ZOOMAIN "$ZOOCFG" > "$_ZOO_DAEMON_OUT" 2>&1 < /dev/null &
+
+#重启进入zkCli
+
+#由于之前设置ip权限，所以不允许访问
+[zk: localhost:2181(CONNECTED) 2] ls /niocoder/ip
+Authentication is not valid : /niocoder/ip
+
+#登录账号信息，即为管理员账号
+[zk: localhost:2181(CONNECTED) 3] addauth digest test:test
+
+#正常访问，节点内容为空
+[zk: localhost:2181(CONNECTED) 4] ls /niocoder/ip
+[]
+[zk: localhost:2181(CONNECTED) 5] get /niocoder/ip
+aa
+cZxid = 0x40000000a
+ctime = Sun Jun 03 01:06:47 UTC 2018
+mZxid = 0x40000000a
+mtime = Sun Jun 03 01:06:47 UTC 2018
+pZxid = 0x40000000a
 cversion = 0
 dataVersion = 0
 aclVersion = 1
 ephemeralOwner = 0x0
 dataLength = 2
 numChildren = 0
-```
-
-3、Digest方式,密文方式
-```
-[zk: localhost:2181(CONNECTED) 1]setAcl /test digest:qlq:JWNEexxIoeVompjU7O5pZzTU+VQ=:cdrwa
-cZxid = 0x40000001d
-ctime = Tue Mar 12 15:16:56 CST 2019
-mZxid = 0x40000001d
-mtime = Tue Mar 12 15:16:56 CST 2019
-pZxid = 0x40000001d
-cversion = 0
-dataVersion = 0
-aclVersion = 1
-ephemeralOwner = 0x0
-dataLength = 2
-numChildren = 0
-```
-
-4、IP的方式
-```
-[zk: localhost:2181(CONNECTED) 13] create /test2 test2-value
-Created /test2
-[zk: localhost:2181(CONNECTED) 14] setAcl /test2 ip:127.0.0.1:crwda   #修改此IP具有所有权限
-cZxid = 0x400000009
-ctime = Tue Mar 12 14:51:58 CST 2019
-mZxid = 0x400000009
-mtime = Tue Mar 12 14:51:58 CST 2019
-pZxid = 0x400000009
-cversion = 0
-dataVersion = 0
-aclVersion = 1
-ephemeralOwner = 0x0
-dataLength = 11
-numChildren = 0
-[zk: localhost:2181(CONNECTED) 15] getAcl /test2
-'ip,'127.0.0.1
-: cdrwa
-
-#当然可以设置IP的时候使用多个ip的方式，比如:
-[zk: localhost:2181(CONNECTED) 42] setAcl /t3 ip:192.168.0.164:cdwra,ip:127.0.0.1:cdwra
-cZxid = 0x400000018
-ctime = Tue Mar 12 15:12:59 CST 2019
-mZxid = 0x400000018
-mtime = Tue Mar 12 15:12:59 CST 2019
-pZxid = 0x400000018
-cversion = 0
-dataVersion = 0
-aclVersion = 1
-ephemeralOwner = 0x0
-dataLength = 2
-numChildren = 0
-[zk: localhost:2181(CONNECTED) 43] getAcl /t3
-'ip,'192.168.0.164
-: cdrwa
-'ip,'127.0.0.1
-: cdrwa
+[zk: localhost:2181(CONNECTED) 6] 
 ```
