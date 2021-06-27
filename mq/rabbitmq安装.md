@@ -61,6 +61,9 @@ http://www.rabbitmq.com/configure.html#configuration-file
 | `rabbitmqctl raname_cluster_node [oldnode1] [newnode1] [oldnode2] [newnode2] ...` | 修改节点名称 |
 | `rabbitmqctl stop_app` | 关闭应用（关闭当前启动的节点） |
 | `rabbitmqctl start_app` | 启动应用，和上述关闭命令配合使用，达到清空队列的目的 |
+| `rabbitmq-server` | 前台启动 |
+| `rabbitmq-server -detached` | 后台启动 |
+
 
 用户角色分类
 --- 
