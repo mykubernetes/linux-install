@@ -56,7 +56,7 @@ http://www.rabbitmq.com/configure.html#configuration-file
 | `rabbitmqctl join_cluster <clusternode> [--ram]` | 组成集群 |
 | `rabbitmqctl status` | 节点状态 |
 | `rabbitmqctl cluster_status` | 查看集群状态 |
-| `rabbitmqctl change_cluster_node_type [disc] | [ram]` | 修改集群节点的存储形式 |
+| `rabbitmqctl change_cluster_node_type [disc] or [ram]` | 修改集群节点的存储形式 |
 | `rabbitmqctl forget_cluster_node [--offline]` | 忘记节点（摘除节点） |
 | `rabbitmqctl raname_cluster_node [oldnode1] [newnode1] [oldnode2] [newnode2] ...` | 修改节点名称 |
 | `rabbitmqctl stop_app` | 关闭应用（关闭当前启动的节点） |
