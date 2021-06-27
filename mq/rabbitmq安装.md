@@ -26,6 +26,9 @@ http://www.rabbitmq.com/configure.html#configuration-file
 | conf | 与资源名称（用户被授予配置权限）匹配的正则表达式 |
 | write | 与资源名称相匹配的正则表达式，用户被授予写权限 |
 | read | 与资源名称相匹配的正则表达式，已授予用户读取权限 |
+```
+set_permissions [-p vhost] user conf write read
+```
 
 虚拟主机相关
 ---
