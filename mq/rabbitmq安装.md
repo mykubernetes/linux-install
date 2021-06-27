@@ -19,6 +19,13 @@ http://www.rabbitmq.com/configure.html#configuration-file
 | `rabbitmqctl change_password <username newpassword>` | 修改密码 |
 | `rabbitmqctl set_permission -p <vhostpath> <username> ".*" ".*" ".*"` | 设置用户权限 |
 
+| 命令 | 描述 |
+|------|-----|
+| vhost | 授予用户访问权限的虚拟主机的名称，默认为"/" |
+| user | 授予对指定虚拟主机的访问权限的用户名 |
+| conf | 与资源名称（用户被授予配置权限）匹配的正则表达式 |
+| write | 与资源名称相匹配的正则表达式，用户被授予写权限 |
+| read | 与资源名称相匹配的正则表达式，已授予用户读取权限 |
 
 虚拟主机相关
 ---
