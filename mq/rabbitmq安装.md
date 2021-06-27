@@ -50,14 +50,22 @@ http://www.rabbitmq.com/configure.html#configuration-file
 | rabbitmqctl stop_app | 关闭应用（关闭当前启动的节点） |
 | rabbitmqctl start_app | 启动应用，和上述关闭命令配合使用，达到清空队列的目的 |
 
+用户角色分类
+--- 
+用户角色可分为五类，超级管理员, 监控者, 策略制定者, 普通管理者以及其他。
+- 超级管理员(administrator): 可登陆管理控制台(启用management plugin的情况下)，可查看所有的信息，并且可以对用户，策略(policy)进行操作。
+- 监控者(monitoring): 可登陆管理控制台(启用management plugin的情况下)，同时可以查看rabbitmq节点的相关信息(进程数，内存使用情况，磁盘使用情况等)
+- 策略制定者(policymaker): 可登陆管理控制台(启用management plugin的情况下), 同时可以对policy进行管理。但无法查看节点的相关信息
+- 普通管理者(management): 仅可登陆管理控制台(启用management plugin的情况下)，无法看到节点信息，也无法对策略进行管理。
+- 其他: 无法登陆管理控制台，通常就是普通的生产者和消费者。
 
- 
- 
-
- 
- 
- 
- 
+设置用户角色的命令为：
+```
+rabbitmqctl set_user_tags User Tag
+User为用户名， Tag为角色名(对应于上面的administrator，monitoring，policymaker，management，或其他自定义名称)。
+也可以给同一用户设置多个角色，例如
+rabbitmqctl set_user_tags hncscwc monitoring policymaker
+```
 
 安装
 ---
