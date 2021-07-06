@@ -26,7 +26,7 @@ set pool 2 size to 2
 2.0 0 [0,6]
 ```
 
-3、接下来我们使用ceph自带的bench工具写入数据，来观察pg内的对象有没有移动
+3、使用ceph自带的bench工具写入数据，来观察pg内的对象有没有移动
 ```
 rados -p pool_1 bench 20 write --no-cleanu
 ```
