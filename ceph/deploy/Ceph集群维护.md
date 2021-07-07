@@ -41,12 +41,12 @@ $ ceph osd unset norecover
 ---
 如果要在生产峰值中添加新的OSD节点，又希望对客户端IO中产生的影响最小，这时就可以借助以下命令限制回填和恢复。
 
-设置`osd_max_backfills = 1`选项以限制回填线程。可以在`ceph.conf [osd]`部分中添加它，也可以使用以下命令动态设置。
+设置`osd_max_backfills = 1`选项以限制回填线程。可以在`ceph.conf [osd]`部分中添加它，也可以使用以下命令动态设置
 ```
 $ ceph tell osd.* injectargs '--osd_max_backfills 1'
 ```
 
-设置`osd_recovery_max_active = 1`选项以限制恢复线程。您可以在`ceph.conf [osd]`部分中添加它，也可以使用以下命令动态设置它：
+设置`osd_recovery_max_active = 1`选项以限制恢复线程。可以在`ceph.conf [osd]`部分中添加它，也可以使用以下命令动态设置
 ```
 $ ceph tell osd.* injectargs '--osd_recovery_max_active 1'
 ```
@@ -55,7 +55,8 @@ $ ceph tell osd.* injectargs '--osd_recovery_max_active 1'
 ```
 $ ceph tell osd.* injectargs '--osd_recovery_op_priority 1'
 ```
- 
+
+
 OSD	和	PG	修复
 ---
 ```
