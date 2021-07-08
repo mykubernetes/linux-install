@@ -54,8 +54,8 @@ last_pg_scan 0
 full_ratio 0
 nearfull_ratio 0
 PG_STAT OBJECTS MISSING_ON_PRIMARY DEGRADED MISPLACED UNFOUND BYTES LOG DISK_LOG STATE        STATE_STAMP                VERSION REPORTED UP     UP_PRIMARY ACTING ACTING_PRIMARY LAST_SCRUB SCRUB_STAMP                LAST_DEEP_SCRUB DEEP_SCRUB_STAMP SNAPTRIMQ_LEN
-6.12          0                  0        0         0       0     0   0        0 active+clean 2019-04-28 15:05:13.658306     0'0    61:30 [5,4,6]         5 [5,4,6]                5        0'0 2019-04-28 15:05:11.648880                              0'0 2019-04-28 15:05:11.648880 0
-1.15          0                  0        0         0       0     0   0        0 active+clean 2019-04-28 14:59:57.127233     0'0    61:70 [1,5,0]         1 [1,5,0]                1        0'0 2019-04-28 14:28:16.404335                              0'0 2019-04-28 14:28:16.404335 0
+6.12          0                  0        0         0       0     0   0        0 active+clean 2019-04-28 15:05:13.658306     0'0    61:30 [5,4,6]         5 [5,4,6]             5        0'0 2019-04-28 15:05:11.648880                              0'0 2019-04-28 15:05:11.648880 0
+1.15          0                  0        0         0       0     0   0        0 active+clean 2019-04-28 14:59:57.127233     0'0    61:70 [1,5,0]         1 [1,5,0]             1        0'0 2019-04-28 14:28:16.404335                              0'0 2019-04-28 14:28:16.404335 0
 ...
 sum 210 0 0 0 0 3817 12602 12602
 OSD_STAT USED    AVAIL   TOTAL   HB_PEERS          PG_SUM PRIMARY_PG_SUM
