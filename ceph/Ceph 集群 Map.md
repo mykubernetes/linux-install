@@ -53,25 +53,21 @@ last_osdmap_epoch 0
 last_pg_scan 0
 full_ratio 0
 nearfull_ratio 0
-PG_STAT OBJECTS MISSING_ON_PRIMARY DEGRADED MISPLACED UNFOUND BYTES LOG
-DISK_LOG STATE STATE_STAMP VERSION REPORTED UP
-UP_PRIMARY ACTING ACTING_PRIMARY LAST_SCRUB SCRUB_STAMP
-LAST_DEEP_SCRUB DEEP_SCRUB_STAMP SNAPTRIMQ_LEN
-6.12 0 0 0 0 0 0 0
-0 active+clean 2019-04-28 15:05:13.658306 0'0 61:30 [5,4,6] 5 [5,4,6] 5 0'0 2019-04-28 15:05:11.648880 0'0 2019-04-28 15:05:11.648880 01.15 0 0 0 0 0 0 0
-0 active+clean 2019-04-28 14:59:57.127233 0'0 61:70 [1,5,0] 1 [1,5,0] 1 0'0 2019-04-28 14:28:16.404335 0'0 2019-04-28 14:28:16.404335 0
+PG_STAT OBJECTS MISSING_ON_PRIMARY DEGRADED MISPLACED UNFOUND BYTES LOG DISK_LOG STATE        STATE_STAMP                VERSION REPORTED UP     UP_PRIMARY ACTING ACTING_PRIMARY LAST_SCRUB SCRUB_STAMP                LAST_DEEP_SCRUB DEEP_SCRUB_STAMP SNAPTRIMQ_LEN
+6.12          0                  0        0         0       0     0   0        0 active+clean 2019-04-28 15:05:13.658306     0'0    61:30 [5,4,6]         5 [5,4,6]                5        0'0 2019-04-28 15:05:11.648880                              0'0 2019-04-28 15:05:11.648880 0
+1.15          0                  0        0         0       0     0   0        0 active+clean 2019-04-28 14:59:57.127233     0'0    61:70 [1,5,0]         1 [1,5,0]                1        0'0 2019-04-28 14:28:16.404335                              0'0 2019-04-28 14:28:16.404335 0
 ...
 sum 210 0 0 0 0 3817 12602 12602
-OSD_STAT USED AVAIL TOTAL HB_PEERS PG_SUM PRIMARY_PG_SUM
-8 1.01GiB 19.0GiB 20.0GiB [0,1,2,3,4,5,6,7] 66 20
-5 1.01GiB 19.0GiB 20.0GiB [0,1,2,3,4,6,7,8] 65 22
-2 1.01GiB 19.0GiB 20.0GiB [0,1,3,4,5,6,7,8] 61 13
-7 1.01GiB 19.0GiB 20.0GiB [0,1,2,3,4,5,6,8] 79 32
-6 1.01GiB 19.0GiB 20.0GiB [0,1,2,3,4,5,7,8] 77 25
-4 1.01GiB 19.0GiB 20.0GiB [0,1,2,3,5,6,7,8] 61 21
-3 1.01GiB 19.0GiB 20.0GiB [0,1,2,4,5,6,7,8] 74 25
-1 1.01GiB 19.0GiB 20.0GiB [0,2,3,4,5,6,7,8] 76 22
-0 1.01GiB 19.0GiB 20.0GiB [1,2,3,4,5,6,7,8] 65 28
+OSD_STAT USED    AVAIL   TOTAL   HB_PEERS          PG_SUM PRIMARY_PG_SUM
+8        1.01GiB 19.0GiB 20.0GiB [0,1,2,3,4,5,6,7]     66             20
+5        1.01GiB 19.0GiB 20.0GiB [0,1,2,3,4,6,7,8]     65             22
+2        1.01GiB 19.0GiB 20.0GiB [0,1,3,4,5,6,7,8]     61             13
+7        1.01GiB 19.0GiB 20.0GiB [0,1,2,3,4,5,6,8]     79             32
+6        1.01GiB 19.0GiB 20.0GiB [0,1,2,3,4,5,7,8]     77             25
+4        1.01GiB 19.0GiB 20.0GiB [0,1,2,3,5,6,7,8]     61             21
+3        1.01GiB 19.0GiB 20.0GiB [0,1,2,4,5,6,7,8]     74             25
+1        1.01GiB 19.0GiB 20.0GiB [0,2,3,4,5,6,7,8]     76             22
+0        1.01GiB 19.0GiB 20.0GiB [1,2,3,4,5,6,7,8]     65             28
 sum 9.07GiB 171GiB 180GiB
 ```
 
