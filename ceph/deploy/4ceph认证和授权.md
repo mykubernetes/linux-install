@@ -54,16 +54,27 @@ mds 'allow'
 - profile bootstrap-mds： 这允许用户引导元数据服务器。例如，该ceph-deploy工具使用
 - client.bootstrap-mds用户添加密钥并引导元数据服务器。
 
-列出集群中的用户  
-``` # ceph auth list ```  
+1、列出集群中的用户  
+```
+# ceph auth list
+```
 
-查看特定用户  
-``` # ceph auth get client.admin ```  
+2、查看特定用户  
+```
+# ceph auth get client.admin
+```
 
-创建用户  
-``` # ceph auth get-or-create client.rbd ```  
+3、创建用户  
+```
+# ceph auth get-or-create client.rbd | tee /etc/ceph/ceph.client.rbd.keyring      #ceph集群名.client.rbd用户名.keyring格式保存
+```
 
-用户添加功能  
+4、删除用户
+```
+# ceph auth del client.rbd
+```
+
+5、用户添加功能  
 ```
 # ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd'
 # ceph auth get client.rbd
