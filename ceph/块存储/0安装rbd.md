@@ -33,21 +33,21 @@
 
 
 
-
-
-服务器端配置认证
+一、服务器端配置认证
 -----------
-1、在服务器端创建 ceph 块客户端用户名和认证密钥  
-``` # ceph auth get-or-create client.rbd mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=rbd' |tee ./ceph.client.rbd.keyring ```  
+1、在服务器端创建 ceph 块客户端用户名和认证密钥
+```
+# ceph auth get-or-create client.rbd mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=rbd' |tee ./ceph.client.rbd.keyring
+```
 
-2、将认证秘钥和配置文件拷贝到客户端  
+2、将认证秘钥和配置文件拷贝到客户端
 ```
 # scp ceph.client.rbd.keyring node04:/etc/ceph/
 # scp /etc/ceph/ceph.conf node04:/etc/ceph/
 ```  
 
 
-客户端安装客户端工具
+二、客户端安装客户端工具
 -----------
 1、客户端检查是否符合块设备环境要求
 ```
@@ -87,7 +87,7 @@ priority=1
 ```  
 
 
-服务器端配置存储池
+三、服务器端配置存储池
 ------------------
 默认创建块设备，会直接创建在rbd 池中，但使用 deploy 安装后，该rbd池并没有创建。  
 1、在服务器端创建池和块  
@@ -101,7 +101,8 @@ priority=1
 • OSD 数量在 10 到 50 个时，可把 pg_num 设置为 4096  
 • OSD 数量大于 50 时，你得理解权衡方法、以及如何自己计算pg_num 取值  
 
-客户端申请image
+
+四、客户端申请image
 -------------
 1、客户端创建 块设备  
 创建一个10G大小的块设备
@@ -136,7 +137,7 @@ rbd image 'rbd1':
 
 
 
-客户端映射块设备
+五、客户端映射块设备
 ------------
 
 1、映射到客户端，应该会报错  
@@ -285,7 +286,7 @@ WantedBy=multi-user.target
 # df -h
 ```  
 
-调整Ceph RBD块大小
+七、调整Ceph RBD块大小
 ---
 扩大RBD img
 ```
@@ -298,7 +299,7 @@ xfs_growfs -d /mnt/ceph-disk1
 ```  
 
 
-创建快照
+八、创建快照
 ---
 
 1、创建一个测试文件到挂载目录
@@ -318,7 +319,7 @@ rbd snap create rbd/rbd1@snapshot1 -n client.rbd
 rbd snap ls rbd/rbd1 -n client.rbd
 ```
     
-恢复快照测试
+九、恢复快照测试
 ---
 
 1、删除文件
@@ -340,13 +341,13 @@ rm -rf /opt/ceph/*
 Hello cephtest,This is snapshot test
 ```  
 
-重命名快照  
+十、重命名快照  
 ---
 1、重命名  
 语法： rbd snap rename <pool-name>/<image-name>@<original-snapshot-name> <pool-name>/<image-name>@<new-snapshot-name>  
 ``` rbd snap rename rbd/rbd1@snapshot1 rbd/rbd1@snapshot1_new -n client.rbd ```  
  
-删除快照  
+十一、删除快照  
 ---  
 1、删除  
 语法： rbd snap rm <pool-name>/<image-name>@<snap-name>  
@@ -361,7 +362,7 @@ Removing snap: 100% complete...done.
 ``` rbd snap purge rbd/rbd1 --name client.rbd ```  
 
 
-克隆
+十二、克隆
 ---
 1、创建具有 layering 功能的 RBD image  
 ```
