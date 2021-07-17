@@ -1,4 +1,7 @@
-环境配置
+ansible部署ceph
+===
+
+一、环境配置
 ---
 1、配置 ceph 仓库  
 ```
@@ -41,7 +44,7 @@ $ ssh-copy-id node02
 $ ssh-copy-id node03
 ```  
 
-安装ceph集群  
+二、安装ceph集群  
 ---
 
 1、下载 ceph-ansible  
