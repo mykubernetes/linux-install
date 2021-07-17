@@ -74,11 +74,10 @@ mds 'allow'
 # ceph auth del client.rbd
 ```
 
-5、用户添加功能  
+5、修改用户添加功能  
 ```
-# ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd'
+# ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd' | tee /etc/ceph/ceph.client.rbd.keyring
 # ceph auth get client.rbd
 ```  
-
 
 
