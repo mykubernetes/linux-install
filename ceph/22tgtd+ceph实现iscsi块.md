@@ -1,8 +1,12 @@
-1、准备编译环境  
-``` #yum install -y rpm-build gcc ceph librbd1-devel ```  
+1、准备编译环境
+```
+#yum install -y rpm-build gcc ceph librbd1-devel
+```
 
-2获取Tgt  
-``` # git clone https://github.com/mykubernetes/tgt.git ```  
+2获取Tgt
+```
+# git clone https://github.com/mykubernetes/tgt.git
+```
 
 3、进入目录后编辑
 ```
@@ -14,7 +18,8 @@ export CEPH_RBD = 1   #修改
 export GLFS_BD
 export SD_NOTIFY
 ...
-```  
+```
+
 ```
 # vim scripts/tgtd.spec
 %{_mandir}/man5/*
@@ -25,21 +30,27 @@ export SD_NOTIFY
 %attr(0600,root,root) %config(noreplace) /etc/tgt/targets.conf
 ```  
 
-4、编译  
-``` # make rpm ```  
+4、编译
+```
+# make rpm
+```
 
-5、生成安装文件  
+5、生成安装文件
 ``` 
 # ls pkg/RPMS/x86_64
 scsi-target-utils-1.0.62-v1.0.62.x86_64.rpm
 scsi-target-utils-debuginfo-1.0.62-v1.0.62.x86_64.rpm
 ```  
 
-6、在3个mon节点安装tgt rpm 包  
-``` # rpm -ivh pkg/RPMS/x86_64/scsi-target-utils-1.0.62-v1.0.62.x86_64.rpm --force ```  
+6、在3个mon节点安装tgt rpm 包
+```
+# rpm -ivh pkg/RPMS/x86_64/scsi-target-utils-1.0.62-v1.0.62.x86_64.rpm --force
+```
 
-7、在ceph创建块设备  
-``` # rbd create pool1/image1 --size 200 --image-format 2 ```  
+7、在ceph创建块设备
+```
+# rbd create pool1/image1 --size 200 --image-format 2
+```
 
 8、安装完成后，在每个mon服务器上添加ceph/rbd配置文件  
 ```
@@ -51,11 +62,15 @@ backing-store pool1/image1
 </targe>
 ```  
 
-9、启动tgt服务  
-``` # service tgtd start ```  
+9、启动tgt服务
+```
+# service tgtd start
+```
 
-10、在客户端服务器上安装iscsi initor 程序  
-``` # yum install -y iscsi-initiator-utils ```  
+10、在客户端服务器上安装iscsi initor 程序
+```
+# yum install -y iscsi-initiator-utils
+```
 
 11、扫描iscsi target  
 ```
@@ -90,10 +105,12 @@ path_grouping_policy multibus
 failback immediate
 no_path_retry fail
 }
-```  
+```
+
 ```
 # service multipathd start
-```  
+```
+
 ```
 multipath -ll
 ```  
