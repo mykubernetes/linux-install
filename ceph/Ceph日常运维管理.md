@@ -1,7 +1,8 @@
 ## 一、集群监控管理
+
 集群整体运行状态
 ```
-[root@cephnode01 ~]# ceph -s 
+# ceph -s 
 cluster:
     id:     8230a918-a0de-4784-9ab8-cd2a2b8671d0
     health: HEALTH_WARN
@@ -19,17 +20,17 @@ cluster:
     usage:   4.0 GiB used, 56 GiB / 60 GiB avail
     pgs:     96 active+clean
 ```
+- id：集群ID
+- health：集群运行状态，这里有一个警告，说明是有问题，意思是pg数大于pgp数，通常此数值相等。
+- mon：Monitors运行状态。
+- osd：OSDs运行状态。
+- mgr：Managers运行状态。
+- mds：Metadatas运行状态。
+- pools：存储池与PGs的数量。
+- objects：存储对象的数量。
+- usage：存储的理论用量。
+- pgs：PGs的运行状态
 
-    id：集群ID
-    health：集群运行状态，这里有一个警告，说明是有问题，意思是pg数大于pgp数，通常此数值相等。
-    mon：Monitors运行状态。
-    osd：OSDs运行状态。
-    mgr：Managers运行状态。
-    mds：Metadatas运行状态。
-    pools：存储池与PGs的数量。
-    objects：存储对象的数量。
-    usage：存储的理论用量。
-    pgs：PGs的运行状态
 ```
 ~]$ ceph -w
 ~]$ ceph health detail
