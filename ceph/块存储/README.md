@@ -15,17 +15,20 @@
 - map成块设备直接使用
 - ISCIS，安装Ceph客户端
 # RBD常用命令
-| 命令 | 功能 | 
-| ------ | ------ | 
-| rbd create | 创建块设备映像 | 
-| rbd ls  | 列出 rbd 存储池中的块设备 | 
+| 命令 | 功能 |
+| ------ | ------ |
+| rbd create | 创建块设备映像 |
+| rbd rm | 删除块设备映像 |
+| rbd ls  | 列出 rbd 存储池中的块设备 |
 | rbd info  | 查看块设备信息 |
 | rbd diff  | 可以统计 rbd 使用量 |
 | rbd map  | 映射块设备 |
-| rbd unmap | 取消映射 |
 | rbd showmapped  | 查看已映射块设备 |
+| rbd unmap | 取消映射 |
 | rbd remove  | 删除块设备 |
 | rbd resize  | 更改块设备的大小 |
+
+
 # RBD配置操作
 ## RBD挂载到操作系统
 1、创建rbd使用的pool
