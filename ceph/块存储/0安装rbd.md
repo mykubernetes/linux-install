@@ -194,6 +194,10 @@ id pool image snap device
 # rbd unmap rbd/rbd1
 ```
 
+```
+rbd remove rbd/rbd1
+```
+
 6、创建文件系统，并挂载
 ```
 # fdisk -l /dev/rbd0
