@@ -292,8 +292,11 @@ WantedBy=multi-user.target
 ```
 # 调整块设备增加到3G
 rbd resize --image rbd1 --size 3000 --name client.rbd
+rbd resize rbd/test1 --size=5G
+
 # 查看调整后的大小
 rbd info --image rbd1 -n client.rbd
+
 # 重新读取配置
 xfs_growfs -d /mnt/ceph-disk1
 ```  
