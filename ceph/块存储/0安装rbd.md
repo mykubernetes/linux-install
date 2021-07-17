@@ -308,7 +308,23 @@ xfs_growfs -d /mnt/ceph-disk1
 ```  
 
 
-八、创建快照
+八、回收站
+---
+```
+# 将rbd镜像移动到回收站
+rbd trash mv rbd/rbd1
+
+# 从回收站中删除RBD镜像
+rbd trash rm rbd/rbd1
+
+# 从回收站中恢复RBD镜像
+rbd trash restore rbd/rbd1
+
+# 列出回收站中所有RBD镜像
+rbd trash ls
+```
+
+九、创建快照
 ---
 
 1、创建一个测试文件到挂载目录
@@ -334,7 +350,7 @@ xfs_growfs -d /mnt/ceph-disk1
 # rbd info rbd1@snapshot1
 ```
     
-九、恢复快照测试
+十、恢复快照测试
 ---
 
 1、删除文件
@@ -356,7 +372,7 @@ rm -rf /opt/ceph/*
 Hello cephtest,This is snapshot test
 ```  
 
-十、重命名快照  
+十一、重命名快照  
 ---
 1、重命名  
 语法： `rbd snap rename <pool-name>/<image-name>@<original-snapshot-name> <pool-name>/<image-name>@<new-snapshot-name>`
@@ -364,7 +380,7 @@ Hello cephtest,This is snapshot test
 # rbd snap rename rbd/rbd1@snapshot1 rbd/rbd1@snapshot1_new -n client.rbd
 ```
  
-十一、删除快照  
+十二、删除快照  
 ---  
 1、删除  
 语法：`rbd snap rm <pool-name>/<image-name>@<snap-name>`
@@ -381,7 +397,7 @@ Removing snap: 100% complete...done.
 ```
 
 
-十二、克隆
+十三、克隆
 ---
 1、创建具有 layering 功能的 RBD image  
 ```
