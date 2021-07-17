@@ -8,7 +8,7 @@
 一、安装前准备
 =========
 
-> 配置 yum源
+> 1、配置 yum源
 ``` 
 # cat /etc/yum.repos.d/ceph.repo 
 [ceph]
@@ -39,14 +39,14 @@ priority=1
 # yum -y install epel-release
 ```
 
-> 配置NTP
+> 2、配置NTP
 ```
 yum -y install ntpdate ntp
 ntpdate  ntp.aliyun.com
 systemctl restart ntpd  && systemctl enable ntpd
 ```  
 
-> 创建部署用户和ssh免密码登录
+> 3、创建部署用户和ssh免密码登录
 ```
 useradd ceph
 echo 123456 | passwd --stdin ceph
@@ -54,7 +54,7 @@ echo "ceph ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph
 chmod 0440 /etc/sudoers.d/ceph
 ```
 
-> 配置防火墙，或者关闭
+> 4、配置防火墙，或者关闭
 ```
 #firewall-cmd --zone=public --add-port=6789/tcp --permanent
 #firewall-cmd --zone=public --add-port=6800-7100/tcp --permanent
@@ -62,13 +62,13 @@ chmod 0440 /etc/sudoers.d/ceph
 #firewall-cmd --zone=public --list-all
 ```
 
-> 关闭 selinux
+> 5、关闭 selinux
 ```
 sed -i "/^SELINUX/s/enforcing/disabled/" /etc/selinux/config
 setenforce 0
 ```
 
-> 配置主机名解析，使用  /etc/hosts,或者dns
+> 6、配置主机名解析，使用  /etc/hosts,或者dns
 ```
 cat >>/etc/hosts<<EOF
 192.168.101.66   node01
@@ -77,7 +77,7 @@ cat >>/etc/hosts<<EOF
 EOF
 ```
 
-> 配置sudo不需要tty
+> 7、配置sudo不需要tty
 
 手动修改配置文件,注释Defaults requiretty  
 ```
@@ -88,7 +88,7 @@ EOF
 二、使用 ceph-deploy 部署集群
 ======================
 
-> 配置免密钥登录
+> 1、配置免密钥登录
 ```
 su - ceph
 ssh-keygen
@@ -97,22 +97,23 @@ ssh-copy-id ceph@node02
 ssh-copy-id ceph@node03
 ```  
 
-> 安装 ceph-deploy
+> 2、安装 ceph-deploy
 ```
 # sudo yum install -y ceph-deploy python-pip
 # mkdir my-cluster
 # cd my-cluster
 ```
 
-> 部署节点,参数为monitor结点的主机名列表 
+> 3、部署节点,参数为monitor结点的主机名列表 
 ```
 # ceph-deploy new node01 node02 node03
-该命令会在当前目录下创建如下文件:
+
+# 该命令会在当前目录下创建如下文件
 # ls
 ceph.conf  ceph-deploy-ceph.log  ceph.mon.keyring
 ```
   
-> 编辑 ceph.conf 配置文件最后添加两行
+> 4、编辑 ceph.conf 配置文件最后添加两行
 ```
 cat ceph.conf
 [global]
@@ -122,44 +123,45 @@ cluster network = 192.168.101.0/24
 osd_pool_default_size = 3            # osd副本数设置，默认为3个
 ```
 
-> 安装ceph相关包
+> 5、安装ceph相关包
 ``` 
 # ceph-deploy install node01 node02 node03
-如果速度慢可以知道阿里源
+
+#如果速度慢可以知道阿里源
 # ceph-deploy install node01 node02 node03  --repo-url http://mirrors.aliyun.com/ceph/rpm-jewel/el7/
 可以使用下面命令代替ceph-deploy命令，因为ceph-deploy命令会下载官方yum源并覆盖本地yum源速度慢
-或者每台ceph节点执行三种人选其一
+#或者每台ceph节点执行三种人选其一
 # yum install -y ceph ceph-radosgw 
 ```
 
-> 配置初始 monitor(s)、并收集所有密钥：
+> 6、配置初始 monitor(s)、并收集所有密钥：
 ```
 # ceph-deploy mon create-initial
 ls -l *.keyring
 netstat -tlunp |grep 6789
 ```
 
-> 查看mon状态  
+> 7、查看mon状态  
 ```
 # ceph mon_status -f json-pretty
 # ceph mon_status | python -mjson.tool
 ```
 
-> 把配置信息拷贝到各节点
+> 8、把配置信息拷贝到各节点
 ```
 # ceph-deploy admin node01 node02 node03
 ```
 
-> 配置 osd
+> 9、配置 osd
 
-1、单台添加
+>> 1）单台添加
 ```
 # ceph-deploy disk list node01                #查看主机可以使用的硬盘       
 # ceph-deploy disk zap node01:/dev/sdb        #初始化
 # ceph-deploy osd create node01:/dev/sdb      #创建并激活
 ```
 
-2、这里使用脚本批量执行
+>> 2)这里使用脚本批量执行
 ```
 for dev in /dev/vda /dev/vdc /dev/vdd
 do
@@ -172,7 +174,7 @@ ceph-deploy osd create node03 --data $dev
 done
 ```
 
-> 查看集群硬盘
+> 10、查看集群硬盘
 ```
 # ceph osd tree
 ID CLASS WEIGHT  TYPE NAME       STATUS REWEIGHT PRI-AFF 
@@ -192,7 +194,7 @@ ID CLASS WEIGHT  TYPE NAME       STATUS REWEIGHT PRI-AFF
 
 
 
-> 查看使用容量
+> 11、查看使用容量
 ```
 # ceph df
 GLOBAL:
@@ -239,7 +241,7 @@ MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
 - %USE: 已用空间百分比
 - PGS: pg数量
 
-> 查询osd在哪个主机上
+> 12、查询osd在哪个主机上
 ```
 # ceph osd find 0
 {
@@ -253,7 +255,7 @@ MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
 }
 ```
 
-> 查看集群状态
+> 13、查看集群状态
 ```
 # ceph -s
 # ceph health
@@ -261,7 +263,7 @@ MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
 # ceph quorum_status --format json-pretty
 ```
 
-> 查看osd是否启动
+> 14、查看osd是否启动
 ```
 # netstat -utpln |grep osd
 tcp        0      0 192.168.101.67:6800     0.0.0.0:*               LISTEN      19079/ceph-osd      
@@ -270,7 +272,7 @@ tcp        0      0 192.168.101.67:6802     0.0.0.0:*               LISTEN      
 tcp        0      0 192.168.101.67:6803     0.0.0.0:*               LISTEN      19079/ceph-osd
 ```
 
-> 查看节点信息
+> 15、查看节点信息
 ```
 ceph node ls
 ceph node ls mon
@@ -278,12 +280,12 @@ ceph node ls osd
 ceph node ls mds
 ```
 
-> 部署 mgr ， L版以后才需要部署
+> 16、部署 mgr ， L版以后才需要部署
 ```
 # ceph-deploy mgr create node01 node02 node03 
 ```
 
-> 开启 dashboard 模块，用于UI查看  
+> 17、开启 dashboard 模块，用于UI查看  
 ```
 # ceph mgr module enable dashboard
 ```
