@@ -69,3 +69,17 @@ Ceph-Cluster：[ID: 2842]
 Ceph-OSD: [ID: 5336]  
 Ceph-Pools: [ID: 5342]  
 https://grafana.com/orgs/galexrt  
+
+
+
+
+https://github.com/krakendash/krakendash
+
+calamari  
+https://www.cnblogs.com/gaohong/p/4669524.html
+
+
+使用 Prometheus 监控 Ceph  
+https://www.jianshu.com/p/f0fae97d9349
+
+https://www.jianshu.com/p/0dcdbc1135bd
