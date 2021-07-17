@@ -10,7 +10,7 @@ http://docs.ceph.com/ceph-ansible/master/
 一、安装前准备
 =========
 
-# 配置 yum源  
+> 配置 yum源  
 ``` 
 # cat /etc/yum.repos.d/ceph.repo 
 [ceph]
