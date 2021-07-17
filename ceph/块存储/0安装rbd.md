@@ -13,8 +13,6 @@
 ```  
 
 
-
-
 客户端安装客户端工具
 -----------
 1、客户端检查是否符合块设备环境要求
@@ -108,42 +106,58 @@ rbd image 'rbd1':
 ------------
 
 1、映射到客户端，应该会报错  
-``` # rbd map --image rbd1 --name client.rbd ```  
+```
+# rbd map --image rbd1 --name client.rbd
+```
 • layering: 分层支持  
 • exclusive-lock: 排它锁定支持对  
 • object-map: 对象映射支持(需要排它锁定(exclusive-lock))  
 • deep-flatten: 快照平支持(snapshot flatten support)  
 • fast-diff: 在client-node1上使用krbd(内核rbd)客户机进行快速diff计算(需要对象映射)，我们将无法在CentOS内核3.10上映射块设备映像，因为该内核不支持对象映射(object-map)、深平(deep-flatten)和快速diff(fast-diff)(在内核4.9中引入了支持)。为了解决这个问题，我们将禁用不支持的特性，有几个选项可以做到这一点:  
 
-1）动态禁用  
-``` # rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd ```  
-2） 创建RBD镜像时，只启用 分层特性。  
-``` # rbd create rbd2 --size 10240 --image-feature layering --name client.rbd ```  
-3）ceph 配置文件中禁用  
-``` rbd_default_features = 1 ```  
+1）动态禁用
+```
+# rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd
+```
 
-2、动态禁用  
-``` # rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd ```  
+2）创建RBD镜像时，只启用 分层特性。
+```
+# rbd create rbd2 --size 10240 --image-feature layering --name client.rbd
+```
 
-3、映射到本地  
+3）ceph 配置文件中禁用
+```
+# rbd_default_features = 1
+```
+
+2、动态禁用
+```
+# rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd
+```
+
+3、映射到本地
 ``` 
 # rbd map --image rbd1 --name client.rbd 
 /dev/rbd0
 ```  
-或者  
-``` # rbd map rbd1 --pool rbd --name client.rbd ```  
+或者
+```
+# rbd map rbd1 --pool rbd --name client.rbd
+```
 
-4、查看系统中已经映射到本地的块  
+4、查看系统中已经映射到本地的块
 ``` 
 # rbd showmapped --name client.rbd
 id pool image snap device    
 0  rbd  rbd1  -    /dev/rbd0
-```  
+```
 
-5、取消映射  
-``` # rbd unmap /dev/rbd0 ```  
+5、取消映射
+```
+# rbd unmap /dev/rbd0
+```
 
-6、创建文件系统，并挂载  
+6、创建文件系统，并挂载
 ```
 # fdisk -l /dev/rbd0
 # mkfs.xfs /dev/rbd0
@@ -151,10 +165,33 @@ id pool image snap device
 # mount /dev/rbd0 /mnt/ceph-disk1
 # df -h /mnt/ceph-disk1
 ```  
-7、写入数据测试  
-``` # dd if=/dev/zero of=/mnt/ceph-disk1/file1 count=100 bs=1M ```  
-8、做成服务，开机自动挂载  
-1)做成服务  
+
+7、写入数据测试
+```
+# dd if=/dev/zero of=/mnt/ceph-disk1/file1 count=100 bs=1M
+```
+
+8、设置自动挂载
+```
+#1、开机自动映射到本地
+# vim /etc/ceph/rbdmap
+  rbd/rbd1  id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
+
+# systemctl start rbdmap.service 
+# systemctl enable rbdmap.service 
+# systemctl status rbdmap.service
+
+
+#2、开机自动挂载
+# vim /etc/fstab
+ /dev/rbd/rbd/rbd1 /mnt/ceph-test001 xfs defaults,noatime,_netdev 0 0
+# mount -a
+```
+
+
+9、做成服务，开机自动挂载(此步不需要，已经过时)
+
+1)做成服务
 ```
 # cat /usr/local/bin/rbd-mount
 
@@ -216,7 +253,7 @@ WantedBy=multi-user.target
 
 调整Ceph RBD块大小
 ---
-扩大RBD img  
+扩大RBD img
 ```
 # 调整块设备增加到3G
 rbd resize --image rbd1 --size 3000 --name client.rbd
@@ -230,21 +267,30 @@ xfs_growfs -d /mnt/ceph-disk1
 创建快照
 ---
 
-1、创建一个测试文件到挂载目录  
-``` echo "Hello cephtest,This is snapshot test" > /opt/ceph/ceph-snapshot-file ```  
+1、创建一个测试文件到挂载目录
+```
+echo "Hello cephtest,This is snapshot test" > /opt/ceph/ceph-snapshot-file
+```
 
-2、创建快照  
+2、创建快照
 语法： rbd snap create <pool name>/<image name>@<snap name>  
-``` rbd snap create rbd/rbd1@snapshot1 -n client.rbd ```  
+```
+rbd snap create rbd/rbd1@snapshot1 -n client.rbd
+```
 
-3、显示 image 的快照  
+3、显示 image 的快照
 语法： rbd snap ls <pool name>/<image name>  
-``` rbd snap ls rbd/rbd1 -n client.rbd ```  
+```
+rbd snap ls rbd/rbd1 -n client.rbd
+```
     
-恢复快照测试  
+恢复快照测试
 ---
-1、删除文件  
-```  rm -rf /opt/ceph/* ```  
+
+1、删除文件
+```
+rm -rf /opt/ceph/*
+```  
 
 2、恢复快照  
 语法： rbd snap rollback <pool-name>/<image-name>@<snap-name>  
