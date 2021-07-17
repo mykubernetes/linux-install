@@ -190,6 +190,8 @@ id pool image snap device
 5、取消映射
 ```
 # rbd unmap /dev/rbd0
+或者
+# rbd unmap rbd/rbd1
 ```
 
 6、创建文件系统，并挂载
