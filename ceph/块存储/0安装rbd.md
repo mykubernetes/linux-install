@@ -20,16 +20,25 @@
 # RBD常用命令
 | 命令 | 功能 |
 | ------ | ------ |
-| rbd create | 创建块设备映像 |
-| rbd rm | 删除块设备映像 |
-| rbd ls  | 列出 rbd 存储池中的块设备 |
-| rbd info  | 查看块设备信息 |
+| rbd create --szie n [pool-name/]image-name | 创建RBD |
+| rbd [--pool pool-name] ls  | 列出RBD |
+| rbd info [pool-name/]image-name | 检索RBD镜像详情 |
+| rbd status [pool-name/]image-name | 检查rbd镜像状态 |
+| rbd du [pool-name/]image-name | 检索RBD镜像的调配磁盘使用量和实际磁盘使用量 |
+| rbd resize  | 调整RBD镜像大小 |
+| rbd rm | 删除RBD映像 |
+| rbd cp [pool-name/]src-image-name [pool-name] tgt-image-name | 复制RBD镜像 |
+| rbd mv [pool-name/]src-image-name [pool-name] tgt-image-name | 重命名RBD镜像 |
+| rbd trash mv [pool-name/]image-name | 将RBD镜像移动到回收站 |
+| rbd trash rm [pool-name/]image-name | 从回收站删除RBD镜像 |
+| rbd trash restore [pool-name/]image-name | 从回收站恢复RBD镜像 |
+| rbd trash ls [pool-name] | 列出回收站中所有镜像 |
 | rbd diff  | 可以统计 rbd 使用量 |
 | rbd map  | 映射块设备 |
 | rbd showmapped  | 查看已映射块设备 |
 | rbd unmap | 取消映射 |
 | rbd remove  | 删除块设备 |
-| rbd resize  | 更改块设备的大小 |
+
 
 
 
@@ -318,7 +327,7 @@ rbd trash mv rbd/rbd1
 rbd trash rm rbd/rbd1
 
 # 从回收站中恢复RBD镜像
-rbd trash restore rbd/rbd1
+rbd trash restore 393f643c9869
 
 # 列出回收站中所有RBD镜像
 rbd trash ls
