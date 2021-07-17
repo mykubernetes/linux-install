@@ -542,3 +542,16 @@ rbd2
 # mount /dev/rbd2 /opt/ceph-disk2
 # ll /opt/ceph-disk2/
 ```  
+
+导出导入RBD镜像
+---
+    
+1、导出RBD镜像
+```
+# rbd export image02 /tmp/image02
+```
+
+2、导出RBD镜像
+```
+# rbd import /tmp/image02 rbd/image02 --image-format 2 
+```
