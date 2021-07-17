@@ -432,6 +432,14 @@ Removing snap: 100% complete...done.
 
 十三、克隆
 ---
+
+| 命令 | 描述 |
+|------|-----|
+| rbd children rbd/rbd1@snap1 | 列出快照 |
+| rbd clone rbd/rbd1@snap1 rbd/rbd2 | 创建快照 |
+| rbd flatten rbd/rbd2 | 扁平化克隆 |
+
+
 1、创建具有 layering 功能的 RBD image  
 ```
 # rbd create rbd2 --size 1024 --image-feature layering --name client.rbd
@@ -458,8 +466,9 @@ rbd image 'rbd2':
 ```  
 
 3、创建此 RBD image 的快照  
-``` # rbd snap create rbd/rbd2@snapshot_for_clone -n client.rbd ```  
-
+```
+# rbd snap create rbd/rbd2@snapshot_for_clone -n client.rbd
+```
 注意：要创建COW克隆，需要保护快照，因为如果快照被删除，所有附加的COW克隆将被销毁：  
 
 4、保护快照  
@@ -469,11 +478,12 @@ rbd image 'rbd2':
 ```  
 
 5、创建链接克隆  
-语法： rbd clone <pool-name>/<parent-image-name>@<snap-name> <pool-name>/<child_image-name> --image-feature <feature-name>  
-``` # rbd clone rbd/rbd2@snapshot_for_clone rbd/clone_rbd2 --image-feature layering -n client.rbd ```  
+语法：`rbd clone <pool-name>/<parent-image-name>@<snap-name> <pool-name>/<child_image-name> --image-feature <feature-name>`
+```
+# rbd clone rbd/rbd2@snapshot_for_clone rbd/clone_rbd2 --image-feature layering -n client.rbd
+```
 
-克隆的速度应该是非常快的，这时一个链接克隆。  
-查看克隆后信息  
+6、查看克隆后信息  
 ```
 # rbd info rbd/clone_rbd2 -n client.rbd
 rbd image 'clone_rbd2':
@@ -512,15 +522,14 @@ rbd image 'clone_rbd2':
 ```  
 注意：如果在deep-flatten映像上启用了该功能，则默认情况下图像克隆与其父级分离。  
 
-删除父镜像  
+7、删除父镜像  
 ```
 # rbd snap unprotect rbd/rbd2@snapshot_for_clone -n client.rbd    # 掉快照保护
 # rbd snap rm rbd/rbd2@snapshot_for_clone -n client.rbd
 Removing snap: 100% complete...done.
 ```  
 
-验证数据  
-验证父映像 rbd2  
+8、验证数据，验证父映像rbd2  
 ```
 # rbd list -n client.rbd
 clone_rbd2
@@ -534,7 +543,7 @@ rbd2
 -rw-r--r-- 1 root root 27 May 4 15:04 rbd2-snapshot
 ```  
 
-验证完整克隆映像 clone_rbd2  
+9、验证完整克隆映像 clone_rbd2  
 ```
 # umount /opt/ceph-disk2
 # rbd unmap /dev/rbd1
