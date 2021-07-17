@@ -353,6 +353,9 @@ rbd trash ls
 | rbd snap ls rbd/rbd1 | 列出快照 |
 | rbd snap limit set --limit 1 | 限制快照数量 |
 | rbd snap limit clear rbd/rbd1 | 移除限制 |
+| rbd snap rename rbd/rbd1@snap1 rbd/rbd1@snap2 | 重命名快照 |
+| rbd snap rm rbd/rbd1@snap1 | 删除快照 |
+| rbd snap purge rbd/rbd1 | 清除所有快照 |
 | rbd snap rollback rbd/rbd1 | 还原快照 |
 | rbd snap protect rbd/rbd1@snap1 | 保护快照 |
 | rbd snap unprotect rbd/rbd1@snap1 | 取消保护 |
