@@ -149,6 +149,16 @@ rbd image 'rbd1':
 五、客户端映射块设备
 ------------
 
+| 属性 | BIT位 |
+|-----|-------|
+| layering | 1 |
+| striping | 2 |
+| exclusive-lock | 4 |
+| object-map | 8 |
+| fast-diff | 16 |
+| deep-flatten | 32 |
+
+
 1、映射到客户端，应该会报错  
 ```
 # rbd map --image rbd1 --name client.rbd
