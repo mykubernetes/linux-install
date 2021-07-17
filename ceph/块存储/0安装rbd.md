@@ -335,6 +335,17 @@ rbd trash ls
 
 九、创建快照
 ---
+| 命令 | 描述 |
+|------|-----|
+| rbd feature enable rbd/test layering | 启动快照 |
+| rbd feature disable rbd/test layering | 禁用快照 |
+| rbd snap create rbd/rbd1@snap1 | 创建快照 |
+| rbd snap ls rbd/rbd1 | 列出快照 |
+| rbd snap limit set --limit 1 | 限制快照数量 |
+| rbd snap limit clear rbd/rbd1 | 移除限制 |
+| rbd snap rollback rbd/rbd1 | 还原快照 |
+| rbd snap protect rbd/rbd1@snap1 | 保护快照 |
+| rbd snap unprotect rbd/rbd1@snap1 | 取消保护 |
 
 1、创建一个测试文件到挂载目录
 ```
