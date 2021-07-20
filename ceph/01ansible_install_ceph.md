@@ -83,6 +83,9 @@ cluster_network: 192.168.30.0/24
 rbd_cache: "true"
 rbd_cache_writethrough_until_flush: "false"
 rbd_client_directories: false
+
+radosgw_civetweb_port: 80
+radosgw_interface: eth0
 ```  
 
 3、osds.yml 文件配置  
