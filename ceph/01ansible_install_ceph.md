@@ -94,31 +94,46 @@ devices:
 osd_scenario: collocated
 ```  
 
-4、site.yml 文件配置（保持默认）  
+4、修改rgws.yml 配置文件
+```
+$ cp group_vars/{rgws.yml.sample,rgws.yml}
+$ vim rgws.yml
+copy_admin_key: true
+```
+
+5、修改clients.yml 配置文件
+```
+$ cp group_vars/{clients.yml.sample,clients.yml}
+$ vim clients.yml
+copy_admin_key: true
+```
+
+6、site.yml 文件配置（保持默认）  
 ```
 cp site.yml.sample site.yml
 ```  
 
-5、hosts 文件配置  
+7、hosts 文件配置  
 ```
 $ cat /etc/ansible/hosts
+
 [mons]
 node01
 node02
 node03
+
 [osds]
 node01
 node02
 node03
+
 [mgrs]
 node01
 node02
 node03
 
-
 [clients]
 node01
-
 
 [rgws]
 node01
