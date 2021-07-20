@@ -114,6 +114,15 @@ node03
 node01
 node02
 node03
+
+
+[clients]
+node01
+
+
+[rgws]
+node01
+
 ```  
 
 6、开始安装  
