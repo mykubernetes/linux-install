@@ -20,12 +20,17 @@ Crush map 编辑
 # crushtool -c crushmap_decompiled_file -o newcrushmap
 ```  
 
-5、将新编译后的 Crush map 注入 Ceph 集群  
+5、将新映射应用到集群前，使用crushtool命令及--show-mappings选项来验证
+```
+# crushool -i newcrushmap --test --show-mappings --rule=5 --num-rep 3
+```
+
+6、将新编译后的 Crush map 注入 Ceph 集群  
 ```
 # ceph osd setcrushmap -i newcrushmap
 ```
 
-6、 tunable (可调参数)  
+7、 tunable (可调参数)  
 ```
 # cat crushmap_compiled_file 
 # begin crush map
