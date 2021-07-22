@@ -69,6 +69,7 @@ centos_package_dependencies:
 - python-setuptools
 - libselinux-python
 ntp_service_enabled: false
+
 ceph_origin: distro
 ceph_repository: custom
 ceph_mirror: http://mirrors.163.com/ceph
@@ -76,6 +77,7 @@ ceph_stable_key: http://mirrors.163.com/ceph/keys/release.asc
 ceph_stable_release: luminous
 ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
 ceph_stable_redhat_distro: el7
+
 cephx: true
 monitor_interface: eth0
 public_network: 192.168.20.0/24
