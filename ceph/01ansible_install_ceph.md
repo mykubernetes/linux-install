@@ -44,7 +44,7 @@ $ ssh-copy-id node02
 $ ssh-copy-id node03
 ```  
 
-二、安装ceph集群  
+二、ceph配置详解  
 ---
 
 Ansible部署Ceph相关yml
@@ -103,6 +103,8 @@ dedicated_devices:
  - /dev/sde
 ```
 
+三、安装ceph集群  
+---
 1、下载 ceph-ansible  
 ```
 yum -y install git
@@ -230,7 +232,6 @@ node01
 [mdss]
 node01
 node02
-
 ```  
 
 9、开始安装  
@@ -243,3 +244,60 @@ $ ansible-playbook site.yml
 $ export CEPH_ARGS="--cluster back"
 $ ceph -s
 ```  
+
+
+四、扩容Ceph集群
+---
+
+1、扩容前置条件
+- 在不中断服务的前提下，扩展ceph集群存储容量
+- 可通过ceph-ansible以两种方式扩展集群中的存储：
+  - 可以添加额外OSD主机到集群（scale-out）
+  - 可以添加额外存储设备到现有的OSD主机（scale-up）
+- 开始部署额外的OSD前，需确保集群处于HEALTH_OK状态
+  - 相关主机解析已正常添加指hosts
+
+
+2、扩容额外的OSD主机
+```
+$ cat /etc/ansible/hosts
+
+[mons]
+node01
+node02
+node03
+
+[osds]
+node01
+node02
+node03
+node04             #追加node04
+
+[mgrs]
+node01
+node02
+node03
+
+[clients]
+node01
+
+[rgws]
+node01
+
+[mdss]
+node01
+node02
+```
+
+3、添加额外OSD存储设备
+```
+devices:
+ - /dev/vdb
+ - /dev/vdc
+ - /dev/vdd						#追加存储设备
+```
+
+4、正式部署OSD节点
+```
+ansible-playbook site.yml
+```
