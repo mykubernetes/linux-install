@@ -57,6 +57,7 @@ Ansible部署Ceph相关yml
 yml主要相关参数
 
 - all.yml参数
+
 | 变量 | 值 | 含义 |
 |-----|----|------|
 | fetch_directory | ~/ceph-ansible-keys | 用于将身份验证密钥复制到集群节点的临时目录的位置。 |
@@ -69,9 +70,11 @@ yml主要相关参数
 | public_network | address and netmask | 集群的公共网络的子网，如192.168.122.0/24。 |
 | cluster_network | address and netmask | 集群专用网络的子网。默认设置为public_network的值。 |
 | journal_size | size in MB | 分配给OSD日志的大小。应该是预期的两倍。在大多数情况下不应小于5120 MB。 |
+
 提示：可以在group_vars/all.yml中将common_single_host_mode这个特殊参数设置为true。用于部署一个单节点、集所有功能于一身的Ceph集群作为测试学习使用。
 
 - osds.ym
+
 | 变量 | 值 | 含义 |
 |-----|----|------|
 | osd_scenario | collocated or non-collocated | OSD日志部署类型。 |
@@ -136,9 +139,9 @@ monitor_interface: eth0
 public_network: 192.168.20.0/24
 cluster_network: 192.168.30.0/24
 
-rbd_cache: "true"
-rbd_cache_writethrough_until_flush: "false"
-rbd_client_directories: false
+rbd_cache: "true"                                    #开启RBD回写缓存
+rbd_cache_writethrough_until_flush: "false"          #在切换回写之前，不从写透开始
+rbd_client_directories: false                        ##不要创建客户机目录(应该已经存在)
 
 radosgw_civetweb_port: 80
 radosgw_interface: eth0
@@ -146,17 +149,21 @@ radosgw_interface: eth0
 ceph_conf_overrides:
   global:
     mon_osd_allow_primary_affinity: 1
-    mon_clock_drift_allowed: 0.5
+    mon_clock_drift_allowed: 0.5                     #允许MON时钟间隔最多0.5秒
     osd_pool_default_size: 2
-    osd_pool_default_min_size:1
-    mon_pg_warn_min_per_osd: 0
-    mon_pg_warn_max_per_osd: 0
-    mon_pg_warn_max_object_skew: 0
+    osd_pool_default_min_size:1                      #降低存储池复制大小的默认设置
+    mon_pg_warn_min_per_osd: 0                       #见提示一
+    mon_pg_warn_max_per_osd: 0                       #见提示二
+    mon_pg_warn_max_object_skew: 0                   #见提示三
   client:
     rbd_default_features: 1
   client.rgw.node01:
     rgw_dns_name: node01
 ```  
+- 提示一：根据每个OSD的pg数量关闭集群健康警告。通常，第一个变量被设置为30，如果OSD中的每个“in”平均少于30个pg，集群就会发出警告。
+- 提示二：此变量默认值为300，如果OSD中的每个“in”平均超过300个pg，集群就会发出警告，在本实验的小集群中可能没有很多pg，因此采用禁用。
+- 提示三：根据某个池中对象的数量大于集群中一组池中对象的平均数量，关闭集群健康警告。同样，我们有一个非常小的集群，这避免了通常指示我们需要调优集群的额外警告。
+
 
 3、osds.yml 文件配置  
 ```
@@ -165,10 +172,10 @@ $ grep -Ev "^#|^$" group_vars/osds.yml
 ---
 dummy:
 devices:
-- /dev/sdb
+- /dev/sdb                                 #使用/dev/sdb作为后端存储设备
 - /dev/sdc
 - /dev/sdd
-osd_scenario: collocated
+osd_scenario: collocated                   #OSD使用并列的OSD形式
 ```  
 
 4、mdss.yml 文件配置  
