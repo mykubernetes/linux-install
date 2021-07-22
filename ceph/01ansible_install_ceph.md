@@ -80,12 +80,27 @@ cephx: true
 monitor_interface: eth0
 public_network: 192.168.20.0/24
 cluster_network: 192.168.30.0/24
+
 rbd_cache: "true"
 rbd_cache_writethrough_until_flush: "false"
 rbd_client_directories: false
 
 radosgw_civetweb_port: 80
 radosgw_interface: eth0
+
+ceph_conf_overrides:
+  global:
+    mon_osd_allow_primary_affinity: 1
+    mon_clock_drift_allowed: 0.5
+    osd_pool_default_size: 2
+    osd_pool_default_min_size:1
+    mon_pg_warn_min_per_osd: 0
+    mon_pg_warn_max_per_osd: 0
+    mon_pg_warn_max_object_skew: 0
+  client:
+    rbd_default_features: 1
+  client.rgw.node01:
+    rgw_dns_name: node01
 ```  
 
 3、osds.yml 文件配置  
@@ -101,26 +116,31 @@ devices:
 osd_scenario: collocated
 ```  
 
-4、修改rgws.yml 配置文件
+4、mdss.yml 文件配置  
+```
+$ cp group_vars/{mdss.yml.sample,mdss.yml}
+```
+
+5、修改rgws.yml 配置文件
 ```
 $ cp group_vars/{rgws.yml.sample,rgws.yml}
 $ vim rgws.yml
 copy_admin_key: true
 ```
 
-5、修改clients.yml 配置文件
+6、修改clients.yml 配置文件
 ```
 $ cp group_vars/{clients.yml.sample,clients.yml}
 $ vim clients.yml
 copy_admin_key: true
 ```
 
-6、site.yml 文件配置（保持默认）  
+7、site.yml 文件配置（保持默认）  
 ```
 cp site.yml.sample site.yml
 ```  
 
-7、hosts 文件配置  
+8、hosts 文件配置  
 ```
 $ cat /etc/ansible/hosts
 
@@ -145,14 +165,18 @@ node01
 [rgws]
 node01
 
+[mdss]
+node01
+node02
+
 ```  
 
-6、开始安装  
+9、开始安装  
 ```
 $ ansible-playbook site.yml
 ```  
 
-7、验证,因为配置文件里设置的集群名称为back,默认为ceph,所以修改为back测试，否则命令不可以执行成功
+10、验证,因为配置文件里设置的集群名称为back,默认为ceph,所以修改为back测试，否则命令不可以执行成功
 ```
 $ export CEPH_ARGS="--cluster back"
 $ ceph -s
