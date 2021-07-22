@@ -47,6 +47,59 @@ $ ssh-copy-id node03
 二、安装ceph集群  
 ---
 
+Ansible部署Ceph相关yml
+- /usr/share/ceph-ansible/group_vars/all.yml：所有节点相关yml配置；
+- /usr/share/ceph-ansible/group_vars/osds.yml：所有OSD节点的yml配置；
+- /usr/share/ceph-ansible/group_vars/client.yml：客户端节点的yml配置。
+- /usr/share/ceph-ansible：运行Ansible部署的主目录。
+
+
+yml主要相关参数
+
+- all.yml参数
+| 变量 | 值 | 含义 |
+|-----|----|------|
+| fetch_directory | ~/ceph-ansible-keys | 用于将身份验证密钥复制到集群节点的临时目录的位置。 |
+| ceph_origin | repository | Ceph来源，repository表示使用包存储库 |
+| ceph_repository | rhcs | 用于安装Red Hat的存储库Ceph存储。rhcs使用官方红帽Ceph存储包。 |
+| ceph_repository_type | cdn or iso | rhcs的安装源，CDN或本地ISO映像。 |
+| ceph_rhcs_iso_path | path to iso | 如果使用iso存储库类型，则指向Red Hat Ceph存储iso的路径。 |
+| ceph_rhcs_version | 3 | Red Hat Ceph安装的版本。 |
+| monitor_interface | network interface | Monitor用于侦听的网络接口。 |
+| public_network | address and netmask | 集群的公共网络的子网，如192.168.122.0/24。 |
+| cluster_network | address and netmask | 集群专用网络的子网。默认设置为public_network的值。 |
+| journal_size | size in MB | 分配给OSD日志的大小。应该是预期的两倍。在大多数情况下不应小于5120 MB。 |
+提示：可以在group_vars/all.yml中将common_single_host_mode这个特殊参数设置为true。用于部署一个单节点、集所有功能于一身的Ceph集群作为测试学习使用。
+
+- osds.ym
+| 变量 | 值 | 含义 |
+|-----|----|------|
+| osd_scenario | collocated or non-collocated | OSD日志部署类型。 |
+| devices | 用于OSDs的设备的名称列表。 | 用于并行OSD数据和日志分区或非并行OSD数据分区的设备。 |
+| dedicated_devices | 用于非并列OSD期刊的设备名称列表。 | OSD日志设备。 |
+
+1、假定所有OSD主机具有相同的硬件并使用相同的设备名称。
+```
+group_vars/osds.yml配置示例：
+osd_scenario: "collocated"
+devices:
+ - /dev/sdb
+ - /dev/sdc
+ - /dev/sdd
+```
+
+2、非并置方案：将不同的存储设备用于OSD数据和OSD日志。
+```
+group_vars/osds.yml配置示例：
+osd_scenario: "non-collocated"
+devices:
+ - /dev/sdb
+ - /dev/sdc
+dedicated_devices:
+ - /dev/sdd
+ - /dev/sde
+```
+
 1、下载 ceph-ansible  
 ```
 yum -y install git
