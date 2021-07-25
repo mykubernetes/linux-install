@@ -1,6 +1,21 @@
 Ceph 服务的管理
 ===
 
+常见命令
+
+| 命令 | 含义 |
+|-----|------|
+| systemctl stop ceph-$type@$id | 停止特定守护进程。 |
+| systemctl stop ceph-osd.target | 停止所有OSD守护进程。 |
+| systemctl stop ceph.target | 停止所有ceph守护进程。 |
+| systemctl start ceph-$type@$id | 启动特定守护进程。 |
+| systemctl start ceph-osd.target | 启动所有OSD守护进程。 |
+| systemctl start ceph.target | 启动所有ceph守护进程。 |
+| systemctl restart ceph-$type@$id | 重启特定守护进程。 |
+| systemctl restart ceph-osd.target | 重启所有OSD守护进程。 |
+| systemctl restart ceph.target | 重启所有ceph守护进程。 |
+
+
 1、启动和停止所有守护进程
 ---
 
