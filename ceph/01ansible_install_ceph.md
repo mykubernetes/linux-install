@@ -1,6 +1,8 @@
 ansible部署ceph
 ===
 
+https://support.huaweicloud.com/dpmg-kunpengsdss/kunpengcephansible_04_0001.html
+
 一、环境配置
 ---
 1、配置 ceph 仓库  
