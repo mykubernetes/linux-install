@@ -2,7 +2,7 @@ Ceph 服务的管理
 ===
 
 常见命令
-
+---
 | 命令 | 含义 |
 |-----|------|
 | systemctl stop ceph-$type@$id | 停止特定守护进程。 |
@@ -15,6 +15,15 @@ Ceph 服务的管理
 | systemctl restart ceph-osd.target | 重启所有OSD守护进程。 |
 | systemctl restart ceph.target | 重启所有ceph守护进程。 |
 
+查看配置
+---
+```
+#查看所有参数和值  命令：ceph daemon type.id config show		
+示例：ceph daemon osd.0 config show
+
+#查看指定参数 命令：ceph daemon type.id config get parameter	
+示例：ceph daemon type.id config get mds_data
+```
 
 1、启动和停止所有守护进程
 ---
