@@ -301,3 +301,5 @@ devices:
 ```
 ansible-playbook site.yml
 ```
+
+https://blog.csdn.net/szh1124/article/details/83902670?spm=1001.2014.3001.5501
