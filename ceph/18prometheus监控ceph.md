@@ -71,37 +71,54 @@ WantedBy=multi-user.target
 # systemctl enable prometheus
 ```
 
-浏览器打开  
-http://192.168.101.66:9090  
+6、检查prometheus服务器中是否添加成功
+```
+# 浏览器-》 http://x.x.x.x:9090 -》status -》Targets
+```
 
 grafana 安装  
 ---
 官方下载：https://grafana.com/grafana/download  
 
-1、软件下载  
+1、安装
 ```
-# wget https://dl.grafana.com/oss/release/grafana-6.1.4-1.x86_64.rpm
-# sudo yum localinstall grafana-6.1.4-1.x86_64.rpm
-```  
+1、配置yum源文件
+# vim /etc/yum.repos.d/grafana.repo
+[grafana]
+name=grafana
+baseurl=https://packages.grafana.com/oss/rpm
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.grafana.com/gpg.key
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 
-2、启动服务  
+2.通过yum命令安装grafana
+# yum -y install grafana
+
+3.启动grafana并设为开机自启
+# systemctl start grafana-server.service 
+# systemctl enable grafana-server.service
 ```
-# systemctl enable grafana-server
-# systemctl start grafana-server
-```  
 
-3、打开浏览器  
+2、打开浏览器  
+```
 192.168.101.66:3000  
+```
 
-4、设置数据源  
+3、设置数据源  
+```
 http://192.168.101.66:9090  
+```
 
-5、导入模板  
+4、导入模板  
+```
 Ceph-Cluster：[ID: 2842]  
 Ceph-OSD: [ID: 5336]  
 Ceph-Pools: [ID: 5342]  
 https://grafana.com/orgs/galexrt  
-
+```
 
 
 
