@@ -109,7 +109,11 @@ sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 
 3、设置数据源  
 ```
-http://192.168.101.66:9090  
+1、浏览器登录 grafana 管理界面 http://192.168.101.66:9090  
+2、添加data sources，点击configuration--》data sources
+3、添加dashboard，点击HOME--》find dashboard on grafana.com
+4、搜索ceph的dashboard
+5、点击HOME--》Import dashboard, 选择合适的dashboard，记录编号
 ```
 
 4、导入模板  
