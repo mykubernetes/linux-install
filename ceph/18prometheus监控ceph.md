@@ -2,7 +2,11 @@ prometheus
 ---
 官方参考地址：https://github.com/ceph/cephmetrics  
 1、ceph集群启动prometheus模块  
-``` # ceph mgr module enable prometheus ```  
+```
+# ceph mgr module enable prometheus
+# netstat -nltp | grep mgr 检查端口
+# curl 127.0.0.1:9283/metrics  测试返回值
+```  
 
 2、prometheus安装  
 官方下载：https://prometheus.io/download/  
