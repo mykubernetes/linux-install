@@ -7,12 +7,36 @@ prometheus
 2、prometheus安装  
 官方下载：https://prometheus.io/download/  
 
-prometheus 下载  
+1)prometheus 下载
 ```
 # wget https://github.com/prometheus/prometheus/releases/download/v2.9.2/prometheus-2.9.2.linux-amd64.tar.gz
 # tar xf prometheus-2.9.2.linux-amd64.tar.gz
 # cd prometheus-2.9.2.linux-amd64
-```  
+
+# 查看promethus版本
+# ./prometheus --version
+```
+
+2)配置系统服务启动
+```
+# vim /etc/systemd/system/prometheus.service
+[Unit]
+Description=Prometheus Monitoring System
+Documentation=Prometheus Monitoring System
+
+[Service]
+ExecStart=/opt/prometheus/prometheus \
+  --config.file /opt/prometheus/prometheus.yml \
+  --web.listen-address=:9090
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3)加载系统服务
+```
+# systemctl daemon-reload
+```
 
 3、添加主机发现配置
 ```
@@ -37,7 +61,11 @@ prometheus 下载
 ```  
 
 5、运行  
-``` $ nohup ./prometheus --config.file prometheus.yml > /var/log/prometheus.out 2>&1 & ```  
+```
+# 启动服务和添加开机自启动
+# systemctl start prometheus
+# systemctl enable prometheus
+```
 
 浏览器打开  
 http://192.168.101.66:9090  
