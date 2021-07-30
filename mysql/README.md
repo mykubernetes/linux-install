@@ -15,6 +15,7 @@ https://www.cnblogs.com/keme/p/10288168.html#1-mysql-%E6%9D%83%E9%99%90%E4%BB%8B
 
 
 ```
+# wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
 # rpm -Uvh mysql57-community-release-el7-11.noarch.rpm
 ```
 
