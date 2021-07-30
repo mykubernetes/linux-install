@@ -27,17 +27,33 @@ https://www.cnblogs.com/keme/p/10288168.html#1-mysql-%E6%9D%83%E9%99%90%E4%BB%8B
 ```
 # systemctl start mysqld.service
 # systemctl status mysqld.service
+# systemctl enable mysqld.service
 ```
 
-root账户默认密码存储在错误日志中：
+root账户默认密码存储在错误日志中，通过日志文件中找出密码
 ```
 # grep 'temporary password' /var/log/mysqld.log
 # mysql -uroot –p
-mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass4!';
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass4!';         #过滤出的密码
 ```
 注意：密码要求包含一个大写字母，一个小写字母，一位数字和一个特殊字符，并且密码长度至少为8个字符。
+
+查看mysql默认密码复杂度
 ```
-# systemctl enable mysqld
+mysql> SHOW VARIABLES LIKE 'validate_password%';
+```
+
+修改密码复杂度
+```
+mysql> set global validate_password_policy=LOW;         #只验证密码的长度
+mysql> set global validate_password_length=6;           #验证密码的长度
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY '123456'; 
+```
+
+开启mysql的远程访问
+```
+mysql> grant all privileges on *.* to 'root'@'%' identified by 'password'
+mysql> flush privileges;
 ```
 
 MySQL服务器配置
