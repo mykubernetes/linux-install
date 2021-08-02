@@ -80,6 +80,6 @@ ceph deep-scrub
 ```
 ceph osd set-full-ratio 0.8
 ```
-如果状态变成HEALTH_ERR 修复后需要重启所有服务
+
 
 mon_osd_nearfull_ration 参数是一个根据保守的限值。超出这个限值时，集群会进入 HEALTH_WARN状态。 这是为了在达到全满比率之前，提醒需要添加OSD到集群或者修复问题。默认情况下，设置为集群中可用空间的0.85（85%）。
