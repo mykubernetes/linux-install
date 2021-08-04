@@ -78,6 +78,8 @@ OK
 (nil)
 127.0.0.1:6379> set foo bar EX 10      #EX 过期时间以秒为单位
 127.0.0.1:6379> ttl foo                #查看当前key的剩余时间
+127.0.0.1:6379> type foo               #查看当前key的数据类型
+string
 ```
 - set
 - get
