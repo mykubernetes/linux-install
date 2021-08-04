@@ -77,6 +77,7 @@ OK
 127.0.0.1:6379> set foo bar XX         #XX 存在才设置
 (nil)
 127.0.0.1:6379> set foo bar EX 10      #EX 过期时间以秒为单位
+127.0.0.1:6379> ttl foo                #查看当前key的剩余时间
 ```
 - set
 - get
