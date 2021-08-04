@@ -7,7 +7,7 @@ redis-cli -h 192.168.101.66 -p 6379
 2、查看帮助信息
 ```
 127.0.0.1:6379> help @generic        #通用命令
-127.0.0.1:6379> help @string
+127.0.0.1:6379> help @string         #字符串
 127.0.0.1:6379> help @list           #列表
 127.0.0.1:6379> help @set            #集合
 127.0.0.1:6379> help @sorted_set     #有序集合
@@ -43,29 +43,31 @@ OK
 
 4、String使用
 ```
-127.0.0.1:6379> set disto feddora      #设置一个key
+127.0.0.1:6379> set disto feddora         #设置一个key
 OK
-127.0.0.1:6379> get disto              #获取key
+127.0.0.1:6379> get disto                 #获取key
 "feddora"
-127.0.0.1:6379> set disto centos       #修改key
+127.0.0.1:6379> exists disto              #判断当前key是否存在
+(integer) 1
+127.0.0.1:6379> move disto                #移除当前key
+127.0.0.1:6379> set disto centos          #修改key
 OK
 127.0.0.1:6379> append disto slackware    #在原有的value上追加新值
 (integer) 15
-127.0.0.1:6379> get disto              #查看追加的新值
+127.0.0.1:6379> get disto                 #查看追加的新值
 "centosslackware"
-127.0.0.1:6379> STRLEN disto           #查看字符串长度
+127.0.0.1:6379> STRLEN disto              #查看字符串长度
 (integer) 15
 
-
-127.0.0.1:6379> set count 0          #设置一个key值为0
+127.0.0.1:6379> set count 0               #设置一个key值为0
 OK
-127.0.0.1:6379> incr count           #自动+1
+127.0.0.1:6379> incr count                #自动+1
 (integer) 1
 127.0.0.1:6379> incr count
 (integer) 2
 127.0.0.1:6379> incr count
 (integer) 3
-127.0.0.1:6379> decr count           #自动-1
+127.0.0.1:6379> decr count                #自动-1
 (integer) 2
 127.0.0.1:6379> decr count
 (integer) 1
