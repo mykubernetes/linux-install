@@ -1525,3 +1525,46 @@ hosts: webservers
              mv apache-tomcat-{{ tomcat_version }} tomcat8 &&
              cd tomcat8/bin && nohup ./startup.sh &
 ```
+
+
+自动化运维之磁盘的分区及挂载
+---
+
+```
+$ cat part.yml 
+---
+- hosts: web
+  tasks:
+    - shell: test -b /dev/sda               #shell模块判断磁盘设备是否存在
+      register: result
+      ignore_errors: True
+
+    - debug:
+        msg: "/dev/sda not exists"          #不存在报错
+      when: result.rc != 0
+
+    - name: create partations
+      block:  
+        - name: Create a new primary partition with a size of 1GiB
+          parted:                           #磁盘分区（parted模块）
+            device: /dev/sda
+            number: 1
+            state: present
+            part_end: 1GiB
+
+        - name: Create a ext4 filesystem on /dev/sda1 
+          filesystem:                       #磁盘格式化（filesystem模块）
+            fstype: ext4
+            dev: /dev/sda1
+
+        - name: Mount up device
+          mount:                            #文件系统的挂载（mount模块）
+            path: /media
+            src: /dev/sda1
+            fstype: ext4
+            opts: noatime
+            state: mounted
+
+      when: result.rc == 0  ##存在创建
+
+```
