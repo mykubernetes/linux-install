@@ -188,14 +188,24 @@ delay=10s表示延迟10秒关闭
 1、查询节点的状态  
 ```
 curl -XGET 'http://localhost:9200/_nodes/stats?pretty=true'
-curl -XGET 'http://localhost:9200/_nodes/192.168.1.2/stats?pretty=true'
-curl -XGET 'http://localhost:9200/_nodes/process'
-curl -XGET 'http://localhost:9200/_nodes/_all/process'
-curl -XGET 'http://localhost:9200/_nodes/192.168.1.2,192.168.1.3/jvm,process'
-curl -XGET 'http://localhost:9200/_nodes/192.168.1.2,192.168.1.3/info/jvm,process'
-curl -XGET 'http://localhost:9200/_nodes/192.168.1.2,192.168.1.3/_all'
-curl -XGET 'http://localhost:9200/_nodes/hot_threads'
+curl -XGET 'http://localhost:9200/_nodes/process'            
+curl -XGET 'http://localhost:9200/_nodes/process/stats'                            #统计信息（内存、cpu）
+curl -XGET 'http://localhost:9200/_nodes/jvm'                                      #获取各节点的虚拟机统计和配置信息
+curl -XGET 'http://localhost:9200/_nodes/jvm/stats'                                #更详细的虚拟机信息
+curl -XGET 'http://localhost:9200/_nodes/http'                                     #获取各个节点的http信息（如ip地址）
+curl -XGET 'http://localhost:9200/_nodes/http/stats'                               #获取各个节点处理http请求的统计情况
+curl -XGET 'http://localhost:9200/_nodes/hot_threads/stats'
+curl -XGET 'http://localhost:9200/_nodes/thread_pool                               #获取各种类型的线程池
+curl -XGET 'http://localhost:9200/_nodes/thread_pool/stats'                        #获取各种类型线程池的统计信息
 ```
+以上操作可以通过以下形式针对指定节点操作
+```
+curl -XGET 'http://localhost:9200/_node/${nodeid}/jvm/stats
+curl -XGET 'http://localhost:9200/_node/${nodeip}/jvm/stats
+curl -XGET 'http://localhost:9200/_node/${nodeattribute}/jvm/stats
+```
+
+
 
 2、集群节点列表api
 ```
@@ -265,7 +275,7 @@ logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 12
 # curl -XPUT http://127.0.0.1:9200/index/type/id/update   #更新一个文档，如果该文档不已存在，则返回失败
 ```
 
-日常巡检
+五、日常巡检
 ---
 
 1、查看集群状态
@@ -294,7 +304,7 @@ df -h
 ```
 
 
-集群常见故障处理
+六、集群常见故障处理
 ---
 ES集群出现Unassigned shards问题 
 
