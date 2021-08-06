@@ -42,20 +42,20 @@ _cat系列提供了一系列查询elasticsearch集群状态的接口。
 curl -XGET localhost:9200/_cat
 获取所有_cat系列的操作
 =^.^=
-/_cat/allocation
-/_cat/shards
+/_cat/allocation              #查看节点分配情况
+/_cat/shards                  #查看分片情况
 /_cat/shards/{index}
-/_cat/master                  #查看住节点信息
+/_cat/master                  #查看主节点信息
 /_cat/nodes                   #查看所有节点
 /_cat/indices                 #查看所有索引 类似于数据库的show databases;
 /_cat/indices/{index}
-/_cat/segments
+/_cat/segments                #查看索引的分片信息
 /_cat/segments/{index}
-/_cat/count
+/_cat/count                   #查看文档个数
 /_cat/count/{index}
 /_cat/recovery
 /_cat/recovery/{index}
-/_cat/health                  #查看es健康状况
+/_cat/health                  #查看集群健康情况
 /_cat/pending_tasks
 /_cat/aliases
 /_cat/aliases/{alias}
@@ -94,7 +94,15 @@ Onyxx      bigdesk          NA      s    /_plugin/bigdesk/
 二、使用_cluster系列  
 ---
 
-1、查询设置集群状态  
+1、集群健康检测
+```
+http://172.0.0.1:9200/_cat/health?v
+     
+epoch      timestamp cluster    status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent
+1498119164 16:12:44  es-cluster yellow          1         1     20  20    0    0       20             0                  -                 50.0%
+```
+
+2、查询设置集群状态  
 ```
 curl -XGET localhost:9200/_cluster/health?pretty=true
 {
@@ -123,19 +131,17 @@ curl -XGET localhost:9200/_cluster/health?level=shards        #表示显示分�
 - yellow 黄灯，所有主分片都正确运行，但是有副本分片缺失。
 - red 红灯，有主分片缺失。这部分数据完全不可用。
 
-
-2、集群的详细信息。包括节点、分片等。  
+3、集群的详细信息。包括节点、分片等。  
 ```
 curl -XGET localhost:9200/_cluster/state?pretty=true
 ```  
 
-3、获取集群堆积的任务  
+4、获取集群堆积的任务  
 ```
 curl -XGET localhost:9200/_cluster/pending_tasks?pretty=true
 ```  
 
-4、修改集群配置
-举例：
+5、修改集群配置
 ```
 curl -XPUT localhost:9200/_cluster/settings -d '{
     "persistent" : {
@@ -145,19 +151,24 @@ curl -XPUT localhost:9200/_cluster/settings -d '{
 ```  
 transient 表示临时的，persistent表示永久的  
 
-5、对shard的手动控制  
-``` curl -XPOST 'localhost:9200/_cluster/reroute' -d 'xxxxxx' ```
+6、对shard的手动控制  
+```
+curl -XPOST 'localhost:9200/_cluster/reroute' -d 'xxxxxx'
+```
 
-6、关闭节点  
+7、关闭节点
+
 关闭指定192.168.1.1节点  
 ```
 curl -XPOST 'http://192.168.1.1:9200/_cluster/nodes/_local/_shutdown'
 curl -XPOST 'http://localhost:9200/_cluster/nodes/192.168.1.1/_shutdown'
-```  
+```
+
 关闭主节点  
 ```
 curl -XPOST http://localhost:9200/_cluster/nodes/_master/_shutdown'
-```  
+```
+
 关闭整个集群  
 ```
 $ curl -XPOST 'http://localhost:9200/_shutdown?delay=10s'
@@ -166,7 +177,7 @@ $ curl -XPOST 'http://localhost:9200/_cluster/nodes/_all/_shutdown'
 delay=10s表示延迟10秒关闭
 ```
 
-7、查看snspshots
+8、查看snspshots
 ```
 # curl -XGET http://127.0.0.1:9200/_cat/snapshots/{repository}
 ```
@@ -186,37 +197,24 @@ curl -XGET 'http://localhost:9200/_nodes/192.168.1.2,192.168.1.3/_all'
 curl -XGET 'http://localhost:9200/_nodes/hot_threads'
 ```
 
-四、使用索引操作
----
-
-1、集群健康检测api
-```
-http://192.168.0.128:9200/_cat/health?v
-     
-epoch      timestamp cluster    status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent
-1498119164 16:12:44  es-cluster yellow          1         1     20  20    0    0       20             0                  -                 50.0%
-     
-说明:集群的状态描述:
-green:一切都准备好了,集群功能全部可用;
-yellow:数据准备好了,但是副本还没有分配好,集群功能全部可用;
-red:有些数据不可用,但是集群部分功能可用;
-```
-
 2、集群节点列表api
 ```
-curl -XGET http://192.168.0.128:9200/_cat/nodes?v
+curl -XGET http://172.0.0.1:9200/_cat/nodes?v
  
 ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
 192.168.0.128           19          72  58                          mdi       *      master
 
 #显示更详细的节点信息
-curl -XGET http://192.168.0.128:9200/_nodes/process?pretty
+curl -XGET http://172.0.0.1:9200/_nodes/process?pretty
 ```
 -  heap.percent 查看内存是否爆表
 
-3、列出集群中所有的索引
+
+四、使用索引操作
+---
+1、列出集群中所有的索引
 ```
-curl -XGET http://192.168.0.128:9200/_cat/indices?v
+curl -XGET http://172.0.0.1:9200/_cat/indices?v
      
 health status index uuid                   pri rep docs.count docs.deleted store.size pri.store.size
 yellow open   ttl   mPSsvTX3TbSsSQKUcJqtbA   5   1          0            0       795b           795b
@@ -246,27 +244,48 @@ logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 12
   - r 复副本
 
 
+```
+# curl -XGET http://127.0.0.1:9200/index/_search          #搜索
+# curl -XGET http://127.0.0.1:9200/_aliases               #获取或操作索引的别名
+# curl -XGET http://127.0.0.1:9200/index/                 #查看当前索引
+# curl -XGET http://127.0.0.1:9200/index/type/            #创建或操作类型
+# curl -XGET http://127.0.0.1:9200/index/_mapping         #创建或操作mapping
+# curl -XGET http://127.0.0.1:9200/index/_settings        #创建或操作设置（number_of_shards是不可更改的）
+# curl -XGET http://127.0.0.1:9200/index/_open            #打开被关闭的索引
+# curl -XGET http://127.0.0.1:9200/index/_close           #关闭索引
+# curl -XGET http://127.0.0.1:9200/index/_refresh         #刷新索引（使新加内容对搜索课件）
+# curl -XGET http://127.0.0.1:9200/index/_flush           #刷新索引（将变动提交到ucene索引文件中，并清空elasticsearch的transaction log）
+# curl -XGET http://127.0.0.1:9200/index/_optimize        #优化segement
+# curl -XGET http://127.0.0.1:9200/index/_status          #获取索引的状态信息
+# curl -XGET http://127.0.0.1:9200/index/_segments        #获取索引的segments的状态信息
+# curl -XGET http://127.0.0.1:9200/index/_explain         #不执行实际搜索，而返回解释信息
+# curl -XGET http://127.0.0.1:9200/index/_analyze         #不执行实际搜索，根据输入的参数进行文本分析
+# curl -XGET http://127.0.0.1:9200/index/type/id          #操作指定文档
+# curl -XPUT http://127.0.0.1:9200/index/type/id/_create  #创建一个文档，如果该文档已存在，则返回失败
+# curl -XPUT http://127.0.0.1:9200/index/type/id/update   #更新一个文档，如果该文档不已存在，则返回失败
+```
+
 日常巡检
 ---
 
 1、查看集群状态
 ```
-curl -XGET http://localhost:9200/_cluster/health?pretty
+curl -XGET http://172.0.0.1:9200/_cluster/health?pretty
 ```
 
 2、显示集群系统信息，包括CPU JVM等等  
 ```
-curl -XGET localhost:9200/_cluster/stats?pretty=true
+curl -XGET http://172.0.0.1:9200/_cluster/stats?pretty=true
 ```
 
 3、查看集群JVM内存大小，如果超过80%，则集群写入会不正常
 ```
-curl -XGET "http://localhost:9200/_nodes/stats/jvm?pretty" | grep heap_used_percent
+curl -XGET "http://172.0.0.1:9200/_nodes/stats/jvm?pretty" | grep heap_used_percent
 ```
 
 4、集群空间检查
 ```
-curl http://localhost:9200/_cat/allocation?v
+curl http://172.0.0.1:9200/_cat/allocation?v
 ```
 
 5、检查磁盘空间
