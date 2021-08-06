@@ -251,10 +251,10 @@ logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 12
 
 查看unassigned shards
 ```
-# curl -XGET http://127.0.0.1:9200/_cat/shards?j=index,shard,prirep,state,unassigned,reason |grep UNASSIGNED
+# curl -XGET http://127.0.0.1:9200/_cat/shards?h=index,shard,prirep,state,unassigned,reason |grep UNASSIGNED
 ```
 
-查看 allocation issue
+查看 allocation issue 分配中的报错
 ```
 # curl -XGET http://127.0.0.1:9200/_cluster/allocation/explain?pretty
 ```
