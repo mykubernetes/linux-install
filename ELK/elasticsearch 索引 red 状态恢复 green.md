@@ -22,7 +22,10 @@ index                      3    r     STARTED     764537 340.2mb 172.xxx.xxx.88 
 index                      4    p     STARTED     765476 339.3mb 172.xxx.xxx.89  Savage Steel
 index                      4    r     STARTED     765476 339.3mb 172.xxx.xxx.88  Temugin      
 index                      0    p     UNASSIGNED                                             
-index                      0    r     UNASSIGNED    
+index                      0    r     UNASSIGNED
+
+
+curl -X GET "http://172.xxx.xxx.174:9288/_cat/shards?h=index,shard,prirep,state,unassigned,reason | grep UNASSIGNED"
 ```
 index 有一个主节点 0 和一个副本 0 处于 UNASSIGNED 状态，也就是没有分配到机子上，因为主节点没有分配到机子上，所以状态为 red。
 
