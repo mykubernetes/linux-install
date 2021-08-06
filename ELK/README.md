@@ -296,16 +296,16 @@ ES集群出现Unassigned shards问题
 # curl -XGET http://127.0.0.1:9200/_cat/indices?v |grep -v green
 ```
 
-通过查看日志，出现unassigned shards的情况有很多，需要具体问题具体分析，下面列出几种情况
+> 通过查看日志，出现unassigned shards的情况有很多，需要具体问题具体分析，下面列出几种情况
 
-1、node节点出现卡死，通过kill es进程重启卡死的es节点即可
+>> 1、node节点出现卡死，通过kill es进程重启卡死的es节点即可
 
-2、shard分配超过最大次数，尝试手动分配shard
+>> 2、shard分配超过最大次数，尝试手动分配shard
 ```
 # curl -XPOST 'http://127.0.0.1:9200/_cluster/reroute?retry_failed=true'
 ```
 
-3、副本数据损坏，需要把相应副本先设为0，再设为1，重新分配
+>> 3、副本数据损坏，需要把相应副本先设为0，再设为1，重新分配
 ```
 # curl -XPUT 'http://127.0.0.1:9200/${index}/_settings?pretty -H 'Content-Type: application/json' -d'
 {
@@ -315,7 +315,7 @@ ES集群出现Unassigned shards问题
 }
 ```
 
-4、对于数据可丢失的情况，可以直接delete出现问题的indices,恢复集群正常（慎用）
+>> 4、对于数据可丢失的情况，可以直接delete出现问题的indices,恢复集群正常（慎用）
 ```
 # curl -XDELETE 'http://127.0.0.1:9200/index_name
 ```
