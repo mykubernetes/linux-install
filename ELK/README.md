@@ -213,6 +213,7 @@ curl -XGET http://192.168.0.128:9200/_cat/nodes?v
 ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
 192.168.0.128           19          72  58                          mdi       *      master
 
+#显示更详细的节点信息
 curl -XGET http://192.168.0.128:9200/_nodes/process?pretty
 ```
 -  heap.percent 查看内存是否爆表
