@@ -31,6 +31,11 @@ index 有一个主节点 0 和一个副本 0 处于 UNASSIGNED 状态，也就�
 
 从 ip 列可以看出一共有三台机子，尾数分别为 174，89 以及 88。一共有 10 个 index所以对应的 elasticsearch 的 index.number_of_shards: 5，index.number_of_replicas: 1。一共有 10 个分片，可以按照 3，3，4 这样分配到三台不同的机子上。88 和 89 机子都分配多个节点，所以可以将另外一个主节点分配到 174 机子上。
 
+查看分片在分配过程中的报错
+```
+curl -XGET localhost:9200/_cluster/allocation/explain?pretty
+```
+
 3、找出机子的 id，找到 174 机子对应的 id，后续重新分配主节点得要用到
 ```
 curl -X GET "http://172.xxx.xxx.174:9288/_nodes/process?v="
