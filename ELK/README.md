@@ -21,6 +21,7 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
 https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md
 
 ES  内置的REST 接口
+---
 | URL | 说明 |
 |-----|------|
 | /index/_search | 搜索指定索引下的数据 |
@@ -34,7 +35,8 @@ ES  内置的REST 接口
 | /index/_refresh | 刷新索引（使新增加内容对搜索可见，不保证数据被写入磁盘） |
 | /index/_flush | 刷新索引（会触发Lucene提交数据） |
 
-一、使用_cat系列  
+一、使用_cat系列
+---
 _cat系列提供了一系列查询elasticsearch集群状态的接口。  
 ```
 curl -XGET localhost:9200/_cat
@@ -62,7 +64,8 @@ curl -XGET localhost:9200/_cat
 /_cat/fielddata
 /_cat/fielddata/{fields}
 ```  
-你也可以后面加一个v，让输出内容表格显示表头  
+
+后面加一个v，让输出内容表格显示表头  
 ```
 curl localhost:9200/_cat/indices?v
 name       component        version type url
@@ -86,8 +89,11 @@ Onyxx      analysis-smartcn 2.1.0   j
 Onyxx      analysis-pinyin  NA      j
 Onyxx      head             NA      s    /_plugin/head/
 Onyxx      bigdesk          NA      s    /_plugin/bigdesk/
-```  
+```
+
 二、使用_cluster系列  
+---
+
 1、查询设置集群状态  
 ```
 curl -XGET localhost:9200/_cluster/health?pretty=true
@@ -192,7 +198,7 @@ curl -XGET 'http://localhost:9200/_nodes/hot_threads'
 ```
 
 四、使用索引操作
-
+---
 1、集群健康检测api
 ```
 http://192.168.0.128:9200/_cat/health?v
@@ -254,547 +260,82 @@ logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 12
 # curl -XGET http://127.0.0.1:9200/_cat/shards?h=index,shard,prirep,state,unassigned,reason |grep UNASSIGNED
 ```
 
-查看 allocation issue 分配中的报错
+查看allocation issue 分配中的报错
 ```
 # curl -XGET http://127.0.0.1:9200/_cluster/allocation/explain?pretty
 ```
 
-查看 snspshots
+查看snspshots
 ```
 # curl -XGET http://127.0.0.1:9200/_cat/snapshots/{repository}
 ```
 
-重启es集群
-```
-# curl -XGET http://127.0.0.1:9200/_cluster/update -d '{
-"cluster_name": "mycluster",
-"operator": "xxx",
-"restart_type": "full_cluster_restart"
-}'
-```
-- rolling_restart 滚动重启
-- full_cluster_restart 全量重启
-- no_restart 不重启
 
-4、创建一个customer的index
-```
-curl -XPUT http://192.168.0.128:9200/customer?pretty
+日常巡检
+---
 
-response:
-{
-  "acknowledged": true,
-  "shards_acknowledged": true
-}
+1、查看集群状态
+```
+curl -XGET http://localhost:9200/_cluster/health?pretty
 ```
 
-5、创建文档索引和查询文档
+2、查看集群JVM内存大小，如果超过80%，则集群写入会不正常
 ```
-curl -XPUT http://192.168.0.128:9200/customer/person/1?pretty -d '{"name":"张三","age":34,"sex":"男"}'
- 
-response:
-{
-  "_index": "customer",
-  "_type": "person",
-  "_id": "1",
-  "_version": 1,
-  "result": "created",
-  "_shards": {
-    "total": 2,
-    "successful": 1,
-    "failed": 0
-  },
-  "created": true
-}
- 
-----------------------------------------------------------
-curl -XPOST http://192.168.0.128:9200/customer/person?pretty -d '{"name":"张三","age":34,"sex":"男"}'
+curl -XGET "http://localhost:9200/_nodes/stats/jvm?pretty" | grep heap_used_percent
+```
 
- response:
- {
-   "_index": "customer",
-   "_type": "person",
-   "_id": "AVzTAOlNiSjTxTQlMxWw",
-   "_version": 1,
-   "result": "created",
-   "_shards": {
-     "total": 2,
-     "successful": 1,
-     "failed": 0
-   },
-   "created": true
- }
- 
------------------------------------------------------------
-     
-curl -XPOST http://192.168.0.128:9200/customer/person/AVzTAOlNiSjTxTQlMxWw/_update?pretty -d
-'{
-	"doc":{"name":"李四","age":44,"sex":"男"}
-}'
- 
-response:
+3、集群空间检查
+```
+curl http://localhost:9200/_cat/allocation?v
+```
+
+4、检查磁盘空间
+```
+df -h
+```
+
+集群常见故障处理
+---
+ES集群出现Unassigned shards问题 
+
+1、对集群进行巡检，进行检查集群状态，检查jvm使用情况，检查集群空间，磁盘空间
+
+2、查看unassigned shards有哪些
+```
+# curl -XGET http://127.0.0.1:9200/_cat/shards?h=index,shard,prirep,state,unassigned,reason |grep UNASSIGNED
+```
+
+3、查看出现unassigned shards的原因
+```
+# curl -XGET http://127.0.0.1:9200/_cluster/allocation/explain?pretty
+```
+
+4、查看状态不为green的index
+```
+# curl -XGET http://127.0.0.1:9200/_cat/indices?v |grep -v green
+```
+
+通过查看日志，出现unassigned shards的情况有很多，需要具体问题具体分析，下面列出几种情况
+
+1、node节点出现卡死，通过kill es进程重启卡死的es节点即可
+
+2、shard分配超过最大次数，尝试手动分配shard
+```
+# curl -XPOST 'http://127.0.0.1:9200/_cluster/reroute?retry_failed=true'
+```
+
+3、副本数据损坏，需要把相应副本先设为0，再设为1，重新分配
+```
+# curl -XPUT 'http://127.0.0.1:9200/${index}/_settings?pretty -H 'Content-Type: application/json' -d'
 {
-  "_index": "customer",
-  "_type": "person",
-  "_id": "AVzTAOlNiSjTxTQlMxWw",
-  "_version": 2,
-  "result": "updated",
-  "_shards": {
-    "total": 2,
-    "successful": 1,
-    "failed": 0
-  }
-}
-     
-ps:AVzTAOlNiSjTxTQlMxWw是文档id
-     
----------------------------------------------------------------
-     
-使用脚本更新,ctx._source指向当前source文档
-curl -XPOST http://192.168.0.128:9200/customer/person/AVzTAOlNiSjTxTQlMxWw/_update?pretty
-'{
-	"script" : "ctx._source.age += 5"
-}'
-     
-response:
-{
-  "_index": "customer",
-  "_type": "person",
-  "_id": "AVzTAOlNiSjTxTQlMxWw",
-  "_version": 3,
-  "result": "updated",
-  "_shards": {
-    "total": 2,
-    "successful": 1,
-    "failed": 0
-  }
-}
-     
----------------------------------------------------------------
-     
-curl -XGET http://192.168.0.128:9200/customer/person/1?pretty
-     
-response:
-{
-  "_index": "customer",
-  "_type": "person",
-  "_id": "1",
-  "_version": 1,
-  "found": true,
-  "_source": {
-    "name": "张三",
-    "age": 34,
-    "sex": "男"
+  "index": {
+    "number_of_repolicas": 0
   }
 }
 ```
 
-6、删除索引
+4、对于数据可丢失的情况，可以直接delete出现问题的indices,恢复集群正常（慎用）
 ```
-curl -XDELETE http://192.168.0.128:9200/customer
- 
-response:
-{
-  "acknowledged": true
-}
+# curl -XDELETE 'http://127.0.0.1:9200/index_name
 ```
 
-7、根据文档id,删除文档
-```
-curl -XDELETE http://192.168.0.128:9200/customer/person/AVzTAOlNiSjTxTQlMxWw?pretty
- 
-response:
-{
-  "found": true,
-  "_index": "customer",
-  "_type": "person",
-  "_id": "AVzTAOlNiSjTxTQlMxWw",
-  "_version": 4,
-  "result": "deleted",
-  "_shards": {
-    "total": 2,
-    "successful": 1,
-    "failed": 0
-  }
-}
-```
-
-8、批处理_bulk API,可以同时处理index,update,delete操作.批处理减少网络请求.批处理时,如果某个动作失败了,不会影响其他的动作;批处理返回结果按执行的顺序返回动作执行状态,可以检测是否失败.
-```
-批量添加两个index
-curl -XPOST http://192.168.0.128:9200/customer/person/_bulk?pretty
-{"index" : {"_id" : 2}}
-{"name" : "赵六","age" : 23}
-{"index" : {"_id" : 3}}
-{"name" : "王五","age" : 53}
- 
-response:
-{
-  "took" : 1541,
-  "errors" : false,
-  "items" : [
-    {
-      "index" : {
-        "_index" : "customer",
-        "_type" : "person",
-        "_id" : "2",
-        "_version" : 1,
-        "result" : "created",
-        "_shards" : {
-          "total" : 2,
-          "successful" : 1,
-          "failed" : 0
-        },
-        "created" : true,
-        "status" : 201
-      }
-    },
-    {
-      "index" : {
-        "_index" : "customer",
-        "_type" : "person",
-        "_id" : "3",
-        "_version" : 1,
-        "result" : "created",
-        "_shards" : {
-          "total" : 2,
-          "successful" : 1,
-          "failed" : 0
-        },
-        "created" : true,
-        "status" : 201
-      }
-    }
-  ]
-}
- 
-------------------------------------------------------
- 
- 
-更新文档2,删除文档3
-curl -XPOST http://192.168.0.128:9200/customer/person/_bulk?pretty
-{"update" : {"_id" : 2}}
-{"doc" : {"age" : 33}}
-{"delete" : {"_id" : 3}}
- 
-response:
-{
-  "took": 941,
-  "errors": false,
-  "items": [
-    {
-      "update": {
-        "_index": "customer",
-        "_type": "person",
-        "_id": "2",
-        "_version": 2,
-        "result": "updated",
-        "_shards": {
-          "total": 2,
-          "successful": 1,
-          "failed": 0
-        },
-        "status": 200
-      }
-    },
-    {
-      "delete": {
-        "found": true,
-        "_index": "customer",
-        "_type": "person",
-        "_id": "3",
-        "_version": 2,
-        "result": "deleted",
-        "_shards": {
-          "total": 2,
-          "successful": 1,
-          "failed": 0
-        },
-        "status": 200
-      }
-    }
-  ]
-}
-```
-
-9、使用REST API搜索文档
-```
-搜索所有文档,结果按account_number升序排序
-curl -XGET http://192.168.0.128:9200/bank/_search?q=*&sort=account_number:asc&pretty
-
-等价的写法:
-curl -XPOST http://192.168.0.128:9200/bank/_search -d
-'{
-  "query": { "match_all": {} },
-  "sort": [
-    { "account_number": "asc" }
-  ],
-  "from" : 5, //从第5条开始,默认是0
-  "size" : 1 //返回1条,默认是10条
-}'
- 
-response:
-{
-  "took": 32, //搜索时间,单位:毫秒
-  "timed_out": false, //搜索是否超时
-  "_shards": { //搜索分片数量,以及成功和失败的数量
-    "total": 5,
-    "successful": 5,
-    "failed": 0
-  },
-  "hits": { //搜索结果
-    "total": 1000, //满足搜索条件的文档数量
-    "max_score": null,
-    "hits": [ //真实搜索结果数组,默认显示10条
-      {
-        "_index": "bank",
-        "_type": "account",
-        "_id": "0",
-        "_score": null,
-        "_source": {
-          "account_number": 0,
-          "balance": 16623,
-          "firstname": "Bradshaw",
-          "lastname": "Mckenzie",
-          "age": 29,
-          "gender": "F",
-          "address": "244 Columbus Place",
-          "employer": "Euron",
-          "email": "bradshawmckenzie@euron.com",
-          "city": "Hobucken",
-          "state": "CO"
-        },
-        "sort": [ //排序的结果
-          0
-        ]
-      }
-    ]
-  }
-}
- 
-------------------------------------------
-搜索所有的文档,返回前2条,并显示指定的fields
-curl -XPOST http://192.168.0.128:9200/bank/_search -d
-'{
-  "query": { "match_all": {} },
-  "_source" : ["account_number","balance","email"], //返回指定的字段
-  "size" : 2
-}'
- 
-response:
-{
-  "took": 17,
-  "timed_out": false,
-  "_shards": {
-    "total": 5,
-    "successful": 5,
-    "failed": 0
-  },
-  "hits": {
-    "total": 1000,
-    "max_score": 1,
-    "hits": [
-      {
-        "_index": "bank",
-        "_type": "account",
-        "_id": "25",
-        "_score": 1,
-        "_source": {
-          "account_number": 25,
-          "balance": 40540,
-          "email": "virginiaayala@filodyne.com"
-        }
-      },
-      {
-        "_index": "bank",
-        "_type": "account",
-        "_id": "44",
-        "_score": 1,
-        "_source": {
-          "account_number": 44,
-          "balance": 34487,
-          "email": "aureliaharding@orbalix.com"
-        }
-      }
-    ]
-  }
-}
- 
-------------------------------------
-搜索account_number为20的文档
-curl -XPOST http://192.168.0.128:9200/bank/_search -d
-'{
-  "query": { "match": {"account_number" : 20} }
-}'
- 
-------------------------------
-搜索address中含有mill的所有文档
-curl -XPOST http://192.168.0.128:9200/bank/_search -d
-'{
- "query": { "match": {"address" : "mill"} }
-}'
- 
----------------------------------
-使用match_phrase匹配address中含有"mill lane"短语的文档
-http://192.168.0.128:9200/bank/_search
-method: POST
-params:
-{
-  "query": { "match_phrase": {"address" : "mill lane"} }
-}
- 
----------------------------------
- 
-使用bool query匹配address中同时含有"mill "和"lane"短语的文档,must:and
-curl -XPOST http://192.168.0.128:9200/bank/_search -d
-'{
-  "query": {
-    "bool": {
-      "must": [
-        { "match": { "address": "mill" } },
-        { "match": { "address": "lane" } }
-      ]
-    }
-  }
-}'
- 
-与之类似的:
-should:or关系
-must_not:即不含"mill",也不含"lane"的文档
-bool query可以同时包含must,should,must_not组成复杂的查询
-```
-
-10 文档score:根据搜索条件估算一个文档匹配程度的相对的数值.得分越高,文档越有价值;反之,价值越低.有些情况不需要score(比如"filter""),es会检测自动优化查询,不计算得分.
-```
-curl -XPOST http://192.168.0.128:9200/bank/_search  -d
-'{
-  "query": {
-    "bool": {
-      "must": { "match_all": {} }, //查询所有的文档
-      "filter": { //过滤,不计算得分,从结果可以查出所有的score都为1,是个常量
-        "range": { //范围查询,适用于numeric或deta 类型
-          "balance": {
-            "gte": 20000,
-            "lte": 30000
-          }
-        }
-      }
-    }
-  }
-}'
-```
-
-11 执行聚合:es提供了分组和统计的能力,这就是聚合.可以认为就是sql中的group by和aggregate 功能.es在聚合时同时返回搜索的文档和聚合两部分.
-```
-按state分组聚合,不返回搜索的文档
-curl -XPOST http://192.168.0.128:9200/bank/_search -d
-'{
-  "size": 0,//不返回搜索的文档
-  "aggs": {//聚合
-    "group_by_state": {
-      "terms": {
-        "field": "state.keyword" //按state分组,降序排序
-      }
-    }
-  }
-}'
- 
-response:
-{
-  "took": 58,
-  "timed_out": false,
-  "_shards": {
-    "total": 5,
-    "successful": 5,
-    "failed": 0
-  },
-  "hits": {
-    "total": 1000,
-    "max_score": 0,
-    "hits": []
-  },
-  "aggregations": {
-    "group_by_state": {
-      "doc_count_error_upper_bound": 20,
-      "sum_other_doc_count": 770,
-      "buckets": [
-        {
-          "key": "ID",
-          "doc_count": 27
-        },
-        ...,
-        {
-          "key": "MO",
-          "doc_count": 20
-        }
-      ]
-    }
-  }
-}
- 
---------------------------------------------------
- 
-按state分组,统计每个state的平均工资,并降序排序
-curl -XPOST http://192.168.0.128:9200/bank/_search -d
-'{
-  "size": 0,
-  "aggs": {
-    "group_by_state": {
-      "terms": {
-        "field": "state.keyword",
-        "order": {
-          "average_balance": "desc"
-        }
-      },
-      "aggs": {
-        "average_balance": {
-          "avg": {
-            "field": "balance"
-          }
-        }
-      }
-    }
-  }
-}'
- 
--------------------------------------------------
-按年龄段分组,然后按性别分组,统计每个年龄段中不同性别的平均工资
-curl -XPOST http://192.168.0.128:9200/bank/_search -d
-'{
- "size": 0,
- "aggs": {
-   "group_by_age": {
-     "range": {
-       "field": "age",
-       "ranges": [
-         {
-           "from": 20,
-           "to": 30
-         },
-         {
-           "from": 30,
-           "to": 40
-         },
-         {
-           "from": 40,
-           "to": 50
-         }
-       ]
-     },
-     "aggs": {
-       "group_by_gender": {
-         "terms": {
-           "field": "gender.keyword"
-         },
-         "aggs": {
-           "average_balance": {
-             "avg": {
-               "field": "balance"
-             }
-           }
-         }
-    
-     }
-   }
- }
-}'
-```
