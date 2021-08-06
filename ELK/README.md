@@ -124,34 +124,17 @@ curl -XGET localhost:9200/_cluster/health?level=shards        #表示显示分�
 - red 红灯，有主分片缺失。这部分数据完全不可用。
 
 
-
-2、显示集群系统信息，包括CPU JVM等等  
-```
-curl -XGET localhost:9200/_cluster/stats?pretty=true
-```
-
-查看集群JVM内存大小，如果超过80%，则集群写入会不正常
-```
-curl -XGET localhost:9200/_nodes/stats/jvm?pretty |grep heap_used_percent
-```
-
-集群空间检查
-```
-curl -XGET localhost:9200/_cat/allocation?v
-```
-
-
-3、集群的详细信息。包括节点、分片等。  
+2、集群的详细信息。包括节点、分片等。  
 ```
 curl -XGET localhost:9200/_cluster/state?pretty=true
 ```  
 
-4、获取集群堆积的任务  
+3、获取集群堆积的任务  
 ```
 curl -XGET localhost:9200/_cluster/pending_tasks?pretty=true
 ```  
 
-5、修改集群配置
+4、修改集群配置
 举例：
 ```
 curl -XPUT localhost:9200/_cluster/settings -d '{
@@ -162,10 +145,10 @@ curl -XPUT localhost:9200/_cluster/settings -d '{
 ```  
 transient 表示临时的，persistent表示永久的  
 
-6、对shard的手动控制  
+5、对shard的手动控制  
 ``` curl -XPOST 'localhost:9200/_cluster/reroute' -d 'xxxxxx' ```
 
-7、关闭节点  
+6、关闭节点  
 关闭指定192.168.1.1节点  
 ```
 curl -XPOST 'http://192.168.1.1:9200/_cluster/nodes/_local/_shutdown'
@@ -183,7 +166,13 @@ $ curl -XPOST 'http://localhost:9200/_cluster/nodes/_all/_shutdown'
 delay=10s表示延迟10秒关闭
 ```
 
+7、查看snspshots
+```
+# curl -XGET http://127.0.0.1:9200/_cat/snapshots/{repository}
+```
+
 三、使用_nodes系列
+---
 
 1、查询节点的状态  
 ```
@@ -199,6 +188,7 @@ curl -XGET 'http://localhost:9200/_nodes/hot_threads'
 
 四、使用索引操作
 ---
+
 1、集群健康检测api
 ```
 http://192.168.0.128:9200/_cat/health?v
@@ -255,21 +245,6 @@ logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 12
   - p 主分片
   - r 复副本
 
-查看unassigned shards
-```
-# curl -XGET http://127.0.0.1:9200/_cat/shards?h=index,shard,prirep,state,unassigned,reason |grep UNASSIGNED
-```
-
-查看allocation issue 分配中的报错
-```
-# curl -XGET http://127.0.0.1:9200/_cluster/allocation/explain?pretty
-```
-
-查看snspshots
-```
-# curl -XGET http://127.0.0.1:9200/_cat/snapshots/{repository}
-```
-
 
 日常巡检
 ---
@@ -279,20 +254,26 @@ logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 12
 curl -XGET http://localhost:9200/_cluster/health?pretty
 ```
 
-2、查看集群JVM内存大小，如果超过80%，则集群写入会不正常
+2、显示集群系统信息，包括CPU JVM等等  
+```
+curl -XGET localhost:9200/_cluster/stats?pretty=true
+```
+
+3、查看集群JVM内存大小，如果超过80%，则集群写入会不正常
 ```
 curl -XGET "http://localhost:9200/_nodes/stats/jvm?pretty" | grep heap_used_percent
 ```
 
-3、集群空间检查
+4、集群空间检查
 ```
 curl http://localhost:9200/_cat/allocation?v
 ```
 
-4、检查磁盘空间
+5、检查磁盘空间
 ```
 df -h
 ```
+
 
 集群常见故障处理
 ---
