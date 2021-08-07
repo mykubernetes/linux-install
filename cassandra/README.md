@@ -36,7 +36,7 @@ Cassandra使用场景
 
 Cassandra 3.9下载
 ---
-打开官网，选择下载频道https://cassandra.apache.org/download/
+> 打开官网，选择下载频道https://cassandra.apache.org/download/
 
 
 nodetool常用命令
