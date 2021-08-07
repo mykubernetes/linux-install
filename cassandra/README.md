@@ -1,3 +1,44 @@
+Cassandra的介绍
+---
+
+1、Cassandra概述
+
+> Cassandra是一套开源分布式NoSQL数据库系统。它最初由Facebook开发，用于储存收件箱等简单格式数据，集[Google](https://baike.baidu.com/item/Google)[BigTable](https://baike.baidu.com/item/BigTable)的数据模型与[Amazon](https://baike.baidu.com/item/Amazon) Dynamo的完全分布式的架构于一身Facebook于2008将 Cassandra 开源，此后，由于Cassandra良好的[可扩展性](https://baike.baidu.com/item/可扩展性/8669999)，被[Digg](https://baike.baidu.com/item/Digg)、[Twitter](https://baike.baidu.com/item/Twitter)等知名[Web 2.0](https://baike.baidu.com/item/Web 2.0)网站所采纳，成为了一种流行的分布式结构化数据存储方案。
+
+2、Cassandra的官网
+
+Cassandra在2009年成为了Apache软件基金会的Incubator项目，并在2010年2月走出孵化器，成为正式的基金会项目。
+
+> 官网地址：https://cassandra.apache.org/
+
+3、Cassandra特点
+
+- **弹性可扩展性** - Cassandra是高度可扩展的; 它允许添加更多的硬件以适应更多的客户和更多的数据根据要求。
+- **始终基于架构** - Cassandra没有单点故障，它可以连续用于不能承担故障的关键业务应用程序。
+- **快速线性性能** - Cassandra是线性可扩展性的，即它为你增加集群中的节点数量增加你的吞吐量。因此，保持一个快速的响应时间。
+- **灵活的数据存储** - Cassandra适应所有可能的数据格式，包括：结构化，半结构化和非结构化。它可以根据您的需要动态地适应变化的数据结构。
+- **便捷的数据分发** - Cassandra通过在多个数据中心之间复制数据，可以灵活地在需要时分发数据。
+- **事务支持** - Cassandra支持属性，如原子性，一致性，隔离和持久性（ACID）。
+- **快速写入** - Cassandra被设计为在廉价的商品硬件上运行。 它执行快速写入，并可以存储数百TB的数据，而不牺牲读取效率。
+
+Cassandra使用场景
+---
+1、特征
+- 数据写入操作密集
+- 数据修改操作很少
+- 通过主键查询
+- 需要对数据进行分区存储
+
+2、场景举例
+- 存储日志型数据
+- 类似物联网的海量数据
+- 对数据进行跟踪
+
+Cassandra 3.9下载
+---
+打开官网，选择下载频道https://cassandra.apache.org/download/
+
+
 nodetool常用命令
 ---
 
