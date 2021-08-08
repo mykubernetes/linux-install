@@ -144,11 +144,13 @@ native_transport_port: 9042
 rpc_address: 192.168.1.76
 ```
 
-
 八、启动
 ```
 然后启动，先启动seed
 /opt/cassandra/bin/cassandra
+
+使用root用户启动需要-R参数
+/opt/cassandra/bin/cassandra -R
 
 /opt/cassandra/bin/cassandra -f              #将日志输出到前台
 
@@ -165,6 +167,59 @@ UN  192.168.1.74  189.2 KiB  256          68.9%             98436d32-5d5d-4e5e-a
 UN  192.168.1.75  161.43 KiB  256          64.7%             2f52f14c-acbb-4241-9eff-6ed13b2827e5  rack1
 UN  192.168.1.76  120.67 KiB  256          66.4%             450b02db-90a1-4b76-831a-9b0b9aa42c27  rack1
 ```
+
+启动、重启、关闭的脚本
+```
+#!/bin/sh
+CASSANDRA_DIR="/opt/cassandra"
+ echo "************cassandra***************"
+case "$1" in
+        start)
+                
+                echo "*                                  *"
+                echo "*            starting              *"
+                nohup $CASSANDRA_DIR/bin/cassandra -R >> $CASSANDRA_DIR/logs/system.log 2>&1 &
+                echo "*            started               *"
+                echo "*                                  *"
+                echo "************************************"
+                ;;
+        stop)
+                
+                echo "*                                  *"
+                echo "*           stopping               *"
+                PID_COUNT=`ps aux |grep CassandraDaemon |grep -v grep | wc -l`
+                PID=`ps aux |grep CassandraDaemon |grep -v grep | awk {'print $2'}`
+                if [ $PID_COUNT -gt 0 ];then
+                		echo "*           try stop               *"
+                        kill -9 $PID
+                		echo "*          kill  SUCCESS!          *"
+                else
+                		echo "*          there is no !           *"
+                echo "*                                  *"
+                echo "************************************"
+                fi
+                ;;
+        restart)
+        		
+        		echo "*                                  *"
+                echo "*********     restarting      ******"
+                $0 stop
+                $0 start
+                echo "*                                  *"
+                echo "************************************"
+                ;;
+        status)
+                $CASSANDRA_DIR/bin/nodetool status
+                ;;
+        
+        *)
+        echo "Usage:$0 {start|stop|restart|status}"
+        
+        exit 1
+esac
+```
+
+
 
 九、开启用户名密码认证
 
