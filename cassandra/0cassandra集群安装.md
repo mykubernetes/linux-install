@@ -170,6 +170,8 @@ UN  192.168.1.76  120.67 KiB  256          66.4%             450b02db-90a1-4b76-
 
 启动、重启、关闭的脚本
 ```
+vim /opt/cassandra/startme.sh
+
 #!/bin/sh
 CASSANDRA_DIR="/opt/cassandra"
  echo "************cassandra***************"
@@ -219,6 +221,11 @@ case "$1" in
 esac
 ```
 
+```
+./startme.sh start
+./startme.sh restart
+./startme.sh stop
+```
 
 
 九、开启用户名密码认证
