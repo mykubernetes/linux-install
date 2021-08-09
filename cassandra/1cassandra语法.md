@@ -215,6 +215,806 @@ CQL：Cassandra Query Language  和关系型数据库的 SQL 很类似（一些�
 | WHERE   | where子句与select一起使用以读取特定数据             |
 | ORDERBY | orderby子句与select一起使用，以特定顺序读取特定数据 |
 
+
+## Cassandra的基本操作
+
+### 1、操作键空间
+
+#### 创建Keyspace
+
+> 语法
+
+```
+CREATE KEYSPACE <identifier> WITH <properties>;
+```
+
+更具体的语法：
+```
+Create keyspace KeyspaceName with replicaton={'class':strategy name,   
+'replication_factor': No of replications on different nodes};
+```
+- KeyspaceName 代表键空间的名字
+- strategy name 代表副本放置策略，内容包括：简单策略、网络拓扑策略，选择其中的一个。
+- No of replications on different nodes 代表 复制因子，放置在不同节点上的数据的副本数。
+
+
+1、创建一个键空间名字为：school，副本策略选择：简单策略 SimpleStrategy，副本因子：3
+```
+CREATE KEYSPACE school WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+```
+
+2、验证
+```
+DESCRIBE keyspaces ;
+```
+
+3、输入 DESCRIBE school 查看键空间的创建语句
+```
+DESCRIBE school;
+```
+
+4、连接Keyspace
+```
+use school;
+```
+
+5、修改键空间 
+
+> 1）语法
+```
+ALTER KEYSPACE <identifier> WITH <properties>
+```
+
+> 2）编写完整的修改键空间语句，修改school键空间，把副本因子 从3 改为1
+```
+ALTER KEYSPACE school WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
+```
+
+
+> 3）验证  
+输入 DESCRIBE school 查看键空间的创建语句，代码：
+```
+DESCRIBE school;
+```
+
+6、删除键空间
+
+> 1）语法
+```
+DROP KEYSPACE <identifier>
+```
+
+> 2）完整删除键空间语句，删除school键空间
+```
+DROP KEYSPACE school
+```
+
+7、操作表、索引
+
+注意：操作前，先把键空间school键空间创建，并使用school 键空间
+```
+CREATE KEYSPACE school WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+use school;
+```
+
+8、查看键空间下所有表
+```
+DESCRIBE TABLES;
+```
+
+9、创建表
+
+> 语法
+```
+CREATE (TABLE | COLUMNFAMILY) <tablename> ('<column-definition>' , '<column-definition>')
+(WITH <option> AND <option>)
+```
+
+>完整创建表语句，创建student 表，student包含属性如下：
+>
+>学生编号（id）， 姓名（name），年龄（age），性别（gender），家庭地址（address），interest（兴趣），phone（电话号码），education（教育经历）
+>
+>id 为主键，并且为每个Column选择对应的数据类型。
+>
+>注意：interest 的数据类型是set  ，phone的数据类型是list，education 的数据类型是map
+
+```sql
+CREATE TABLE student(
+   id int PRIMARY KEY,  
+   name text,  
+   age int,  
+   gender tinyint,  
+   address text ,
+   interest set<text>,
+   phone list<text>,
+   education map<text, text>
+);
+```
+
+> 验证
+
+- 使用 DESCRIBE TABLE student;  查看创建的表
+
+```
+cqlsh:school> DESCRIBE TABLE student;
+```
+
+#### 5.2.3 cassandra的索引（KEY）
+
+> 上面创建student的时候，把id 设置为primary key
+>
+> 在Cassandra中的primary key是比较宏观概念，用于从表中取出数据。primary key可以由1个或多个column组合而成。
+>
+> 不要在以下情况使用索引：
+>
+> - 这列的值很多的情况下，因为你相当于查询了一个很多条记录，得到一个很小的结果。
+> - 表中有couter类型的列
+> - 频繁更新和删除的列
+> - 在一个很大的分区中去查询一条记录的时候（也就是不指定分区主键的查询）
+
+##### Cassandra的5种Key
+
+> 1. Primary Key      主键
+> 2. Partition  Key     分区Key
+> 3. Composite Key  复合key
+> 4. Compound Key   复合Key
+> 5. Clustering Key    集群
+
+##### 1）Primary Key
+
+是用来获取某一行的数据， 可以是单一列（Single column Primary Key）或者多列（Composite Primary Key）。
+
+在 Single column Primary Key 决定这一条记录放在哪个节点。
+
+例如：
+
+```sql
+create table testTab (
+id int PRIMARY KEY,
+name text
+);
+```
+
+##### 2）Composite Primary Key
+
+如果 Primary Key 由多列组成，那么这种情况称为 Compound Primary Key 或 Composite Primary Key。
+
+例如：
+
+```sql
+create table testTab (
+key_one int,
+key_two int,
+name text,
+PRIMARY KEY(key_one, key_two)
+);
+```
+
+
+##### 3）Partition Key 
+
+在组合主键的情况下(上面的例子)，第一部分称作Partition Key（key_one就是partition key），第二部分是CLUSTERING KEY（key_two）
+
+ Cassandra会对Partition key 做一个hash计算，并自己决定将这一条记录放在哪个节点。
+
+如果 Partition key 由多个字段组成，称之为 Composite Partition key
+
+例如：
+
+```sql
+create table testTab (
+key_part_one int,
+key_part_two int,
+key_clust_one int,
+key_clust_two int,
+key_clust_three uuid,
+name text,
+PRIMARY KEY((key_part_one,key_part_two), key_clust_one, key_clust_two, key_clust_three)
+);
+```
+
+##### 4）Clustering Key 
+
+决定同一个分区内相同 Partition Key 数据的排序，默认为升序，可以在建表语句里面手动设置排序的方式
+
+#### 5.2.4 修改表结构
+
+> 语法，可以添加列，删除列
+
+- **添加列，语法**
+
+```shell
+ALTER TABLE 【table name】 ADD  【new column】 datatype;
+```
+
+给student添加一个列email代码：
+
+```shell
+ALTER TABLE student ADD email text;
+```
+
+执行代码后，进行查询，查看效果：
+
+![](assets/1590303608.png)
+
+- **删除列，语法**
+
+```
+ALTER table name DROP columnname;
+```
+
+代码：
+
+```
+cqlsh:school> ALTER table student DROP email;
+```
+
+
+#### 5.2.5 删除表
+
+> 语法：
+
+```
+DROP TABLE <tablename>
+```
+
+> 删除student，代码如下：
+
+```
+DROP TABLE student;
+```
+
+执行删除代码，然后查询student，报错：unconfigured table student ，说明student已经被删除
+
+
+#### 5.2.6 清空表
+
+表的所有行都将永久删除
+
+> 语法
+
+```
+TRUNCATE <tablename>
+```
+
+> 代码
+
+```
+TRUNCATE student；
+```
+
+先查询student，发现有2条数据，然后使用上面的命令
+
+#### 5.2.7 创建索引
+
+##### 1）普通列创建索引
+
+> 语法
+
+```
+CREATE INDEX <identifier> ON <tablename>
+```
+
+> 代码
+
+为student的 name 添加索引，索引的名字为：sname， 代码：
+
+```
+CREATE INDEX sname ON student (name);
+```
+
+为student 的age添加索引，不设置索引名字，代码
+
+```
+CREATE INDEX ON student (age);
+```
+
+执行上面的命令，然后使用 DESCRIBE student 查看表
+
+
+可以发现 对age创建索引，没有指定索引名字，会提供一个默认的索引名：student_age_idx。
+
+索引原理：
+
+Cassandra之中的索引的实现相对MySQL的索引来说就要简单粗暴很多了。Cassandra自动新创建了一张表格，同时将原始表格之中的索引字段作为新索引表的Primary Key！并且存储的值为原始数据的Primary Key 
+
+##### 2）集合列创建索引
+
+给集合列设置索引
+
+```
+CREATE INDEX ON student(interest);                 -- set集合添加索引
+CREATE INDEX mymap ON student(KEYS(education));          -- map结合添加索引
+```
+
+#### 5.2.8 删除索引
+
+> 语法
+
+```
+DROP INDEX <identifier>
+```
+
+> 删除student的sname 索引
+
+```
+drop index sname;
+```
+
+执行上面代码，然后使用DESCRIBE student 查看表，发现sname索引已经不存在
+
+
+### 5.3 查询数据
+
+#### 5.3.1 查询数据
+
+> 语法
+
+使用 SELECT   、WHERE、LIKE、GROUP BY 、ORDER BY等关键词
+
+```shell
+SELECT FROM <tablename>
+SELECT FROM <table name> WHERE <condition>;
+```
+
+> 代码
+
+##### 1）查询所有数据
+
+当前student表有2行数据，全部查询出来
+
+```
+cqlsh:school> select * from student;
+```
+
+
+##### 2）根据主键查询
+
+查询student_id = 1012 的行
+
+代码
+
+```shell
+cqlsh:school> select * from student where id=1012;
+```
+
+
+
+#### 5.3.2 查询时使用索引
+
+> Cassandra对查询时使用索引有一定的要求，具体如下：
+>
+> - **Primary Key 只能用 = 号查询**
+>
+> - **第二主键 支持= > < >= <=**
+>
+> - **索引列 只支持 = 号**
+>
+> - 非索引非主键字段过滤**可以使用ALLOW FILTERING**
+
+当前有一张表testTab，表中包含一些数据
+
+```sql
+create table testTab (
+key_one int,
+key_two int,
+name text,
+age  int,
+PRIMARY KEY(key_one, key_two)
+);
+create INDEX tage ON testTab (age);
+```
+
+可以看到key_one 是第一主键，key_two是第二主键，age是索引列，name是普通列
+
+
+##### 1）第一主键 只能用=号查询
+
+> key_one列是第一主键
+>
+> 对key_one进行 = 号查询，可以查出结果
+
+代码如下
+
+```sql
+select * from testtab where key_one=4;
+```
+
+
+> 对key_one 进行范围查询使用 > 号，无法查出结果
+
+代码如下：
+
+```shell
+select * from testtab where key_one>4;
+```
+
+
+错误信息：
+
+```
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Only EQ and IN relation are supported on the partition key (unless you use the token() function)"
+```
+
+##### 2) 第二主键 支持 =  、>、  <、    >= 、  <=
+
+key_two是第二主键
+
+> 不要单独对key_two 进行 查询， 
+
+代码：
+
+```sql
+select * from testtab where key_two = 8;
+```
+
+
+错误信息：
+```
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING"
+```
+
+意思是如果想要完成这个查询，可以使用 ALLOW FILTERING
+
+修改：
+
+```sql
+select * from testtab where key_two = 8 ALLOW FILTERING;
+```
+
+
+
+**注意：加上ALLOW FILTERING 后确实可以查询出数据，但是不建议这么做**
+
+>正确的做法是 ，在查询第二主键时，前面先写上第一主键
+
+代码：
+
+```sql
+select * from testtab where key_one=12 and key_two = 8 ;
+```
+
+代码：
+
+```sql
+select * from testtab where key_one=12 and key_two > 7;
+```
+
+##### 3) 索引列 只支持=号
+
+age是索引列
+
+代码：
+
+```sql
+ select * from testtab where age = 19;   -- 正确
+ select * from testtab where age > 20 ;  --会报错
+ select * from testtab where age >20 allow filtering;  --可以查询出结果，但是不建议这么做
+```
+
+
+##### 4）普通列，非索引非主键字段
+
+name是普通列，在查询时需要使用ALLOW FILTERING。
+
+代码：
+
+```sql
+select * from testtab where key_one=12 and name='张小仙'; --报错
+select * from testtab where key_one=12 and name='张小仙' allow filtering;  --可以查询
+```
+
+##### 5）集合列
+
+使用student表来测试集合列上的索引使用。
+
+假设已经给集合添加了索引，就可以使用where子句的CONTAINS条件按照给定的值进行过滤。
+
+```sql
+select * from student where interest CONTAINS '电影';        -- 查询set集合
+select * from student where education CONTAINS key  '小学';  --查询map集合的key值
+select * from student where education CONTAINS '中心第9小学' allow filtering; --查询map的value值
+```
+
+##### 6） ALLOW FILTERING
+
+ALLOW FILTERING是一种非常消耗计算机资源的查询方式。
+如果表包含例如100万行，并且其中95％具有满足查询条件的值，则查询仍然相对有效，这时应该使用ALLOW FILTERING。
+
+如果表包含100万行，并且只有2行包含满足查询条件值，则查询效率极低。Cassandra将无需加载999,998行。如果经常使用查询，则最好在列上添加索引。
+
+ALLOW FILTERING在表数据量小的时候没有什么问题，但是数据量过大就会使查询变得缓慢。
+
+#### 5.3.3 查询时排序
+
+cassandra也是支持排序的，order by。 排序也是有条件的
+
+##### 1）必须有第一主键的=号查询
+
+cassandra的第一主键是决定记录分布在哪台机器上，cassandra只支持单台机器上的记录排序。
+
+##### 2）只能根据第二、三、四…主键进行有序的，相同的排序。
+
+##### 3）不能有索引查询
+
+cassandra的任何查询，最后的结果都是有序的，内部就是这样存储的。
+
+现在使用 testTab表，来测试排序
+
+```sql
+select * from testtab where key_one = 12 order by key_two;  --正确
+select * from testtab where key_one = 12 and age =19 order key_two;  --错误，不能有索引查询
+```
+
+索引列 支持 like 
+
+主键支持 group by 
+
+#### 5.3.4 分页查询
+
+使用limit 关键字来限制查询结果的条数 进行分页
+
+### 5.4 添加数据
+
+> 语法：
+
+```shell
+INSERT INTO <tablename>(<column1 name>, <column2 name>....) VALUES (<value1>, <value2>....) USING <option>
+```
+
+> 给student添加2行数据，包含对set，list ，map类型数据
+
+```shell
+INSERT INTO student (id,address,age,gender,name,interest, phone,education) VALUES (1011,'中山路21号',16,1,'Tom',{'游泳', '跑步'},['010-88888888','13888888888'],{'小学' : '城市第一小学', '中学' : '城市第一中学'}) ;
+
+INSERT INTO student (id,address,age,gender,name,interest, phone,education) VALUES (1012,'朝阳路19号',17,2,'Jerry',{'看书', '电影'},['020-66666666','13666666666'],{'小学' :'城市第五小学','中学':'城市第五中学'});
+```
+
+> 执行上面的代码，然后 select * from student
+
+
+添加TTL，设定的computed_ttl数值秒后，数据会自动删除
+
+```sql
+INSERT INTO student (id,address,age,gender,name,interest, phone,education) VALUES (1030,'朝阳路30号',20,1,'Cary',{'运动', '游戏'},['020-7777888','139876667556'],{'小学' :'第30小学','中学':'第30中学'}) USING TTL 60;
+```
+
+
+
+### 5.5 更新列数据
+
+更新表中的数据，可用关键字：
+
+- **Where** - 选择要更新的行
+- **Set** - 设置要更新的值
+- **Must** - 包括组成主键的所有列
+
+在更新行时，如果给定行不可用，则UPDATE创建一个新行
+
+> 语法：
+
+```shell
+UPDATE <tablename>
+SET <column name> = <new value>
+<column name> = <value>....
+WHERE <condition>
+```
+
+#### 5.5.1 更新简单数据
+
+把student_id = 1012 的数据的gender列 的值改为1，代码：
+
+```shell
+UPDATE student set gender = 1 where student_id= 1012;
+```
+
+#### 5.5.2 更新set类型数据
+
+> 在student中interest列是set类型
+
+##### 1）添加一个元素
+
+> 使用UPDATE命令 和 ‘+’ 操作符
+
+```sql
+UPDATE student SET interest = interest + {'游戏'} WHERE student_id = 1012;
+```
+
+先查询，执行上面的代码，再查询
+
+
+##### 2）删除一个元素
+
+> 使用UPDATE命令 和 ‘-’ 操作符
+
+代码：
+
+```sql
+UPDATE student SET interest = interest - {'电影'} WHERE student_id = 1012;
+```
+
+##### 3）删除所有元素
+
+> 可以使用UPDATA或DELETE命令，效果一样
+
+代码：
+
+```sql
+UPDATE student SET interest = {} WHERE student_id = 1012;
+或
+DELETE interest FROM student WHERE student_id = 1012;
+```
+
+
+一般来说，Set,list和Map要求最少有一个元素，否则Cassandra无法把其同一个空值区分
+
+#### 5.5.3 更新list类型数据
+
+> 在student中phone列是list类型
+
+##### 1）使用UPDATA命令向list插入值
+
+代码：
+
+```sql
+UPDATE student SET phone = ['020-66666666', '13666666666'] WHERE student_id = 1012;
+```
+
+##### 2）在list前面插入值
+
+代码：
+
+```sql
+UPDATE student SET phone = [ '030-55555555' ] + phone WHERE student_id = 1012;
+```
+
+可以看到新数据的位置在旧数据的前面
+
+##### 3）在list后面插入值
+
+代码：
+
+```sql
+UPDATE student SET phone = phone + [ '040-33333333' ]  WHERE student_id = 1012;
+```
+
+可以看到新数据的位置在最后面
+
+##### 4）使用列表索引设置值，覆盖已经存在的值
+
+> 这种操作会读入整个list，效率比上面2种方式差
+
+现在把phone中下标为2的数据，也就是 “13666666666”替换，代码：
+
+```sql
+UPDATE student SET phone[2] = '050-22222222' WHERE student_id = 1012;
+```
+
+
+
+##### 5）【不推荐】使用DELETE命令和索引删除某个特定位置的值
+
+>非线程安全的，如果在操作时其它线程在前面添加了一个元素，会导致移除错误的元素
+
+代码：
+
+```sql
+DELETE phone[2] FROM student WHERE student_id = 1012;
+```
+
+
+##### 6）【推荐】使用UPDATE命令和‘-’移除list中所有的特定值
+
+代码：
+
+```sql
+UPDATE student SET phone = phone - ['020-66666666'] WHERE student_id = 1012;
+```
+
+#### 5.5.4 更新map类型数据
+
+map输出顺序取决于map类型。
+
+##### 1）使用Insert或Update命令
+
+```sql
+UPDATE student SET education=
+  {'中学': '城市第五中学', '小学': '城市第五小学'} WHERE student_id = 1012;
+```
+
+##### 2）使用UPDATE命令设置指定元素的value
+
+```sql
+UPDATE student SET education['中学'] = '爱民中学' WHERE student_id = 1012;
+```
+
+
+##### 3）可以使用如下语法增加map元素。如果key已存在，value会被覆盖，不存在则插入
+
+```sql
+UPDATE student SET education = education + { '幼儿园' : '大海幼儿园', '中学': '科技路中学'} WHERE student_id = 1012;
+```
+
+覆盖“中学”为“科技路中学”，添加“幼儿园”数据
+
+##### 4）删除元素
+
+可以用DELETE 和 UPDATE  删除Map类型中的数据
+
+使用DELETE删除数据
+
+```sql
+DELETE education['幼儿园'] FROM student WHERE student_id = 1012;
+```
+
+
+使用UPDATE删除数据
+
+```sql
+UPDATE student SET education=education - {'中学','小学'} WHERE student_id = 1012;
+```
+
+
+### 5.6 删除行
+
+> 语法
+
+```sql
+DELETE FROM <identifier> WHERE <condition>;
+```
+
+> 代码
+
+删除student中student_id=1012 的数据，代码:
+
+```sql
+DELETE FROM student WHERE student_id=1012;
+```
+
+> 效果
+
+执行上面的命令后，查询student，发现只有一条数据
+
+
+
+### 5.7 批量操作
+
+> 作用
+
+把多次更新操作合并为一次请求，减少客户端和服务端的网络交互。 batch中同一个partition key的操作具有隔离性
+
+> 语法
+
+使用**BATCH**，您可以同时执行多个修改语句（插入，更新，删除）
+
+```shell
+BEGIN BATCH
+<insert-stmt>/ <update-stmt>/ <delete-stmt>
+APPLY BATCH
+```
+
+> 代码
+
+1、先把数据清空，然后使用添加数据的代码，在student中添加2条记录，student_id 为1011 、 1012
+
+2、在批量操作中实现 3个操作：
+
+新增一行数据，student_id =1015 
+
+更新student_id =1012的数据，把年龄改为11，
+
+删除已经存在的student_id=1011的数据，代码：
+
+```shell
+BEGIN BATCH
+	INSERT INTO student (id,address,age,gender,name) VALUES (1015,'上海路',20,1,'Jack') ;
+	UPDATE student set age = 11 where id= 1012;
+	DELETE FROM student WHERE id=1011;
+APPLY BATCH;
+```
+
+
+
 keyspace操作
 ---
 1、创建keyspace
