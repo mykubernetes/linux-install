@@ -223,7 +223,6 @@ CQL：Cassandra Query Language  和关系型数据库的 SQL 很类似（一些�
 #### 创建Keyspace
 
 > 语法
-
 ```
 CREATE KEYSPACE <identifier> WITH <properties>;
 ```
@@ -240,69 +239,84 @@ Create keyspace KeyspaceName with replicaton={'class':strategy name,
 
 1、创建一个键空间名字为：school，副本策略选择：简单策略 SimpleStrategy，副本因子：3
 ```
-CREATE KEYSPACE school WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+CREATE KEYSPACE school WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3} AND DURABLE_WRITES = false;
+```
+- SimpleStrategy 简单策略(机架感知策略)
+- NetworkTopologyStrategy 网络拓扑策略(数据中心共享策略)
+- replication_factor 复制因子
+- durable_writes 默认情况下，表的durable_writes属性设置为true，但可以将其设置为false。您不能将此属性设置为simplex策略。
+
+2、查看创建的keyspace
+```
+cqlsh> SELECT * FROM system.schema_keyspaces;
+  keyspace_name | durable_writes |                                       strategy_class | strategy_options
+----------------+----------------+------------------------------------------------------+----------------------------
+         school |          False |          org.apache.cassandra.locator.SimpleStrategy | {"datacenter1" : "3"}
+ tutorialspoint |           True |          org.apache.cassandra.locator.SimpleStrategy | {"replication_factor" : "4"}
+         system |           True |           org.apache.cassandra.locator.LocalStrategy | { }
+  system_traces |           True |          org.apache.cassandra.locator.SimpleStrategy | {"replication_factor" : "2"}
+(4 rows)
 ```
 
-2、验证
+3、验证
 ```
 DESCRIBE keyspaces ;
 ```
 
-3、输入 DESCRIBE school 查看键空间的创建语句
+4、查看键空间的创建语句
 ```
 DESCRIBE school;
 ```
 
-4、连接Keyspace
+5、连接Keyspace
 ```
 use school;
 ```
 
-5、修改键空间 
+6、修改键空间 
 
-> 1）语法
-```
-ALTER KEYSPACE <identifier> WITH <properties>
-```
-
-> 2）编写完整的修改键空间语句，修改school键空间，把副本因子 从3 改为1
+> 1）编写完整的修改键空间语句，修改school键空间，把副本因子 从3 改为1
 ```
 ALTER KEYSPACE school WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
 ```
 
-
-> 3）验证  
-输入 DESCRIBE school 查看键空间的创建语句，代码：
+> 2）验证，查看键空间的创建语句
 ```
 DESCRIBE school;
 ```
 
-6、删除键空间
-
-> 1）语法
+> 3)查看创建的keyspace
 ```
-DROP KEYSPACE <identifier>
+SELECT * FROM system.schema_keyspaces;
+  keyspace_name | durable_writes |                                       strategy_class | strategy_options
+----------------+----------------+------------------------------------------------------+----------------------------
+         school |           True |          org.apache.cassandra.locator.SimpleStrategy | {"datacenter1":"1"}
+ tutorialspoint |           True | org.apache.cassandra.locator.NetworkTopologyStrategy | {"replication_factor":"3"}
+         system |           True |           org.apache.cassandra.locator.LocalStrategy | { }
+  system_traces |           True |          org.apache.cassandra.locator.SimpleStrategy | {"replication_factor":"2"}
+(4 rows)
 ```
 
-> 2）完整删除键空间语句，删除school键空间
+
+7、删除键空间，完整删除键空间语句，删除school键空间
 ```
 DROP KEYSPACE school
 ```
 
-7、操作表、索引
+#### 操作表、索引
 
-注意：操作前，先把键空间school键空间创建，并使用school 键空间
+1、操作前，先把键空间school键空间创建，并使用school 键空间
 ```
 CREATE KEYSPACE school WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
 use school;
 ```
 
-8、查看键空间下所有表
+2、查看键空间下所有表
 ```
 DESCRIBE TABLES;
 ```
 
-9、创建表
+3、创建表
 
 > 语法
 ```
@@ -318,7 +332,7 @@ CREATE (TABLE | COLUMNFAMILY) <tablename> ('<column-definition>' , '<column-defi
 >
 >注意：interest 的数据类型是set  ，phone的数据类型是list，education 的数据类型是map
 
-```sql
+```
 CREATE TABLE student(
    id int PRIMARY KEY,  
    name text,  
@@ -331,15 +345,12 @@ CREATE TABLE student(
 );
 ```
 
-> 验证
-
-- 使用 DESCRIBE TABLE student;  查看创建的表
-
+> 验证，查看创建的表
 ```
 cqlsh:school> DESCRIBE TABLE student;
 ```
 
-#### 5.2.3 cassandra的索引（KEY）
+#### cassandra的索引（KEY）
 
 > 上面创建student的时候，把id 设置为primary key
 >
@@ -354,11 +365,11 @@ cqlsh:school> DESCRIBE TABLE student;
 
 ##### Cassandra的5种Key
 
-> 1. Primary Key      主键
-> 2. Partition  Key     分区Key
-> 3. Composite Key  复合key
-> 4. Compound Key   复合Key
-> 5. Clustering Key    集群
+> 1. Primary Key     主键
+> 2. Partition  Key  分区Key
+> 3. Composite Key   复合key
+> 4. Compound Key    复合Key
+> 5. Clustering Key  集群
 
 ##### 1）Primary Key
 
@@ -368,7 +379,7 @@ cqlsh:school> DESCRIBE TABLE student;
 
 例如：
 
-```sql
+```
 create table testTab (
 id int PRIMARY KEY,
 name text
@@ -417,7 +428,7 @@ PRIMARY KEY((key_part_one,key_part_two), key_clust_one, key_clust_two, key_clust
 
 决定同一个分区内相同 Partition Key 数据的排序，默认为升序，可以在建表语句里面手动设置排序的方式
 
-#### 5.2.4 修改表结构
+####  修改表结构
 
 > 语法，可以添加列，删除列
 
@@ -450,7 +461,7 @@ cqlsh:school> ALTER table student DROP email;
 ```
 
 
-#### 5.2.5 删除表
+####  删除表
 
 > 语法：
 
@@ -467,7 +478,7 @@ DROP TABLE student;
 执行删除代码，然后查询student，报错：unconfigured table student ，说明student已经被删除
 
 
-#### 5.2.6 清空表
+#### 清空表
 
 表的所有行都将永久删除
 
@@ -485,7 +496,7 @@ TRUNCATE student；
 
 先查询student，发现有2条数据，然后使用上面的命令
 
-#### 5.2.7 创建索引
+#### 创建索引
 
 ##### 1）普通列创建索引
 
@@ -497,14 +508,12 @@ CREATE INDEX <identifier> ON <tablename>
 
 > 代码
 
-为student的 name 添加索引，索引的名字为：sname， 代码：
-
+为student的 name 添加索引，索引的名字为：sname
 ```
 CREATE INDEX sname ON student (name);
 ```
 
-为student 的age添加索引，不设置索引名字，代码
-
+为student 的age添加索引，不设置索引名字
 ```
 CREATE INDEX ON student (age);
 ```
@@ -527,7 +536,7 @@ CREATE INDEX ON student(interest);                 -- set集合添加索引
 CREATE INDEX mymap ON student(KEYS(education));          -- map结合添加索引
 ```
 
-#### 5.2.8 删除索引
+#### 删除索引
 
 > 语法
 
@@ -544,9 +553,9 @@ drop index sname;
 执行上面代码，然后使用DESCRIBE student 查看表，发现sname索引已经不存在
 
 
-### 5.3 查询数据
+### 查询数据
 
-#### 5.3.1 查询数据
+#### 1 查询数据
 
 > 语法
 
@@ -580,7 +589,7 @@ cqlsh:school> select * from student where id=1012;
 
 
 
-#### 5.3.2 查询时使用索引
+#### 2 查询时使用索引
 
 > Cassandra对查询时使用索引有一定的要求，具体如下：
 >
@@ -614,16 +623,12 @@ create INDEX tage ON testTab (age);
 >
 > 对key_one进行 = 号查询，可以查出结果
 
-代码如下
-
 ```sql
 select * from testtab where key_one=4;
 ```
 
 
 > 对key_one 进行范围查询使用 > 号，无法查出结果
-
-代码如下：
 
 ```shell
 select * from testtab where key_one>4;
@@ -725,7 +730,7 @@ ALLOW FILTERING是一种非常消耗计算机资源的查询方式。
 
 ALLOW FILTERING在表数据量小的时候没有什么问题，但是数据量过大就会使查询变得缓慢。
 
-#### 5.3.3 查询时排序
+#### 3 查询时排序
 
 cassandra也是支持排序的，order by。 排序也是有条件的
 
@@ -750,11 +755,11 @@ select * from testtab where key_one = 12 and age =19 order key_two;  --错误，
 
 主键支持 group by 
 
-#### 5.3.4 分页查询
+#### 4 分页查询
 
 使用limit 关键字来限制查询结果的条数 进行分页
 
-### 5.4 添加数据
+### 添加数据
 
 > 语法：
 
@@ -781,7 +786,7 @@ INSERT INTO student (id,address,age,gender,name,interest, phone,education) VALUE
 
 
 
-### 5.5 更新列数据
+###  更新列数据
 
 更新表中的数据，可用关键字：
 
@@ -800,7 +805,7 @@ SET <column name> = <new value>
 WHERE <condition>
 ```
 
-#### 5.5.1 更新简单数据
+#### 1 更新简单数据
 
 把student_id = 1012 的数据的gender列 的值改为1，代码：
 
@@ -808,7 +813,7 @@ WHERE <condition>
 UPDATE student set gender = 1 where student_id= 1012;
 ```
 
-#### 5.5.2 更新set类型数据
+#### 2 更新set类型数据
 
 > 在student中interest列是set类型
 
@@ -848,7 +853,7 @@ DELETE interest FROM student WHERE student_id = 1012;
 
 一般来说，Set,list和Map要求最少有一个元素，否则Cassandra无法把其同一个空值区分
 
-#### 5.5.3 更新list类型数据
+#### 3 更新list类型数据
 
 > 在student中phone列是list类型
 
@@ -911,7 +916,7 @@ DELETE phone[2] FROM student WHERE student_id = 1012;
 UPDATE student SET phone = phone - ['020-66666666'] WHERE student_id = 1012;
 ```
 
-#### 5.5.4 更新map类型数据
+#### 4 更新map类型数据
 
 map输出顺序取决于map类型。
 
@@ -955,7 +960,7 @@ UPDATE student SET education=education - {'中学','小学'} WHERE student_id = 
 ```
 
 
-### 5.6 删除行
+### 6 删除行
 
 > 语法
 
@@ -965,19 +970,14 @@ DELETE FROM <identifier> WHERE <condition>;
 
 > 代码
 
-删除student中student_id=1012 的数据，代码:
+删除student中student_id=1012 的数据
 
 ```sql
 DELETE FROM student WHERE student_id=1012;
 ```
 
-> 效果
 
-执行上面的命令后，查询student，发现只有一条数据
-
-
-
-### 5.7 批量操作
+###  批量操作
 
 > 作用
 
@@ -1005,7 +1005,7 @@ APPLY BATCH
 
 删除已经存在的student_id=1011的数据，代码：
 
-```shell
+```
 BEGIN BATCH
 	INSERT INTO student (id,address,age,gender,name) VALUES (1015,'上海路',20,1,'Jack') ;
 	UPDATE student set age = 11 where id= 1012;
@@ -1015,70 +1015,6 @@ APPLY BATCH;
 
 
 
-keyspace操作
----
-1、创建keyspace
-```
-#简单副本策略
-cqlsh.> CREATE KEYSPACE tutorialspoint
-WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
-
-#持久化写入
-cqlsh> CREATE KEYSPACE test
-... WITH REPLICATION = { 'class' : 'NetworkTopologyStrategy', 'datacenter1' : 3 }
-... AND DURABLE_WRITES = false;
-```
-- SimpleStrategy 简单策略(机架感知策略)
-- NetworkTopologyStrategy 网络拓扑策略(数据中心共享策略)
-- replication_factor 复制因子
-- durable_writes 默认情况下，表的durable_writes属性设置为true，但可以将其设置为false。您不能将此属性设置为simplex策略。
-
-2、查看创建的keyspace
-```
-cqlsh> SELECT * FROM system.schema_keyspaces;
-  keyspace_name | durable_writes |                                       strategy_class | strategy_options
-----------------+----------------+------------------------------------------------------+----------------------------
-           test |          False | org.apache.cassandra.locator.NetworkTopologyStrategy | {"datacenter1" : "3"}
- tutorialspoint |           True |          org.apache.cassandra.locator.SimpleStrategy | {"replication_factor" : "4"}
-         system |           True |           org.apache.cassandra.locator.LocalStrategy | { }
-  system_traces |           True |          org.apache.cassandra.locator.SimpleStrategy | {"replication_factor" : "2"}
-(4 rows)
-```
-
-3、使用Keyspace
-```
-cqlsh> USE tutorialspoint;
-cqlsh:tutorialspoint>
-```
-
-4、修改修改Keyspace
-```
-cqlsh.> ALTER KEYSPACE tutorialspoint WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};
-cqlsh.> ALTER KEYSPACE test WITH REPLICATION = {'class' : 'NetworkTopologyStrategy', 'datacenter1' : 3} AND DURABLE_WRITES = true;
-```
-
-验证
-```
-SELECT * FROM system.schema_keyspaces;
-  keyspace_name | durable_writes |                                       strategy_class | strategy_options
-----------------+----------------+------------------------------------------------------+----------------------------
-           test |           True | org.apache.cassandra.locator.NetworkTopologyStrategy | {"datacenter1":"3"}
- tutorialspoint |           True | org.apache.cassandra.locator.NetworkTopologyStrategy | {"replication_factor":"3"}
-         system |           True |           org.apache.cassandra.locator.LocalStrategy | { }
-  system_traces |           True |          org.apache.cassandra.locator.SimpleStrategy | {"replication_factor":"2"}
-(4 rows)
-```
-
-5、删除keyspace
-```
-cqlsh> DROP KEYSPACE tutorialspoint;
-```
-
-验证
-```
-cqlsh> DESCRIBE keyspaces;
-system system_traces
-```
 
 表操作
 ---
