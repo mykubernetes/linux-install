@@ -80,7 +80,15 @@ map 数据类型包含了 key/value 键值对。key 和 value 可以是任何类
 如果内置的数据类型无法满足需求，可以使用自定义数据类型。
 
 
-1）help  帮助，输入命令，可以查看cqlsh 支持的命令
+
+### 启动cqlsh
+
+1）进入cassandra安装目录下的 bin 目录，执行 cqlsh 命令
+```
+# ./bin/cqlsh 192.168.137.131 9042
+```
+
+2）help  帮助，输入命令，可以查看cqlsh 支持的命令
 ```
 cqlsh> help
 ```
@@ -104,80 +112,70 @@ cqlsh> Describe tables;
 
 > Describe tables  列出键空间内指定表的信息
 
-先指定键空间 ，这里使用  system_traces
+4）先指定键空间 ，这里使用  system_traces
 ```
 cqlsh> USE system_traces ；
 ```
 
-列出system_traces 下的 sessions信息
+5）列出system_traces 下的 sessions信息
 ```
 cqlsh:system_traces> DESCRIBE sessions；
 ```
 
-Expand  扩展输出
+### Expand  扩展输出
 
 > 使用命令后会扩展select输出的结果展示形式，对每个需要的操作先开启扩展，然后进行查询，最后关闭扩展
 
-开启扩展输出
+1、开启扩展输出
 ```
 expand on;
 ```
 
-查询数据
+2、查询数据
 ```
 select * from table;
 ```
 
-关闭扩展输入
+3、关闭扩展输入
 ```
 expand OFF;
 ```
 
-Capture 捕获命令输出到文件
+4、Capture 捕获命令输出到文件
 
 此命令捕获命令的输出并将其添加到文件。
 
-输入命令，将输出内容捕获到名为outputfile的文件
-
+1）输入命令，将输出内容捕获到名为outputfile的文件
 ```
 CAPTURE '/usr/local/apache-cassandra-3.11.6/outputfile'
 ```
 
+2）执行一个查询，控制台可以看到输出。然后去看outputfile文件，会发现把刚才查询的
 
-执行一个查询，控制台可以看到输出。
-
-然后去看outputfile文件，会发现把刚才查询的
-
-#####  show 显示当前cqlsh会话的详细信息
-
+5、show 显示当前cqlsh会话的详细信息  
 > show命令后可以跟3个内容 ，分别是 HOST 、SESSION 、VERSION
 >
 > 输入SHOW ，点击2次TAB 按键，可以看到3个内容提示
-
-
 ```
 cqlsh:system_traces> SHOW
 ```
 
-输入SHOW HOST，显示当前cqlsh 连接的Cassandra服务的ip和端口
-
+1）显示当前cqlsh 连接的Cassandra服务的ip和端口
 ```
 cqlsh:system_traces> SHOW HOST
 ```
 
-输入 SHOW VERSION  显示当前的版本
-
+2）显示当前的版本
 ```
 cqlsh:system_traces> SHOW VERSION
 ```
 
-出入SHOW SESSION 显示会话信息，需要参数uuid
-
+3）显示会话信息，需要参数uuid
 ```
 cqlsh:system_traces> SHOW SESSION <uuid>
 ```
 
-Exit  用于终止cql shell
+6、Exit  用于终止cql shell
 
 
 keyspace操作
