@@ -177,6 +177,43 @@ cqlsh:system_traces> SHOW SESSION <uuid>
 
 6、Exit  用于终止cql shell
 
+## CQL-Cassandra查询语言
+
+CQL：Cassandra Query Language  和关系型数据库的 SQL 很类似（一些关键词相似），可以使用CQL和 Cassandra 进行交互，实现 定义数据结构，插入数据，执行查询。
+
+> 注意：CQL 和 SQL 是相互独立，没有任何关系的。CQL 缺少 SQL 的一些关键功能，比如 JOIN 等。
+
+### 数据定义命令
+
+| 指令            | 描述                      |
+| --------------- | ------------------------- |
+| CREATE KEYSPACE | 在Cassandra中创建KeySpace |
+| USE             | 连接到已创建的KeySpace    |
+| ALTER KEYSPACE  | 更改KeySpace的属性        |
+| DROP KEYSPACE   | 删除KeySpace              |
+| CREATE TABLE    | 在KeySpace中创建表        |
+| ALTER TABLE     | 修改表的列属性            |
+| DROP TABLE      | 删除表                    |
+| TRUNCATE        | 从表中删除所有数据        |
+| CREATE INDEX    | 在表的单个列上定义新索引  |
+| DROP INDEX      | 删除命名索引              |
+
+### 数据操作指令
+
+| 指令   | 描述              |
+| ------ | ----------------- |
+| INSERT | 在表中添加行的列  |
+| UPDATE | 更新行的列        |
+| DELETE | 从表中删除数据    |
+| BATCH  | 一次执行多个DML语 |
+
+### 查询指令
+
+| 指令    | 描述                                                |
+| ------- | --------------------------------------------------- |
+| SELECT  | 从表中读取数据                                      |
+| WHERE   | where子句与select一起使用以读取特定数据             |
+| ORDERBY | orderby子句与select一起使用，以特定顺序读取特定数据 |
 
 keyspace操作
 ---
