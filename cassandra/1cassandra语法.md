@@ -350,7 +350,7 @@ CREATE TABLE student(
 cqlsh:school> DESCRIBE TABLE student;
 ```
 
-#### cassandra的索引（KEY）
+4、cassandra的索引（KEY）
 
 > 上面创建student的时候，把id 设置为primary key
 >
@@ -363,7 +363,7 @@ cqlsh:school> DESCRIBE TABLE student;
 > - 频繁更新和删除的列
 > - 在一个很大的分区中去查询一条记录的时候（也就是不指定分区主键的查询）
 
-##### Cassandra的5种Key
+5、Cassandra的5种Key
 
 > 1. Primary Key     主键
 > 2. Partition  Key  分区Key
@@ -371,14 +371,11 @@ cqlsh:school> DESCRIBE TABLE student;
 > 4. Compound Key    复合Key
 > 5. Clustering Key  集群
 
-##### 1）Primary Key
+1）Primary Key
 
 是用来获取某一行的数据， 可以是单一列（Single column Primary Key）或者多列（Composite Primary Key）。
 
 在 Single column Primary Key 决定这一条记录放在哪个节点。
-
-例如：
-
 ```
 create table testTab (
 id int PRIMARY KEY,
@@ -386,13 +383,10 @@ name text
 );
 ```
 
-##### 2）Composite Primary Key
+2）Composite Primary Key
 
 如果 Primary Key 由多列组成，那么这种情况称为 Compound Primary Key 或 Composite Primary Key。
-
-例如：
-
-```sql
+```
 create table testTab (
 key_one int,
 key_two int,
@@ -401,18 +395,14 @@ PRIMARY KEY(key_one, key_two)
 );
 ```
 
-
-##### 3）Partition Key 
+3）Partition Key 
 
 在组合主键的情况下(上面的例子)，第一部分称作Partition Key（key_one就是partition key），第二部分是CLUSTERING KEY（key_two）
 
  Cassandra会对Partition key 做一个hash计算，并自己决定将这一条记录放在哪个节点。
 
 如果 Partition key 由多个字段组成，称之为 Composite Partition key
-
-例如：
-
-```sql
+```
 create table testTab (
 key_part_one int,
 key_part_two int,
@@ -424,57 +414,37 @@ PRIMARY KEY((key_part_one,key_part_two), key_clust_one, key_clust_two, key_clust
 );
 ```
 
-##### 4）Clustering Key 
+4）Clustering Key 
 
 决定同一个分区内相同 Partition Key 数据的排序，默认为升序，可以在建表语句里面手动设置排序的方式
 
 ####  修改表结构
 
-> 语法，可以添加列，删除列
-
-- **添加列，语法**
-
-```shell
-ALTER TABLE 【table name】 ADD  【new column】 datatype;
+1、给student添加一个列email
 ```
-
-给student添加一个列email代码：
-
-```shell
 ALTER TABLE student ADD email text;
 ```
 
-- **删除列，语法**
-
-```
-ALTER table name DROP columnname;
-```
-
-代码：
-
+2、删除列
 ```
 cqlsh:school> ALTER table student DROP email;
 ```
 
-
 ####  删除表
 
-> 删除student
+1、删除student
 ```
 DROP TABLE student;
 ```
-
-执行删除代码，然后查询student，报错：unconfigured table student ，说明student已经被删除
+- 执行删除代码，然后查询student，报错：unconfigured table student ，说明student已经被删除
 
 
 #### 清空表
 
-表的所有行都将永久删除
+1、表的所有行都将永久删除
 ```
 TRUNCATE student；
 ```
-
-先查询student，发现有2条数据，然后使用上面的命令
 
 #### 创建索引
 
