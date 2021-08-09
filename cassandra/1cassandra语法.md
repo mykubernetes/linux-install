@@ -444,10 +444,6 @@ ALTER TABLE 【table name】 ADD  【new column】 datatype;
 ALTER TABLE student ADD email text;
 ```
 
-执行代码后，进行查询，查看效果：
-
-![](assets/1590303608.png)
-
 - **删除列，语法**
 
 ```
@@ -463,14 +459,7 @@ cqlsh:school> ALTER table student DROP email;
 
 ####  删除表
 
-> 语法：
-
-```
-DROP TABLE <tablename>
-```
-
-> 删除student，代码如下：
-
+> 删除student
 ```
 DROP TABLE student;
 ```
@@ -481,15 +470,6 @@ DROP TABLE student;
 #### 清空表
 
 表的所有行都将永久删除
-
-> 语法
-
-```
-TRUNCATE <tablename>
-```
-
-> 代码
-
 ```
 TRUNCATE student；
 ```
