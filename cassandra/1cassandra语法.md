@@ -686,20 +686,13 @@ UPDATE student set gender = 1 where student_id= 1012;
 ##### 1）添加一个元素
 
 > 使用UPDATE命令 和 ‘+’ 操作符
-
-```sql
+```
 UPDATE student SET interest = interest + {'游戏'} WHERE student_id = 1012;
 ```
-
-先查询，执行上面的代码，再查询
-
 
 ##### 2）删除一个元素
 
 > 使用UPDATE命令 和 ‘-’ 操作符
-
-代码：
-
 ```
 UPDATE student SET interest = interest - {'电影'} WHERE student_id = 1012;
 ```
@@ -707,9 +700,6 @@ UPDATE student SET interest = interest - {'电影'} WHERE student_id = 1012;
 ##### 3）删除所有元素
 
 > 可以使用UPDATA或DELETE命令，效果一样
-
-代码：
-
 ```
 UPDATE student SET interest = {} WHERE student_id = 1012;
 或
@@ -724,8 +714,6 @@ DELETE interest FROM student WHERE student_id = 1012;
 > 在student中phone列是list类型
 
 ##### 1）使用UPDATA命令向list插入值
-
-代码：
 
 ```
 UPDATE student SET phone = ['020-66666666', '13666666666'] WHERE student_id = 1012;
@@ -749,26 +737,20 @@ UPDATE student SET phone = phone + [ '040-33333333' ]  WHERE student_id = 1012;
 
 > 这种操作会读入整个list，效率比上面2种方式差
 
-现在把phone中下标为2的数据，也就是 “13666666666”替换，代码：
-
+现在把phone中下标为2的数据，也就是 “13666666666”替换
 ```
 UPDATE student SET phone[2] = '050-22222222' WHERE student_id = 1012;
 ```
 
-
-
 ##### 5）【不推荐】使用DELETE命令和索引删除某个特定位置的值
 
->非线程安全的，如果在操作时其它线程在前面添加了一个元素，会导致移除错误的元素
-
+> 非线程安全的，如果在操作时其它线程在前面添加了一个元素，会导致移除错误的元素
 ```
 DELETE phone[2] FROM student WHERE student_id = 1012;
 ```
 
-
 ##### 6）【推荐】使用UPDATE命令和‘-’移除list中所有的特定值
-
-``
+```
 UPDATE student SET phone = phone - ['020-66666666'] WHERE student_id = 1012;
 ```
 
@@ -777,22 +759,19 @@ UPDATE student SET phone = phone - ['020-66666666'] WHERE student_id = 1012;
 map输出顺序取决于map类型。
 
 ##### 1）使用Insert或Update命令
-
-```sql
+```
 UPDATE student SET education=
   {'中学': '城市第五中学', '小学': '城市第五小学'} WHERE student_id = 1012;
 ```
 
 ##### 2）使用UPDATE命令设置指定元素的value
-
-```sql
+```
 UPDATE student SET education['中学'] = '爱民中学' WHERE student_id = 1012;
 ```
 
 
 ##### 3）可以使用如下语法增加map元素。如果key已存在，value会被覆盖，不存在则插入
-
-```sql
+```
 UPDATE student SET education = education + { '幼儿园' : '大海幼儿园', '中学': '科技路中学'} WHERE student_id = 1012;
 ```
 
@@ -802,14 +781,12 @@ UPDATE student SET education = education + { '幼儿园' : '大海幼儿园', '�
 
 可以用DELETE 和 UPDATE  删除Map类型中的数据
 
-使用DELETE删除数据
-
-```sql
+1、使用DELETE删除数据
+```
 DELETE education['幼儿园'] FROM student WHERE student_id = 1012;
 ```
 
-
-使用UPDATE删除数据
+2、使用UPDATE删除数据
 ```
 UPDATE student SET education=education - {'中学','小学'} WHERE student_id = 1012;
 ```
@@ -817,12 +794,10 @@ UPDATE student SET education=education - {'中学','小学'} WHERE student_id = 
 
 ### 6 删除行
 
-
-删除student中student_id=1012 的数据
+1、删除student中student_id=1012 的数据
 ```
 DELETE FROM student WHERE student_id=1012;
 ```
-
 
 ###  批量操作
 
@@ -833,7 +808,6 @@ DELETE FROM student WHERE student_id=1012;
 > 语法
 
 使用**BATCH**，您可以同时执行多个修改语句（插入，更新，删除）
-
 ```
 BEGIN BATCH
 <insert-stmt>/ <update-stmt>/ <delete-stmt>
@@ -843,13 +817,9 @@ APPLY BATCH
 1、先把数据清空，然后使用添加数据的代码，在student中添加2条记录，student_id 为1011 、 1012
 
 2、在批量操作中实现 3个操作：
-
-新增一行数据，student_id =1015 
-
-更新student_id =1012的数据，把年龄改为11，
-
-删除已经存在的student_id=1011的数据
-
+- 新增一行数据，student_id =1015 
+- 更新student_id =1012的数据，把年龄改为11，
+- 删除已经存在的student_id=1011的数据
 ```
 BEGIN BATCH
 	INSERT INTO student (id,address,age,gender,name) VALUES (1015,'上海路',20,1,'Jack') ;
@@ -885,9 +855,7 @@ cqlsh:tutorialspoint> ALTER TABLE emp DROP emp_email;
 3、删除表
 ```
 cqlsh:tutorialspoint> DROP TABLE emp;
-```
-验证
-```
+
 cqlsh:tutorialspoint> DESCRIBE COLUMNFAMILIES;
 employee
 ```
