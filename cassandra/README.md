@@ -34,6 +34,18 @@ Cassandra使用场景
 - 类似物联网的海量数据
 - 对数据进行跟踪
 
+数据读写
+---
+node接收write请求，将数据写入memtable，同时记录到commit log。commit log 记录node接收到的每一次write请求，这样，即使发生断电等故障，也不会丢失数据。
+
+memtable是一个cache，按顺序存储write的数据，当memtable 的内容大小达到配置的阈值或者commit log的存储空间大于阈值，memtable里的数据被flush到磁盘，保存为SSTables。当memtable中的数据flush到磁盘后，commit log被删除。
+
+在内部实现上，memtable 和 SSTable按table进行划分，不同的table可以共享一个commit log。SSTable本质上是磁盘文件，不可更改，因此，一个partition 包含了多个SSTables。
+
+best practice: 重启node前先使用nodetool flush memtable，这样可以减少commit log重放。
+
+
+
 Cassandra 3.9下载
 ---
 > 打开官网，选择下载频道https://cassandra.apache.org/download/
