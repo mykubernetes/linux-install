@@ -471,22 +471,16 @@ TRUNCATE student；
 
 #### 1）普通列创建索引
 
-> 语法
-```
-CREATE INDEX <identifier> ON <tablename>
-```
-
-为student的 name 添加索引，索引的名字为：sname
+1、为student的 name 添加索引，索引的名字为：sname
 ```
 CREATE INDEX sname ON student (name);
 ```
 
-为student 的age添加索引，不设置索引名字
+2、为student 的age添加索引，不设置索引名字
 ```
 CREATE INDEX ON student (age);
 ```
-
-执行上面的命令，然后使用 DESCRIBE student 查看表，可以发现 对age创建索引，没有指定索引名字，会提供一个默认的索引名：student_age_idx。
+- 使用 DESCRIBE student 查看表，可以发现 对age创建索引，没有指定索引名字，会提供一个默认的索引名：student_age_idx。
 
 索引原理：
 
@@ -500,12 +494,7 @@ CREATE INDEX ON student(interest);                   -- set集合添加索引
 CREATE INDEX mymap ON student(KEYS(education));      -- map结合添加索引
 ```
 
-#### 删除索引
-
-> 语法
-```
-DROP INDEX <identifier>
-```
+#### 3）删除索引
 
 > 删除student的sname 索引
 ```
@@ -513,16 +502,6 @@ drop index sname;
 ```
 
 ## 3、查询数据
-
-#### 1 查询数据
-
-> 语法
-
-使用 SELECT   、WHERE、LIKE、GROUP BY 、ORDER BY等关键词
-```
-SELECT FROM <tablename>
-SELECT FROM <table name> WHERE <condition>;
-```
 
 ##### 1）查询所有数据
 
@@ -534,9 +513,6 @@ cqlsh:school> select * from student;
 ##### 2）根据主键查询
 
 查询student_id = 1012 的行
-
-代码
-
 ```
 cqlsh:school> select * from student where id=1012;
 ```
@@ -554,7 +530,6 @@ cqlsh:school> select * from student where id=1012;
 > - 非索引非主键字段过滤**可以使用ALLOW FILTERING**
 
 当前有一张表testTab，表中包含一些数据
-
 ```
 create table testTab (
 key_one int,
@@ -584,12 +559,6 @@ select * from testtab where key_one=4;
 
 ```
 select * from testtab where key_one>4;
-```
-
-
-错误信息：
-
-```
 InvalidRequest: Error from server: code=2200 [Invalid query] message="Only EQ and IN relation are supported on the partition key (unless you use the token() function)"
 ```
 
@@ -597,68 +566,40 @@ InvalidRequest: Error from server: code=2200 [Invalid query] message="Only EQ an
 
 key_two是第二主键
 
-> 不要单独对key_two 进行 查询， 
-
-代码：
-
+> 不要单独对key_two 进行查询，输出错误信息
 ```
 select * from testtab where key_two = 8;
-```
-
-
-错误信息：
-```
 InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING"
 ```
 
 意思是如果想要完成这个查询，可以使用 ALLOW FILTERING
-
-修改：
-
 ```
 select * from testtab where key_two = 8 ALLOW FILTERING;
 ```
 
-
-
 **注意：加上ALLOW FILTERING 后确实可以查询出数据，但是不建议这么做**
 
 >正确的做法是 ，在查询第二主键时，前面先写上第一主键
-
-代码：
-
 ```
 select * from testtab where key_one=12 and key_two = 8 ;
-```
-
-代码：
-
-```
 select * from testtab where key_one=12 and key_two > 7;
 ```
 
 ##### 3) 索引列 只支持=号
 
 age是索引列
-
-代码：
-
 ```
- select * from testtab where age = 19;   -- 正确
- select * from testtab where age > 20 ;  --会报错
- select * from testtab where age >20 allow filtering;  --可以查询出结果，但是不建议这么做
+select * from testtab where age = 19;                     # 正确
+select * from testtab where age > 20 ;                    # 会报错
+select * from testtab where age >20 allow filtering;      # 可以查询出结果，但是不建议这么做
 ```
-
 
 ##### 4）普通列，非索引非主键字段
 
 name是普通列，在查询时需要使用ALLOW FILTERING。
-
-代码：
-
-```sql
-select * from testtab where key_one=12 and name='张小仙'; --报错
-select * from testtab where key_one=12 and name='张小仙' allow filtering;  --可以查询
+```
+select * from testtab where key_one=12 and name='张小仙';                       # 报错
+select * from testtab where key_one=12 and name='张小仙' allow filtering;       # 可以查询
 ```
 
 ##### 5）集合列
@@ -666,21 +607,18 @@ select * from testtab where key_one=12 and name='张小仙' allow filtering;  --
 使用student表来测试集合列上的索引使用。
 
 假设已经给集合添加了索引，就可以使用where子句的CONTAINS条件按照给定的值进行过滤。
-
-```sql
-select * from student where interest CONTAINS '电影';        -- 查询set集合
-select * from student where education CONTAINS key  '小学';  --查询map集合的key值
-select * from student where education CONTAINS '中心第9小学' allow filtering; --查询map的value值
+```
+select * from student where interest CONTAINS '电影';                             # 查询set集合
+select * from student where education CONTAINS key  '小学';                       # 查询map集合的key值
+select * from student where education CONTAINS '中心第9小学' allow filtering;     # 查询map的value值
 ```
 
 ##### 6） ALLOW FILTERING
 
 ALLOW FILTERING是一种非常消耗计算机资源的查询方式。
-如果表包含例如100万行，并且其中95％具有满足查询条件的值，则查询仍然相对有效，这时应该使用ALLOW FILTERING。
-
-如果表包含100万行，并且只有2行包含满足查询条件值，则查询效率极低。Cassandra将无需加载999,998行。如果经常使用查询，则最好在列上添加索引。
-
-ALLOW FILTERING在表数据量小的时候没有什么问题，但是数据量过大就会使查询变得缓慢。
+- 如果表包含例如100万行，并且其中95％具有满足查询条件的值，则查询仍然相对有效，这时应该使用ALLOW FILTERING。
+- 如果表包含100万行，并且只有2行包含满足查询条件值，则查询效率极低。Cassandra将无需加载999,998行。如果经常使用查询，则最好在列上添加索引。
+- ALLOW FILTERING在表数据量小的时候没有什么问题，但是数据量过大就会使查询变得缓慢。
 
 #### 3 查询时排序
 
@@ -697,71 +635,47 @@ cassandra的第一主键是决定记录分布在哪台机器上，cassandra只�
 cassandra的任何查询，最后的结果都是有序的，内部就是这样存储的。
 
 现在使用 testTab表，来测试排序
-
-```sql
-select * from testtab where key_one = 12 order by key_two;  --正确
-select * from testtab where key_one = 12 and age =19 order key_two;  --错误，不能有索引查询
 ```
-
-索引列 支持 like 
-
-主键支持 group by 
+select * from testtab where key_one = 12 order by key_two;                  # 正确
+select * from testtab where key_one = 12 and age =19 order key_two;         # 错误，不能有索引查询
+```
+- 索引列 支持 like 
+- 主键支持 group by 
 
 #### 4 分页查询
 
-使用limit 关键字来限制查询结果的条数 进行分页
+- 使用limit 关键字来限制查询结果的条数 进行分页
 
 ### 添加数据
 
-> 语法：
 
-```shell
-INSERT INTO <tablename>(<column1 name>, <column2 name>....) VALUES (<value1>, <value2>....) USING <option>
+1、给student添加2行数据，包含对set，list ，map类型数据
 ```
-
-> 给student添加2行数据，包含对set，list ，map类型数据
-
-```shell
 INSERT INTO student (id,address,age,gender,name,interest, phone,education) VALUES (1011,'中山路21号',16,1,'Tom',{'游泳', '跑步'},['010-88888888','13888888888'],{'小学' : '城市第一小学', '中学' : '城市第一中学'}) ;
 
 INSERT INTO student (id,address,age,gender,name,interest, phone,education) VALUES (1012,'朝阳路19号',17,2,'Jerry',{'看书', '电影'},['020-66666666','13666666666'],{'小学' :'城市第五小学','中学':'城市第五中学'});
 ```
 
-> 执行上面的代码，然后 select * from student
 
-
-添加TTL，设定的computed_ttl数值秒后，数据会自动删除
-
-```sql
+2、添加TTL，设定的computed_ttl数值秒后，数据会自动删除
+```
 INSERT INTO student (id,address,age,gender,name,interest, phone,education) VALUES (1030,'朝阳路30号',20,1,'Cary',{'运动', '游戏'},['020-7777888','139876667556'],{'小学' :'第30小学','中学':'第30中学'}) USING TTL 60;
 ```
 
 
-
 ###  更新列数据
 
-更新表中的数据，可用关键字：
-
+更新表中的数据，可用关键字
 - **Where** - 选择要更新的行
 - **Set** - 设置要更新的值
 - **Must** - 包括组成主键的所有列
 
 在更新行时，如果给定行不可用，则UPDATE创建一个新行
 
-> 语法：
-
-```shell
-UPDATE <tablename>
-SET <column name> = <new value>
-<column name> = <value>....
-WHERE <condition>
-```
-
 #### 1 更新简单数据
 
-把student_id = 1012 的数据的gender列 的值改为1，代码：
-
-```shell
+把student_id = 1012 的数据的gender列 的值改为1
+```
 UPDATE student set gender = 1 where student_id= 1012;
 ```
 
@@ -786,7 +700,7 @@ UPDATE student SET interest = interest + {'游戏'} WHERE student_id = 1012;
 
 代码：
 
-```sql
+```
 UPDATE student SET interest = interest - {'电影'} WHERE student_id = 1012;
 ```
 
@@ -796,7 +710,7 @@ UPDATE student SET interest = interest - {'电影'} WHERE student_id = 1012;
 
 代码：
 
-```sql
+```
 UPDATE student SET interest = {} WHERE student_id = 1012;
 或
 DELETE interest FROM student WHERE student_id = 1012;
@@ -813,25 +727,19 @@ DELETE interest FROM student WHERE student_id = 1012;
 
 代码：
 
-```sql
+```
 UPDATE student SET phone = ['020-66666666', '13666666666'] WHERE student_id = 1012;
 ```
 
 ##### 2）在list前面插入值
-
-代码：
-
-```sql
+```
 UPDATE student SET phone = [ '030-55555555' ] + phone WHERE student_id = 1012;
 ```
 
 可以看到新数据的位置在旧数据的前面
 
 ##### 3）在list后面插入值
-
-代码：
-
-```sql
+```
 UPDATE student SET phone = phone + [ '040-33333333' ]  WHERE student_id = 1012;
 ```
 
@@ -843,7 +751,7 @@ UPDATE student SET phone = phone + [ '040-33333333' ]  WHERE student_id = 1012;
 
 现在把phone中下标为2的数据，也就是 “13666666666”替换，代码：
 
-```sql
+```
 UPDATE student SET phone[2] = '050-22222222' WHERE student_id = 1012;
 ```
 
@@ -853,18 +761,14 @@ UPDATE student SET phone[2] = '050-22222222' WHERE student_id = 1012;
 
 >非线程安全的，如果在操作时其它线程在前面添加了一个元素，会导致移除错误的元素
 
-代码：
-
-```sql
+```
 DELETE phone[2] FROM student WHERE student_id = 1012;
 ```
 
 
 ##### 6）【推荐】使用UPDATE命令和‘-’移除list中所有的特定值
 
-代码：
-
-```sql
+``
 UPDATE student SET phone = phone - ['020-66666666'] WHERE student_id = 1012;
 ```
 
@@ -906,25 +810,16 @@ DELETE education['幼儿园'] FROM student WHERE student_id = 1012;
 
 
 使用UPDATE删除数据
-
-```sql
+```
 UPDATE student SET education=education - {'中学','小学'} WHERE student_id = 1012;
 ```
 
 
 ### 6 删除行
 
-> 语法
-
-```sql
-DELETE FROM <identifier> WHERE <condition>;
-```
-
-> 代码
 
 删除student中student_id=1012 的数据
-
-```sql
+```
 DELETE FROM student WHERE student_id=1012;
 ```
 
@@ -939,13 +834,11 @@ DELETE FROM student WHERE student_id=1012;
 
 使用**BATCH**，您可以同时执行多个修改语句（插入，更新，删除）
 
-```shell
+```
 BEGIN BATCH
 <insert-stmt>/ <update-stmt>/ <delete-stmt>
 APPLY BATCH
 ```
-
-> 代码
 
 1、先把数据清空，然后使用添加数据的代码，在student中添加2条记录，student_id 为1011 、 1012
 
@@ -955,7 +848,7 @@ APPLY BATCH
 
 更新student_id =1012的数据，把年龄改为11，
 
-删除已经存在的student_id=1011的数据，代码：
+删除已经存在的student_id=1011的数据
 
 ```
 BEGIN BATCH
@@ -964,8 +857,6 @@ BEGIN BATCH
 	DELETE FROM student WHERE id=1011;
 APPLY BATCH;
 ```
-
-
 
 
 表操作
@@ -1024,36 +915,3 @@ cqlsh:tutorialspoint> BEGIN BATCH
 ... DELETE emp_city FROM emp WHERE emp_id = 2;
 ... APPLY BATCH;
 ```
-
-数据增删改查操作
----
-1、创建数据
-```
-cqlsh:tutorialspoint> INSERT INTO emp (emp_id, emp_name, emp_city,emp_phone, emp_sal) VALUES(1,'ram', 'Hyderabad', 9848022338, 50000);
-cqlsh:tutorialspoint> INSERT INTO emp (emp_id, emp_name, emp_city,emp_phone, emp_sal) VALUES(2,'robin', 'Hyderabad', 9848022339, 40000);
-cqlsh:tutorialspoint> INSERT INTO emp (emp_id, emp_name, emp_city,emp_phone, emp_sal) VALUES(3,'rahman', 'Chennai', 9848022330, 45000);
-```
-
-2、更新数据
-```
-cqlsh:tutorialspoint> UPDATE emp SET emp_city='Delhi',emp_sal=50000 WHERE emp_id=2;
-```
-
-
-3、读取数据
-```
-cqlsh:tutorialspoint> select * from emp;
-cqlsh:tutorialspoint> SELECT emp_name,emp_sal from emp;
-cqlsh:tutorialspoint> SELECT * FROM emp WHERE emp_sal=50000;
-```
-
-4、删除数据
-```
-cqlsh:tutorialspoint> DELETE emp_sal FROM emp WHERE emp_id=3;
-```
-
-5、删除整行
-```
-cqlsh:tutorialspoint> DELETE FROM emp WHERE emp_id=3;
-```
-
