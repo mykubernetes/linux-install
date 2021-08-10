@@ -81,7 +81,7 @@ map 数据类型包含了 key/value 键值对。key 和 value 可以是任何类
 
 
 
-### 启动cqlsh
+# 启动cqlsh
 
 1）进入cassandra安装目录下的 bin 目录，执行 cqlsh 命令
 ```
@@ -122,7 +122,7 @@ cqlsh> USE system_traces ；
 cqlsh:system_traces> DESCRIBE sessions；
 ```
 
-### Expand  扩展输出
+## Expand  扩展输出
 
 > 使用命令后会扩展select输出的结果展示形式，对每个需要的操作先开启扩展，然后进行查询，最后关闭扩展
 
@@ -227,10 +227,9 @@ CQL：Cassandra Query Language  和关系型数据库的 SQL 很类似（一些�
 CREATE KEYSPACE <identifier> WITH <properties>;
 ```
 
-更具体的语法：
+更具体的语法
 ```
-Create keyspace KeyspaceName with replicaton={'class':strategy name,   
-'replication_factor': No of replications on different nodes};
+Create keyspace KeyspaceName with replicaton={'class':strategy name,'replication_factor': No of replications on different nodes};
 ```
 - KeyspaceName 代表键空间的名字
 - strategy name 代表副本放置策略，内容包括：简单策略、网络拓扑策略，选择其中的一个。
@@ -241,10 +240,10 @@ Create keyspace KeyspaceName with replicaton={'class':strategy name,
 ```
 CREATE KEYSPACE school WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3} AND DURABLE_WRITES = false;
 ```
-- SimpleStrategy 简单策略(机架感知策略)
-- NetworkTopologyStrategy 网络拓扑策略(数据中心共享策略)
+- SimpleStrategy 简单策略(机架感知策略)，仅适用于单datacenter单rack。根据partitioner存储第一份replica，然后在顺时针方向的下一个node上存放下一份replica（不考虑网络拓扑信息）。
+- NetworkTopologyStrategy 网络拓扑策略(数据中心共享策略)，可以方便的扩展到多datacenter，推荐使用，同时，NetworkTopologyStrategy尽量避免将数据存储到相同的rack上。
 - replication_factor 复制因子
-- durable_writes 默认情况下，表的durable_writes属性设置为true，但可以将其设置为false。您不能将此属性设置为simplex策略。
+- durable_writes 默认值durable_writes属性为true，但可以将其设置为false。不能将此属性设置为simplex策略。
 
 2、查看创建的keyspace
 ```
@@ -303,7 +302,7 @@ SELECT * FROM system.schema_keyspaces;
 DROP KEYSPACE school
 ```
 
-#### 操作表、索引
+### 2、操作表、索引
 
 1、操作前，先把键空间school键空间创建，并使用school 键空间
 ```
@@ -425,7 +424,7 @@ PRIMARY KEY((key_part_one,key_part_two), key_clust_one, key_clust_two, key_clust
 ALTER TABLE student ADD email text;
 ```
 
-2、删除列
+2、删除一列
 ```
 cqlsh:school> ALTER table student DROP email;
 ```
@@ -436,8 +435,6 @@ cqlsh:school> ALTER table student DROP email;
 ```
 DROP TABLE student;
 ```
-- 执行删除代码，然后查询student，报错：unconfigured table student ，说明student已经被删除
-
 
 #### 清空表
 
@@ -446,17 +443,14 @@ DROP TABLE student;
 TRUNCATE student；
 ```
 
-#### 创建索引
+### 创建索引
 
-##### 1）普通列创建索引
+#### 1）普通列创建索引
 
 > 语法
-
 ```
 CREATE INDEX <identifier> ON <tablename>
 ```
-
-> 代码
 
 为student的 name 添加索引，索引的名字为：sname
 ```
@@ -468,64 +462,50 @@ CREATE INDEX sname ON student (name);
 CREATE INDEX ON student (age);
 ```
 
-执行上面的命令，然后使用 DESCRIBE student 查看表
-
-
-可以发现 对age创建索引，没有指定索引名字，会提供一个默认的索引名：student_age_idx。
+执行上面的命令，然后使用 DESCRIBE student 查看表，可以发现 对age创建索引，没有指定索引名字，会提供一个默认的索引名：student_age_idx。
 
 索引原理：
 
 Cassandra之中的索引的实现相对MySQL的索引来说就要简单粗暴很多了。Cassandra自动新创建了一张表格，同时将原始表格之中的索引字段作为新索引表的Primary Key！并且存储的值为原始数据的Primary Key 
 
-##### 2）集合列创建索引
+#### 2）集合列创建索引
 
 给集合列设置索引
-
 ```
-CREATE INDEX ON student(interest);                 -- set集合添加索引
-CREATE INDEX mymap ON student(KEYS(education));          -- map结合添加索引
+CREATE INDEX ON student(interest);                   -- set集合添加索引
+CREATE INDEX mymap ON student(KEYS(education));      -- map结合添加索引
 ```
 
 #### 删除索引
 
 > 语法
-
 ```
 DROP INDEX <identifier>
 ```
 
 > 删除student的sname 索引
-
 ```
 drop index sname;
 ```
 
-执行上面代码，然后使用DESCRIBE student 查看表，发现sname索引已经不存在
-
-
-### 查询数据
+## 3、查询数据
 
 #### 1 查询数据
 
 > 语法
 
 使用 SELECT   、WHERE、LIKE、GROUP BY 、ORDER BY等关键词
-
-```shell
+```
 SELECT FROM <tablename>
 SELECT FROM <table name> WHERE <condition>;
 ```
 
-> 代码
-
 ##### 1）查询所有数据
 
 当前student表有2行数据，全部查询出来
-
 ```
 cqlsh:school> select * from student;
 ```
-
 
 ##### 2）根据主键查询
 
@@ -533,11 +513,9 @@ cqlsh:school> select * from student;
 
 代码
 
-```shell
+```
 cqlsh:school> select * from student where id=1012;
 ```
-
-
 
 #### 2 查询时使用索引
 
@@ -553,7 +531,7 @@ cqlsh:school> select * from student where id=1012;
 
 当前有一张表testTab，表中包含一些数据
 
-```sql
+```
 create table testTab (
 key_one int,
 key_two int,
@@ -573,14 +551,14 @@ create INDEX tage ON testTab (age);
 >
 > 对key_one进行 = 号查询，可以查出结果
 
-```sql
+```
 select * from testtab where key_one=4;
 ```
 
 
 > 对key_one 进行范围查询使用 > 号，无法查出结果
 
-```shell
+```
 select * from testtab where key_one>4;
 ```
 
@@ -599,7 +577,7 @@ key_two是第二主键
 
 代码：
 
-```sql
+```
 select * from testtab where key_two = 8;
 ```
 
@@ -613,7 +591,7 @@ InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot exe
 
 修改：
 
-```sql
+```
 select * from testtab where key_two = 8 ALLOW FILTERING;
 ```
 
@@ -625,13 +603,13 @@ select * from testtab where key_two = 8 ALLOW FILTERING;
 
 代码：
 
-```sql
+```
 select * from testtab where key_one=12 and key_two = 8 ;
 ```
 
 代码：
 
-```sql
+```
 select * from testtab where key_one=12 and key_two > 7;
 ```
 
@@ -641,7 +619,7 @@ age是索引列
 
 代码：
 
-```sql
+```
  select * from testtab where age = 19;   -- 正确
  select * from testtab where age > 20 ;  --会报错
  select * from testtab where age >20 allow filtering;  --可以查询出结果，但是不建议这么做
