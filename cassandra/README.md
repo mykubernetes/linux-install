@@ -387,9 +387,27 @@ nodetool getendpoints <keyspace> <table> <key>
 nodetool tpstats
 ```
 
-7、info
+7、查看某个节点负载，内存使用情况
 ```
-nodetool info
+# nodetool info
+ID                     : 091ff0dc-415b-48a7-b4ce-e70c84bbfafc
+Gossip active          : true
+Thrift active          : false
+Native Transport active: true
+Load                   : 282.65 KiB
+Generation No          : 1561803589
+Uptime (seconds)       : 844997
+Heap Memory (MB)       : 354.14 / 3970.00
+Off Heap Memory (MB)   : 0.00
+Data Center            : dc1
+Rack                   : rack1
+Exceptions             : 0
+Key Cache              : entries 119, size 11.7 KiB, capacity 100 MiB, 435 hits, 596 requests, 0.730 recent hit rate, 14400 save period in seconds
+Row Cache              : entries 0, size 0 bytes, capacity 0 bytes, 0 hits, 0 requests, NaN recent hit rate, 0 save period in seconds
+Counter Cache          : entries 0, size 0 bytes, capacity 50 MiB, 0 hits, 0 requests, NaN recent hit rate, 7200 save period in seconds
+Chunk Cache            : entries 11, size 704 KiB, capacity 480 MiB, 1388 misses, 2253 requests, 0.384 recent hit rate, NaN microseconds miss latency
+Percent Repaired       : 100.0%
+Token                  : (invoke with -T/--tokens to see all 256 tokens)w
 ```
 
 cqlsh命令
