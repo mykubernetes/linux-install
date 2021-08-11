@@ -142,7 +142,7 @@ Save this to use as the --reassignment-json-file option during rollback
 Successfully started reassignment of partitions
 ```
 
-4)查看分区重新分配的进度
+4) 查看分区重新分配的进度
 ```
 # kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file result.json --verify
 Status of partition reassignment:
