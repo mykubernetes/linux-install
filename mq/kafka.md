@@ -151,3 +151,38 @@ Reassignment of partition heima-par-0 is still in progress
 Reassignment of partition heima-par-2 is still in progress
 Reassignment of partition heima-par-1 is still in progress
 ```
+
+修改副本因子
+===
+
+1、配置topic的副本，保存为json文件
+```
+# cat replication-factor.json
+{
+"version":1,
+"partitions":[
+    {"topic":"heima","partition":0,"replicas":[0,1,2]},
+    {"topic":"heima","partition":1,"replicas":[0,1,2]},
+    {"topic":"heima","partition":2,"replicas":[0,1,2]}
+]
+}
+```
+
+2、执行脚本
+```
+# kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file replication-factor.json --execute
+Current partition replica assignment
+{"version":1,"partitions":[{"topic":"topic0703","partition":1,"replicas":[1,0],"log_dirs":["any","any"]},{"topic":"topic0703","partition":0,"replicas":[0,1],"log_dirs":["any","any"]},{"topic":"topic0703","partition":2,"replicas":[2,0],"log_dirs":["any","any"]}]}
+
+Save this to use as the --reassignment-json-file option during rollback
+Successfully started reassignment of partitions.
+```
+
+3、验证
+```
+# kafka-topics.sh --describe --zookeeper localhost:2181 --topic topic0703
+Topic:topic0703 PartitionCount:3    ReplicationFactor:3   Configs:
+Topic: topic0703    Partition: 0  Leader: 0    Replicas: 0,1,2 Isr: 0,1
+Topic: topic0703    Partition: 1  Leader: 1    Replicas: 0,1,2 Isr: 1,0
+Topic: topic0703    Partition: 2  Leader: 2    Replicas: 0,1,2 Isr: 2,0
+```
