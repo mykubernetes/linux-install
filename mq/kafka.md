@@ -54,9 +54,10 @@ Topic: heima-par    Partition: 3  Leader: 2    Replicas: 2,1,0 Isr: 2,1,0
 {"topics":[{"topic":"heima-par"}],
 "version":1
 }
-
+```
 
 2) 使用 kafka -reassign-partitions.sh 工具生成reassign plan
+```
 # kafka-reassign-partitions.sh --zookeeper localhost:2181 --topics-to-move-json-file reassign.json --broker-list "0,1,2,3" --generate
 Current partition replica assignment
 {"version":1,"partitions":[{"topic":"heima-par","partition":2,"replicas":[1,0,2],"log_dirs":["any","any","any"]},{"topic":"heima-par","partition":1,"replicas":[0,2,1],"log_dirs":["any","any","any"]},{"topic":"heima-par","partition":0,"replicas":[2,1,0],"log_dirs":["any","any","any"]},{"topic":"heima-par","partition":3,"replicas":[2,1,0],"log_dirs":["any","any","any"]}]}
@@ -64,14 +65,14 @@ Current partition replica assignment
 Proposed partition reassignment configuration
 {"version":1,"partitions":[{"topic":"heima-par","partition":0,"replicas":[1,2,3],"log_dirs":["any","any","any"]},{"topic":"heima-par","partition":2,"replicas":[3,0,1],"log_dirs":["any","any","any"]},{"topic":"heima-par","partition":1,"replicas":[2,3,0],"log_dirs":["any","any","any"]},{"topic":"heima-par","partition":3,"replicas":[0,1,2],"log_dirs":["any","any","any"]}]}
 ```
---generate 表示指定类型参数
---topics-to-move-json-file 指定分区重分配对应的主题清单路径
+- --generate 表示指定类型参数
+- --topics-to-move-json-file 指定分区重分配对应的主题清单路径
 
 > 注意：
 > 命令输入两个Json字符串，第一个JSON内容为当前的分区副本分配情况，第二个为重新分配的候选方案，注意这里只是生成一份可行性的方案，并没有真正执行重分配的动作。
 
-```
 3) 将第二个JSON内容保存到名为result.json文件里面（文件名不重要，文件格式也不一定要以json为结尾，只要保证内容是json即可），然后执行这些reassign plan：
+```
 # cat result.json
 {
  "version": 1,
@@ -141,8 +142,8 @@ Save this to use as the --reassignment-json-file option during rollback
 Successfully started reassignment of partitions
 ```
 
-```
 4)查看分区重新分配的进度
+```
 # kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file result.json --verify
 Status of partition reassignment:
 Reassignment of partition heima-par-3 completed successfully
