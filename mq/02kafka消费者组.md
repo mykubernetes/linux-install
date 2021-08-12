@@ -16,8 +16,8 @@ heima      2         0              0              0   
 3、查看消费组当前的状态
 ```
 # kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group group.demo --state
-COORDINATOR (ID)              ASSIGNMENT-STRATEGY     STATE       #MEMBERS
-Server-node.localdomain:9092 (0) range                Stable       1
+COORDINATOR (ID)                    ASSIGNMENT-STRATEGY     STATE        #MEMBERS
+Server-node.localdomain:9092 (0)    range                   Stable       1
 ```
 
 4、消费组内成员信息
