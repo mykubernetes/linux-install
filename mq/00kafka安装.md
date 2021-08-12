@@ -477,13 +477,7 @@ my-topic    2         2              3       �
 - LAG 表示堆积
 
 
-
-11、显示所有消费者
-```
-./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
-```
-
-12、查看topic消费进度
+11、查看topic消费进度
 - 显示出consumer group的offset情况， 必须参数为--group， 不指定--topic，默认为所有topic
 ```
 # bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker
@@ -513,13 +507,13 @@ pv              page_visits        2   20       20         0      none
 - Owner：表示消费者
 
 
-13、增加、删除配置项
+12、增加、删除配置项
 ```
 # bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --add-config x=y
 # bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --delete-config x
 ```
 
-14、常用创建topic参数
+13、常用创建topic参数
 ```
 bin/kafka-topics.sh --create \
 --zookeeper $zookeeper_address \
