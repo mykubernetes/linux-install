@@ -90,3 +90,48 @@ root      57769      1  1 06:19 ?        00:00:00 rsync --daemon
 #指定端口号
 # rsync -avzP -e "ssh -p 22" /etc/passwd 192.168.101.70:/tmp/cc.txt
 ```
+
+
+rsync+ssh非交互登录同步数据
+===
+
+有两种方法可以解决此问题。
+- 一、配置两台主机ssh免密互信
+- 二、使用sshpass免交互的ssh登录工具
+
+1、在本机上安装sshpass，centos的用户直接通过下面的命令安装
+```
+yum install sshpass
+```
+或者在 https://sourceforge.net/projects/sshpass/files/latest/download 下载源码，通过编译的方式安装：
+```
+tar zxvf sshpass-1.06.tar.gz
+cd sshpass-1.06
+./configure
+make install
+```
+
+2、在本机上通过rsync传送远程主机文件到本机，运行下面的命令：
+```
+sshpass -p '123456' rsync -avP --delete --exclude-from='/exclude.list' -e 'ssh -p 19222' root@192.168.57.178:/home/ /home
+```
+ 
+sshpass man 手册中还列举了两个示例
+
+**EXAMPLES**
+Run rsync over SSH using password authentication, passing the password on the command line:　　　
+```
+rsync --rsh='sshpass -p 12345 ssh -l test' host.example.com:path
+```
+ 
+To do the same from a bourne shell script in a marginally less exposed way:
+```
+SSHPASS=12345 rsync --rsh='sshpass -e ssh -l test' host.example.com:path
+```
+- -p: 后面接远程主机的登录密码
+- 'ssh -p 19222' ：表示通过ssh连接，ssh服务使用的19222端口
+
+实现了免密登录，就可以将同步命令放到后台，然后关掉窗口放心地做其他事了，也不用担心登录shell断开导致同步失败。
+```
+nohup sshpass -p 'passwd' rsync -avP --delete --exclude-from='/exclude.list' -e 'ssh -p 19222' root@192.168.57.178:/home/ /home &
+```
