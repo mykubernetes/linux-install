@@ -67,9 +67,13 @@ http.port: 9200                                    #es端口
 transport.tcp.port: 9300                           #集群选举通信端口
 network.host: 192.168.101.66         #监听的ip地址，如果是0.0.0.0，则表示监听全部ip
 discovery.zen.ping.unicast.hosts: ["node001","node002","node003"]   #默认使用9300，如果修改可node001:9300
-discovery.zen.ping_timeout: 10s
-discovery.zen.minimum_master_nodes: 3
 discovery.zen.ping.multicast.enabled: false        #如果是不同网段的节点如何组成es集群禁用自动发现机制
+
+es集群防止脑裂产生的配置方法
+discovery.zen.fd.ping_interval: 10s                #节点间存活检测间隔
+discovery.zen.ping_timeout: 10s                    #连接超时等待时间
+discovery.zen.minimum_master_nodes: 2              #节点的master数量，一半是集群节点数除2+1的数量，3个节点就是2
+discovery.zen.fd.ping_retries: 6                   #重试次数，当连接超时后重试多少次
 
 # 允许跨域请求
 http.cors.enabled: true
