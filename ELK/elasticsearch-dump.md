@@ -63,7 +63,7 @@ Thu, 14 Jan 2021 03:04:50 GMT | Total Writes: 4
 Thu, 14 Jan 2021 03:04:50 GMT | dump complete
 ```
 
-# 4…两个es之间进行数据迁移
+# 4.两个es之间进行数据迁移
 
 elasticdump --input 要迁移es1地址/索引 --output 迁移到es2地址/索引
 ```
