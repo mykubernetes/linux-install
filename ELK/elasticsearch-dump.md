@@ -104,7 +104,7 @@ npm ERR!     /root/.npm/_logs/2021-01-13T06_36_56_956Z-debug.log
 错误的ERR！ 可以在以下位置找到此运行的完整日志：
 ```
 
-##错误解决
+## 错误解决
 
 根据翻译的内容提示说我们包安装名相同，elasticsearch-dump目录下有个package.json的文件，打开文件，将里面的name字段值换成和npm安装插件的名称不一致就行
 ```
