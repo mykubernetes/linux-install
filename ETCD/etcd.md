@@ -205,9 +205,16 @@ ETCD_INITIAL_CLUSTER_STATE="new"
 4、配置完成后启动服务
 ```
 systemctl start etcd
+systemctl enable etcd
 ```
 
-5、查看集群状态
+5、配置etcd API 版本为3#
+```
+# cat .bash_profile
+export ETCDCTL_API=3
+```
+
+6、查看集群状态
 
 查看 etcd 状态
 ```
@@ -234,22 +241,22 @@ systemctl start etcd
 
 查看端口监听(如果未在本地监听环回地址，那么在本地使用etcdctl不能正常连入进去)
 ```
-[root@etcd-0-8 default.etcd]# netstat -lntup |grep etcd
+# netstat -lntup |grep etcd
 tcp 0      0 172.16.0.8:2379   0.0.0.0:*     LISTEN 25167/etcd
 tcp 0      0 127.0.0.1:2379    0.0.0.0:*     LISTEN 25167/etcd
 tcp 0      0 172.16.0.8:2380   0.0.0.0:*     LISTEN 25167/etcd
 ```
 
 
-查看集群状态(可以看到etcd-0-17)
+查看集群状态
 ```
 # 查看集群成员
-[root@etcd-0-8 default.etcd]# etcdctl member list
+# etcdctl member list
 2d2e457c6a1a76cb: name=etcd-0-8 peerURLs=http://172.16.0.8:2380 clientURLs=http://127.0.0.1:2379,http://172.16.0.8:2379 isLeader=false
 56e0b6dad4c53d42: name=etcd-0-14 peerURLs=http://172.16.0.14:2380 clientURLs=http://127.0.0.1:2379,http://172.16.0.14:2379 isLeader=true
 d2d2e9fc758e6790: name=etcd-0-17 peerURLs=http://172.16.0.17:2380 clientURLs=http://127.0.0.1:2379,http://172.16.0.17:2379 isLeader=false
 
-[root@etcd-0-8 ~]# etcdctl cluster-health
+# etcdctl cluster-health
 member 2d2e457c6a1a76cb is healthy: got healthy result from http://127.0.0.1:2379
 member 56e0b6dad4c53d42 is healthy: got healthy result from http://127.0.0.1:2379
 member d2d2e9fc758e6790 is healthy: got healthy result from http://127.0.0.1:2379
@@ -693,7 +700,6 @@ lease 694d71ddacfda22c granted with TTL(300s), remaining(282s)
 
 $ etcdctl lease timetolive --keys 694d71ddacfda22c
 lease 694d71ddacfda22c granted with TTL(300s), remaining(220s), attached keys([foo10])
-
 ```
 
 8)备份
@@ -758,13 +764,13 @@ $ etcdctl --endpoints=http://localhost:22379  member list -w table
 ```
 
 
-删除集群中存在的节点
+4、删除集群中存在的节点
 ```
 $ etcdctl --endpoints=http://localhost:2379 member remove 8e9e05c52164694d
 Removed member 8e9e05c52164694d from cluster
 ```
 
-向集群中新加节点
+5、向集群中新加节点
 ```
 $ etcdctl --endpoints=http://localhost:2379 member add etcd3 --peer-urls=http://192.168.1.100:2380
 Added member named etcd3 with ID 8e9e05c52164694d to cluster
