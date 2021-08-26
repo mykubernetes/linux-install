@@ -452,8 +452,97 @@ delete和truncate的区别
 - truncate不可以回滚，delete可以回滚
 
 
+## 一、添加数据：INSERT
+
+### 1、插入单条数据（常用）
+```
+-- 插入学生表测试数据
+insert into Student(s_id,s_name,s_birth,s_sex) values('01' , '赵信' , '1990-01-01' , '男');
+```
+
+### 2、插入单条数据
+```
+INSERT INTO student SET s_id='02',s_name='德莱厄斯',s_birth='1990-01-01',s_sex='男'
+```
+
+### 3、插入多条数据
+```
+INSERT INTO student VALUES('03','艾希','1990-01-01','女'),('04','德莱文','1990-08-06','男'),('05','俄洛依','1991-12-01','女');
+```
+```
+INSERT INTO student(s_name,s_sex) VALUES('艾希','女'),('德莱文','男');
+```
+
+### 4、表数据复制
+```
+INSERT INTO student SELECT * from student1;
+```
+
+## 二、更新数据：UPDATE
+1. 修改一条数据的某个字段
+```
+UPDATE student SET s_name ='张三' WHERE s_id ='01'
+```
+2. 修改多个字段为同一的值
+```
+UPDATE student SET s_name = '李四' WHERE s_id in ('01','02','03');
+```
+
+3. 使用case when实现批量更新
+```
+update student set s_name = case s_id when 01 then '小王' when 02 then '小周' when 03 then '老周' end where s_id in (01,02,03)
+```
+
+```
+UPDATE student SET s_birth = CASE s_name
+	WHEN '小王' THEN
+		'2019-01-20'
+	WHEN '小周' THEN
+		'2019-01-22'
+END WHERE s_name IN ('小王','小周');
+```
+
+## 三、删除数据：DELETE
+
+### 1、删除指定数据
+```
+DELETE FROM student WHERE s_id='09'
+```
+
+### 2、删除表中全部数据
+```
+TRUNCATE student1;
+```
+
 DQL语言
 ===
+
+数学运算符
+| 运算符 | 含义 | 范例 | 结果 |
+|-------|------|-----|------|
+| = | 等于| 5=6 | false |
+| <>或！= | 不等于| 5!6 | true |
+| > | 大于| 5>6 | false |
+| < | 小于| 5<6 | true |
+| >= | 大于等于| 5>=6 | false |
+| <= | 小于等于| 5<=6 | true |
+
+逻辑操作符
+| 操作符名称| 语法 | 描述 |
+|----------|-----|------|
+| AND或&& | a AND b 或a && b | 逻辑与，同时为真结果才为真 |
+| OR或`||` | a OR b 或 a `||` b | 逻辑或，只要一个为真，则结果为真 |
+| NOT或! | NOT a 或!a | 逻辑非，若操作数为假，结果为真 |
+
+比较运算符
+| 操作符名称 | 语法 | 描述 |
+|-----------|-----|------|
+| IS NULL | a IS NULL | 若操作符为NULL则结果为真 |
+| IS NOT NULL | a IS NOT NULL | 若操作符不为NULL,则结果为真 |
+| BETMEEN | a BETWEEN b AND c | 若a范围在b与c之间则寄过为真 |
+| LIKE | a LIKE b | SOL模式匹配，若a匹配b,则结果为真 |
+| IN | a IN (a1, a2, a3, ...) | 若a等于a1,a2...中的某一个，则结果为真 |
+
 ```
 选择：select * from table1 where 范围
 插入：insert into table1(field1,field2) values(value1,value2)
@@ -558,7 +647,6 @@ select EXISTS(SELECT employee_id FROM employees);
 ```
 
 
-
 ```
 #数据运算：+ - * / % 加 减 乘 除 余数
 
@@ -652,6 +740,9 @@ drop user user1；
 查看用户
 select user，password，host from mysql.user;
 ```
+
+
+
 
 mysql_secure_installation安全配置向导
 ===
