@@ -231,41 +231,6 @@ alter table 表 modify column 字段名 字段类型 约束
 DDL语音
 ===
 
-设置表的类型
----
--Mysql的数据类型： MyISAM、InnoDB、HEAP、 BOB、CSV等
-
-| **对比项** |**MyISAM** | **InnoDB** |
-|-------|--------|--------|
-| **主外键** | 不支持 | 支持 |
-| **事务** | 不支持 | 支持 |
-| **行锁** | 表锁，即使操作一条记录也会锁住整个表，不适合高并发的操作 | 行锁，操作时只锁某一行，不对其他行影响，适合高并发的操作 |
-| **缓存** | 只缓存索引，不缓存真实数据 | 不仅缓存索引还要缓存真实数据，对内存要求较高，而且内存大小对性能有决定性的影响 |
-| **表空间** | 小 | 大 |
-| **关注点** | 性能 | 事务 |
-| **默认安装** | Y | Y |
-| **用户默认使用** | N | Y |
-| **自带系统表使用** | Y | N |
-
-```
-CREATE TABLE 表名(
-	#省略代码
-）ENGINE= InnoDB;
-```
-适用场景
-- 1. 使用MyISAM：节约空间及响应速度快；不需事务，空间小，以查询访问为主
-- 2. 使用InnoDB：安全性，事务处理及多用户操作数据表；多删除、更新操作，安全性高，事务处理及并发控制
-
-查看mysql所支持的引擎类型
----
-```
-SHOW ENGINES
-```
-
-查看默认引擎
-```
-SHOW VARIABLES LIKE 'storage_engine';
-```
 
 ```
 mysql> SHOW DATABASES;
@@ -329,7 +294,133 @@ create table 表名 like 旧表;
 create table 表名 select 查询列表 from 旧表 [where 筛选];
 ```
 
+设置表的类型
+---
+-Mysql的数据类型： MyISAM、InnoDB、HEAP、 BOB、CSV等
 
+| **对比项** |**MyISAM** | **InnoDB** |
+|-------|--------|--------|
+| **主外键** | 不支持 | 支持 |
+| **事务** | 不支持 | 支持 |
+| **行锁** | 表锁，即使操作一条记录也会锁住整个表，不适合高并发的操作 | 行锁，操作时只锁某一行，不对其他行影响，适合高并发的操作 |
+| **缓存** | 只缓存索引，不缓存真实数据 | 不仅缓存索引还要缓存真实数据，对内存要求较高，而且内存大小对性能有决定性的影响 |
+| **表空间** | 小 | 大 |
+| **关注点** | 性能 | 事务 |
+| **默认安装** | Y | Y |
+| **用户默认使用** | N | Y |
+| **自带系统表使用** | Y | N |
+
+```
+CREATE TABLE 表名(
+	#省略代码
+）ENGINE= InnoDB;
+```
+适用场景
+- 1. 使用MyISAM：节约空间及响应速度快；不需事务，空间小，以查询访问为主
+- 2. 使用InnoDB：安全性，事务处理及多用户操作数据表；多删除、更新操作，安全性高，事务处理及并发控制
+
+查看mysql所支持的引擎类型
+---
+```
+SHOW ENGINES
+```
+
+查看默认引擎
+---
+```
+SHOW VARIABLES LIKE 'storage_engine';
+```
+
+## 一、创建表
+```
+CREATE TABLE `Student`(
+	`s_id` VARCHAR(20),
+	`s_name` VARCHAR(20) NOT NULL DEFAULT '',
+	`s_birth` VARCHAR(20) NOT NULL DEFAULT '',
+	`s_sex` VARCHAR(10) NOT NULL DEFAULT '',
+	PRIMARY KEY(`s_id`)
+);
+```
+
+## 二、查看表定义
+```
+mysql> desc Student;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----|---------+-------+
+| s_id    | VARCHAR(20) | NO   | PRI | NULL    |       |
+| s_name  | VARCHAR(20) | NO   |     |         |       |
+| s_birth | VARCHAR(20) | NO   |     |         |       |
+| s_sex   | VARCHAR(10) | NO   |     |         |       |
++---------+-------------+------+-----+---------+-------+
+4 rows in set (0.02 sec)
+```
+
+## 三、查看创建表的 SQL 语句
+```
+mysql> show create table Student \G;
+******************************= 1. riw ********************************
+       Table: Student
+Create Table: CREATE TABLE `Student`(
+  `s_id` VARCHAR(20),
+  `s_name` VARCHAR(20) NOT NULL DEFAULT '',
+  `s_birth` VARCHAR(20) NOT NULL DEFAULT '',
+  `s_sex` VARCHAR(10) NOT NULL DEFAULT '',
+  PRIMARY KEY(`s_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+1 row in set (0.00 sec)
+
+ERROR:
+No query specified
+```
+
+## 四、删除表
+```
+mysql> drop table Student;
+```
+
+## 五、修改表
+
+### 1、修改表类型
+- 修改表 student 的 s_name 字段定义，将 varchar(20)改为 varchar(30)
+```
+mysql> alter table Student modify s_name varchar(30);
+```
+
+### 2、增加表字段
+- 表 student 上新增加字段 s_test，类型为 int(3)
+```
+mysql> alter table student add column s_test int(3);
+```
+
+### 3、删除表字段
+- 将字段 s_test 删除掉
+```
+mysql> alter table Student drop column s_test;
+```
+
+### 4、字段改名
+- 将 s_sex 改名为 s_sex1，同时修改字段类型为 int(4)
+```
+mysql> alter table Student change s_sex s_sex1 int(4);
+```
+
+### 5、修改字段排列顺序
+- 将新增的字段 s_test 加在 s_id 之后
+```
+mysql> alter table Student add s_test date after s_id;
+```
+
+- 修改已有字段 s_name，将它放在最前面
+```
+mysql> alter table Student modify s_name varchar(30) default '' first;
+```
+
+### 6、表名修改
+- 将表 Student 改名为 student
+```
+mysql> alter table Student rename student;
+```
 
 DML语言
 ===
