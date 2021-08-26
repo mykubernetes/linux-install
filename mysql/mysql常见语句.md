@@ -48,57 +48,6 @@ select database()；
 
 ```
 
-DDL语音
-===
-```
-##############################数据库操作##############################
-#创建数据库
-create database 库名;
-CREATE DATABASE [IF NOT EXISTS] 库名;    #如果不存在就创建
-
-create database [if not exists] 库名 [character set 字符集名];
-
-#删除数据库
-drop database 库名;
-DROP DATABASE [IF EXISTS] 库名;        #如果存在就删除
-
-##############################表操作##############################
-#使用表
-use 表名；
-
-#创建表
-create table 表名 (id int(5) not null,name char(10) );
-CREATE TABLE [IF  NOT EXISTS] 表名 (id int(5) not null,name char(10) );
-
-删除表
-drop table [if exists] 表名;
-
-##############################修改表##############################
-1.添加列
-alter table 表名 add column 列名 类型 [first|after 字段名];
-
-2.修改列的类型或约束
-alter table 表名 modify column 列名 新类型 [新约束];
-
-3.修改列名
-alter table 表名 change column 旧列名 新列名 类型;
-
-4 .删除列
-alter table 表名 drop column 列名;
-
-5.修改表名
-alter table 表名 rename [to] 新表名;
-
-#修改库的字符集
-ALTER DATABASE books CHARACTER SET utf8;
-
-复制表
-1、复制表的结构
-create table 表名 like 旧表;
-
-2、复制表的结构+数据
-create table 表名 select 查询列表 from 旧表 [where 筛选];
-```
 
 数据类型
 ---
@@ -279,6 +228,57 @@ alter table 表 modify column 字段名 字段类型 约束 auto_increment
 alter table 表 modify column 字段名 字段类型 约束 
 ```
 
+DDL语音
+===
+```
+##############################数据库操作##############################
+#创建数据库
+create database 库名;
+CREATE DATABASE [IF NOT EXISTS] 库名;    #如果不存在就创建
+
+create database [if not exists] 库名 [character set 字符集名];
+
+#删除数据库
+drop database 库名;
+DROP DATABASE [IF EXISTS] 库名;        #如果存在就删除
+
+##############################表操作##############################
+#使用表
+use 表名；
+
+#创建表
+create table 表名 (id int(5) not null,name char(10) );
+CREATE TABLE [IF  NOT EXISTS] 表名 (id int(5) not null,name char(10) );
+
+删除表
+drop table [if exists] 表名;
+
+##############################修改表##############################
+1.添加列
+alter table 表名 add column 列名 类型 [first|after 字段名];
+
+2.修改列的类型或约束
+alter table 表名 modify column 列名 新类型 [新约束];
+
+3.修改列名
+alter table 表名 change column 旧列名 新列名 类型;
+
+4 .删除列
+alter table 表名 drop column 列名;
+
+5.修改表名
+alter table 表名 rename [to] 新表名;
+
+#修改库的字符集
+ALTER DATABASE books CHARACTER SET utf8;
+
+复制表
+1、复制表的结构
+create table 表名 like 旧表;
+
+2、复制表的结构+数据
+create table 表名 select 查询列表 from 旧表 [where 筛选];
+```
 
 DML语言
 ===
