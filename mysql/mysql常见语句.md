@@ -231,6 +231,18 @@ alter table 表 modify column 字段名 字段类型 约束
 DDL语音
 ===
 ```
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| test               |
++--------------------+
+6 rows in set (0.02 sec)
+
 ##############################数据库操作##############################
 #创建数据库
 create database 库名;
