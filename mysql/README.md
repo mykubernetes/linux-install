@@ -1,3 +1,6 @@
+
+https://blog.csdn.net/weixin_45692705/article/details/119003128?spm=1001.2014.3001.5501
+
 社区版  
 https://dev.mysql.com/downloads/mysql/
 
