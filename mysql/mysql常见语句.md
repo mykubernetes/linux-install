@@ -741,6 +741,195 @@ drop user user1；
 select user，password，host from mysql.user;
 ```
 
+## 一、wherer 条件语句
+
+### 1、AND
+```
+SELECT  * FROM student WHERE s_name ='小王' AND s_sex='男'
+```
+
+### 2、OR
+```
+SELECT  * FROM student WHERE s_name ='崔丝塔娜' OR s_sex='男'
+```
+
+### 3、NOT
+```
+SELECT  * FROM student WHERE NOT s_name ='崔丝塔娜' 
+```
+
+### 4、IS NULL
+```
+SELECT * FROM student WHERE s_name IS NULL;
+```
+
+### 5、IS NOT NULL
+```
+SELECT * FROM student WHERE s_name IS NOT NULL;
+```
+
+### 6、BETWEEN
+```
+SELECT * FROM student WHERE s_birth BETWEEN '2019-01-20' AND '2019-01-22'
+```
+
+### 7、LINK
+```
+SELECT * FROM student WHERE s_name LIKE '小%'
+```
+
+### 8、IN
+```
+SELECT * FROM student WHERE s_name IN ('小王','小周')
+```
+
+## 二、as 取别名
+
+### 1、表里的名字没有变，只影响了查询出来的结果
+```
+SELECT s_name as `name` FROM student 
+```
+- 使用as也可以为表取别名 （作用：单表查询意义不大，但是当多个表的时候取别名就好操作，当不同的表里有相同名字的列的时候区分就会好区分）
+
+## 三、distinct 去除重复记录
+- 注意：当查询结果中所有字段全都相同时 才算重复的记录
+
+### 1、去重
+```
+SELECT DISTINCT * FROM student
+```
+
+### 2、指定字段
+- 星号表示所有字段
+- 手动指定需要查询的字段
+- 还可也是四则运算
+- 聚合函数
+```
+SELECT DISTINCT s_name,s_birth FROM student
+```
+
+## 四、group by 分组
+- group by的意思是根据by对数据按照哪个字段进行分组，或者是哪几个字段进行分组。
+
+### 1、单个字段分组
+```
+SELECT COUNT(*)FROM student GROUP BY s_sex;
+```
+
+### 2、多个字段分组
+```
+SELECT s_name,s_sex,COUNT(*) FROM student GROUP BY s_name,s_sex;
+```
+- 注意：多个字段进行分组时，需要将s_name和s_sex看成一个整体，只要是s_name和s_sex相同的可以分成一组；如果只是s_sex相同，s_sex不同就不是一组。
+
+
+## 五、having 过滤
+- HAVING 子句对 GROUP BY 子句设置条件的方式与 WHERE 和 SELECT 的交互方式类似。WHERE 搜索条件在进行分组操作之前应用；而 HAVING 搜索条件在进行分组操作之后应用。HAVING 语法与 WHERE 语法类似，但 HAVING 可以包含聚合函数。HAVING 子句可以引用选择列表中显示的任意项。
+
+### 1、查询男生或者女生，人数大于4的性别
+```
+SELECT s_sex as 性别,count(s_id) AS 人数 FROM student GROUP BY s_sex HAVING COUNT(s_id)>4
+```
+
+## 六、order by 排序
+- 根据某个字段排序，默认升序(从小到大)
+
+ ### 1、一个字段，降序（从大到小）
+ ```
+ SELECT * FROM student ORDER BY s_id DESC;
+ ```
+ 
+ ### 2、多个字段
+```
+SELECT * FROM student ORDER BY s_id DESC, s_birth ASC;
+```
+- 多个字段 第一个相同在按照第二个 asc 表示升序
+
+
+## 七、limit 分页
+- 用于限制要显示的记录数量
+
+```
+语法1:
+select * from table_name limit 个数;
+
+语法2:
+select * from table_name limit 起始位置,个数;
+```
+
+### 1、查询前三条数据
+```
+SELECT * FROM student LIMIT 3;
+```
+
+### 2、从第三条开始 查询3条
+```
+SELECT * FROM student LIMIT 2,3;
+```
+- 注意：起始位置 从0开始
+
+
+## 八、子查询
+- 将一个查询语句的结果作为另一个查询语句的条件或是数据来源，​ 当我们一次性查不到想要数据时就需要使用子查询。
+```
+SELECT
+	* 
+FROM
+	score 
+WHERE
+	s_id =(
+	SELECT
+		s_id 
+	FROM
+		student 
+WHERE
+	s_name = '赵信')
+```
+
+### 1、in 关键字子查询
+- 当内层查询 (括号内的) 结果会有多个结果时, 不能使用 = 必须是in ,另外子查询必须只能包含一列数据
+```
+SELECT
+	* 
+FROM
+	score 
+WHERE
+	s_id IN (
+	SELECT
+		s_id 
+	FROM
+		student 
+WHERE
+	s_sex = '男')
+```
+
+### 2、exists 关键字子查询
+- 当内层查询 有结果时 外层才会执行
+
+## 九、多表查询
+
+### 1、笛卡尔积查询
+- 笛卡尔积查询的结果会出现大量的错误数据即,数据关联关系错误,并且会产生重复的字段信息 !
+
+### 2、内连接查询
+-  本质上就是笛卡尔积查询，inner可以省略。
+```
+select * from  表1 inner join 表2;
+```
+
+### 3、左外连接查询
+- 左边的表无论是否能够匹配都要完整显示，右边的仅展示匹配上的记录
+- 注意: 在外连接查询中不能使用where 关键字 必须使用on专门来做表的对应关系
+
+
+### 4、右外连接查询
+- 右边的表无论是否能够匹配都要完整显示，左边的仅展示匹配上的记录
+
+
+
+
+
+
 
 
 
