@@ -227,7 +227,7 @@ $ etcdctl role add rw_key_ --user=root
 Password: 
 Role rw_key_ created
 
-$ etcdctl --user=root role grant-permission rw_key_ readwrite key --prefix=true
+$ etcdctl --user=root role grant-permission rw_key_ --readwrite key --prefix=true
 Password: 
 Role rw_key_ updated
 
