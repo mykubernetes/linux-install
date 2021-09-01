@@ -161,7 +161,7 @@ listen test1
 - uri：对URI的左半部分做hash计算，并由服务器总权重相除以后派发至某挑出的服务器；
 - url_param：对用户请求的uri听<params>部分中的参数的值作hash计算，并由服务器总权重相除以后派发至某挑出的服务器；通常用于追踪用户，以确保来自同一个用户的请求始终发往同一个Backend Server；
 - hdr(name)：对于每个http请求，此处由<name>指定的http首部将会被取出做hash计算； 并由服务器总权重相除以后派发至某挑出的服务器；没有有效值的会被轮询调度； 
-- rdp-cookie	
+- rdp-cookie(name):根据cookie来锁定并哈希每一次TCP请求
 
 
 hash-type：哈希算法  
