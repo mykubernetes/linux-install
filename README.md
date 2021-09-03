@@ -1,7 +1,5 @@
 https://www.cnblogs.com/arjenlee
 
-https://www.cnblogs.com/ckh2014/
-
 https://www.cnblogs.com/itzgr/
 
 https://www.cnblogs.com/clsn/default.html?page=2
