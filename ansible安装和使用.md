@@ -967,8 +967,6 @@ force_handelers强制执行handlers
 | <= | 小于等于 |
 | >= | 大于等于 |
 | != | 不等于 |
-| xxx is defined | 变量存在 |
-| xxx is not defined | 变量不存在 |
 | 1、true、yes | 布尔值true |
 | 0、false、no | 布尔值false |
 | A in B | 第一个变量的值存在，且在第二个变量的列表中 |
@@ -1040,6 +1038,18 @@ force_handelers强制执行handlers
 - 等于： ==,=,eq
 - 不等于： !=,<>,ne
 
+子集父集判断
+| 用法 | 描述 |
+|-----|------|
+| subset | 判断一个list是不是另一个list的子集，是另一个list的子集则返回真 |
+| superset | 判断一个list是不是另一个list的父集，是另一个list的父集则返回真 |
+- 2.5版本中issubset和issuperset更名为subset和superset
+
+字符串和数值判断
+| 用法 | 描述 |
+|-----|------|
+| string | 判断对象是否是一个字符串，是字符串则返回真 |
+| number | 判断对象是否是一个数字，是数字则返回真 |
 
 
 
@@ -1328,9 +1338,65 @@ force_handelers强制执行handlers
       msg: "greater1"
     when: ansible_distribution_version is version("7.3","gt")   # ansible的版本大于7.3
 
+14、子集父集
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    a: 
+    - 2
+    - 5
+    b: [1,2,3,4,5]
+  tasks:
+  - debug:
+      msg: "a is a subset of b"
+    when: a is subset(b)
+  - debug:
+      msg: "b is the parent set of a"
+    when: b is suberset(a)
 
+15、字符串判断
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    testvar1: 1
+    testvar2: "1"
+    tesrvar3: a
+  tasks:
+  - debug:
+      msg: "string"
+    when: testvar1 is string
+  - debug:
+      msg: "string"
+    when: testvar2 is string
+  - debug:
+      msg: "string"
+    when: testvar3 is string
 
-14、交互式变量
+16、数值判断
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    testvar1: 1
+    testvar2: "1"
+    tesrvar3: 0.2
+  tasks:
+  - debug:
+      msg: "number"
+    when: testvar1 is number
+  - debug:
+      msg: "number"
+    when: testvar2 is number
+  - debug:
+      msg: "number"
+    when: testvar3 is number
+
+17、交互式变量
 1）var_prompt提示用户输入信息并写入变量
 - hosts: testB
   remote_user: root
@@ -1362,7 +1428,186 @@ force_handelers强制执行handlers
 - is match 匹配到的
 - is not match 没有匹配到的
 
+
+条件判断与block
+---
+1、如果判断条件成立，则执行的一个任务，如果想执行多个任务可以使用block模块解决
+```
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "task1 not in block"
+  - block:                       #将多个任务写在一个block中，当判断语句成立则执行block语句
+      - debug:
+          msg: "task1 in block"
+      - debug:
+          msg: "task1 in block"
+    when: 2 > 1
+```
+
+2、block中的内容执行失败后，执行rescue中的内容
+```
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - block:
+      - shell: 'ls /oo'
+    rescue:                      # 当block中的内容执行失败后，执行rescue中的内容
+      - debug:
+          msg: "i cought an error"
+
+```
+
+3、block任意语句执行错误都会按照顺序执行rescue内容
+```
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - block:                       #将多个任务写在一个block中，当判断语句成立则执行block语句
+      - shell: 'ls /mnt'         # 任意一个错误，都会执行rescue中的内容
+      - shell: 'ls /mnt1'
+      - shell: 'ls /mnt2'
+    rescue:                      # 写多个任务
+      - debug:
+        msg: "i cought an error1"
+      - debug:
+        msg: "i cought an error1"
+```
+
+block结合always关键字
+---
+1、无论block中的任务执行成功还是失败，always中的任务都会被执行
+```
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - block:
+      - debug:
+          msg: "i execute no rmally"
+      - command: /bin/false
+      - debug:
+          msg: 'i never execute'
+    rescue:
+      - debug:
+          msg: "i execute no error1"
+      - command: /bin/false
+      - debug:
+          msg: 'i never execute'
+    always:
+      - debug:
+          msg: "this is always execute"
+```
+
+错误忽略ignore_errors
+---
+```
+# cat test.yml 
+- hosts: webserver
+  tasks:
+     - name: task1
+       shell: "ls /testabc"
+       register: returnmsg
+       ignore_errors: true          #即使当前语句报错，也会忽略,继续执行playbook
+     - name: task2
+       debug: 
+         msg: "command exection successful"
+       when: returnmsg.rc == 0
+     - name: task3
+       debug:
+         msg: "command failed"
+```
+
+条件判断与错误处理
+---
+```
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - block:
+      - debug:
+          msg: "1"
+      - debug:
+          msg: '2'
+      - fail:                  # 手动让后面的都失败
+          msg: "my test"       # 可以通过fail模块的msg自定义报错信息
+      - debug:
+          msg: "3"
+      - debug:
+          msg: '4'
+```
+
+```
+--- 
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - block:
+      - shell: "echo '---error'"
+        register: return_value
+      - fail:
+          msg: "running fail"
+	when: " 'error' in return_value.stout"
+      - debug:        # 当中断时，不会执行这里的内容
+          msg: " i never exectue"
+
+```
+
+使用in或者not in条件判断时正确写法
+```
+when: ' "successful" not in return_value.stdout '
+when: " 'successful' not in return_value.stdout "
+```
+
+failed_when关键字
+---
+```
+--- 
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - shell: "echo '---error'"
+      register: return_valuefailed_when: '"error" in return_value.stout'  # 针对shell模块的关键字，当error在shell模块的输出时，条件成立，shell模块的执行状态将会被设置失败，playbook终止运行但不代表shell模块没有正常执行
+    - debug:
+        msg: "i never exectue"
+```
+
+
+changed_when 关键字
+---
+```
+--- 
+- host: testA
+  remote_user: root
+  tasks:
+    - bedug:
+        msg: "test message"
+      changed_when: 2 > 1
+```
+
+```
+--- 
+- host: testA
+  remote_user: root
+  tasks:
+    - shell: "ls /opt"
+      changed_when: false    #此时任务的执行状态不是changed了,是ok
+```
+
 交互是变量进行hash加密
+---
 ```
 利用encrypt关键字可以解决之前遇到的创建用户时指定密码字符串的问题，但是需要注意，
 
@@ -1750,25 +1995,6 @@ import*（静态）：在Playbook解析时预先导入
 
     - name: Restart httpd
       include: restart_httpd.yml
-```
-
-错误忽略ignore_errors
----
-```
-# cat test.yml 
-- hosts: webserver
-  tasks:
-     - name: task1
-       shell: "ls /testabc"
-       register: returnmsg
-       ignore_errors: true          #即使当前语句报错，也会忽略,继续执行playbook
-     - name: task2
-       debug: 
-         msg: "command exection successful"
-       when: returnmsg.rc == 0
-     - name: task3
-       debug:
-         msg: "command failed"
 ```
 
 错误处理changed_when
