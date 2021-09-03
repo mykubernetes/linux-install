@@ -492,7 +492,25 @@ ansible testB -e "testvar=test" -m shell -a "echo {{testvar}}"
         name:
           - "{{ web_packages }}"
           - "{{ ftp_packages }}"
-        state: present	
+        state: present
+```
+
+```
+# cat vars.yml 
+- hosts: node02
+  vars:
+    httpd:
+      conf80: /etc/httpd/conf.d/80.conf
+      conf8080: /etc/httpd/conf.d/8080.conf
+  tasks:
+    - name: task1
+      file:
+        path: "{{ httpd.conf80 }}"
+	state: touch
+    - name: task2
+      file:
+          path: "{{ httpd.conf8080 }}"
+        state: touch
 ```
 
 定义一个变量文件,然后使用playbook进行调用
