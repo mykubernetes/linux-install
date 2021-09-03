@@ -1059,6 +1059,14 @@ force_handelers强制执行handlers
 - search：子串匹配
 - regex：正则匹配
 
+
+测验列表真假
+| 用法 | 描述 |
+|-----|------|
+| all | 一假则假 |
+| any | 一真则真 |
+- 用于检查列表里元素的真假，列表中所有为真或者任何一个为真
+
 1、when判断
 ```
 1、根据不同操作系统，安装相同的软件包
@@ -1432,6 +1440,71 @@ force_handelers强制执行handlers
       password: "{{user_password}}"
 ```  
 
+字符串匹配
+```
+---
+- hosts: manageservers
+  vars:
+    url: "http://example.com/users/foo/resources/bar"
+
+  tasks:
+    - debug:
+        msg: "matched pattern 1-1"
+      when: url is match("http://example.com/users/.*/resources/.*") # True
+
+    - debug:
+        msg: "matched pattern 1-2"
+      when: url is match("http://example.com") # True
+
+    - debug:
+        msg: "matched pattern 1-3"
+      when: url is match(".*://example.com") # True
+
+    - debug:
+        msg: "matched pattern 1-4"
+      when: url is match("example.com/users/.*/resources/.*") # False
+
+    - debug:
+        msg: "matched pattern 2-1"
+      when: url is search("/users/.*/resources/.*") # True
+
+    - debug:
+        msg: "matched pattern 2-2"
+      when: url is search("/users/") # True
+
+    - debug:
+        msg: "matched pattern 2-3"
+      when: url is search("/user/") # False
+
+    - debug:
+        msg: "matched pattern 3"
+      when: url is regex("example.com/\w+/foo") # True
+```
+
+测验列表真假
+```
+---
+#  tests 测验 all any
+- hosts: manageservers
+
+  vars:
+    mylist:
+      - 1
+      - "{{ 3 == 3 }}"
+      - True
+    myotherlist:
+      - False
+      - True
+
+  tasks:
+    - debug:
+        msg: "all are true!"
+      when: mylist is all
+
+    - debug:
+        msg: "at least one is true"
+      when: myotherlist is any
+```
 
 条件判断与block
 ---
