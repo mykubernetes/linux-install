@@ -1051,7 +1051,13 @@ force_handelers强制执行handlers
 | string | 判断对象是否是一个字符串，是字符串则返回真 |
 | number | 判断对象是否是一个数字，是数字则返回真 |
 
+| 用法 | 描述 |
+|-----|------|
+| is match | 开头匹配的，则为真 |
+| is not match | 开头没匹配到，则为真 |
 
+- search：子串匹配
+- regex：正则匹配
 
 1、when判断
 ```
@@ -1425,8 +1431,6 @@ force_handelers强制执行handlers
       name: "{{user_name}}"
       password: "{{user_password}}"
 ```  
-- is match 匹配到的
-- is not match 没有匹配到的
 
 
 条件判断与block
