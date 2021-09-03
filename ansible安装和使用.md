@@ -976,9 +976,72 @@ force_handelers强制执行handlers
 多条件
 | 用法 | 描述 |
 |-----|------|
-| or | 两个条件一个为真即可 |
-| and | 两个条件必须都为真 |
-| not | 取反 |
+| or | 逻辑或，当做边与右边有任意一个为真，则返回真 |
+| and | 逻辑与，当左边与右边同时为真，则返回真 |
+| not | 取反，对一个操作体取反 |
+| () | 组合，将一组操作体包装在一起，形成一个较大的操作体 |
+
+存在判断
+| 用法 | 描述 |
+|-----|------|
+| is exists | 存在则返回真 |
+| is not exists | 不存在则返回真 |
+
+变量是否定义判断
+| 用法 | 描述 |
+|-----|------|
+| defined | 判断变量是否已经定义，已经定义则返回真 |
+| undefind | 判断变量是否已经定义，未定义则返回真 |
+| none | 判断变量值是否为空，如果变量已经定义，但是变量值为空，则返回真 |
+
+
+任务执行结果判断
+| 用法 | 描述 |
+|-----|------|
+| success 或 succeeded | 通过任务的返回值信息判断任务的执行状态，任务执行成功则返回真 |
+| failure 或 failed | 通过任务的返回值信息判断任务的执行状态，任务执行失败则返回真 |
+| change 或 changed | 通过任务的返回值信息判断任务的执行状态，任务执行chage则返回真 |
+| skip 或 skipped | 通过任务的返回值信息判断任务的执行状态，当任务没满足条件，而跳过执行时，则返回真 |
+
+路径的判断
+| 用法 | 描述 |
+|-----|------|
+| file | 判断路径是否是一个文件，如果路径是一个文件则返回真 |
+| directory | 判断路径是否是一个目录，如果是一个目录则返回真 |
+| link | 判断路径是否是一个软连接，如果是一个软连接则返回真 |
+| mount | 判断路径是否是一个挂载点，如果是一个挂载点则返回真 |
+| exists | 判断路径是否存在，如果存在则返回真 |
+- 上述判断为2.6版本中的名称，如果是2.5之前的版本需要加上`is_`前缀
+
+字符串判断
+| 用法 | 描述 |
+|-----|------|
+| lower | 判断包含字母的字符串中的字母是否为纯小写，字符串中的字母全部为小写则返回为真 |
+| upper | 判断包含字母的字符串中的字母是否为纯大写，字符串中的字母全部为大写则返回为真 |
+
+整数的判断
+| 用法 | 描述 |
+|-----|------|
+| even | 判断数值是否是偶数，是偶数则返回真 |
+| odd | 判断数值是否是奇数，是奇数则返回真 |
+| divisibleby(num) | 判断是否可以正吃指定的数值，如果除以指定的数值以后余数为0，则返回真 |
+
+版本判断
+| 用法 | 描述 |
+|-----|------|
+| version | 可以用于对比两个版本号的大小，或者指定的版本号进行对比使用语法为version('版本号'，'比较操作符') |
+- 注：2.5版本中`version_compare`更名为`version`
+
+当版本比较时支持多种比较操作符
+- 大于： >,gt
+- 大于等于： >=,ge
+- 小于： <,lt
+- 小于等于： <=,le
+- 等于： ==,=,eq
+- 不等于： !=,<>,ne
+
+
+
 
 1、when判断
 ```
@@ -995,8 +1058,65 @@ force_handelers强制执行handlers
       yum: name=httpd2 state=present
       when: ( ansible_distribution == "Ubuntu" )
 	
-	
-2、为所有的web主机名添加nginx仓库，其余的都跳过添加
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "redhat7"
+    when: ansible_distribution == "Redhat" and ansible_distribution_major_version == "7"
+
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "redhat7"
+    when:
+    - ansible_distribution == "Redhat"           #两个条件同时满足才执行
+    - ansible_distribution_major_version == "7"
+
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "redhat7 or 6"
+    when: ansible_distribution == "Redhat" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
+
+取反，如果系统不是windows，则输出"not windows"
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "not windows"
+    when: not ansible_distribution == "windows"
+
+
+2、当shell模块运行命令后的返回值，进行判断
+- host: testA
+  remote_user: root
+  tasks:
+  - name: task1
+    shell: "ls /testabc"
+    register: returnmsg
+    ignore_errors: true          #即使当前语句报错，也会忽略,继续执行playbook
+  - name: task2
+    debug:         # var: returnmsg 当执行成功时，相当于$？的值是0，命令执行成功
+      msg: " command exection successful "
+    when: returnmsg.rc == 0
+  -name: task3
+    debug:
+      msg: " command failed "
+    when: returnmsg.rc != 0
+
+
+3、为所有的web主机名添加nginx仓库，其余的都跳过添加
 # cat tasks.yml 
 - hosts: all
   tasks:
@@ -1009,7 +1129,7 @@ force_handelers强制执行handlers
         enabled: no
       when: ( ansible_fqdn is match ("web*"))
 
-3、主机名称是web*或主机名称是lb*的则添加这个nginx源
+4、主机名称是web*或主机名称是lb*的则添加这个nginx源
 # cat tasks.yml 
 - hosts: all
   tasks:
@@ -1020,11 +1140,10 @@ force_handelers强制执行handlers
         baseurl: https://mirrors.aliyun.com/repo/Centos-7.repo
         gpgcheck: no
         enabled: no
-      when: ( ansible_fqdn is match ("web*")) or 
-	    ( ansible_fqdn is match ("lb*"))
+      when: ( ansible_fqdn is match ("web*")) or ( ansible_fqdn is match ("lb*"))
 可以用or 或者and 做判断
 
-4、根据命令执行的结果进行判断
+5、根据命令执行的结果进行判断
 # cat tasks.yml 
 - hosts: all
   tasks:
@@ -1039,35 +1158,179 @@ force_handelers强制执行handlers
       service: name=httpd state=restarted
       when: check_httpd.rc == 0
       
-5、布尔型判断
+6、布尔型判断
 - name: Boolean test
     hosts: all
     vars:
-      run_my_task: true    #只有当变量为true时，才会执行
+      run_my_task: true             # 只有当变量为true时，才会执行
     tasks:
       - name: httpd is install
         yum: name=httpd
 	when: run_my_task
 
-6、是否存在的或定义
-- name: Boolean test
-    hosts: all
-    vars:
-      my_service: httpd
-    tasks:
-      - name: {{ my_service }} is install
-        yum: name={{ my_service }}
-	when: my_service is defined
-
-7、取反，如果系统不是centos，则输出"System release is not centos"
-- hosts: testB
+7、变量是否存在的或定义
+- host: testA
   remote_user: root
+  gather_facts: no
+  vars:
+    testvar: "test"
+    testvar1: 
   tasks:
   - debug:
-      msg: "System release is not Centos"
-    when: not ansible_distribution == "Centos"
+      msg: "var is defined"
+    when: testvar is defined             # 变量是否定义
+  - debug:
+      msg: "var is not defined"
+    when: testvar2 is not defined        # 变量是否未定义
+  - debug:
+      msg: "var is defined,but no value"
+    when: testpath is none               # 变量值是否为空
+
+8、判断文件是否存在 is exists,is not exists
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    testpath: /test
+  tasks:
+  - debug:
+      msg: "file exist"
+    when: testpath is exists
+
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    testpath: /testrrr
+  tasks:
+  - debug:
+      msg: "file not exist"
+    when: not testpath is exists
     
-8、交互式变量
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    testpath: /test
+  tasks:
+  - debug:
+      msg: "file exist"
+    when: testpath is not exists
+
+9、命令的执行结果判断success、failure
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    doshell: "yes"
+  tasks:
+  - shell: "cat /test/abc"
+    when: doshell == "yes"
+    register: returnmsg
+    ignore_errors: true
+  - debug:
+      msg: "success"
+    when: returnmsg is success
+  - debug:
+      msg: "changed"
+    when: returnmsg is change
+  - debug:
+      msg: "failed"
+    when: returnmsg is failure
+  - debug:
+      msg: "skip"
+    when: returnmsg is skip
+
+10、路径判断
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    testpath1: "/testdir/test"
+    testpath2: "/testdir/"
+    testpath3: "/testdir/testsoftlink"
+    testpath4: "/testdir/testhardlink"
+    testpath5: "/boot"
+  tasks:
+  - debug:
+      msg: "file"
+    when: testpath1 is file
+  - debug:
+      msg: "directory"
+    when: testpath2 is directory
+  - debug:
+      msg: "link"
+    when: testpath3 is link
+  - debug:
+      msg: "link"
+    when: testpath4 is link
+  - debug:
+      msg: "mount"
+    when: testpath5 is mount
+  - debug:
+      msg: "exists"
+    when: testpath1 is exists
+
+11、字符串判断
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    str1: "abc"
+    str2: "ABC"
+  tasks:
+  - debug:
+      msg: "this string is all lower"
+    when: str1 is lower             # 判断字符串是否为全小写
+  - debug:
+      msg: "this string is all lower"
+    when: str2 is upper             # 判断字符串是否为全大写
+
+
+12、整除的判断
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    str1: 4
+    str2: 7
+    str3: 64
+  tasks:
+  - debug:
+      msg: "an even number"
+    when: str1 is even
+  - debug:
+      msg: "an odd number"
+    when: str2 is odd
+  - debug:
+      msg: "can be diviede exactly by"
+    when: str3 is divisibleby(8)
+
+13、版本判断
+---
+- host: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    ver1: 7.4.1708
+    ver2: 7.4.1707
+  tasks:
+  - debug:
+      msg: "greater"
+    when: ver1 is version(ver2,">")  # ver1的版本大于ver2
+  - debug:
+      msg: "greater1"
+    when: ansible_distribution_version is version("7.3","gt")   # ansible的版本大于7.3
+
+
+
+14、交互式变量
 1）var_prompt提示用户输入信息并写入变量
 - hosts: testB
   remote_user: root
@@ -1495,12 +1758,17 @@ import*（静态）：在Playbook解析时预先导入
 # cat test.yml 
 - hosts: webserver
   tasks:
-     - name: Command 
-       command: /bin/false
-       ignore_errors: yes
-
-     - name: Create File 
-       file: path=/tmp/tttt state=touch
+     - name: task1
+       shell: "ls /testabc"
+       register: returnmsg
+       ignore_errors: true          #即使当前语句报错，也会忽略,继续执行playbook
+     - name: task2
+       debug: 
+         msg: "command exection successful"
+       when: returnmsg.rc == 0
+     - name: task3
+       debug:
+         msg: "command failed"
 ```
 
 错误处理changed_when
