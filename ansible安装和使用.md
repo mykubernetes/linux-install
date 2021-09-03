@@ -1734,6 +1734,7 @@ pip安装完成后，通过pip安装passlib库
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
 
 with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
+
 ```
 1、使用循环启动多个服务
 - hosts: web
@@ -1775,7 +1776,7 @@ with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_l
   debug:
     msg: "{{ item }}"
   loop: "{{ items|flatten(levels=1) }}"
-
+```
 
 ```
 - hosts: testA
@@ -2215,6 +2216,7 @@ with_fileglob关键字
 
 
 2、定义变量方式循环安装软件包
+```
 # cat vars.yml
 - hosts: web
   tasks:
@@ -2224,16 +2226,19 @@ with_fileglob关键字
        pack:
          - httpd
          - mariadb-server	
+```
 
 3、使用变量字典循环方式批量创建用户
+```
 - name: with_items
   user: name={{itme.name}} groups={{item.groups}} state=present
   with_items:
     - {name: 'zhangsan', groups: nginx}
     - {name: 'lisi', groups: nginx}
-
+```
 
 4、使用变量字典循环方式批量拷贝文件
+```
 - hosts: webserver
   tasks:
     - name: Configure Rsyncd Server
@@ -2247,9 +2252,6 @@ with_fileglob关键字
       with_items:
         - { src: './docs1/php_www.conf.j2', dest: '{{ php_fpm_conf }}' }
         - { src: './docs1/php.ini.j2', dest: '{{ php_ini_conf }}' }
-
-
-
 ```
 
 Playbook模板（jinja2）
