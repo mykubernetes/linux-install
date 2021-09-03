@@ -456,6 +456,37 @@ task控制:
      copy: content={{ ansible_env }} dest=/tmp/ansible.env
 ```
 
+ansible中的内置变量
+- Ansible内置了一些变量以方便主机之间相互调用各自的变量。
+```
+# 查看ansible的版本信息
+ansible testA -m debug -a "msg={{ansible_version}}"
+
+# 获取当前操作的目的主机的名称
+ansible testA -m debug -a "msg={{inventory_hostname}}"
+
+# 获取短名称
+ansible testA -m debug -a "msg={{inventory_hostname_short}}"
+
+# 获取清单中的组和信息
+ansible testA -m debug -a "msg={{groups}}"
+
+# 查看某个小分组的信息
+ansible testA -m debug -a "msg={{groups.testA}}"
+
+# 查看某个主机属于哪些组
+ansible testA -m debug -a "msg={{group_names}}"
+
+# 获取ansible主机清单的存放路径
+ansible testA -m debug -a "msg={{inventory_dir}}"
+```
+- hostvars允许你访问另一个主机的变量，当然前提是ansible已经收集到这个主机的变量了：
+- group_names：是当前主机所在的group列表
+- groups：是所有inventory的group列表
+- inventory_hostname：是在inventory里定义的主机名（ip或主机名称）
+- play_hosts是当前的playbook范围内的主机列表
+- inventory_dir和inventory_file是定义inventory的目录和文件
+
 命令行传递变量  
 ```  
 #  ansible-playbook -e pkgname=memcached  test.yaml
@@ -534,6 +565,30 @@ ftp_packages: vsftpd-3.0.2
         state: present
 ```
 
+```
+# 定义一个变量文件
+# cat testfile
+testvar: testfile
+numlist:
+- one
+- two
+- three
+
+# 编写playbook调用变量文件
+# cat test.yml
+- hosts: testA
+  remote_user: root
+  tasks:
+    - name: "pass the var from the file"
+      debug:
+        msg: "{{testvar}} {{numlist[0]}}"
+
+剧本传递变量文件
+# ansible-playbook test.yml -e "@/root/testfile"
+```
+
+
+
 注册变量（register）
 ```
 - hosts: webservers 
@@ -564,6 +619,7 @@ ftp_packages: vsftpd-3.0.2
       debug:
         msg: "{{ check_httpd.stdout_lines }}"
 ```
+
 set_fact变量在tasks中定义
 ```
 ---
@@ -573,7 +629,7 @@ set_fact变量在tasks中定义
     testvar1: test1_string
   tasks:
   - shell: "echo test2_string"
-    register: shellreturn
+    register: shellreturn       #注册变量接受shell模块返回的值
   - set_fact:
       testsf1: "{{testvar1}}"
       testsf2: "{{shellreturn.stdout}}"
@@ -636,6 +692,10 @@ ansible facts变量
       debug:
         msg: the so is {{solu}}
 ```
+
+
+
+
 
 invertory自带变量和自定义变量
 ---
