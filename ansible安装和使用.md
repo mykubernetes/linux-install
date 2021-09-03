@@ -602,6 +602,41 @@ ansible facts变量
 # ansible-playbook test.yml
 ```
 
+在playbook中实现交互
+---
+
+```
+- hosts: testA
+  remote_user: root
+  vars_prompt:
+    - name: "you_name"              #定义的变量名
+      prompt: "what is you name?"   #提示用户输入的不回显
+    - name: "you_age"               #定义的变量名
+      prompt: "how old are you?"
+  tasks:
+    - name: output vars
+      debug:
+        msg: your name is {{your_name}},you are {{your_age}} years old
+```
+
+设置输入时的默认值
+```
+- hosts: testA
+  remote_user: root
+  vars_prompt:
+    - name: "solu" 
+      prompt: "please choose \n
+      A: solA\n
+      B: solB\n
+      C: solC\n"
+      private: no
+      default: A
+  tasks:
+    - name: out vars
+      debug:
+        msg: the so is {{solu}}
+```
+
 invertory自带变量和自定义变量
 ---
 ```
