@@ -701,8 +701,8 @@ confirm（输入密码时，再确认一次）
     - name: "you_name"              # 定义的变量名
       prompt: "what is you name?"
       private: no                   # 提示用户，输入的回显
-    - name: "you_age"               # 定义的变量名
-      prompt: "how old are you?"
+    - name: "you_pass"               # 定义的变量名
+      prompt: "what is your password?"
       encrypt: "sha512_crypt"       # 对用户输入进行hash,依赖python的passlib库
       confirm: yes                  # 输入密码后进行确认
   tasks:
