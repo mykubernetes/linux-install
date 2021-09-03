@@ -1067,6 +1067,7 @@ force_handelers强制执行handlers
 | any | 一真则真 |
 - 用于检查列表里元素的真假，列表中所有为真或者任何一个为真
 
+
 1、when判断
 ```
 1、根据不同操作系统，安装相同的软件包
@@ -1717,7 +1718,22 @@ pip安装完成后，通过pip安装passlib库
 
 ```
 
-2、with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
+循环语句
+---
+
+| 循环语句关键字 | 描述 |
+|--------------|-------|
+| with_items  | 简单的列表循环 |
+| with_nested | 嵌套循环 |
+| with_dict | 循环字典 |
+| with_fileglob | 循环指定目录中的所有文件 |
+| with_lines | 循环一个文件中的所有行 |
+| with_sequence | 生成一个自增的整数序列，可以指定起始值和结束值以及步长。参数以key=value的形式指定，format指定输出的格式。数字可以是十进制、十六进制、八进制 |
+| with_subelement | 遍历子元素 |
+| with_together | 遍历数据并行集合 |
+- 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
+
+with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 ```
 1、使用循环启动多个服务
 - hosts: web
@@ -1729,6 +1745,14 @@ pip安装完成后，通过pip安装passlib库
       - tomcat
       - tomcat-webapps
       - tomcat-admin-webapps
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_items: [1,2,3,4]
 
 
 - name: with_list
@@ -1751,7 +1775,445 @@ pip安装完成后，通过pip安装passlib库
   debug:
     msg: "{{ item }}"
   loop: "{{ items|flatten(levels=1) }}"
-  
+
+
+```
+- hosts: testA
+  remote_user: root
+  vars:
+    dirs:                        # 相当于定义了一个列表
+    - "/opt/a"
+    - "/opt/b"
+    - "/opt/c"
+    - "/opt/d"
+  tasks:
+    - name: "create file"
+      file:
+        path: "{{item}}"         # 输出了每一次循环的值
+	state: touch
+      with_items: "{{dirs}}"     # 循环了列表
+```
+
+借助注册函数，多次执行循环中的不同命令
+```
+---
+- hosts: testA
+  remote_user: root
+  tasks:
+  - shell: "{{item}}"
+    register: returnvalue
+    with_items:
+    - "ls /opt"
+    - "ls /mnt"
+  - debug:
+      var: returnvalue
+```
+
+results,shell模块执行后的返回值放入results的序列中，results也是一个返回值
+```
+---
+- hosts: testA
+  remote_user: root
+  tasks:
+  - shell: "{{item}}"
+    register: returnvalue
+    with_items:
+    - "ls /opt"
+    - "ls /mnt"
+  - debug:
+      msg: "{{returnvalue.results}}"
+      
+---
+- hosts: testA
+  remote_user: root
+  tasks:
+  - shell: "{{item}}"
+    register: returnvalue
+    with_items:
+    - "ls /opt"
+    - "ls /mnt"
+  - debug:
+      msg: "{{item.stdout}}"
+    with_items: "{{returnvalue.results}}"
+```
+
+for循环实现遍历
+```
+---
+- hosts: testA
+  gather_facts: no
+  tasks:
+  - shell: "{{item}}"
+    with_items:
+    - "ls /opt"
+    - "ls /home"
+    register: returnvalue
+  - debug:
+      msg:
+       "{% for i in returnvalue.results %}
+          {{ i.stdout }}
+        {% endfor %}"
+```
+
+嵌套列表的定义
+```
+---
+- hosts: testA
+- remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_item:
+    - [ 1,2,3 ]
+    - [ a,b ]
+```
+
+```
+---
+- hosts: testA
+- remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_list:
+    - [ 1,2,3 ]
+    - [ a,b ]
+```
+
+```
+---
+- hosts: testA
+- remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_flattened:
+    - [ 1,2,3 ]
+    - [ a,b ]
+```
+- with_list、with_items、with_flattened之前的区别，在处理简单的单层列表时没区别，但是在处理嵌套的多层列表时，with_items、with_flattened会将列表"拉平展开"循环的处理每一个元素，而with_list只会处理最外层的列表，将最外层的列表中的项循环处理
+
+ with_together关键字
+ -  with_together可以将两个列表中的元素"对齐合并"
+```
+---
+- hosts: testA
+- remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_together:
+    - [ 1,2,3 ]
+    - [ a,b ]
+```
+
+with_cartesian关键字
+- 将每个小列表中的元素按照"迪卡尔的方式"组合后，循环的处理每个组合
+```
+---
+- hosts: testA
+- remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_together:
+    - [ 1,2,3 ]
+    - [ a,b,c ]
+```
+
+with_indexed_items关键字
+- 循环处理列表时为列表中的每一项添加"数字索引"，"索引"从0开始
+
+1)单层列表
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "index is : {{ item.0 }} , value is {{ item.1 }}"
+    with_indexed_items:
+    - test1
+    - test2
+    - test3
+```
+
+2) 两层列表嵌套
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "index is : {{ item.0 }} , value is {{ item.1 }}"
+    with_indexed_items:
+    - [ test1, test2 ]
+    - [ test3, test4, test5 ]
+    - [ test6, test7 ]
+```
+
+with_sequence关键字
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "index is : {{ item }}"
+    with_sequence: start=1 end=5 stride=1           # 步长为1
+```
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "index is : {{ item }}"
+    with_sequence:
+      start=6
+      end=2
+      stride=-2           # 输出的是递减序列
+```
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "index is : {{ item }}"
+    with_sequence: count=5           #输出 1，2，3，4，5
+```
+
+```
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - file: 
+      path: "/westos{{item}}"
+      state: directory
+    with_sequence:
+      start=2
+      end=10
+      stride=2
+```
+
+with_sequence格式化输出
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_sequence: start=2 end=6 stride=2 format="number is %0.2f"
+```
+
+with_random_choice关键字
+- 从列表中随机取一个值
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_random_choice:
+      - 1
+      - 2
+      - 3
+```
+
+with_dict关键字
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      lily: female
+      bob: male
+  tasks:
+  - debug:
+      msg: "{{item}}"       # 每一个item就是一组键值对    
+    with_dict: "{{users}}"  # 字典形式输出users
+```
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      lily: female
+      bob: male
+  tasks:
+  - debug:
+      msg: "user name:{{item.key}},user gender:{{item.value}}"   
+    with_dict: "{{users}}"  # 字典形式输出users
+```
+
+字典的嵌套
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      lily:
+        name: lilybb
+	sex: female
+	tele: 1234567
+      bob:
+        name: bobbb
+	sex: male
+	tele: 8899078
+  tasks:
+  - debug:
+      msg: "{{item}}"   
+    with_dict: "{{users}}"  # 字典形式输出users
+```
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      lily:
+        name: lilybb
+	sex: female
+	tele: 1234567
+      bob:
+        name: bobbb
+	sex: male
+	tele: 8899078
+  tasks:
+  - debug:
+      msg: "user {{item.key}} is {{item.value.name}} sex is {{item.value.sex}}"        # 多层字典的引用   
+    with_dict: "{{users}}"  # 字典形式输出users
+```
+
+with_subelements关键字
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      lily:
+        name: lilybb
+	sex: female
+	tele: 1234567
+	hobby:
+	  - skate
+	  - video
+      bob:
+        name: bobbb
+	sex: male
+	tele: 8899078
+	hobby:
+	  - music
+  tasks:
+  - debug:
+      msg: "{{item}}"       # 多层字典的引用   
+    with_subelements: "{{users}}" 
+#    - "{{users}}"
+#    - hobby
+```
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      lily:
+        name: lilybb
+	sex: female
+	tele: 1234567
+	hobby:
+	  - skate
+	  - video
+      bob:
+        name: bobbb
+	sex: male
+	tele: 8899078
+	hobby:
+	  - music
+  tasks:
+  - debug:
+      msg: "{{ item.0.name }} is {{item.1}}"
+    with_subelements:
+    - "{{users}}"
+    - hobby
+```
+
+with_file关键字
+- 查看文件的内容，针对ansible主机进行操作，而不是目标主机
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_file:
+    - /test/pp
+    - /opt/ansible
+```
+
+with_fileglob关键字
+- 匹配文件名称，在指定目录中匹配符合模式的文件名，针对ansible主机进行操作，而不是目标主机
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_fileglob:     #只匹配文件，输出文件名，而不是内容
+    - /test/*
+```
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_fileglob:     #只匹配文件，输出文件名，而不是内容
+    - /test/*
+    - /opt/test*.???   #匹配/opt/test开头的以三个符号结尾的
+```
+
+
+
+
 2、定义变量方式循环安装软件包
 # cat vars.yml
 - hosts: web
