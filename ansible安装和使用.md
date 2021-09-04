@@ -7,6 +7,8 @@ http://www.zsythink.net/archives/category/%e8%bf%90%e7%bb%b4%e7%9b%b8%e5%85%b3/a
 
 https://www.cnblogs.com/clsn/p/7743792.html#auto-id-66
 
+http://www.ansible.com.cn/index.html#
+
 ssh免密
 ```
 ssh-keygen -t rsa 
