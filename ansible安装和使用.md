@@ -2254,6 +2254,164 @@ with_fileglob关键字
         - { src: './docs1/php.ini.j2', dest: '{{ php_ini_conf }}' }
 ```
 
+# lookup插件
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: " index is {{item.0}},value is {{item.1}}"
+      with_indexed_items: ['a','b','c']
+```
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: " index is {{item.0}},value is {{item.1}}"
+      loop: "{{ lookup(' indexed_items',['a','b','c'])}}"   #lookup是插件 loop是循环
+```
+- 第一个使用with_indexed_items关键字处理列表
+- 第二个使用loop关键字配合lookup产处理列表
+- indexed_items是一个lookup插件
+
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      yyx: male
+      ll: female
+  tasks:
+    - debug:
+        msg: "{{item.key}} is {{item.value}}"
+      with_dict: "{{users}}"   #获取字典中的每一个键值对
+```
+
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      yyx: male
+      ll: female
+  tasks:
+    - debug:
+        msg: "{{item.key}} is {{item.value}}"
+      loop: "{{lookup('dict'users)}}"
+```
+
+## 插件用法
+`lookup('插件名',被处理数据或参数)`
+
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: "{{lookup('file','/test/yxx')}}"   # 查看本机文件的内容
+
+
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: "{{lookup('file','/test/yxx','/test/yxx1')}}"   # 查看本机多个文件的内容
+
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: "{{lookup('file','/test/yxx','/test/yxx1',wantlist=true)}}"   # 查看本机多个文件的内容,以逗号分隔字符串。
+
+# 2.5版本中引入了jinja2函数，这函数叫query，通过query也可以调用lookup插件，但是通过query函数调用lookup插件时，query函数的默认行为是返回一个列表
+- debug:
+      msg: "{{ lookup('file','/testdir/testfile',wantlist=true) }}"
+  - debug:
+      msg: "{{ query('file','/testdir/testfile') }}"
+```
+
+```
+---
+- hosts: testA
+  remote_user: root
+  gather_facts: no
+  tasks:
+  #file插件可以获取ansible主机中指定文件的内容
+  - debug:
+      msg: "{{ lookup('file','/testdir/testfile') }}"
+  #env插件可以获取ansible主机中指定变量的值
+  - debug:
+      msg: "{{ lookup('env','PATH') }}"
+  #first_found插件可以获取列表中第一个找到的文件
+  #按照列表顺序在ansible主机中查找
+  - debug:
+      msg: "{{ lookup('first_found',looklist) }}"
+    vars:
+      looklist:
+        - /testdir
+        - /tmp/staging
+  #当使用with_first_found时，可以在列表的最后添加- skip: true
+  #表示如果列表中的所有文件都没有找到，则跳过当前任务,不会报错
+  #当不确定有文件能够被匹配到时，推荐这种方式
+  - debug:
+      msg: "{{item}}"
+    with_first_found:
+      - /testdir1
+      - /tmp/staging
+      - skip: true
+  #ini插件可以在ansible主机中的ini文件中查找对应key的值
+  #如下示例表示从test.ini文件中的testA段落中查找testa1对应的值
+  #测试文件/testdir/test.ini的内容如下(不包含注释符#号)
+  #[testA]
+  #testa1=Andy
+  #testa2=Armand
+  #
+  #[testB]
+  #testb1=Ben
+  - debug:
+      msg: "{{ lookup('ini','testa1 section=testA file=/testdir/test.ini') }}"
+  #当未找到对应key时，默认返回空字符串，如果想要指定返回值，可以使用default选项,如下
+  #msg: "{{ lookup('ini','test666 section=testA file=/testdir/test.ini default=notfound') }}"
+  #可以使用正则表达式匹配对应的键名，需要设置re=true，表示开启正则支持,如下
+  #msg: "{{ lookup('ini','testa[12] section=testA file=/testdir/test.ini re=true') }}"
+  #ini插件除了可以从ini类型的文件中查找对应key，也可以从properties类型的文件中查找key
+  #默认在操作的文件类型为ini，可以使用type指定properties类型，如下例所示
+  #如下示例中，application.properties文件内容如下(不包含注释符#号)
+  #http.port=8080
+  #redis.no=0
+  #imageCode = 1,2,3
+  - debug:
+      msg: "{{ lookup('ini','http.port type=properties file=/testdir/application.properties') }}"
+  #dig插件可以获取指定域名的IP地址
+  #此插件依赖dnspython库,可使用pip安装pip install dnspython
+  #如果域名使用了CDN，可能返回多个地址
+  - debug:
+      msg: "{{ lookup('dig','www.baidu.com',wantlist=true) }}"
+  #password插件可以生成随机的密码并保存在指定文件中
+  - debug:
+      msg: "{{ lookup('password','/tmp/testpasswdfile') }}"
+```
+
 # 过滤器
 
 ## 与字符串操作有关的过滤器
