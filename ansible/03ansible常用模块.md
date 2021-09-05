@@ -634,19 +634,32 @@ ansible web -m service -a "name=httpd state=started enabled=yes"
 ```
 
 ## 14、group
+
+### 1)group模块常用参数说明
+
+| 参数 | 参数说明 |
+|------|--------|
+| name | 必须参数，用于指定要操作的组名称 |
+| state | 用于指定组的状态，两个值可选，present，absent，默认为present，设置为absent表示删除组 |
+| gid | 用于指定组的gid |
+
+
+### 2)创建news基本组，指定uid为9999
 ```
-#1、创建news基本组，指定uid为9999
 ansible node02 -m group -a "name=news gid=9999 state=present" -i hosts
+```
 
-#2、创建http系统组，指定uid为8888
+### 3)创建http系统组，指定uid为8888
+```
 ansible node02 -m group -a "name=http gid=8888 system=yes state=present" -i hosts 
+```
 
-#3、删除news基本组
+### 4)删除news基本组
+```
 ansible node02 -m group -a "name=news state=absent" -i hosts
 ```
 
 ## 15、user
-```
 
 ### 1)user模块常用参数说明
 
@@ -666,21 +679,31 @@ ansible node02 -m group -a "name=news state=absent" -i hosts
 | update_password | 1、always当前的加密过的密码字符串不一致，则直接更新用户的密码 2、on_create当前的加密过的密码字符串不一致，则不会更新用户的密码字符串，保持之前的密码设定，如果新创建的用户为on_create，会将密码设置为password的值。默认值即为always |
 | generate_ssh_key | 此参数默认值为no，如果设置为yes，表示为对应的用户生成ssh密钥对，默认在用户家目录的./ssh目录中生成名为id_rsa的私钥和名为id_rsa.pub的公钥，如果同名的密钥已经存在与对应的目录中，原同名密钥并不会被覆盖(不做任何操作)  |
 
-#1、创建joh用户，uid是1040，主要的组是adm
+
+### 2)创建joh用户，uid是1040，主要的组是adm
+```
 ansible node02 -m user -a "name=joh uid=1040 group=adm state=present system=no" -i hosts
+```
 
-#2、创建joh用户，登录shell是/sbin/nologin，追加bin、sys两个组
+### 3)创建joh用户，登录shell是/sbin/nologin，追加bin、sys两个组
+```
 ansible node02 -m user -a "name=joh shell=/sbin/nologin groups=bin,sys" -i hosts 
+```
 
-#3、创建jsm用户，为其添加123作为登录密码，并且创建家目录
+### 4)创建jsm用户，为其添加123作为登录密码，并且创建家目录
+```
 #ansible localhost -m debug -a "msg={{ '123' | password_hash('sha512', 'salt') }}"
 $6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1
 
 # ansible node02 -m user -a 'name=jsm password=$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1 create_home=yes'
+```
 
-#4、移除joh用户
+### 5)移除joh用户
+```
 # ansible node02  -m user -a 'name=joh state=absent remove=yes' -i hosts 
+```
 
-#5、创建http用户，并为该用户创建2048字节的私钥，存放在~/http/.ssh/id_rsa
+### 6)创建http用户，并为该用户创建2048字节的私钥，存放在~/http/.ssh/id_rsa
+```
 # ansible node02  -m user -a 'name=http generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa' -i hosts
 ```
