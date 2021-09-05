@@ -9,6 +9,8 @@ https://www.cnblogs.com/clsn/p/7743792.html#auto-id-66
 
 http://www.ansible.com.cn/index.html#
 
+https://www.cnblogs.com/mauricewei/p/10056379.html
+
 ssh免密
 ```
 ssh-keygen -t rsa 
