@@ -559,3 +559,104 @@ ansible web -m service -a "name=httpd state=stopped"
 ```
 ansible web -m service -a "name=httpd state=started enabled=yes"  
 ```
+
+## 10、hostname 修改主机名模块
+```
+# ansible 172.16.1.8 -m hostname -a "name=web01"
+172.16.1.8 | SUCCESS => {
+    "ansible_facts": {
+        "ansible_domain": "etiantian.org",
+        "ansible_fqdn": "www.etiantian.org",
+       "ansible_hostname": "web01",
+        "ansible_nodename": "web01"
+    },
+    "changed": false,
+    "name": "web01"
+}
+```
+
+## 11、selinux 管理模块
+```
+# ansible 172.16.1.8 -m selinux -a "state=disabled"
+172.16.1.8 | SUCCESS => {
+    "changed": false,
+    "configfile": "/etc/selinux/config",
+    "msg": "",
+    "policy": "targeted",
+    "state": "disabled"
+}
+```
+
+## 12、get_url 模块 == 【wget】
+```
+# ansible 172.16.1.8 -m get_url -a "url=http://lan.znix.top/RDPWrap-v1.6.1.zip dest=/tmp/"
+172.16.1.8 | SUCCESS => {
+    "changed": true,
+    "checksum_dest": null,
+    "checksum_src": "ad402705624d06a6ff4b5a6a98c55fc2453b3a70",
+    "dest": "/tmp/RDPWrap-v1.6.1.zip",
+    "gid": 0,
+    "group": "root",
+    "md5sum": "b04dde546293ade71287071d187ed92d",
+    "mode": "0644",
+    "msg": "OK (1567232 bytes)",
+    "owner": "root",
+    "size": 1567232,
+    "src": "/tmp/tmp4X4Von",
+    "state": "file",
+    "status_code": 200,
+    "uid": 0,
+    "url": "http://lan.znix.top/RDPWrap-v1.6.1.zip"
+}
+```
+- url= 下载文件的地址 dest 下载到哪里
+- timeout 超时时间
+- url_password   密码
+- url_username  用户名
+
+## 13、firewalld
+```
+# ansible node02 -m service -a "name=firewalld state=started"
+
+#1、永久放行https的流量,只有重启才会生效
+# ansible node02 -m firewalld -a "zone=public service=https permanent=yes state=enabled"
+
+#2、永久放行8081端口的流量,只有重启才会生效
+# ansible node02 -m firewalld -a "zone=public port=8080/tcp permanent=yes state=enabled"
+	
+#3、放行8080-8090的所有tcp端口流量,临时和永久都生效.
+# ansible node02 -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled"
+```
+
+## 14、group
+```
+#1、创建news基本组，指定uid为9999
+ansible node02 -m group -a "name=news gid=9999 state=present" -i hosts
+
+#2、创建http系统组，指定uid为8888
+ansible node02 -m group -a "name=http gid=8888 system=yes state=present" -i hosts 
+
+#3、删除news基本组
+ansible node02 -m group -a "name=news state=absent" -i hosts
+```
+
+## 15、user
+```
+#1、创建joh用户，uid是1040，主要的组是adm
+ansible node02 -m user -a "name=joh uid=1040 group=adm state=present system=no" -i hosts
+
+#2、创建joh用户，登录shell是/sbin/nologin，追加bin、sys两个组
+ansible node02 -m user -a "name=joh shell=/sbin/nologin groups=bin,sys" -i hosts 
+
+#3、创建jsm用户，为其添加123作为登录密码，并且创建家目录
+#ansible localhost -m debug -a "msg={{ '123' | password_hash('sha512', 'salt') }}"
+$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1
+
+# ansible node02 -m user -a 'name=jsm password=$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1 create_home=yes'
+
+#4、移除joh用户
+# ansible node02  -m user -a 'name=joh state=absent remove=yes' -i hosts 
+
+#5、创建http用户，并为该用户创建2048字节的私钥，存放在~/http/.ssh/id_rsa
+# ansible node02  -m user -a 'name=http generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa' -i hosts
+```
