@@ -328,11 +328,11 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 
 ### 1)fetch常用参数说明
 
-|参数| 参数说明 |
+| 参数 | 参数说明 |
 |----|---------|
-|dest| 将远程主机拉取过来的文件保存在本地的路径信息 |
-|src| 指定从远程主机要拉取的文件信息，只能拉取文件 |
-|flat| 默认设置为no，如果设置为yes，将不显示172.16.1.8/etc/信息 |
+| dest | 将远程主机拉取过来的文件保存在本地的路径信息 |
+| src | 指定从远程主机要拉取的文件信息，只能拉取文件 |
+| flat | 默认设置为no，如果设置为yes，将不显示172.16.1.8/etc/信息 |
 
 -从被控远端机器上拉取文件(和COPY模块整好相反)
 
@@ -535,7 +535,7 @@ ansible web -m yum -a "name=httpd state=absent" -i hosts
 ### 1)service模块常用参数说明
 
 | 参数 | 参数说明 |
-|------|--------||
+|------|--------|
 | name=service name | 服务的名称 |
 | state=参数 | 停止服务 服务状态信息为过去时stared/stoped/restarted/reloaded |
 | enabled=yes | 设置开机自启动 |
@@ -647,6 +647,25 @@ ansible node02 -m group -a "name=news state=absent" -i hosts
 
 ## 15、user
 ```
+
+### 1)user模块常用参数说明
+
+| 参数 | 参数说明 |
+|------|--------|
+| name | 必须参数，指定要操作的用户名称，可以使用别名user |
+| group | 指定用户所在的基本组
+| gourps | 指定用户所在的附加组，如果用户已经存在并且已经拥有多个附加组，那么想要继续添加新的附加组，需要结合append参数使用，否则再次使用groups参数设置附加组时，用户原来的附加组会被覆盖。
+| append | 如果用户原本就存在多个附加组，那么当使用groups参数时，当前设置会覆盖原来的附加组设置，如果不想覆盖原来的附加组设置，需要结合append参数，将append设置为yes，表示追加附加组到现有的附加组设置，append默认值为no。
+| shell | 指定用户的默认shell |
+| uid | 指定用户的uid号 | 
+| expires | 指定用户的过期时间 |
+| comment | 指定用户的注释信息 |
+| state | present创建用户，absent删除用户，默认值为present |
+| remove | 当state的值设置为absent时，表示要删除远程主机中的用户，但是在删除用户时，不会删除用户的家目录等信息，这是因为remoove参数的默认值为no，如果设置为yes，在删除用户的同时，会删除用户的家目录，当state=absent并且remove=yes时，相当于执行”userdel –remove”命令 |
+| password | 指定用户的密码，但是这个密码不能是明文的密码，而是一个对明文密码”加密后”的字符串，相当于/etc/shadow文件中的密码字段，是一个对明文密码进行哈希后的字符串 |
+| update_password | 1、always当前的加密过的密码字符串不一致，则直接更新用户的密码 2、on_create当前的加密过的密码字符串不一致，则不会更新用户的密码字符串，保持之前的密码设定，如果新创建的用户为on_create，会将密码设置为password的值。默认值即为always |
+| generate_ssh_key | 此参数默认值为no，如果设置为yes，表示为对应的用户生成ssh密钥对，默认在用户家目录的./ssh目录中生成名为id_rsa的私钥和名为id_rsa.pub的公钥，如果同名的密钥已经存在与对应的目录中，原同名密钥并不会被覆盖(不做任何操作)  |
+
 #1、创建joh用户，uid是1040，主要的组是adm
 ansible node02 -m user -a "name=joh uid=1040 group=adm state=present system=no" -i hosts
 
