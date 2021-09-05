@@ -119,7 +119,7 @@ fenfa 192.168.101.69 [  OK  ]
 ### 1)在本地执行脚本时，将脚本中的内容传输到远程节点上运行
 ```
 ansible all -m script -a "/server/scripts/free.sh"
-192.168.101.69| SUCCESS => {
+192.168.101.69 | SUCCESS => {
     "changed": true,
     "rc": 0,
     "stderr": "Shared connection to 192.168.101.69 closed.\r\n",
@@ -153,3 +153,267 @@ ansible all -m script -a "/server/scripts/free.sh"
 | group| 修改属组 |
 
 - src和content不能同时使用
+
+### 2)使用copy 模块，将/etc/hosts 文件 传输到各个服务器送，权限修改为0600 属主属组为clsn
+```
+# ansible clsn -m copy -a "src=/etc/hosts dest=/tmp/ mode=0600 owner=clsn group=clsn"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "checksum": "b3c1ab140a1265cd7f6de9175a962988d93c629b",
+    "dest": "/tmp/hosts",
+    "gid": 500,
+    "group": "clsn",
+    "md5sum": "8c2b120b4742a806dcfdc8cfff6b6308",
+    "mode": "0600",
+    "owner": "clsn",
+    "size": 357,
+    "src": "/root/.ansible/tmp/ansible-tmp-1508410846.63-224022812989166/source",
+    "state": "file",
+    "uid": 500
+}
+
+# 检查结果
+# ansible all -m shell -a "ls -l /tmp/hosts"
+192.168.101.69 | SUCCESS | rc=0 >>
+-rw------- 1 clsn clsn 357 Oct 19 19:00 /tmp/hosts
+```
+
+### 3)将本地的httpd.conf文件推送到远端，检查远端是否存在上一次的备份文件
+```
+ansible clsn -m copy -a "src=./httpd.conf dest=/etc/httpd/conf/httpd.conf owner=root group=root mode=644 backup=yes"
+```
+
+### 4)移动远程主机上的文件 remote_src=true 参数
+```
+# ansible clsn -m copy -a " src=/server/scripts/ssh-key.sh  dest=/tmp/ remote_src=true"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "checksum": "d27bd683bd37e15992d2493b50c9410e0f667c9c",
+    "dest": "/tmp/ssh-key.sh",
+    "gid": 0,
+    "group": "root",
+    "md5sum": "dc88a3a419e3657bae7d3ef31925cbde",
+    "mode": "0644",
+    "owner": "root",
+    "size": 397,
+    "src": "/server/scripts/ssh-key.sh",
+    "state": "file",
+    "uid": 0
+}
+```
+
+### 5)定义文件中的内容 content=clsnedu.com 默认没有换行
+```
+# ansible clsn -m copy -a "content=clsnedu.com dest=/tmp/clsn666.txt"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "checksum": "291694840cd9f9c464263ea9b13421d8e74b7d00",
+    "dest": "/tmp/clsn666.txt",
+    "gid": 0,
+    "group": "root",
+    "md5sum": "0a6bb40847793839366d0ac014616d69",
+    "mode": "0644",
+    "owner": "root",
+    "size": 13,
+    "src": "/root/.ansible/tmp/ansible-tmp-1508466752.1-24733562369639/source",
+    "state": "file",
+    "uid": 0
+}
+```
+
+### 6)拷贝目录
+```
+ansible node02 -m copy -a "src=/etc/pam.d/ dest=/tmp/"
+```
+
+## 4、file模块 设置文件属性
+
+### 1）file模块常用参数
+
+| 参数 | 参数说明 |
+|-----|---------|
+| owner | 设置复制传输后的数据属主信息 |
+| group | 设置复制传输后的数据属组信息 |
+| mode | 设置文件数据权限信息 |
+| dest | 要创建的文件或目录命令，以及路径信息 |
+| src | 指定要创建软链接的文件信息 |
+| state | state参数信息 |
+| directory | 创建目录 |
+| file | 创建文件 |
+| link | 创建软链接 |
+| hard | 创建出硬链接 |
+| absent | 目录将被递归删除以及文件，而链接将被取消链接 |
+| touch | 创建文件；如果路径不存在将创建一个空文件
+
+- 注意：重命名和创建多级目录不能同时实现
+
+### 1)创建目录,并设定属主、属组、权限
+```
+# ansible clsn -m file -a "dest=/tmp/clsn_dir state=directory owner=apache group=apache mode=755"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "gid": 0,
+    "group": "apache",
+    "mode": "0755",
+    "owner": "apache",
+    "path": "/tmp/clsn_dir",
+    "size": 4096,
+    "state": "directory",
+    "uid": 0
+}
+```
+
+### 2)创建文件,并设定属主、属组、权限
+```
+# ansible clsn -m file -a "dest=/tmp/clsn_file state=touch owner=apache group=apache mode=644"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "dest": "/tmp/clsn_file",
+    "gid": 0,
+    "group": "apache",
+    "mode": "0644",
+    "owner": "apache",
+    "size": 0,
+    "state": "file",
+    "uid": 0
+} 
+```
+
+### 3)创建软连接
+```
+# ansible clsn -m file -a "src=/tmp/clsn_file dest=/tmp/clsn_file_link state=link"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "dest": "/tmp/clsn_file_link",
+    "gid": 0,
+    "group": "root",
+    "mode": "0777",
+    "owner": "root",
+    "size": 16,
+    "src": "/tmp/clsn_file",
+    "state": "link",
+    "uid": 0
+}
+```
+
+### 4)删除目录和文件信息
+```
+# ansible clsn -m file -a "dest=/tmp/clsn_dir state=absent"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "path": "/tmp/clsn_dir",
+    "state": "absent"
+
+# ansible clsn -m file -a "dest=/tmp/clsn_file state=absent"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "path": "/tmp/clsn_file",
+    "state": "absent"
+```
+
+### 5)创建多级目录
+```
+ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache mode=755"
+ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=yes"
+```
+
+- 注意：重命名和创建多级目录不能同时实现
+
+## 5、fetch 模块  拉取文件
+
+### 1)fetch常用参数说明
+
+|参数| 参数说明 |
+|----|---------|
+|dest| 将远程主机拉取过来的文件保存在本地的路径信息 |
+|src| 指定从远程主机要拉取的文件信息，只能拉取文件 |
+|flat| 默认设置为no，如果设置为yes，将不显示172.16.1.8/etc/信息 |
+
+-从被控远端机器上拉取文件(和COPY模块整好相反)
+
+### 2）从远程拉取出来文件
+```
+# ansible clsn -m fetch -a "dest=/tmp/backup src=/etc/hosts"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "checksum": "b3c1ab140a1265cd7f6de9175a962988d93c629b",
+    "dest": "/tmp/backup/172.16.1.8/etc/hosts",
+    "md5sum": "8c2b120b4742a806dcfdc8cfff6b6308",
+    "remote_checksum": "b3c1ab140a1265cd7f6de9175a962988d93c629b",
+    "remote_md5sum": null
+}
+```
+
+### 3)flat 参数，拉去的时候不创建目录（同名文件会覆盖）
+```
+# ansible clsn -m fetch -a "dest=/tmp/backup/ src=/etc/hosts flat=yes"
+192.168.101.69 | SUCCESS => {
+    "changed": false,
+    "checksum": "b3c1ab140a1265cd7f6de9175a962988d93c629b",
+    "dest": "/tmp/backup/hosts",
+    "file": "/etc/hosts",
+    "md5sum": "8c2b120b4742a806dcfdc8cfff6b6308"
+```
+
+## 6、mount模块 配置挂载点模块
+
+### 1）mount模块常用参数
+
+| 参数 | 参数说明 |
+|------|---------|
+| fstyp| 指定挂载文件类型 -t nfs == fstype=nfs |
+| opts| 设定挂载的参数选项信息 -o ro  == opts=ro |
+| path| 挂载点路径          path=/mnt |
+| src | 要被挂载的目录信息  src=172.16.1.31:/data |
+| state | 挂载的状态, |
+
+| state参数 | state状态说明 |
+|--------|-----------||
+| unmounted | 加载/etc/fstab文件 实现卸载 |
+| absent | 在fstab文件中删除挂载配置 |
+| present | 在fstab文件中添加挂载配置 |
+| mounted | 1.将挂载信息添加到/etc/fstab文件中 2.加载配置文件挂载 |
+
+### 2）挂载
+```
+# ansible 172.16.1.8 -m mount -a "fstype=nfs opts=rw path=/mnt/  src=172.16.1.31:/data/ state=mounted"
+172.16.1.8 | SUCCESS => {
+    "changed": true,
+    "dump": "0",
+    "fstab": "/etc/fstab",
+    "fstype": "nfs",
+    "name": "/mnt/",
+    "opts": "rw",
+ "passno": "0",
+  "src": "172.16.1.31:/data/"
+}
+```
+
+### 3)卸载
+```
+# ansible 172.16.1.8 -m mount -a "fstype=nfs opts=rw path=/mnt/  src=172.16.1.31:/data/ state=unmounted"
+172.16.1.8 | SUCCESS => {
+   "changed": true,
+    "dump": "0",
+    "fstab": "/etc/fstab",
+    "fstype": "nfs",
+    "name": "/mnt/",
+    "opts": "rw",
+    "passno": "0",
+    "src": "172.16.1.31:/data/"
+}
+```
+
+### 4)环境准备：将172.16.1.61作为nfs服务端，172.16.1.7、172.16.1.8作为nfs客户端挂载
+```
+# ansible localhost -m yum -a 'name=nfs-utils state=present'
+# ansible localhost -m file -a 'path=/ops state=directory'
+# ansible localhost -m copy -a 'content="/ops 172.16.1.0/24(rw,sync)" dest=/etc/exports'
+# ansible localhost -m service -a "name=nfs state=restarted"
+
+#1、挂载nfs存储至本地的/opt目录，并实现开机自动挂载
+# ansible node02 -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=mounted"  
+
+#2、永久卸载nfs的挂载，会清理/etc/fstab
+# ansible webservers -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=absent"
+```
