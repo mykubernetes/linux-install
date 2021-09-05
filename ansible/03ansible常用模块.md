@@ -232,12 +232,17 @@ ansible node02 -m copy -a "src=/etc/pam.d/ dest=/tmp/"
 
 | 参数 | 参数说明 |
 |-----|---------|
+| path | 指定要操作的文件或目录,使用dest参数或者name参数指定文件或目录也可以 |
 | owner | 设置复制传输后的数据属主信息 |
 | group | 设置复制传输后的数据属组信息 |
 | mode | 设置文件数据权限信息 |
 | dest | 要创建的文件或目录命令，以及路径信息 |
 | src | 指定要创建软链接的文件信息 |
+| recurse | 当要操作的文件为目录，将recurse设置为yes，可以递归的修改目录中文件的属性 |
 | state | state参数信息 |
+
+| state参数 | state参数说明 |
+|-----|---------|
 | directory | 创建目录 |
 | file | 创建文件 |
 | link | 创建软链接 |
@@ -311,7 +316,7 @@ ansible node02 -m copy -a "src=/etc/pam.d/ dest=/tmp/"
     "state": "absent"
 ```
 
-### 5)创建多级目录
+### 5)创建多级目录，同时递归的将目录中的文件的属主属组都设置为apache
 ```
 ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache mode=755"
 ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=yes"
