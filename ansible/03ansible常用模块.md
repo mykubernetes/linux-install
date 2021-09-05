@@ -1,6 +1,6 @@
 # 一、ansible模块的使用
 
-## 1、常用参数
+## 1、ansible常用参数
 ```
 -a MODULE_ARGS, --args=MODULE_ARGS                  模块参数
 -C, --check                                         运行检查，不执行任何操作
