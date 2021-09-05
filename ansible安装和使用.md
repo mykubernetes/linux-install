@@ -11,6 +11,8 @@ http://www.ansible.com.cn/index.html#
 
 https://www.cnblogs.com/mauricewei/p/10056379.html
 
+https://jinja.palletsprojects.com/en/3.0.x/templates/#list-of-builtin-filters
+
 ssh免密
 ```
 ssh-keygen -t rsa 
