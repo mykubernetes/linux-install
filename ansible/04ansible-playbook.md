@@ -295,24 +295,29 @@ PLAY RECAP *********************************************************************
 192.168.101.69             : ok=2    changed=2    unreachable=0    failed=0 
 ```
 
-4）只执行有标签的任务，没有任何标签的任务不会被执行
+4)never的作用应该与always正好相反
+```
+ansible-playbook --tags never test2.yml
+```
+
+5）只执行有标签的任务，没有任何标签的任务不会被执行
 ```
 ansible-playbook --tags tagged test2.yml
 ```
 
-5)跳过包含标签的任务，即使对应的任务包含always标签，也会被跳过
+6)跳过包含标签的任务，即使对应的任务包含always标签，也会被跳过
 ```
 ansible-playbook --skip-tags tagged test2.yml
 ```
 
-6)只执行没有标签的任务，但是如果某些任务包含always标签，那么这些任务也会被执行
+7)只执行没有标签的任务，但是如果某些任务包含always标签，那么这些任务也会被执行
 ```
-ansible-playbook --tags untagged testtag.yml
+ansible-playbook --tags untagged test2.yml
 ```
 
 7)跳过没有标签的任务
 ```
-ansible-playbook --skip-tags untagged testtag.yml
+ansible-playbook --skip-tags untagged test2.yml
 ```
 
 8)特殊标签all表示所有任务会被执行，不用指定，默认情况下就是使用这个标签
