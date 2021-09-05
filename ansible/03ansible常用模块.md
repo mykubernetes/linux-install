@@ -501,36 +501,79 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 ### 1）yum 模块常用参数
 
 | 参数 | 参数说明 |
-|----—|-------|
+|-----|-------|
 | name=name | 指定安装的软件 |
 | state | 1、安装present、installed 2、卸载absent 3、升级latest 4、排除exclude 5、指定仓库enablerepo |
+| disable_gpg_check | 用于禁用对rpm包的公钥gpg验证，默认值为no，表示不禁用验证，设置为yes表示禁用验证，即不验证包，直接安装，在对应的yum源没有开启gpg验证的情况下，需要将此参数的值设置为yes，否则会报错而无法进行安装 |
+| enablerepo | 用于指定安装软件包时临时启用的yum源，假如你想要从A源中安装软件，但是你不确定A源是否启用了，你可以在安装软件包时将此参数的值设置为yes，即使A源的设置是未启用，也可以在安装软件包时临时启用A源 |
+| disablerepo | 用于指定安装软件包时临时禁用的yum源，某些场景下需要此参数，比如，当多个yum源中同时存在要安装的软件包时，你可以使用此参数临时禁用某个源，这样设置后，在安装软件包时则不会从对应的源中选择安装包 |
+
 
 ### 2)安装当前最新的Apache软件，如果存在则更新
 ```
-ansible web -m yum -a "name=httpd state=latest" -i hosts
+ansible web -m yum -a "name=httpd state=latest"
 ```
 
 ### 3)安装当前最新的Apache软件，通过epel仓库安装
 ```
-ansible web -m yum -a "name=httpd state=latest enablerepo=epel" -i hosts 
+ansible web -m yum -a "name=httpd state=latest enablerepo=epel"
 ```
 
 ### 4)通过公网URL安装rpm软件
 ```
-ansible web -m yum -a "name=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm state=latest" -i hosts 
+ansible web -m yum -a "name=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm state=latest"
 ```
 
 ### 5)更新所有的软件包，但排除和kernel相关的
 ```
-ansible web -m yum -a "name=* state=latest exclude=kernel*,foo*" -i hosts
+ansible web -m yum -a "name=* state=latest exclude=kernel*,foo*"
 ```
 
 ### 6）删除Apache软件
 ```
-ansible web -m yum -a "name=httpd state=absent" -i hosts
+ansible web -m yum -a "name=httpd state=absent"
 ```
 
-## 9、service模块 服务管理
+## 9、yum_repository模块
+
+### 1)yum_repository模块常用参数说明
+| 参数 | 参数说明 |
+|-----|-------|
+| name | 必须参数，用于指定要操作的唯一的仓库ID，也就是”.repo”配置文件中每个仓库对应的”中括号”内的仓库ID |
+| baseurl | 设置yum仓库的baseurl |
+| description | 设置仓库的注释信息，也就是”.repo”配置文件中每个仓库对应的”name字段”对应的内容。 |
+| file | 设置仓库的配置文件名称，即设置”.repo”配置文件的文件名前缀，不使用此参数情况下，默认以name参数的仓库ID作为”.repo”配置文件的文件名前缀，同一个’.repo’配置文件中可以存在多个yum源 |
+| enabled | 是否激活对应的yum源，此参数默认值为yes，表示启用对应的yum源，设置为no表示不启用对应的yum源。 |
+| gpgcheck | 是否开启rpm包验证功能，默认值为no，表示不启用包验证，设置为yes表示开启包验证功能。 |
+| gpgcakey | 当gpgcheck参数设置为yes时，需要使用此参数指定验证包所需的公钥 |
+| state | 默认值为present，当值设置为absent时，表示删除对应的yum源 |
+
+### 2)设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/aliEpel.repo
+```
+ansible web -m yum_repository -a 'name=aliEpel description="alibaba EPEL" baseurl=https://mirrors.aliyun.com/epel/$releasever\Server/$basearch/'
+```
+
+### 3)设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/alibaba.repo
+```
+ansible web -m yum_repository -a 'name=aliEpel description="alibaba EPEL" baseurl=https://mirrors.aliyun.com/epel/$releasever\Server/$basearch/ file=alibaba'
+```
+
+### 4)设置ID为local 的yum源，但是不启用它（local源使用系统光盘镜像作为本地yum源，以便测试举例，所以baseurl中的值以file:///开头）
+```
+ansible web -m yum_repository -a 'name=local baseurl=file:///media description="local cd yum" enabled=no'
+```
+
+### 5)设置ID为local的yum源，开启包验证功能，并指定验证包所需的公钥位置为/media/RPM-GPG-KEY-CentOS-7
+```
+ansible web -m yum_repository -a 'name=local baseurl=file:///media description="local cd yum" gpgcheck=yes gpgcakey=file:///media/RPM-GPG-KEY-CentOS-7'
+```
+
+### 6)删除/etc/yum.repos.d/alibaba.repo配置文件中的aliEpel源
+```
+ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
+```
+
+## 10、service模块 服务管理
 
 ### 1)service模块常用参数说明
 
@@ -565,7 +608,7 @@ ansible web -m service -a "name=httpd state=stopped"
 ansible web -m service -a "name=httpd state=started enabled=yes"  
 ```
 
-## 10、hostname 修改主机名模块
+## 11、hostname 修改主机名模块
 ```
 # ansible 172.16.1.8 -m hostname -a "name=web01"
 172.16.1.8 | SUCCESS => {
@@ -580,7 +623,7 @@ ansible web -m service -a "name=httpd state=started enabled=yes"
 }
 ```
 
-## 11、selinux 管理模块
+## 12、selinux 管理模块
 ```
 # ansible 172.16.1.8 -m selinux -a "state=disabled"
 172.16.1.8 | SUCCESS => {
@@ -592,7 +635,7 @@ ansible web -m service -a "name=httpd state=started enabled=yes"
 }
 ```
 
-## 12、get_url 模块 == 【wget】
+## 13、get_url 模块 == 【wget】
 ```
 # ansible 172.16.1.8 -m get_url -a "url=http://lan.znix.top/RDPWrap-v1.6.1.zip dest=/tmp/"
 172.16.1.8 | SUCCESS => {
@@ -619,7 +662,7 @@ ansible web -m service -a "name=httpd state=started enabled=yes"
 - url_password   密码
 - url_username  用户名
 
-## 13、firewalld
+## 14、firewalld
 ```
 # ansible node02 -m service -a "name=firewalld state=started"
 
@@ -633,7 +676,7 @@ ansible web -m service -a "name=httpd state=started enabled=yes"
 # ansible node02 -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled"
 ```
 
-## 14、group
+## 15、group
 
 ### 1)group模块常用参数说明
 
@@ -659,7 +702,7 @@ ansible node02 -m group -a "name=http gid=8888 system=yes state=present" -i host
 ansible node02 -m group -a "name=news state=absent" -i hosts
 ```
 
-## 15、user
+## 16、user
 
 ### 1)user模块常用参数说明
 
