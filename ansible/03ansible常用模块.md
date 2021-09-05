@@ -365,10 +365,10 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 | opts| 设定挂载的参数选项信息 -o ro  == opts=ro |
 | path| 挂载点路径          path=/mnt |
 | src | 要被挂载的目录信息  src=172.16.1.31:/data |
-| state | 挂载的状态, |
+| state | 挂载的状态 |
 
 | state参数 | state状态说明 |
-|--------|-----------||
+|--------|-----------|
 | unmounted | 加载/etc/fstab文件 实现卸载 |
 | absent | 在fstab文件中删除挂载配置 |
 | present | 在fstab文件中添加挂载配置 |
@@ -416,4 +416,146 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 
 #2、永久卸载nfs的挂载，会清理/etc/fstab
 # ansible webservers -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=absent"
+```
+
+## 7、cron模块 定时任务
+
+### 1）cron模块常用参数
+
+| 参数 | 参数说明 |
+|------|---------|
+| minute 分 | Minute when the job should run ( 0-59, *, */2, etc ) |
+| hour 时 | Hour when the job should run ( 0-23, *, */2, etc ) |
+| day 日 | Day of the month the job should run ( 1-31, *, */2, etc ) |
+| month 月 | Month of the year the job should run ( 1-12, *, */2, etc ) |
+| weekday 周 | Day of the week that the job should run ( 0-6 for Sunday-Saturday, *, etc ) |
+| job | 工作 ;要做的事情 |
+| name | 定义定时任务的描述信息 |
+| disabled | 注释定时任务 |
+| state | 1、absent删除定时任务 2、present创建定时任务，默认为present  |
+
+### 2)添加定时任务
+```
+# ansible clsn -m cron -a "minute=0 hour=0 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null' name=clsn01"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "envs": [],
+    "jobs": [
+     "clsn01"
+    ]
+}
+```
+
+### 3）删除定时任务
+```
+# ansible clsn -m cron -a "minute=00 hour=00 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null' name=clsn01 state=absent"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "envs": [],
+    "jobs": []
+}
+```
+
+### 4）只用名字就可以删除
+```
+# ansible clsn -m cron -a "name=clsn01  state=absent"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "envs": [],
+    "jobs": []
+}
+```
+
+### 5）注释定时任务
+- 注意： 注释定时任务的时候必须有job的参数
+```
+# ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=yes"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "envs": [],
+    "jobs": [
+    "clsn01"
+    ]
+}
+```
+
+### 6）取消注释
+```
+# ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=no"
+192.168.101.69 | SUCCESS => {
+    "changed": true,
+    "envs": [],
+   "jobs": [
+       "clsn01"
+    ]
+}
+```
+
+## 8、yum 模块
+
+### 1）yum 模块常用参数
+
+| 参数 | 参数说明 |
+|----—|-------|
+| name=name | 指定安装的软件 |
+| state | 1、安装present、installed 2、卸载absent 3、升级latest 4、排除exclude 5、指定仓库enablerepo |
+
+### 2)安装当前最新的Apache软件，如果存在则更新
+```
+ansible web -m yum -a "name=httpd state=latest" -i hosts
+```
+
+### 3)安装当前最新的Apache软件，通过epel仓库安装
+```
+ansible web -m yum -a "name=httpd state=latest enablerepo=epel" -i hosts 
+```
+
+### 4)通过公网URL安装rpm软件
+```
+ansible web -m yum -a "name=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm state=latest" -i hosts 
+```
+
+### 5)更新所有的软件包，但排除和kernel相关的
+```
+ansible web -m yum -a "name=* state=latest exclude=kernel*,foo*" -i hosts
+```
+
+### 6）删除Apache软件
+```
+ansible web -m yum -a "name=httpd state=absent" -i hosts
+```
+
+## 9、service模块 服务管理
+
+### 1)service模块常用参数说明
+
+| 参数 | 参数说明 |
+|------|--------||
+| name=service name | 服务的名称 |
+| state=参数 | 停止服务 服务状态信息为过去时stared/stoped/restarted/reloaded |
+| enabled=yes | 设置开机自启动 |
+
+### 2)启动Httpd服务
+```
+ansible web -m service -a "name=httpd state=started"
+```
+
+### 3)重载Httpd服务
+```
+ansible web -m service -a "name=httpd state=reloaded"
+```
+
+### 4)重启Httpd服务
+```
+ansible web -m service -a "name=httpd state=restarted"
+```
+
+### 5)停止Httpd服务
+```
+ansible web -m service -a "name=httpd state=stopped"
+```
+
+### 6)启动Httpd服务，并加入开机自启
+```
+ansible web -m service -a "name=httpd state=started enabled=yes"  
 ```
