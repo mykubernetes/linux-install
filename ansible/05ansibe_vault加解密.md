@@ -3,6 +3,7 @@ ansible-vault加密及解密
 
 - 编写playbook时，可能会涉及敏感的数据，比如密码，这些敏感数据以明文的方式存储在playbook中时，使用`ansible-vault`命令，对敏感数据进行加密，可以对整个文件加密，也可以对某个字符串加密（也就是变量加密）。
 
+# 一、常用命令
 ```
 ansible-vault create test.yml                                         # 加密创建新文件
 ansible-vault create --vault-password-file=file test.yml              # 指定密码加密创建新文件（file要先写好）
@@ -20,6 +21,8 @@ ansible-playbook --vault-password-file=file test.yml                  # 执行�
 ansible-playbook --vault-id @prompt test.yml                          # 执行加密的playbook（方式二）
 ansible-playbook --ask-vault-pass test.yml                            # 手动输入密码执行playbook
 ```
+
+# 二、通过命令对playbook进行手动加解密
 
 1、编写playbook文件
 ```
@@ -65,46 +68,59 @@ ERROR! Attempting to decrypt but no vault secrets found
 # ansible-vault decrypt test.yml
 ```
 
-7、将密码写到文件中，通过文件对playbook进行加密
+# 三、通过密码文件对playbook进行加解密
+
+1、将密码写到文件中，通过文件对playbook进行加密
 ```
 # echo "123123" > pwdfile
 # ansible-vault encrypt --vault-password-file pwdfile test.yml
 ```
 
-8、执行playbook时使用密码文件进行操作
+2、执行playbook时使用密码文件进行操作
 ```
 # ansible-playbook --vault-password-file pwdfile test.yml
 ```
 
-9、通过密码文件对playbook进行解密
+3、通过密码文件对playbook进行解密
 ```
 # ansible-vault decrypt --vault-password-file pwdfile test.yml
 ```
 
-10、从ansible2.4版本开始，官方不再推荐使用`--vault-password-file`选项，官方开始推荐使用`--vault-id`选项代替`--vault-password-file`选项指定密码文件，也就是说，如下两条命令的效果是一样的。
+
+# 四、ansible2.4版本以后引入`--vault-id`代替`--vault-password-file`
+
+- 从ansible2.4版本开始，官方不再推荐使用`--vault-password-file`选项，官方开始推荐使用`--vault-id`选项代替`--vault-password-file`选项指定密码文件，也就是说，如下两条命令的效果是一样的。
+
+1、使用`vault-id`对playbook进行加密
 ```
 # ansible-vault encrypt --vault-id pwdfile test.yml
-# ansible-vault decrypt --vault-password-file pwdfile test.yml
 ```
 
-11、运行加密过的脚本和解密时，也可以使用`--vault-id`选项指定密码文件
+2、执行加密的polybook时也可以使用`--vault-id`选项指定密码文件
 ```
 # ansible-playbook --vault-id pwdfile test.yml
+```
+
+3、使用`--vault-id`对文件加密过的playbook进行解密
+```
 # ansible-vault decrypt --vault-id pwdfile test.yml
 ```
 
-12、`--vault-id`选项不仅能够代替`--vault-password-file`选项，还能够代替`--ask-vault-pass`选项，交互式的输入密码
+4、`--vault-id`选项不仅能够代替`--vault-password-file`选项，还能够代替`--ask-vault-pass`选项，交互式的输入密码
 ```
 # ansible-playbook --vault-id prompt test.yml
 ```
 
-13、两条同样会交互式的提示用户输入密码，输入正确的密码后，即可正常的运行加密过的剧本，也就是说，如下两条命令的效果是完全相同的。
+5、两条交互式命令效果是完全相同的。
 ```
 # ansible-playbook --vault-id prompt test.yml
 # ansible-playbook --ask-vault-pass test.yml
 ```
 
-14、2.4版本以后的ansible中，`--vault-id`选项支持同时使用多个密码文件进行解密
+
+# 五、2.4版本以后的ansible中，`--vault-id`选项支持同时使用多个密码文件进行解密
+
+1、创建两条playbook文件
 ```
 # cat test.yml
 - hosts: test70
@@ -118,32 +134,42 @@ ERROR! Attempting to decrypt but no vault secrets found
     msg: "message from test1"
 ```
 
+2、配置两条密码文件，分别存放不同的密码
 ```
 # echo "123123" > pwdfile
 # echo "123456" > pwdfile1
 ```
 
+3、分别用两个密码文件对playbbook进行加密操作
 ```
 # ansible-vault encrypt --vault-id pwdfile test.yml
 # ansible-vault encrypt --vault-id pwdfile1 test1.yml
 ```
 
+4、因为test.yml包含test1.yml，当调用test.yml时，也会调用test1.yml，但是使用了不同的密码加密了这两个yml文件，所以，必须同时提供两个密码文件
 ```
 # ansible-playbook --vault-id pwdfile1 --vault-id pwdfile test.yml
 ```
 
+5、可以一次性使用不同的密码文件解密不同的文件
 ```
 # ansible-vault decrypt --vault-id pwdfile1 --vault-id pwdfile test.yml test1.yml
 ```
+- 不用纠结密码文件与加密文件的对应关系，ansible会自动尝试这些密码文件
 
+6、可以使用如下交互式命令，一次性的输入多个文件的解密密码，但是需要注意对应顺序
 ```
 # ansible-vault view --vault-id prompt --vault-id prompt test.yml test1.yml
 ```
 
+# 六、`--vault-id`选项还有一个小功能，就是在加密文件时，给被加密的文件`做记号`
+
+1、对文件进行加密，使用pwdfile文件中的内容作为密码，并且在加密文件中加入了`zsy`记号
 ```
 # ansible-vault encrypt --vault-id zsy@pwdfile test.yml
 ```
 
+2、查看加密后文件内容
 ```
 # cat test.yml
 $ANSIBLE_VAULT;1.2;AES256;zsy
@@ -157,7 +183,9 @@ $ANSIBLE_VAULT;1.2;AES256;zsy
 61623266373735373066316663303533633638353762653630323833376535666134316136356639
 61386437656562383965656162376434666439633134643665393637663639363133
 ```
+- 这些记号并不会对加密和解密的过程产生影响，只是为了方便管理，如果你是管理员，可能通过一些记号，能够更方便的对这些加密过的内容进行标识
 
+3、在交互输入密码时添加记号，比如添加一个`记号`zsythink
 ```
 # ansible-vault encrypt --vault-id zsythink@prompt test.yml
 ```
