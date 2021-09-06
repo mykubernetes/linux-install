@@ -1,0 +1,36 @@
+Github 地址：https://github.com/jlafon/ansible-profile
+
+- 在做性能优化之前首先需要做的是收集一些统计数据，这样才能为后面做的性能优化提供数据支持
+
+
+1、部署插件
+```
+cd /etc/ansible 
+mkdir callback_plugins 
+cd callback_plugins 
+wget https://raw.githubusercontent.com/jlafon/ansible-profile/master/callback_plugins/profile_tasks.py
+```
+
+2、修改配置文件
+```
+# vim ansible.cfg
+callback_whitelist = profile_tasks
+```
+
+3、执行后会输出运行时间
+```
+ansible <args here>
+<normal output here>
+PLAY RECAP ********************************************************************
+really slow task  | Download project packages-----------------------------11.61s
+security | Really slow security policies-----------------------------------7.03s
+common-base | Install core system dependencies-----------------------------3.62s
+common | Install pip-------------------------------------------------------3.60s
+common | Install boto------------------------------------------------------3.57s
+nginx | Install nginx------------------------------------------------------3.41s
+serf | Install system dependencies-----------------------------------------3.38s
+duo_security | Install Duo Unix SSH Integration----------------------------3.37s
+loggly | Install TLS version-----------------------------------------------3.36s
+```
+
+** 在ansible2.2版本以上，ansible自带了/usr/lib/python2.6/site-packages/ansible/plugins/callback/profile_tasks.py文件，所以，只需在callback_whitelist开启这个插件，从而不需要下载这个文件，就可以实现统计任务处理时间的功能。**
