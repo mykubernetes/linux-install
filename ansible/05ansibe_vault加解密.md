@@ -4,14 +4,14 @@ ansible-vault加密及解密
 - 编写playbook时，可能会涉及敏感的数据，比如密码，这些敏感数据以明文的方式存储在playbook中时，使用`ansible-vault`命令，对敏感数据进行加密，可以对整个文件加密，也可以对某个字符串加密（也就是变量加密）。
 
 ```
-ansible-vault create test.yml              # 加密创建新文件
-ansible-vault create --vault-password-file=file test.yml             # 指定密码加密创建新文件（file要先写好）
+ansible-vault create test.yml                                         # 加密创建新文件
+ansible-vault create --vault-password-file=file test.yml              # 指定密码加密创建新文件（file要先写好）
 
-ansible-vault view test.yml                # 查看加密的文件
-ansible-vault edit test.yml                # 编辑加密的文件
+ansible-vault view test.yml                                           # 查看加密的文件
+ansible-vault edit test.yml                                           # 编辑加密的文件
 
-ansible-vault encrypt test.yml             # 加密已经有的文件
-ansible-vault decrypt test.yml             # 解密
+ansible-vault encrypt test.yml                                        # 加密已经有的文件
+ansible-vault decrypt test.yml                                        # 解密
 
 ansible-vault rekey test.yml                                          # 更改密码
 ansible-vault rekey --new-vault password-file=file test.yml           # 指定密码文件更改密码
@@ -63,4 +63,43 @@ ERROR! Attempting to decrypt but no vault secrets found
 6、对加密过的文件进行解密操作
 ```
 # ansible-vault decrypt test.yml
+```
+
+7、将密码写到文件中，通过文件对playbook进行加密
+```
+# echo "123123" > pwdfile
+# ansible-vault encrypt --vault-password-file pwdfile test.yml
+```
+
+8、执行playbook时使用密码文件进行操作
+```
+# ansible-playbook --vault-password-file pwdfile test.yml
+```
+
+9、通过密码文件对playbook进行解密
+```
+# ansible-vault decrypt --vault-password-file pwdfile test.yml
+```
+
+10、从ansible2.4版本开始，官方不再推荐使用`--vault-password-file`选项，官方开始推荐使用`--vault-id`选项代替`--vault-password-file`选项指定密码文件，也就是说，如下两条命令的效果是一样的。
+```
+# ansible-vault encrypt --vault-id pwdfile test.yml
+# ansible-vault decrypt --vault-password-file pwdfile test.yml
+```
+
+11、运行加密过的脚本和解密时，也可以使用`--vault-id`选项指定密码文件
+```
+# ansible-playbook --vault-id pwdfile test.yml
+# ansible-vault decrypt --vault-id pwdfile test.yml
+```
+
+12、`--vault-id`选项不仅能够代替`--vault-password-file`选项，还能够代替`--ask-vault-pass`选项，交互式的输入密码
+```
+# ansible-playbook --vault-id prompt test.yml
+```
+
+13、两条同样会交互式的提示用户输入密码，输入正确的密码后，即可正常的运行加密过的剧本，也就是说，如下两条命令的效果是完全相同的。
+```
+# ansible-playbook --vault-id prompt test.yml
+# ansible-playbook --ask-vault-pass test.yml
 ```
