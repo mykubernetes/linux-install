@@ -72,6 +72,49 @@ test70                     : ok=1    changed=0    unreachable=0    failed=0
 
 
 
+# import_tasks
+
+```
+# cat intest1.yml
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "test task"
+  - import_tasks: in.yml
+ 
+# cat in.yml
+- debug:
+    msg: "task1 in in.yml"
+- debug:
+    msg: "task2 in in.yml"
+```
+
+```
+# ansible-playbook intest1.yml
+ 
+PLAY [test70] *******************************************
+ 
+TASK [debug] *******************************************
+ok: [test70] => {
+    "msg": "test task"
+}
+ 
+TASK [debug] *******************************************
+ok: [test70] => {
+    "msg": "task1 in in.yml"
+}
+ 
+TASK [debug] *******************************************
+ok: [test70] => {
+    "msg": "task2 in in.yml"
+}
+ 
+PLAY RECAP ********************************************
+test70                     : ok=3    changed=0    unreachable=0    failed=0
+```
 
 
 
@@ -94,14 +137,30 @@ test70                     : ok=1    changed=0    unreachable=0    failed=0
 
 
 
+# import_playbook
 
-
-
-
-
-
-
-
+1、在2.8版本以后，使用”include”关键字引用整个playbook的特性将会被弃用
+```
+# cat intest6.yml
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "test task in intest6.yml"
+ 
+- import_playbook: intest7.yml
+ 
+# cat intest7.yml
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "test task in intest7.yml"
+```
 
 
 
