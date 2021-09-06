@@ -1,0 +1,158 @@
+default_disk_parted_rules:
+  tce_360:
+    - parts:
+      - path: "/data/monitor/volume0"
+        bdev: "/dev/sdb1"
+        capacity:
+          start: 0MB
+          end: 10000MB
+      - path: "/data/mysql/volume0"
+        bdev: "/dev/sdb2"
+        capacity:
+          start: 10000MB
+          end: 20000MB
+      - path: "/data/cassandras/volume0"
+        bdev: "/dev/sdb3"
+        capacity:
+          start: 20000MB
+          end: 90000MB
+      - path: "/data/mongodb/volume1"
+        bdev: "/dev/sdb4"
+        capacity:
+          start: 90000MB
+          end: 500000MB
+      - path: "/data/minio/volume0"
+        bdev: "/dev/sdb5"
+        capacity:
+          start: 500000MB
+          end: 530000MB
+      - path: "/data/zookeeper/volume0"
+        bdev: "/dev/sdb6"
+        capacity:
+          start: 530000MB
+          end: 550000MB
+      - path: "/data/kafka/volume0"
+        bdev: "/dev/sdb7"
+        capacity:
+          start: 550000MB
+          end: 650000MB
+      name: "/dev/sdb"
+    - parts:
+      - path: "/nas"
+        bdev: "/dev/sdc1"
+        capacity:
+          start: 0MB
+          end: 6291456MB
+      name: "/dev/sdc"
+
+  tce_370:
+    - parts:
+      - path: "/data/monitor/volume0"
+        bdev: "/dev/sdb1"
+        capacity:
+          start: 0MB
+          end: 10000MB
+      - path: "/data/mysql/volume0"
+        bdev: "/dev/sdb2"
+        capacity:
+          start: 10000MB
+          end: 20000MB
+      - path: "/data/cassandras/volume0"
+        bdev: "/dev/sdb3"
+        capacity:
+          start: 20000MB
+          end: 90000MB
+      - path: "/data/mongodb/volume1"
+        bdev: "/dev/sdb4"
+        capacity:
+          start: 90000MB
+          end: 500000MB
+      - path: "/data/minio/volume0"
+        bdev: "/dev/sdb5"
+        capacity:
+          start: 500000MB
+          end: 530000MB
+      - path: "/data/zookeeper/volume0"
+        bdev: "/dev/sdb6"
+        capacity:
+          start: 530000MB
+          end: 550000MB
+      - path: "/data/kafka/volume0"
+        bdev: "/dev/sdb7"
+        capacity:
+          start: 550000MB
+          end: 650000MB
+      name: "/dev/sdb"
+    - parts:
+      - path: "/data1/zookeeper"
+        bdev: "/dev/sdc1"
+        capacity:
+          start: 0MB
+          end: 200000MB
+      - path: "/data1/kafka"
+        bdev: "/dev/sdc2"
+        capacity:
+          start: 2000000MB
+          end: 4000000MB
+      - path: "/data1/redis"
+        bdev: "/dev/sdc2"
+        capacity:
+          start: 4000000MB
+          end: 6000000MB
+      name: "/dev/sdc"
+
+  tce_380:
+    - parts:
+      - path: "/data/monitor/volume0"
+        bdev: "/dev/sdb1"
+        capacity:
+          start: 0MB
+          end: 10000MB
+      - path: "/data/mysql/volume0"
+        bdev: "/dev/sdb2"
+        capacity:
+          start: 10000MB
+          end: 20000MB
+      - path: "/data/cassandras/volume0"
+        bdev: "/dev/sdb3"
+        capacity:
+          start: 20000MB
+          end: 90000MB
+      - path: "/data/mongodb/volume1"
+        bdev: "/dev/sdb4"
+        capacity:
+          start: 90000MB
+          end: 500000MB
+      - path: "/data/minio/volume0"
+        bdev: "/dev/sdb5"
+        capacity:
+          start: 500000MB
+          end: 530000MB
+      - path: "/data/zookeeper/volume0"
+        bdev: "/dev/sdb6"
+        capacity:
+          start: 530000MB
+          end: 550000MB
+      - path: "/data/kafka/volume0"
+        bdev: "/dev/sdb7"
+        capacity:
+          start: 550000MB
+          end: 650000MB
+      name: "/dev/sdb"
+    - parts:
+      - path: "/data1/prometheus/volume0"
+        bdev: "/dev/sdc1"
+        capacity:
+          start: 0MB
+          end: 200000MB
+      - path: "/data1/grafana/volume0"
+        bdev: "/dev/sdc2"
+        capacity:
+          start: 2000000MB
+          end: 4000000MB
+      - path: "/data1/infuxdb/volume0"
+        bdev: "/dev/sdc3"
+        capacity:
+          start: 4000000MB
+          end: 6000000MB
+      name: "/dev/sdc"
