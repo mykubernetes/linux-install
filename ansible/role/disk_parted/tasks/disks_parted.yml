@@ -1,0 +1,30 @@
+---
+- name: "Disk parted | Set_fact disk_name"
+  set_fact:
+    disk_name: "{{ disk.name }}"
+    wipe_disk: "{{ disk.wipe|default(false) }}"
+    disk_name_script: "{{ disk.name | regex_replace('/', '_') }}"
+    upgrade: "{{ is_upgrade|default(false) }}"
+    dry_run: "{{ is_dry_run|default(false) }}"
+
+- name: "Disk parted | Write parted.sh file to /tmp"
+  template:
+    src: "parted.sh"
+    dest: "/tmp/parted_disk{{ disk_name_script }}.sh"
+    mode: 0755
+    owner: root
+    group: root
+  vars:
+    parts: "{{ disk.parts | to_json }}"
+    disk_name: "{{ disk_name }}"
+    wipe_disk: "{{ wipe_disk }}"
+    upgrade: "{{ upgrade }}"
+    dry_run: "{{ dry_run }}"
+
+- name: "Disk parted | Execute {{ disk_name }} parted.sh in /tmp"
+  shell: "/tmp/parted_disk{{ disk_name_script }}.sh >> /tmp/parted_disk.log"
+  register: parted_result
+
+- name: "Check parted disk {{ disk_name }} result"
+  fail: "Disk {{ disk_name }} parted scripts execute failed!"
+  when: parted_result.rc != 0
