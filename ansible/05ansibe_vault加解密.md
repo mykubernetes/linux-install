@@ -230,8 +230,11 @@ $ANSIBLE_VAULT;1.2;AES256;zsy
 ```
 
 
-## encrypt_string
+## 5、encrypt_string
 
+- 从2.3版本开始，使用encrypt_string子命令，可以加密`字符串`，通过加密字符串的功能，能够有效的隐藏敏感变量的值，比如，隐藏变量列表中密码变量的值
+
+### 1）创建包含密码的playbook
 ```
 # cat test.yml
 - hosts: test71
@@ -245,11 +248,7 @@ $ANSIBLE_VAULT;1.2;AES256;zsy
       msg: "{{test_passwd}}"
 ```
 
-
-```
-# ansible-vault encrypt_string 123456
-```
-
+### 2）使用`ansible-vault encrypt_string`命令对`123456`这个字符串进行加密，加密时会提示你输入密码，命令会将加密后的字符串输入到前台
 ```
 # ansible-vault encrypt_string 123456
 New Vault password:
@@ -263,6 +262,7 @@ Confirm New Vault password:
           6335
 ```
 
+### 3）复制这串文本，用这串文本替换playbook中的`123456`
 ```
 # cat test.yml
 - hosts: test71
@@ -282,12 +282,11 @@ Confirm New Vault password:
       msg: "{{test_passwd}}"
 ```
 
+### 4)运行带密码字符串的playbook和运行加密的文件一样，两条命令都可以。
 ```
 # ansible-playbook --ask-vault-pass test.yml
-# ansible-playbook --vault-id prompt test.yml
-```
 
-```
+
 # ansible-playbook --vault-id prompt test.yml
 Vault password (default):
  
@@ -310,13 +309,18 @@ PLAY RECAP **************************************
 test71                     : ok=3    changed=0    unreachable=0    failed=0
 ```
 
+### 5）加密字符串或者解密字符串时，可以使用`--vault-id`或者`--vault-password-file`选项指定`密码文件`，以免手动的输入加密时的密码
 ```
 # echo aaaa > pwdfile
 # ansible-vault encrypt_string --vault-id pwdfile 123456
+
+# 将密码写入剧本后可以通过密码文件执行playbook
 # ansible-playbook --vault-id pwdfile test.yml
 ```
+- 使用密码文件的方式是最常见的，因为我们不可能在自动化的过程中手动的输入密码进行解密，所以密码文件的权限一定要控制好，无论是放在git上或者放在jenkins上，都应该做好权限控制。
 
 
+### 6)`encrypt_string`子命令还有一个选项，能够设置加密后的字符串的变量名，它就是`--name`选项
 ```
 # ansible-vault encrypt_string --vault-id pwdfile --name test_passwd 123456
 test_passwd: !vault |
@@ -328,7 +332,9 @@ test_passwd: !vault |
           6264
 Encryption successful
 ```
+- 指定了变量名`test_passwd`，生成结果的格式就是`变量名：加密后的字符串`，其实与不使用`--name`选项时没有太大的区别，不过这样比较方便复制，你可以直接将生成的结果复制到playbook中
 
+### 7)字符串加密也可以做标记
 ```
 # ansible-vault encrypt_string --vault-id zsy@pwdfile --name test_passwd 123456
 ```
