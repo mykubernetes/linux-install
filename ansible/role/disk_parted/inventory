@@ -1,0 +1,4 @@
+node001 ansible_host=192.168.101.70 ansible_user=root ansible_ssh_pass='123456' 
+
+[nodes]
+node001
