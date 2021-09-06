@@ -256,6 +256,50 @@ include
     msg: "{{item}}--task2 in B.yml"
 ```
 
+```
+# ansible-playbook A.yml
+ 
+PLAY [test70] *************************************************
+ 
+TASK [include] *************************************************
+included: /testdir/ansible/B.yml for test70
+included: /testdir/ansible/B.yml for test70
+included: /testdir/ansible/B.yml for test70
+ 
+TASK [debug] *************************************************
+ok: [test70] => {
+    "msg": "1--task1 in B.yml"
+}
+ 
+TASK [debug] *************************************************
+ok: [test70] => {
+    "msg": "1--task2 in B.yml"
+}
+ 
+TASK [debug] *************************************************
+ok: [test70] => {
+    "msg": "2--task1 in B.yml"
+}
+ 
+TASK [debug] *************************************************
+ok: [test70] => {
+    "msg": "2--task2 in B.yml"
+}
+ 
+TASK [debug] *************************************************
+ok: [test70] => {
+    "msg": "3--task1 in B.yml"
+}
+ 
+TASK [debug] *************************************************
+ok: [test70] => {
+    "msg": "3--task2 in B.yml"
+}
+ 
+PLAY RECAP *************************************************
+test70                     : ok=9    changed=0    unreachable=0    failed=0
+```
+
 # 八、B.yml中循环调用了debug模块，而在A.yml中，又循环的调用了B.yml，当出现这种”双层循环”的情况时，当出现上述”双层循环”的情况时，内层item的信息为B.yml中的loop列表，而不是A.yml中的loop列表
 ```
 # cat A.yml
@@ -302,6 +346,40 @@ include
   - c
 ```
 
+```
+# ansible-playbook A.yml
+ 
+PLAY [test70] *************************************************
+ 
+TASK [include] *************************************************
+included: /testdir/ansible/B.yml for test70
+included: /testdir/ansible/B.yml for test70
+ 
+TASK [debug] *************************************************
+ok: [test70] => (item=a) => {
+    "msg": "1--a--task in B.yml"
+}
+ok: [test70] => (item=b) => {
+    "msg": "1--b--task in B.yml"
+}
+ok: [test70] => (item=c) => {
+    "msg": "1--c--task in B.yml"
+}
+ 
+TASK [debug] *************************************************
+ok: [test70] => (item=a) => {
+    "msg": "2--a--task in B.yml"
+}
+ok: [test70] => (item=b) => {
+    "msg": "2--b--task in B.yml"
+}
+ok: [test70] => (item=c) => {
+    "msg": "2--c--task in B.yml"
+}
+ 
+PLAY RECAP *************************************************
+test70                     : ok=4    changed=0    unreachable=0    failed=0
+```
 
 
 
