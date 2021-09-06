@@ -103,3 +103,39 @@ ERROR! Attempting to decrypt but no vault secrets found
 # ansible-playbook --vault-id prompt test.yml
 # ansible-playbook --ask-vault-pass test.yml
 ```
+
+14、2.4版本以后的ansible中，`--vault-id`选项支持同时使用多个密码文件进行解密
+```
+# cat test.yml
+- hosts: test70
+  tasks:
+  - debug:
+      msg: "message from test"
+  - include_tasks: test1.yml
+ 
+# cat test1.yml
+- debug:
+    msg: "message from test1"
+```
+
+```
+# echo "123123" > pwdfile
+# echo "123456" > pwdfile1
+```
+
+```
+# ansible-vault encrypt --vault-id pwdfile test.yml
+# ansible-vault encrypt --vault-id pwdfile1 test1.yml
+```
+
+```
+# ansible-playbook --vault-id pwdfile1 --vault-id pwdfile test.yml
+```
+
+```
+# ansible-vault decrypt --vault-id pwdfile1 --vault-id pwdfile test.yml test1.yml
+```
+
+```
+# ansible-vault view --vault-id prompt --vault-id prompt test.yml test1.yml
+```
