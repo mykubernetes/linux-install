@@ -327,13 +327,71 @@ debug:
       - name: Echo date_output
         command: touch /tmp/{{date_output.stdout}}
 ```
+- 注册变量也可以在之后的play操作同一主机时被调用到
 
+```
+---
+- hosts: test70
+  remote_user: root
+  vars:
+    testvar3: tv3
+  tasks:
+  - shell: "echo tv4"
+    register: testvar4
+  - debug:
+      msg: "{{testvar3}} -- {{testvar4.stdout}}"
+ 
+- hosts: test70
+  remote_user: root
+  tasks:
+  - name: other play get testvar4
+    debug:
+      msg: "{{testvar4.stdout}}"
+  - name: other play get testvar3
+    debug:
+      msg: "{{testvar3}}"
+```
 
+## 11、set_fact是一个模块，通过set_fact模块在tasks中定义变量
+```
+---
+- hosts: test70
+  remote_user: root
+  vars:
+    testvar1: test1_string
+  tasks:
+  - shell: "echo test2_string"
+    register: shellreturn
+  - set_fact:
+      testsf1: "{{testvar1}}"
+      testsf2: "{{shellreturn.stdout}}"
+  - debug:
+      msg: "{{testsf1}} {{testsf2}}"
+```
+- 通过set_fact模块创建的变量还有一个特殊性，通过set_fact创建的变量就像主机上的facts信息一样，可以在之后的play中被引用
 
-
-
-
-
+```
+---
+- hosts: test70
+  remote_user: root
+  vars:
+    testvar1: tv1
+  tasks:
+  - set_fact:
+      testvar2: tv2
+  - debug:
+      msg: "{{testvar1}} ----- {{testvar2}}"
+ 
+- hosts: test70
+  remote_user: root
+  tasks:
+  - name: other play get testvar2
+    debug:
+      msg: "{{testvar2}}"
+  - name: other play get testvar1
+    debug:
+      msg: "{{testvar1}}"
+```
 
 
 
