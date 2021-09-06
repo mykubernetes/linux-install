@@ -224,6 +224,7 @@ msg2=This is the second custom test message
 ```
 
 ```
+# 以通过ansible_local关键字过滤远程主机的local facts信息
 ansible test70 -m setup -a "filter=ansible_local"
 
 test70 | SUCCESS => {
