@@ -78,6 +78,16 @@
 }
 ```
 
+## 5)ansible批量设置免密登录
+```
+# ssh-keygen -t rsa 
+# ssh-copy-id 192.168.0.1          #本机ip
+# ansible all -m authorized_key -a "user=root exclusive=true manage_dir=true key='$(</root/.ssh/authorized_keys)'"
+
+#验证
+ssh 192.168.0.2            #其他机器ip
+```
+
 # 二、ansible常用模块
 
 ## 1、command 模块 默认模块
