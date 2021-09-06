@@ -1,0 +1,13 @@
+---
+- name: "Disk | Install parted"
+  package:
+    name: parted
+    state: present
+  when: tobe_parted_disks is defined
+  tags: ['disk']
+
+- name: "Disk | Parted each disk within rules"
+  include: disks_parted.yml disk={{ item }}
+  with_items: '{{ tobe_parted_disks }}'
+  when: tobe_parted_disks is defined
+  tags: ['disk']
