@@ -82,9 +82,34 @@ ansible testA -m debug -a "msg={{inventory_dir}}"
 
 ## 2、playbook一次性传入多个变量，变量之间用空格隔开
 ```
-ansible-playbook test.yml  --extra-vars 'pass_var="redhat" num_var="westos"'
+ansible-playbook test.yml --extra-vars "pass_var=cmdline pass var"
+ansible-playbook test.yml --extra-vars 'pass_var="redhat" num_var="westos"'
 ansible-playbook test.yml -e '{"pass_var":"test","num_var":"test1"}'
+ansible-playbook test.yml -e '{"countlist":["one","two","three","four"]}'
 ```
+
+命令行通过文件的方式传递变量
+```
+# cat /testdir/ansible/testvar
+testvar: testvarinfile
+countlist:
+- one
+- two
+- three
+- four
+
+
+---
+- hosts: test70
+  remote_user: root
+  tasks:
+  - name: "Passing Variables On The Command Line"
+    debug:
+      msg: "{{testvar}} {{countlist[0]}}"
+
+ansible-playbook test.yml -e "@/testdir/ansible/testvar"
+```
+
 
 ## 3、在playbook文件中的play使用变量
 
@@ -290,8 +315,18 @@ debug:
      msg: "Remote host memory information : {{ansible_memory_mb['real']}}"
 ```
 
+## 10、注册变量（register）
 
-
+```
+- hosts: webservers 
+    gather_facts: no
+    tasks:
+      - name: Get date 
+        command: date +"%F_%T"
+        register: date_output
+      - name: Echo date_output
+        command: touch /tmp/{{date_output.stdout}}
+```
 
 
 
