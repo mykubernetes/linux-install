@@ -189,3 +189,146 @@ $ANSIBLE_VAULT;1.2;AES256;zsy
 ```
 # ansible-vault encrypt --vault-id zsythink@prompt test.yml
 ```
+
+# 七、ansible-vault子命令
+
+## 1、create
+
+### 1)创建一个被加密的文件
+```
+# ansible-vault create test
+```
+- 命令后会提示你输入密码，确认密码，然后默认调用vi编辑器，输入的内容将会被保存到test文件中，并且在退出编辑器时自动将test文件加密。
+
+## 2、view
+
+### 1)查看已经被加密过的文件的原内容，不会对文件本身进行还原操作，只是查看原内容。
+```
+# ansible-vault view test.yml
+# ansible-vault view --vault-id pwdfile test.yml
+```
+
+## 3、edit
+
+### 1）直接修改被加密过的文件的原内容，相当于：先解密、修改原内容，再加密
+```
+# ansible-vault edit test.yml
+# ansible-vault edit --vault-id pwdfile test.yml
+```
+
+## 4、rekey
+
+### 1)修改被加密文件的密码
+```
+# ansible-vault rekey test.yml
+```
+- 一共会提示输入3次密码，第一次输入老密码，之后两次输入新密码。
+
+### 2)如果之前使用密码文件进行的加密，可以使用`--new-vault-id`或者`--new-vault-password-file`选项，通过这两个选项的任何一个，都可以指定新的密码文件。
+```
+# ansible-vault rekey --vault-id pwdfile --new-vault-id pwdfile1 test.yml
+```
+
+
+## encrypt_string
+
+```
+# cat test.yml
+- hosts: test71
+  vars:
+    test_user: "testuser"
+    test_passwd: "123456"
+  tasks:
+  - debug:
+      msg: "{{test_user}}"
+  - debug:
+      msg: "{{test_passwd}}"
+```
+
+
+```
+# ansible-vault encrypt_string 123456
+```
+
+```
+# ansible-vault encrypt_string 123456
+New Vault password:
+Confirm New Vault password:
+!vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          30316633646364663764333666383437373439353538353336623532323131623739353663653637
+          3430626637386231366236643034643365323738336231330a326534623039363030393739663237
+          65623635616666656233333337636439366535383334393138623231613035373133323832383335
+          3737386234363761350a343839326663626664396436336465393862613237393864316533663533
+          6335
+```
+
+```
+# cat test.yml
+- hosts: test71
+  vars:
+    test_user: "testuser"
+    test_passwd: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          30316633646364663764333666383437373439353538353336623532323131623739353663653637
+          3430626637386231366236643034643365323738336231330a326534623039363030393739663237
+          65623635616666656233333337636439366535383334393138623231613035373133323832383335
+          3737386234363761350a343839326663626664396436336465393862613237393864316533663533
+          6335
+  tasks:
+  - debug:
+      msg: "{{test_user}}"
+  - debug:
+      msg: "{{test_passwd}}"
+```
+
+```
+# ansible-playbook --ask-vault-pass test.yml
+# ansible-playbook --vault-id prompt test.yml
+```
+
+```
+# ansible-playbook --vault-id prompt test.yml
+Vault password (default):
+ 
+PLAY [test71] *************************************
+ 
+TASK [Gathering Facts] *****************************
+ok: [test71]
+ 
+TASK [debug] *************************************
+ok: [test71] => {
+    "msg": "testuser"
+}
+ 
+TASK [debug] **************************************
+ok: [test71] => {
+    "msg": "123456"
+}
+ 
+PLAY RECAP **************************************
+test71                     : ok=3    changed=0    unreachable=0    failed=0
+```
+
+```
+# echo aaaa > pwdfile
+# ansible-vault encrypt_string --vault-id pwdfile 123456
+# ansible-playbook --vault-id pwdfile test.yml
+```
+
+
+```
+# ansible-vault encrypt_string --vault-id pwdfile --name test_passwd 123456
+test_passwd: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          36396366336238376662353664383836316366383937623830626635613063343764333962376466
+          3835646161363364303563373438643732626231303564320a393233333461663562383733643166
+          62313362623838336433303032376565343264356665323832623565653631386536383762633764
+          3961613265366336300a376564633034376238363664653565316163313739343639643565306665
+          6264
+Encryption successful
+```
+
+```
+# ansible-vault encrypt_string --vault-id zsy@pwdfile --name test_passwd 123456
+```
