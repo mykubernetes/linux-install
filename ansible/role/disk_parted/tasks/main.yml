@@ -1,3 +1,7 @@
+- name: set parted env
+  set_fact:
+    disk_parted_rules: "{{ disk_parted_rules if disk_parted_rules is defined else ( default_disk_parted_rules | default([]) ) }}"
+
 - debug:
     msg: "deployment mode is : {{ deployment_mode }}"
   tags: ['disk']
