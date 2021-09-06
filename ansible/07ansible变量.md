@@ -25,6 +25,11 @@ ansible变量
    - name: copy file
      copy: content={{ ansible_env }} dest=/tmp/ansible.env
 ```
+- `ansible_all_ipv4_addresses`表示远程主机中的所有ipv4地址
+- `ansible_distribution`表示远程主机的系统发行版
+- `ansible_distribution_version`表示远程主机的系统版本号
+- `ansible_ens35`表示远程主机ens35网卡的相关信息
+- `ansible_memory_mb`表示远程主机的内存配置信息
 
 
 ## 2、ansible中的内置变量
@@ -155,15 +160,86 @@ ftp_packages: vsftpd-3.0.2
         state: present
 ```
 
+## 6、`vars_files`也可以引入多个变量文件，每个被引入的文件都需要以`- `开头
+```
+---
+- hosts: node02
+  remote_user: root
+  vars_files:
+  - /testdir/ansible/nginx_vars.yml
+  - /testdir/ansible/other_vars.yml
+  tasks:
+  - name: task1
+    file:
+      path={{nginx.conf80}}
+      state=touch
+  - name: task2
+    file:
+      path={{nginx['conf8080']}}
+      state=touch
+```
 
 
+## 7、`vars`关键字和`vars_files`关键字可以同时使用
+```
+---
+- hosts: node02
+  remote_user: root
+  vars:
+  - conf90: /etc/nginx/conf.d/90.conf
+  vars_files:
+  - /testdir/ansible/nginx_vars.yml
+  - /testdir/ansible/other_vars.yml
+  tasks:
+  - name: task1
+    file:
+      path={{nginx.conf80}}
+      state=touch
+  - name: task2
+    file:
+      path={{nginx['conf8080']}}
+      state=touch
 
+```
 
+## 8、ansible默认会去目标主机的/etc/ansible/facts.d目录下查找主机中的自定义信息
 
+```
+cat  /etc/ansible/facts.d/testinfo.fact
+# INI格式
+# cat testinfo.fact
+[testmsg]
+msg1=This is the first custom test message
+msg2=This is the second custom test message
+```
 
+```
+#json格式
+{
+   "testmsg":{
+       "msg1":"This is the first custom test message",
+       "msg2":"This is the second custom test message"
+   }
+}
+```
 
+```
+ansible test70 -m setup -a "filter=ansible_local"
 
-
+test70 | SUCCESS => {
+   "ansible_facts": {
+       "ansible_local": {
+           "testinfo": {
+               "testmsg": {
+                   "msg1": "This is the first custom test message",
+                   "msg2": "This is the second custom test message"
+               }
+           }
+       }
+   },
+   "changed": false
+}
+```
 
 
 
