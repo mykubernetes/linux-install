@@ -242,13 +242,53 @@ test70 | SUCCESS => {
 }
 ```
 
+## 9、debug模块的获取变量信息
 
+1)通过debug模块直接输出变量信息需要使用var参数
+```
+---
+- hosts: test70
+  remote_user: root
+  vars:
+    testvar: value of test variable
+  tasks:
+  - name: debug demo
+    debug:
+      var: testvar
+```
 
+2)使用debug的msg参数时可以引用变量的值
+```
+---
+- hosts: test70
+  remote_user: root
+  vars:
+    testvar: testv
+  tasks:
+  - name: debug demo
+    debug:
+      msg: "value of testvar is : {{testvar}}"
+```
 
+3)通过`ansible_memory_mb`关键字获取远程主机的内存信息
+```
+---
+- hosts: test70
+  remote_user: root
+  tasks:
+  - name: debug demo
+    debug:
+      msg: "Remote host memory information: {{ansible_memory_mb}}"
+```
 
-
-
-
+```
+语法一示例：
+debug:
+     msg: "Remote host memory information : {{ansible_memory_mb.real}}"
+语法二示例：
+debug:
+     msg: "Remote host memory information : {{ansible_memory_mb['real']}}"
+```
 
 
 
