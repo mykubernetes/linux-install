@@ -33,4 +33,4 @@ duo_security | Install Duo Unix SSH Integration----------------------------3.37s
 loggly | Install TLS version-----------------------------------------------3.36s
 ```
 
-**在ansible2.2版本以上，ansible自带了/usr/lib/python2.6/site-packages/ansible/plugins/callback/profile_tasks.py文件，所以，只需在callback_whitelist开启这个插件，从而不需要下载这个文件，就可以实现统计任务处理时间的功能。
+**在ansible2.2版本以上，ansible自带了/usr/lib/python2.6/site-packages/ansible/plugins/callback/profile_tasks.py文件，所以，只需在callback_whitelist开启这个插件，从而不需要下载这个文件，就可以实现统计任务处理时间的功能。**
