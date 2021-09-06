@@ -1,1 +1,26 @@
+- debug:
+    msg: "deployment mode is : {{ deployment_mode }}"
+  tags: ['disk']
+
+- name: "Set disk parted rule when disk_parted_rule is defined"
+  set_fact:
+    matched_rule: '{{ disk_parted_rules.get(disk_parted_rule) }}'
+  when:
+    - disk_parted_rules is defined
+    - disk_parted_rule is defined and disk_parted_rules.get(disk_parted_rule)
+  tags: ['disk']
+
+- name: "Set disk parted rule when rules match deployment_mode"
+  set_fact:
+    matched_rule: '{{ disk_parted_rules.get(deployment_mode) }}'
+  when:
+    - disk_parted_rules is defined
+    - deployment_mode is defined and disk_parted_rules.get(deployment_mode)
+  tags: ['disk']
+
+- import_tasks: disks.yml
+  vars:
+    tobe_parted_disks: '{{ matched_rule }}'
+  when:
+    - matched_rule is defined
 
