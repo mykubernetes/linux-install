@@ -1,3 +1,6 @@
+
+https://docs.ansible.com/ansible/2.4/playbooks_tests.html#tests
+
 # 一、文件存在判断
 
 | 用法 | 描述 |
