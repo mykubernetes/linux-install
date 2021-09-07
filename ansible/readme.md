@@ -14,7 +14,7 @@ https://jinja.palletsprojects.com/en/3.0.x/templates/#list-of-builtin-filters
 
 
 
-
+```
 - name: "Kafka | Wait for kafka nodes ready"
   vars:
     - replicas: "{{ item.get('replicas') or kafka_default_replicas }}"
@@ -25,7 +25,7 @@ https://jinja.palletsprojects.com/en/3.0.x/templates/#list-of-builtin-filters
   until: "{{ result.stdout|int }} == {{ replicas|int}}"
   retries: 30
   delay: 20
-
+```
 
 
 
