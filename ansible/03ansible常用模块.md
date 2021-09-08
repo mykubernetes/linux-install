@@ -835,10 +835,10 @@ $6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBo
 
 ### 2)把文件中的所有ASM替换成asm
 ```
-ansible test70 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm'
+ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm'
 ```
 
 ### 3)把文件中的所有ASM替换成asm，但是在操作文件之前进行备份。
 ```
-ansible test70 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup=yes'
+ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup=yes'
 ```
