@@ -4,13 +4,13 @@
 | 循环语句关键字 | 描述 |
 |--------------|-------|
 | [with_items](#with_items) | 简单的列表循环 |
-| with_flattened | 与with_items类似 |
-| with_list | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
-| with_together | 可以将两个列表中的元素`对齐合并` | 
-| with_cartesian | 关键字的作用就是将每个小列表中的元素按照`笛卡尔的方式`组合后，循环的处理每个组合 |
-| with_indexed_items | 在循环处理列表时为列表中的每一项添加`数字索引`，`索引`从0开始 |
-| with_sequence | 按照顺序生成数字序列，`start=1 end=5 stride=1`，其中start=1表示从1开始，end=5表示到5结束， stride=1表示步长为1 |
-| with_random_choice | 可以从列表的多个值中随机返回一个值 |
+| [with_flattened](#with_flattened) | 与with_items类似 |
+| [with_list](#with_list) | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
+| [with_together](#with_together) | 可以将两个列表中的元素`对齐合并` | 
+| [with_cartesian](#with_cartesian) | 关键字的作用就是将每个小列表中的元素按照`笛卡尔的方式`组合后，循环的处理每个组合 |
+| [with_indexed_items](#with_indexed_items) | 在循环处理列表时为列表中的每一项添加`数字索引`，`索引`从0开始 |
+| [with_sequence](#with_sequence) | 按照顺序生成数字序列，`start=1 end=5 stride=1`，其中start=1表示从1开始，end=5表示到5结束， stride=1表示步长为1 |
+| [with_random_choice](#with_random_choice) | 可以从列表的多个值中随机返回一个值 |
 | with_nested | 嵌套循环 |
 | with_dict | 循环字典 |
 | with_fileglob | 循环指定目录中的所有文件 |
@@ -22,7 +22,7 @@
 - with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 
 
-## with_items
+# with_items
 
 ## 一、with_items 循环
 
@@ -195,6 +195,7 @@ ok: [test70] => (item=test71) => {
         {% endfor %}"
 ```
 
+# with_list
 
 # 二、with_list 循环
 
@@ -309,6 +310,8 @@ ok: [test70] => (item=[u'a', u'b']) => {
 ```
 
 
+# with_flattened
+
 ## 三、with_flattened 循环
 
 - 当处理这种嵌套的列表时，如果想要实现”拉平”的效果，还能使用另外一个关键字，它就是`with_flattened`关键字
@@ -328,6 +331,7 @@ ok: [test70] => (item=[u'a', u'b']) => {
 
 - `with_list`、`with_items`、`with_flattened`之间的区别，在处理简单的单层列表时，他们没有区别，但是当处理嵌套的多层列表时，`with_items`与`with_flattened`会将嵌套列表`拉平展开`，循环的处理每个元素，而with_list只会处理最外层的列表，将最外层的列表中的每一项循环处理。
 
+# with_together
 
 ## 四、with_together 循环可以将两个列表中的元素`对齐合并`
 
@@ -384,6 +388,7 @@ ok: [test70] => (item=[3, u'c']) => {
 - 第一个小列表中的第2个值与第二个小列表中的第2个值合并在一起输出
 - 第一个小列表中的第3个值与第二个小列表中的第3个值合并在一起输出
 
+# with_cartesian
 
 ## 五、with_cartesian 循环
 
@@ -486,6 +491,8 @@ ok: [test70] => (item=[u'c', u'test2']) => {
     - [ a, b, c ]
     - [ test1, test2 ]
 ```
+
+# with_indexed_items
 
 ## 六、with_indexed_items循环
 
@@ -717,8 +724,9 @@ ok: [test70] => (item=(4, u'test6')) => {
 - 当多加了一层嵌套以后，`with_indexed_items`并不像`with_flattened`一样将嵌套的列表`完全拉平`，第二层列表中的项如果仍然是一个列表，`with_indexed_items`则不会拉平这个列表，而是将其当做一个整体进行编号。
 
 
+# with_sequence
 
-## 六、with_sequence
+## 七、with_sequence
 
 ### 1)设置起始值为1，最大五，步长为1
 
@@ -860,7 +868,9 @@ ok: [test70] => (item=number is 6.00) => {
 }
 ```
 
-## 七、with_random_choice循环
+# with_random_choice
+
+## 八、with_random_choice循环
 ```
 ---
 - hosts: test70
