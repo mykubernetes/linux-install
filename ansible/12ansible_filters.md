@@ -268,3 +268,4 @@ http://jinja.pocoo.org/docs/2.10/templates/#builtin-filters
   - file: dest={{item.path}} state=touch mode={{item.mode | default(omit)}}
     with_items: "{{ paths }}"
 ```
+- omit 是`省略`,有就用，没有就不用，可以有，也可以没有
