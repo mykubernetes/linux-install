@@ -7,6 +7,7 @@
 | with_flattened | 与with_items类似 |
 | with_list | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
 | with_together | 可以将两个列表中的元素`对齐合并` | 
+| with_cartesian | 关键字的作用就是将每个小列表中的元素按照`笛卡尔的方式`组合后，循环的处理每个组合 |
 | with_nested | 嵌套循环 |
 | with_dict | 循环字典 |
 | with_fileglob | 循环指定目录中的所有文件 |
@@ -375,3 +376,106 @@ ok: [test70] => (item=[3, u'c']) => {
 - 第一个小列表中的第1个值与第二个小列表中的第1个值合并在一起输出
 - 第一个小列表中的第2个值与第二个小列表中的第2个值合并在一起输出
 - 第一个小列表中的第3个值与第二个小列表中的第3个值合并在一起输出
+
+
+## 五、with_cartesian
+
+### 1）第一个小列表中的每个元素与第二个小列表中的每个元素都”两两组合在了一起”
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_cartesian:
+    - [ a, b, c ]
+    - [ test1, test2 ]
+```
+
+```
+TASK [debug] ***********************************
+ok: [test70] => (item=[u'a', u'test1']) => {
+    "changed": false,
+    "item": [
+        "a",
+        "test1"
+    ],
+    "msg": [
+        "a",
+        "test1"
+    ]
+}
+ok: [test70] => (item=[u'a', u'test2']) => {
+    "changed": false,
+    "item": [
+        "a",
+        "test2"
+    ],
+    "msg": [
+        "a",
+        "test2"
+    ]
+}
+ok: [test70] => (item=[u'b', u'test1']) => {
+    "changed": false,
+    "item": [
+        "b",
+        "test1"
+    ],
+    "msg": [
+        "b",
+        "test1"
+    ]
+}
+ok: [test70] => (item=[u'b', u'test2']) => {
+    "changed": false,
+    "item": [
+        "b",
+        "test2"
+    ],
+    "msg": [
+        "b",
+        "test2"
+    ]
+}
+ok: [test70] => (item=[u'c', u'test1']) => {
+    "changed": false,
+    "item": [
+        "c",
+        "test1"
+    ],
+    "msg": [
+        "c",
+        "test1"
+    ]
+}
+ok: [test70] => (item=[u'c', u'test2']) => {
+    "changed": false,
+    "item": [
+        "c",
+        "test2"
+    ],
+    "msg": [
+        "c",
+        "test2"
+    ]
+}
+```
+
+
+### 2）在目标主机的测试目录中创建a、b、c三个目录，这三个目录都有相同的子目录，它们都有test1和test2两个子目录
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - file:
+      state: directory
+      path: "/testdir/testdir/{{ item.0 }}/{{ item.1 }}"
+    with_cartesian:
+    - [ a, b, c ]
+    - [ test1, test2 ]
+```
