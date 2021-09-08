@@ -3,7 +3,7 @@
 
 | 循环语句关键字 | 描述 |
 |--------------|-------|
-| with_items  | 简单的列表循环 |
+| with_items | 简单的列表循环 |
 | with_flattened | 与with_items类似 |
 | with_list | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
 | with_together | 可以将两个列表中的元素`对齐合并` | 
