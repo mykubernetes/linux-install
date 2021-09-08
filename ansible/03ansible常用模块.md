@@ -819,3 +819,26 @@ $6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBo
 ```
 # ansible node02  -m user -a 'name=http generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa' -i hosts
 ```
+
+## 17、replace模块
+
+- replace模块可以根据我们指定的正则表达式替换文件中的字符串，文件中所有被正则匹配到的字符串都会被替换。
+
+### 1)user模块常用参数说明
+| 参数 | 参数说明 |
+|------|--------|
+| path | 必须参数，指定要操作的文件，2.3版本之前，只能使用dest, destfile, name指定要操作的文件，2.4版本中，仍然可以使用这些参数名，这些参数名作为path参数的别名使用 |
+| regexp |  必须参数，指定一个python正则表达式，文件中与正则匹配的字符串将会被替换 |
+| replace | 指定最终要替换成的字符串 |
+| backup | 是否在修改文件之前对文件进行备份，最好设置为yes |
+
+
+### 2)把文件中的所有ASM替换成asm
+```
+ansible test70 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm'
+```
+
+### 3)把文件中的所有ASM替换成asm，但是在操作文件之前进行备份。
+```
+ansible test70 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup=yes'
+```
