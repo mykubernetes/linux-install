@@ -791,7 +791,6 @@ ansible node02 -m group -a "name=news state=absent" -i hosts
 | update_password | 1、always当前的加密过的密码字符串不一致，则直接更新用户的密码 2、on_create当前的加密过的密码字符串不一致，则不会更新用户的密码字符串，保持之前的密码设定，如果新创建的用户为on_create，会将密码设置为password的值。默认值即为always |
 | generate_ssh_key | 此参数默认值为no，如果设置为yes，表示为对应的用户生成ssh密钥对，默认在用户家目录的./ssh目录中生成名为id_rsa的私钥和名为id_rsa.pub的公钥，如果同名的密钥已经存在与对应的目录中，原同名密钥并不会被覆盖(不做任何操作)  |
 
-
 ### 2)创建joh用户，uid是1040，主要的组是adm
 ```
 ansible node02 -m user -a "name=joh uid=1040 group=adm state=present system=no" -i hosts
@@ -825,6 +824,7 @@ $6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBo
 - replace模块可以根据我们指定的正则表达式替换文件中的字符串，文件中所有被正则匹配到的字符串都会被替换。
 
 ### 1)user模块常用参数说明
+
 | 参数 | 参数说明 |
 |------|--------|
 | path | 必须参数，指定要操作的文件，2.3版本之前，只能使用dest, destfile, name指定要操作的文件，2.4版本中，仍然可以使用这些参数名，这些参数名作为path参数的别名使用 |
@@ -842,3 +842,18 @@ ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm'
 ```
 ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup=yes'
 ```
+
+## 18、blockinfile模块
+
+- blockinfile模块可以帮助我们在指定的文件中插入`一段文本`，这段文本是被标记过的，换句话说就是，我们在这段文本上做了记号，以便在以后的操作中可以通过`标记`找到这段文本，然后修改或者删除它
+
+| 参数 | 参数说明 |
+|------|--------|
+| path参 | 必须参数，指定要操作的文件。 |
+| block | 此参数用于指定我们想要操作的那”一段文本”，此参数有一个别名叫”content”，使用content或block的作用是相同的。 |
+| marker | 假如我们想要在指定文件中插入一段文本，ansible会自动为这段文本添加两个标记，一个开始标记，一个结束标记，默认情况下，开始标记为# BEGIN ANSIBLE MANAGED BLOCK，结束标记为# END ANSIBLE MANAGED BLOCK，我们可以使用marker参数自定义”标记”，比如，marker=#{mark}test ，这样设置以后，开始标记变成了# BEGIN test，结束标记变成了# END test，没错，{mark}会自动被替换成开始标记和结束标记中的BEGIN和END，我们也可以插入很多段文本，为不同的段落添加不同的标记，下次通过对应的标记即可找到对应的段落。 |
+| state | state参数有两个可选值，present与absent，默认情况下，我们会将指定的一段文本”插入”到文件中，如果对应的文件中已经存在对应标记的文本，默认会更新对应段落，在执行插入操作或更新操作时，state的值为present，默认值就是present，如果对应的文件中已经存在对应标记的文本并且将state的值设置为absent，则表示从文件中删除对应标记的段落。 |
+| insertafter | 在插入一段文本时，默认会在文件的末尾插入文本，如果你想要将文本插入在某一行的后面，可以使用此参数指定对应的行，也可以使用正则表达式(python正则)，表示将文本插入在符合正则表达式的行的后面，如果有多行文本都能够匹配对应的正则表达式，则以最后一个满足正则的行为准，此参数的值还可以设置为EOF，表示将文本插入到文档末尾。 |
+| insertbefore | 在插入一段文本时，默认会在文件的末尾插入文本，如果你想要将文本插入在某一行的前面，可以使用此参数指定对应的行，也可以使用正则表达式(python正则)，表示将文本插入在符合正则表达式的行的前面，如果有多行文本都能够匹配对应的正则表达式，则以最后一个满足正则的行为准，此参数的值还可以设置为BOF，表示将文本插入到文档开头。 |
+| backup | 是否在修改文件之前对文件进行备份 |
+| create | 当要操作的文件并不存在时，是否创建对应的文件 |
