@@ -169,7 +169,22 @@ ok: [test70] => (item=test71) => {
     with_items: "{{returnvalue.results}}"
 ```
 
-
+```
+---
+- hosts: test70
+  gather_facts: no
+  tasks:
+  - shell: "{{item}}"
+    with_items:
+    - "ls /opt"
+    - "ls /home"
+    register: returnvalue
+  - debug:
+      msg:
+       "{% for i in returnvalue.results %}
+          {{ i.stdout }}
+        {% endfor %}"
+```
 
 
 
