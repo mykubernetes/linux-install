@@ -1,5 +1,5 @@
-handlers
----
+# handlers
+
 - notify：在任务结束时触发  
 - handlers：由特定条件触发Tasks  
 ```
@@ -50,9 +50,10 @@ listen 可以把listen理解成"组名",可以把多个handler分成"组"
           state=touch
 ```
 
-meta模块
+# meta模块
 
-默认情况下，所有task执行完毕后，才会执行各个handler，并不是执行完某个task后，立即执行对应的handler，如果想要在执行完某些task以后立即执行对应的handler，则需要使用meta模块
+- 默认情况下，所有task执行完毕后，才会执行各个handler，并不是执行完某个task后，立即执行对应的handler，如果想要在执行完某些task以后立即执行对应的handler，则需要使用meta模块
+
 ```
 - hosts: testB
   remote_user: root
@@ -85,8 +86,9 @@ meta模块
           state=touch
 ```
 
-force_handelers强制执行handlers  
-通常任务失败会终止，force_handelers可以在任务失败后任然执行处理程序，要写在剧本中
+# force_handelers强制执行handlers  
+
+- 通常任务失败会终止，force_handelers可以在任务失败后任然执行处理程序，要写在剧本中
 ```
 - hosts
   force_handelers: yes
