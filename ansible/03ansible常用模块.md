@@ -648,9 +648,9 @@ ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
 
 | 参数 | 参数说明 |
 |------|--------|
-| name=service name | 服务的名称 |
-| state=参数 | 停止服务 服务状态信息为过去时stared/stoped/restarted/reloaded |
-| enabled=yes | 设置开机自启动 |
+| name | 服务的名称 |
+| state | 服务状态信息为过去时stared/stoped/restarted/reloaded |
+| enabled | 设置开机自启动yes、no |
 
 ### 2)启动Httpd服务
 ```
