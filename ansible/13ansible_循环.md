@@ -8,6 +8,7 @@
 | with_list | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
 | with_together | 可以将两个列表中的元素`对齐合并` | 
 | with_cartesian | 关键字的作用就是将每个小列表中的元素按照`笛卡尔的方式`组合后，循环的处理每个组合 |
+| with_indexed_items | 在循环处理列表时为列表中的每一项添加`数字索引`，`索引`从0开始 |
 | with_nested | 嵌套循环 |
 | with_dict | 循环字典 |
 | with_fileglob | 循环指定目录中的所有文件 |
@@ -19,7 +20,7 @@
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
 - with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 
-## 一、with_items循环
+## 一、with_items 循环
 
 ### 1）假设有一个清单配置
 ```
@@ -191,7 +192,7 @@ ok: [test70] => (item=test71) => {
 ```
 
 
-# 二、with_list循环
+# 二、with_list 循环
 
 ## 1）with_list和with_items的区别
 
@@ -304,7 +305,9 @@ ok: [test70] => (item=[u'a', u'b']) => {
 ```
 
 
-## 三、当处理这种嵌套的列表时，如果想要实现”拉平”的效果，我们还能使用另外一个关键字，它就是`with_flattened`关键字
+## 三、with_flattened 循环
+
+- 当处理这种嵌套的列表时，如果想要实现”拉平”的效果，还能使用另外一个关键字，它就是`with_flattened`关键字
 
 ```
 ---
@@ -322,7 +325,7 @@ ok: [test70] => (item=[u'a', u'b']) => {
 - `with_list`、`with_items`、`with_flattened`之间的区别，在处理简单的单层列表时，他们没有区别，但是当处理嵌套的多层列表时，`with_items`与`with_flattened`会将嵌套列表`拉平展开`，循环的处理每个元素，而with_list只会处理最外层的列表，将最外层的列表中的每一项循环处理。
 
 
-## 四、with_together可以将两个列表中的元素`对齐合并`
+## 四、with_together 循环可以将两个列表中的元素`对齐合并`
 
 ```
 ---
@@ -378,7 +381,7 @@ ok: [test70] => (item=[3, u'c']) => {
 - 第一个小列表中的第3个值与第二个小列表中的第3个值合并在一起输出
 
 
-## 五、with_cartesian
+## 五、with_cartesian 循环
 
 ### 1）第一个小列表中的每个元素与第二个小列表中的每个元素都”两两组合在了一起”
 ```
@@ -478,4 +481,150 @@ ok: [test70] => (item=[u'c', u'test2']) => {
     with_cartesian:
     - [ a, b, c ]
     - [ test1, test2 ]
+```
+
+## 六、with_indexed_items循环
+
+### 1)with_indexed_items 在循环的时候会添加索引索引
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_indexed_items:
+    - test1
+    - test2
+    - test3
+```
+
+```
+TASK [debug] **********************************
+ok: [test70] => (item=(0, u'test1')) => {
+    "changed": false,
+    "item": [
+        0,
+        "test1"
+    ],
+    "msg": [
+        0,
+        "test1"
+    ]
+}
+ok: [test70] => (item=(1, u'test2')) => {
+    "changed": false,
+    "item": [
+        1,
+        "test2"
+    ],
+    "msg": [
+        1,
+        "test2"
+    ]
+}
+ok: [test70] => (item=(2, u'test3')) => {
+    "changed": false,
+    "item": [
+        2,
+        "test3"
+    ],
+    "msg": [
+        2,
+        "test3"
+    ]
+}
+```
+
+### 2)处理每一项的时候同时获取到对应的编号
+
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "index is : {{ item.0 }} , value is {{ item.1 }}"
+    with_indexed_items:
+    - test1
+    - test2
+    - test3
+```
+
+### 3)多层嵌套列表显示索引编号
+
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "index is : {{ item.0 }} , value is {{ item.1 }}"
+    with_indexed_items:
+    - [ test1, test2 ]
+    - [ test3, test4, test5 ]
+    - [ test6, test7 ]
+```
+
+```
+TASK [debug] *****************************
+ok: [test70] => (item=(0, u'test1')) => {
+    "changed": false,
+    "item": [
+        0,
+        "test1"
+    ],
+    "msg": "index is : 0 , value is test1"
+}
+ok: [test70] => (item=(1, u'test2')) => {
+    "changed": false,
+    "item": [
+        1,
+        "test2"
+    ],
+    "msg": "index is : 1 , value is test2"
+}
+ok: [test70] => (item=(2, u'test3')) => {
+    "changed": false,
+    "item": [
+        2,
+        "test3"
+    ],
+    "msg": "index is : 2 , value is test3"
+}
+ok: [test70] => (item=(3, u'test4')) => {
+    "changed": false,
+    "item": [
+        3,
+        "test4"
+    ],
+    "msg": "index is : 3 , value is test4"
+}
+ok: [test70] => (item=(4, u'test5')) => {
+    "changed": false,
+    "item": [
+        4,
+        "test5"
+    ],
+    "msg": "index is : 4 , value is test5"
+}
+ok: [test70] => (item=(5, u'test6')) => {
+    "changed": false,
+    "item": [
+        5,
+        "test6"
+    ],
+    "msg": "index is : 5 , value is test6"
+}
+ok: [test70] => (item=(6, u'test7')) => {
+    "changed": false,
+    "item": [
+        6,
+        "test7"
+    ],
+    "msg": "index is : 6 , value is test7"
+}
 ```
