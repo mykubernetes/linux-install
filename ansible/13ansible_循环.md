@@ -629,6 +629,8 @@ ok: [test70] => (item=(6, u'test7')) => {
 }
 ```
 
+### 4)`with_indexed_items`会将嵌套的两层列表`拉平`，`拉平`后按照顺序为每一项编号,`拉平`效果跟`with_flattened`效果类似.但是，当处理这种嵌套的多层列表时，`with_indexed_items`的拉平效果与`with_flattened`的不完全一致
+
 ```
 ---
 - hosts: test70
@@ -643,7 +645,7 @@ ok: [test70] => (item=(6, u'test7')) => {
     - [ test6 ]
 ```
 
-### 4)`with_indexed_items`会将嵌套的两层列表`拉平`，`拉平`后按照顺序为每一项编号,`拉平`效果跟`with_flattened`效果类似.但是，当处理这种嵌套的多层列表时，`with_indexed_items`的拉平效果与`with_flattened`的不完全一致
+
 ```
 TASK [debug] ********************************
 ok: [test70] => (item=(0, u'test1')) => {
