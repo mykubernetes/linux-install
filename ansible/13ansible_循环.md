@@ -4,6 +4,8 @@
 | 循环语句关键字 | 描述 |
 |--------------|-------|
 | with_items  | 简单的列表循环 |
+| with_flattened | 与with_items类似 |
+| with_list | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
 | with_nested | 嵌套循环 |
 | with_dict | 循环字典 |
 | with_fileglob | 循环指定目录中的所有文件 |
@@ -15,7 +17,7 @@
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
 - with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 
-## 1、with_items循环
+## 一、with_items循环
 
 ### 1）假设有一个清单配置
 ```
@@ -187,21 +189,135 @@ ok: [test70] => (item=test71) => {
 ```
 
 
+# 二、with_list循环
+
+## 1）with_list和with_items的区别
+
+### with_items将小列表`展开拉平`后一并将小列表中的元素循环输出。
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_items:
+    - [ 1, 2, 3 ]
+    - [ a, b ]
+```
+
+```
+TASK [debug] ********************************
+ok: [test70] => (item=1) => {
+    "changed": false,
+    "item": 1,
+    "msg": 1
+}
+ok: [test70] => (item=2) => {
+    "changed": false,
+    "item": 2,
+    "msg": 2
+}
+ok: [test70] => (item=3) => {
+    "changed": false,
+    "item": 3,
+    "msg": 3
+}
+ok: [test70] => (item=a) => {
+    "changed": false,
+    "item": "a",
+    "msg": "a"
+}
+ok: [test70] => (item=b) => {
+    "changed": false,
+    "item": "b",
+    "msg": "b"
+}
+```
+
+### with_list每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中，最终被debug作为一个小整体输出了
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_list:
+    - [ 1, 2, 3 ]
+    - [ a, b ]
+```
 
 
+```
+TASK [debug] *******************************
+ok: [test70] => (item=[1, 2, 3]) => {
+    "changed": false,
+    "item": [
+        1,
+        2,
+        3
+    ],
+    "msg": [
+        1,
+        2,
+        3
+    ]
+}
+ok: [test70] => (item=[u'a', u'b']) => {
+    "changed": false,
+    "item": [
+        "a",
+        "b"
+    ],
+    "msg": [
+        "a",
+        "b"
+    ]
+}
+```
+
+- 当处理单层的简单列表时，with_list与with_items没有任何区别，只有在处理上例中的”嵌套列表”时，才会体现出区别，区别就是，with_items会将嵌套在内的小列表”拉平”，拉平后循环处理所有元素，而with_list则不会”拉平”嵌套的列表，with_list只会循环的处理列表（最外层列表）中的每一项。
 
 
+### 定义嵌套的列表
+```
+    with_list:
+    -
+      - 1
+      - 2
+      - 3
+    -
+      - a
+      - b
+```
+
+### 上述方法通过缩进对齐的方式，定义出了一个嵌套有列表的列表，与如下定义完全相同
+```
+    with_list:
+    - [ 1, 2, 3 ]
+    - [ a, b ]
+```
 
 
+## 三、当处理这种嵌套的列表时，如果想要实现”拉平”的效果，我们还能使用另外一个关键字，它就是`with_flattened`关键字
 
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_flattened:
+    - [ 1, 2, 3 ]
+    - [ a, b ]
+```
 
-
-
-
-
-
-
-
+- `with_list`、`with_items`、`with_flattened`之间的区别，在处理简单的单层列表时，他们没有区别，但是当处理嵌套的多层列表时，`with_items`与`with_flattened`会将嵌套列表`拉平展开`，循环的处理每个元素，而with_list只会处理最外层的列表，将最外层的列表中的每一项循环处理。
 
 
 
