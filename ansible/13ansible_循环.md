@@ -628,3 +628,84 @@ ok: [test70] => (item=(6, u'test7')) => {
     "msg": "index is : 6 , value is test7"
 }
 ```
+
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_indexed_items:
+    - [ test1, test2 ]
+    - [ test3, [ test4, test5 ] ]
+    - [ test6 ]
+```
+
+### 4)`with_indexed_items`会将嵌套的两层列表`拉平`，`拉平`后按照顺序为每一项编号,`拉平`效果跟`with_flattened`效果类似.但是，当处理这种嵌套的多层列表时，`with_indexed_items`的拉平效果与`with_flattened`的不完全一致
+```
+TASK [debug] ********************************
+ok: [test70] => (item=(0, u'test1')) => {
+    "changed": false,
+    "item": [
+        0,
+        "test1"
+    ],
+    "msg": [
+        0,
+        "test1"
+    ]
+}
+ok: [test70] => (item=(1, u'test2')) => {
+    "changed": false,
+    "item": [
+        1,
+        "test2"
+    ],
+    "msg": [
+        1,
+        "test2"
+    ]
+}
+ok: [test70] => (item=(2, u'test3')) => {
+    "changed": false,
+    "item": [
+        2,
+        "test3"
+    ],
+    "msg": [
+        2,
+        "test3"
+    ]
+}
+ok: [test70] => (item=(3, [u'test4', u'test5'])) => {
+    "changed": false,
+    "item": [
+        3,
+        [
+            "test4",
+            "test5"
+        ]
+    ],
+    "msg": [
+        3,
+        [
+            "test4",
+            "test5"
+        ]
+    ]
+}
+ok: [test70] => (item=(4, u'test6')) => {
+    "changed": false,
+    "item": [
+        4,
+        "test6"
+    ],
+    "msg": [
+        4,
+        "test6"
+    ]
+}
+```
+- 当多加了一层嵌套以后，`with_indexed_items`并不像`with_flattened`一样将嵌套的列表`完全拉平`，第二层列表中的项如果仍然是一个列表，`with_indexed_items`则不会拉平这个列表，而是将其当做一个整体进行编号。
