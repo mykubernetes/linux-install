@@ -117,8 +117,9 @@ ok: [test70] => (item=test71) => {
     with_items: [ 1, 2, 3 ]
 ```
 
-### 
+### 7)稍微复杂一点的循环
 
+第一个条目的test1键对应的值是a，第二个条目的test1键对应的值是c，所以执行上例playbook以后，”a”和”c”会被输出
 ```
 ---
 - hosts: test70
@@ -132,10 +133,41 @@ ok: [test70] => (item=test71) => {
     - { test1: c, test2: d }
 ```
 
+### 8）使用循环创建文件
 
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    dirs:
+    - "/opt/a"
+    - "/opt/b"
+    - "/opt/c"
+    - "/opt/d"
+  tasks:
+  - file:
+      path: "{{item}}"
+      state: touch
+    with_items: "{{dirs}}"
+```
 
-
-
+### 9)每次shell模块执行后的返回值都会放入一个名为`results`的序列中,`results`也是一个返回值，当模块中使用了循环时，模块每次执行的返回值都会追加存放到`results`这个返回值中
+```
+---
+- hosts: test70
+  gather_facts: no
+  tasks:
+  - shell: "{{item}}"
+    with_items:
+    - "ls /opt"
+    - "ls /home"
+    register: returnvalue
+  - debug:
+      msg: "{{item.stdout}}"
+    with_items: "{{returnvalue.results}}"
+```
 
 
 
