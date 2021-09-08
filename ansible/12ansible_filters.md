@@ -232,3 +232,39 @@ http://jinja.pocoo.org/docs/2.10/templates/#builtin-filters
       #如果对应的变量未定义,则报出“Mandatory variable not defined.”错误，而不是报出默认错误
       msg: "{{ testvar5 | mandatory }}"
 ```
+
+## 1、使用file模块在目标主机中创建文件,需要对文件是否有mode属性进行判断,然后根据判断结果调整file模块的参数设定。
+```
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    paths:
+      - path: /tmp/test
+        mode: '0444'
+      - path: /tmp/foo
+      - path: /tmp/bar
+  tasks:
+  - file: dest={{item.path}} state=touch mode={{item.mode}}
+    with_items: "{{ paths }}"
+    when: item.mode is defined
+  - file: dest={{item.path}} state=touch
+    with_items: "{{ paths }}"
+    when: item.mode is undefined
+```
+
+## 2、没有对文件是否有mode属性进行判断，而是直接调用了file模块的mode参数，如果item有mode属性，就把file模块的mode参数的值设置为item的mode属性的值，如果item没有mode属性，file模块就直接省略mode参数，’omit’的字面意思就是”省略”
+```
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    paths:
+      - path: /tmp/test
+        mode: '0444'
+      - path: /tmp/foo
+      - path: /tmp/bar
+  tasks:
+  - file: dest={{item.path}} state=touch mode={{item.mode | default(omit)}}
+    with_items: "{{ paths }}"
+```
