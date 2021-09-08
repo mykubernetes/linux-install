@@ -30,9 +30,7 @@
 - 3.不能使用handlers替代tasks、因为handlers是一个特殊的tasks。
 
 
-## 2、一个task中调用多个handler
-
-- listen 可以把listen理解成"组名",可以把多个handler分成"组"  
+## 2、listen模块，一个task中调用多个handler，可以把listen理解成"组名",可以把多个handler分成"组"  
 
 ```
 - hosts: testB
