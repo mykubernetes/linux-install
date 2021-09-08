@@ -1,7 +1,9 @@
 # handlers
 
-- notify：在任务结束时触发  
-- handlers：由特定条件触发Tasks  
+- notify：在任务结束时触发
+- handlers：由特定条件触发Tasks
+
+## 1、只有redis配置文件被修改后才重新redis服务
 ```
 - hosts: node01
   remote_user: root
@@ -28,8 +30,10 @@
 - 3.不能使用handlers替代tasks、因为handlers是一个特殊的tasks。
 
 
-listen 可以把listen理解成"组名",可以把多个handler分成"组"  
-一个task中调用多个handler
+## 2、一个task中调用多个handler
+
+- listen 可以把listen理解成"组名",可以把多个handler分成"组"  
+
 ```
 - hosts: testB
   remote_user: root
@@ -50,7 +54,7 @@ listen 可以把listen理解成"组名",可以把多个handler分成"组"
           state=touch
 ```
 
-# meta模块
+## 3、meta模块
 
 - 默认情况下，所有task执行完毕后，才会执行各个handler，并不是执行完某个task后，立即执行对应的handler，如果想要在执行完某些task以后立即执行对应的handler，则需要使用meta模块
 
@@ -86,7 +90,7 @@ listen 可以把listen理解成"组名",可以把多个handler分成"组"
           state=touch
 ```
 
-# force_handelers强制执行handlers  
+## 4、force_handelers强制执行handlers  
 
 - 通常任务失败会终止，force_handelers可以在任务失败后任然执行处理程序，要写在剧本中
 ```
