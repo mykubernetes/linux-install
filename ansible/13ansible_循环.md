@@ -9,11 +9,11 @@
 | with_together | 可以将两个列表中的元素`对齐合并` | 
 | with_cartesian | 关键字的作用就是将每个小列表中的元素按照`笛卡尔的方式`组合后，循环的处理每个组合 |
 | with_indexed_items | 在循环处理列表时为列表中的每一项添加`数字索引`，`索引`从0开始 |
+| with_sequence | 按照顺序生成数字序列，`start=1 end=5 stride=1`，其中start=1表示从1开始，end=5表示到5结束， stride=1表示步长为1 |
 | with_nested | 嵌套循环 |
 | with_dict | 循环字典 |
 | with_fileglob | 循环指定目录中的所有文件 |
 | with_lines | 循环一个文件中的所有行 |
-| with_sequence | 生成一个自增的整数序列，可以指定起始值和结束值以及步长。参数以key=value的形式指定，format指定输出的格式。数字可以是十进制、十六进制、八进制 |
 | with_subelement | 遍历子元素 |
 | with_together | 遍历数据并行集合 |
 
@@ -711,3 +711,98 @@ ok: [test70] => (item=(4, u'test6')) => {
 }
 ```
 - 当多加了一层嵌套以后，`with_indexed_items`并不像`with_flattened`一样将嵌套的列表`完全拉平`，第二层列表中的项如果仍然是一个列表，`with_indexed_items`则不会拉平这个列表，而是将其当做一个整体进行编号。
+
+
+
+## 六、with_sequence
+
+### 1)设置起始值为1，最大五，步长为1
+
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_sequence: start=1 end=5 stride=1
+    
+#    with_sequence:
+#      start=1
+#      end=5
+#      stride=1
+```
+
+```
+TASK [debug] ***************************
+ok: [test70] => (item=1) => {
+    "changed": false,
+    "item": "1",
+    "msg": "1"
+}
+ok: [test70] => (item=2) => {
+    "changed": false,
+    "item": "2",
+    "msg": "2"
+}
+ok: [test70] => (item=3) => {
+    "changed": false,
+    "item": "3",
+    "msg": "3"
+}
+ok: [test70] => (item=4) => {
+    "changed": false,
+    "item": "4",
+    "msg": "4"
+}
+ok: [test70] => (item=5) => {
+    "changed": false,
+    "item": "5",
+    "msg": "5"
+}
+```
+
+### 2)count=5表示数字序列默认从1开始，到5结束，默认步长为1
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_sequence: count=5
+```
+
+### 3)不指定stride的值时，stride的值默认为1，但是当end的值小于start的值时，则必须指定stride的值，而且stride的值必须是负数
+
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_sequence: start=6 end=2 stride=-2
+```
+
+```
+TASK [debug] ***************************
+ok: [test70] => (item=6) => {
+    "changed": false,
+    "item": "6",
+    "msg": "6"
+}
+ok: [test70] => (item=4) => {
+    "changed": false,
+    "item": "4",
+    "msg": "4"
+}
+ok: [test70] => (item=2) => {
+    "changed": false,
+    "item": "2",
+    "msg": "2"
+}
+```
