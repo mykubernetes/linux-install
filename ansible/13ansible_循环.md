@@ -6,6 +6,7 @@
 | with_items  | 简单的列表循环 |
 | with_flattened | 与with_items类似 |
 | with_list | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
+| with_together | 可以将两个列表中的元素`对齐合并` | 
 | with_nested | 嵌套循环 |
 | with_dict | 循环字典 |
 | with_fileglob | 循环指定目录中的所有文件 |
@@ -320,7 +321,57 @@ ok: [test70] => (item=[u'a', u'b']) => {
 - `with_list`、`with_items`、`with_flattened`之间的区别，在处理简单的单层列表时，他们没有区别，但是当处理嵌套的多层列表时，`with_items`与`with_flattened`会将嵌套列表`拉平展开`，循环的处理每个元素，而with_list只会处理最外层的列表，将最外层的列表中的每一项循环处理。
 
 
+## 四、with_together可以将两个列表中的元素`对齐合并`
 
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_together:
+    - [ 1, 2, 3 ]
+    - [ a, b, c ]
+```
 
-
-
+```
+TASK [debug] ******************************
+ok: [test70] => (item=[1, u'a']) => {
+    "changed": false,
+    "item": [
+        1,
+        "a"
+    ],
+    "msg": [
+        1,
+        "a"
+    ]
+}
+ok: [test70] => (item=[2, u'b']) => {
+    "changed": false,
+    "item": [
+        2,
+        "b"
+    ],
+    "msg": [
+        2,
+        "b"
+    ]
+}
+ok: [test70] => (item=[3, u'c']) => {
+    "changed": false,
+    "item": [
+        3,
+        "c"
+    ],
+    "msg": [
+        3,
+        "c"
+    ]
+}
+```
+- 第一个小列表中的第1个值与第二个小列表中的第1个值合并在一起输出
+- 第一个小列表中的第2个值与第二个小列表中的第2个值合并在一起输出
+- 第一个小列表中的第3个值与第二个小列表中的第3个值合并在一起输出
