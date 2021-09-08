@@ -10,6 +10,7 @@
 | with_cartesian | 关键字的作用就是将每个小列表中的元素按照`笛卡尔的方式`组合后，循环的处理每个组合 |
 | with_indexed_items | 在循环处理列表时为列表中的每一项添加`数字索引`，`索引`从0开始 |
 | with_sequence | 按照顺序生成数字序列，`start=1 end=5 stride=1`，其中start=1表示从1开始，end=5表示到5结束， stride=1表示步长为1 |
+| with_random_choice | 可以从列表的多个值中随机返回一个值 |
 | with_nested | 嵌套循环 |
 | with_dict | 循环字典 |
 | with_fileglob | 循环指定目录中的所有文件 |
@@ -805,4 +806,70 @@ ok: [test70] => (item=2) => {
     "item": "2",
     "msg": "2"
 }
+```
+
+### 4)使用with_sequence循环创建目录
+
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - file:
+      path: "/testdir/testdir/test{{ item }}"
+      state: directory
+    with_sequence:
+      start=2
+      end=10
+      stride=2
+```
+
+### 5）with_sequence `格式化`输出数据
+
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_sequence: start=2 end=6 stride=2 format="number is %0.2f"
+```
+
+```
+TASK [debug] ***************************
+ok: [test70] => (item=number is 2.00) => {
+    "changed": false,
+    "item": "number is 2.00",
+    "msg": "number is 2.00"
+}
+ok: [test70] => (item=number is 4.00) => {
+    "changed": false,
+    "item": "number is 4.00",
+    "msg": "number is 4.00"
+}
+ok: [test70] => (item=number is 6.00) => {
+    "changed": false,
+    "item": "number is 6.00",
+    "msg": "number is 6.00"
+}
+```
+
+## 七、with_random_choice循环
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_random_choice:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
 ```
