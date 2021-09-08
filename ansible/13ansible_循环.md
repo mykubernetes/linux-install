@@ -3,7 +3,7 @@
 
 | 循环语句关键字 | 描述 |
 |--------------|-------|
-| with_items | 简单的列表循环 |
+| [with_items](#with_items) | 简单的列表循环 |
 | with_flattened | 与with_items类似 |
 | with_list | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
 | with_together | 可以将两个列表中的元素`对齐合并` | 
@@ -21,7 +21,8 @@
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
 - with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 
-## 一、with_items 循环
+
+## with_items
 
 ### 1）假设有一个清单配置
 ```
