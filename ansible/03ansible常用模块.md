@@ -151,7 +151,16 @@ fenfa 192.168.101.69 [  OK  ]
 
 ## 3、script 模块 执行脚本模块
 
-### 1)在本地执行脚本时，将脚本中的内容传输到远程节点上运行
+### 1）script命令常用参数说明
+| 选项参数 | 选项说明 |
+|---------|---------|
+| free_form参数 | 必须参数，指定需要执行的脚本，脚本位于ansible主机本地，并没有具体的一个参数名叫free_form |
+| chdir参数 | 此参数的作用就是指定一个远程主机中的目录，在执行对应的脚本之前，会先进入到chdir参数指定的目录中 |
+| creates参数 | 使用此参数指定一个远程主机中的文件，当指定的文件存在时，就不执行对应脚本 |
+| removes参数 | 使用此参数指定一个远程主机中的文件，当指定的文件不存在时，就不执行对应脚本 |
+
+
+### 2)在本地执行脚本时，将脚本中的内容传输到远程节点上运行
 ```
 ansible all -m script -a "/server/scripts/free.sh"
 192.168.101.69 | SUCCESS => {
@@ -169,6 +178,20 @@ ansible all -m script -a "/server/scripts/free.sh"
 ```
 - 使用scripts模块，不用将脚本传输到远程节点，脚本本身不用进行授权，即可利用script模块执行。直接执行脚本即可，不需要使用sh
 
+先进入到主机中的/opt目录,然后执行脚本
+```
+ansible clsn -m script -a "chdir=/opt /testdir/atest.sh"
+```
+
+目标主机/opt/testfile文件存在，ansible主机中的/testdir/atest.sh脚本将不会在主机中执行，反之则执行。
+```
+ansible clsn -m script -a "creates=/opt/testfile /testdir/atest.sh"
+```
+
+目标主机中的/opt/testfile文件不存在，ansible主机中的/testdir/atest.sh脚本将不会在主机中执行，反之则执行。
+```
+ansible clsn -m script -a "removes=/opt/testfile /testdir/atest.sh"
+```
 
 ## 4、copy模块 把本地文件发送到远端
 
