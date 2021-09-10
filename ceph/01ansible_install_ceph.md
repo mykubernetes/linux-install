@@ -46,6 +46,16 @@ $ ssh-copy-id node02
 $ ssh-copy-id node03
 ```  
 
+# release版本
+根据需求选择以下分支，其中`stable-*`分支已经过QE测试，master分支应视为实验性分支，请谨慎使用。
+- stable-3.0支持Ceph版本jewel和luminous。该分支需要Ansible版本2.4。
+- stable-3.1支持Ceph版本luminous和mimic。该分支需要Ansible版本2.4。
+- stable-3.2支持Ceph版本luminous和mimic。该分支需要Ansible版本2.6。
+- stable-4.0支持Ceph版本nautilus。该分支需要Ansible版本2.8。
+- stable-5.0支持Ceph版本octopus。该分支需要Ansible版本2.9。
+- master支持Ceph的master分支。该分支需要Ansible版本2.9。
+
+
 二、ceph配置详解  
 ---
 
@@ -303,5 +313,22 @@ devices:
 ```
 ansible-playbook site.yml
 ```
+
+或者
+```
+ansible-playbook -vv -i hosts site-container.yml --limit node04
+```
+
+
+
+
+
+
+
+清理集群
+```
+ansible-playbook -vv infrastructure-playbooks/purge-container-cluster.yml
+```
+
 
 https://blog.csdn.net/szh1124/article/details/83902670?spm=1001.2014.3001.5501
