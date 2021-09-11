@@ -539,22 +539,22 @@ Display all cluster names ------------------------------------------------------
   tasks:
   - name: "Display json"
     debug:
-      msg: "{{ domain_definition | to_json }}"
+      msg: "{{ domain_definition | to_json }}"            # 将变量转换为json格式
   - name: "Display nice json"
     debug:
-      msg: "{{ domain_definition | to_nice_json }}"
+      msg: "{{ domain_definition | to_nice_json }}"       # 将变量转换为更加友好的json格式
   - name: "Display yaml"
     debug:
-      msg: "{{ domain_definition | to_yaml }}"
+      msg: "{{ domain_definition | to_yaml }}"            # 将变量转换为yaml格式
   - name: "Display nice yaml"
     debug:
-      msg: "{{ domain_definition | to_nice_yaml }}"
+      msg: "{{ domain_definition | to_nice_yaml }}"       # 将变量转换为更加友好的yaml格式
   - name: "Display indent json"
     debug:
-      msg: "{{ domain_definition | to_nice_json(indent=2) }}"
+      msg: "{{ domain_definition | to_nice_json(indent=2) }}"   # 自定义json缩进的大小
   - name: "Display indent yaml"
     debug:
-      msg: "{{ domain_definition | to_nice_yaml(indent=8) }}"
+      msg: "{{ domain_definition | to_nice_yaml(indent=8) }}"   # 自定义yaml缩进的大小
 ```
 
 ```
