@@ -716,3 +716,55 @@ debug --------------------------------------------------------------------------
     loop: '{{ result.stdout | from_yaml_all | list }}'
 
 ```
+
+
+```
+- hosts: all
+  remote_user: root
+  gather_facts: no
+  vars:
+    ip: 192.0.2.1/24
+    maca: "52:54:00"
+  tasks:
+  - name: "Display ip"
+    debug:
+      msg: '{{ ip | ipaddr("address") }}'         # ip地址过滤
+  - name: "Display ipv4"
+    debug:
+      msg: '{{ ip | ipv4 }}'                      # ipv4地址过滤
+  - name: "Display ipv6"
+    debug:
+      msg: '{{ ip | ipv6 }}'                      # ipv6地址过滤
+  - name: "Display mac"
+    debug:
+      msg: "{{ maca | random_mac }}"              # MAC地址前缀的基础上，随机生成mac地址
+```
+
+```
+- hosts: all
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - name: "Display comment"
+    debug:
+      msg: '{{ "Plain style (default)" | comment }}'                # 添加属性信息为#
+  - name: "Display comment //...//"
+    debug:
+      msg: "{{ 'c style' | comment('c') }}"                         # 添加注释信息为//
+  - name: "Display comment /*...*/"
+    debug:
+      msg: "{{ 'c block style' | comment('cblock') }}"              # 添加注释信息为/*
+  - name: "Display comment %...%"
+    debug:
+      msg: "{{ 'Erlang style' | comment('erlang') }}"               # 添加注释信息为%
+  - name: "Display comment <!--...-->"
+    debug:
+      msg: "{{ 'XML style' | comment('xml') }}"                     # 添加注释信息为<!
+  - name: "Display comment decoration"
+    debug:
+      msg: "{{ 'my spcial case' | comment(decoration='! ') }}"      # 自定义注释符号
+  - name: "Display Cistom  comment"
+    debug:
+      msg: "{{ 'custom style' | comment('plain', prefix='#######\n#', postfix='#\n#######\n   ###\n    #') }}"       #美观输出，可以定制格式
+
+```
