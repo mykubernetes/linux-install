@@ -486,7 +486,7 @@ http://jinja.pocoo.org/docs/2.10/templates/#builtin-filters
 ```
 
 ```
-# ansible-playbook -i host test1.yml 
+# ansible-playbook test.yml 
 
 PLAY [all] **********************************************************************************************************
 
@@ -505,4 +505,108 @@ PLAY RECAP *********************************************************************
 Saturday 11 September 2021  09:47:10 -0400 (0:00:00.058)       0:00:00.120 **** 
 =============================================================================== 
 Display all cluster names ------------------------------------------------------------------------------------- 0.06s
+```
+
+
+# 七、数据格式化过滤器
+```
+- hosts: all
+  remote_user: root
+  gather_facts: no
+  vars:
+    domain_definition:
+        domain:
+            cluster:
+                - name: "cluster1"
+                - name: "cluster2"
+            server:
+                - name: "server11"
+                  cluster: "cluster1"
+                  port: "8080"
+                - name: "server12"
+                  cluster: "cluster1"
+                  port: "8090"
+                - name: "server21"
+                  cluster: "cluster2"
+                  port: "9080"
+                - name: "server22"
+                  cluster: "cluster2"
+                  port: "9090"
+            library:
+                - name: "lib1"
+                  target: "cluster1"
+                - name: "lib2"
+  tasks:
+  - name: "Display json"
+    debug:
+      msg: "{{ domain_definition | to_json }}"
+  - name: "Display nice json"
+    debug:
+      msg: "{{ domain_definition | to_nice_json }}"
+  - name: "Display yaml"
+    debug:
+      msg: "{{ domain_definition | to_yaml }}"
+  - name: "Display nice yaml"
+    debug:
+      msg: "{{ domain_definition | to_nice_yaml }}"
+  - name: "Display indent json"
+    debug:
+      msg: "{{ domain_definition | to_nice_json(indent=2) }}"
+  - name: "Display indent yaml"
+    debug:
+      msg: "{{ domain_definition | to_nice_yaml(indent=8) }}"
+```
+
+```
+# ansible-playbook test.yml 
+
+PLAY [all] *********************************************************************************************************************************************
+
+TASK [Display json] ************************************************************************************************************************************
+Saturday 11 September 2021  10:15:16 -0400 (0:00:00.063)       0:00:00.063 **** 
+ok: [192.168.101.69] => {
+    "msg": "{\"domain\": {\"cluster\": [{\"name\": \"cluster1\"}, {\"name\": \"cluster2\"}], \"library\": [{\"name\": \"lib1\", \"target\": \"cluster1\"}, {\"name\": \"lib2\"}], \"server\": [{\"cluster\": \"cluster1\", \"name\": \"server11\", \"port\": \"8080\"}, {\"cluster\": \"cluster1\", \"name\": \"server12\", \"port\": \"8090\"}, {\"cluster\": \"cluster2\", \"name\": \"server21\", \"port\": \"9080\"}, {\"cluster\": \"cluster2\", \"name\": \"server22\", \"port\": \"9090\"}]}}"
+}
+
+TASK [Display nice json] *******************************************************************************************************************************
+Saturday 11 September 2021  10:15:16 -0400 (0:00:00.045)       0:00:00.109 **** 
+ok: [192.168.101.69] => {
+    "msg": "{\n    \"domain\": {\n        \"cluster\": [\n            {\n                \"name\": \"cluster1\"\n            }, \n            {\n                \"name\": \"cluster2\"\n            }\n        ], \n        \"library\": [\n            {\n                \"name\": \"lib1\", \n                \"target\": \"cluster1\"\n            }, \n            {\n                \"name\": \"lib2\"\n            }\n        ], \n        \"server\": [\n            {\n                \"cluster\": \"cluster1\", \n                \"name\": \"server11\", \n                \"port\": \"8080\"\n            }, \n            {\n                \"cluster\": \"cluster1\", \n                \"name\": \"server12\", \n                \"port\": \"8090\"\n            }, \n            {\n                \"cluster\": \"cluster2\", \n                \"name\": \"server21\", \n                \"port\": \"9080\"\n            }, \n            {\n                \"cluster\": \"cluster2\", \n                \"name\": \"server22\", \n                \"port\": \"9090\"\n            }\n        ]\n    }\n}"
+}
+
+TASK [Display yaml] ************************************************************************************************************************************
+Saturday 11 September 2021  10:15:16 -0400 (0:00:00.043)       0:00:00.153 **** 
+ok: [192.168.101.69] => {
+    "msg": "domain:\n  cluster:\n  - {name: cluster1}\n  - {name: cluster2}\n  library:\n  - {name: lib1, target: cluster1}\n  - {name: lib2}\n  server:\n  - {cluster: cluster1, name: server11, port: '8080'}\n  - {cluster: cluster1, name: server12, port: '8090'}\n  - {cluster: cluster2, name: server21, port: '9080'}\n  - {cluster: cluster2, name: server22, port: '9090'}\n"
+}
+
+TASK [Display nice yaml] *******************************************************************************************************************************
+Saturday 11 September 2021  10:15:16 -0400 (0:00:00.046)       0:00:00.199 **** 
+ok: [192.168.101.69] => {
+    "msg": "domain:\n    cluster:\n    -   name: cluster1\n    -   name: cluster2\n    library:\n    -   name: lib1\n        target: cluster1\n    -   name: lib2\n    server:\n    -   cluster: cluster1\n        name: server11\n        port: '8080'\n    -   cluster: cluster1\n        name: server12\n        port: '8090'\n    -   cluster: cluster2\n        name: server21\n        port: '9080'\n    -   cluster: cluster2\n        name: server22\n        port: '9090'\n"
+}
+
+TASK [Display indent json] *****************************************************************************************************************************
+Saturday 11 September 2021  10:15:16 -0400 (0:00:00.045)       0:00:00.244 **** 
+ok: [192.168.101.69] => {
+    "msg": "{\n  \"domain\": {\n    \"cluster\": [\n      {\n        \"name\": \"cluster1\"\n      }, \n      {\n        \"name\": \"cluster2\"\n      }\n    ], \n    \"library\": [\n      {\n        \"name\": \"lib1\", \n        \"target\": \"cluster1\"\n      }, \n      {\n        \"name\": \"lib2\"\n      }\n    ], \n    \"server\": [\n      {\n        \"cluster\": \"cluster1\", \n        \"name\": \"server11\", \n        \"port\": \"8080\"\n      }, \n      {\n        \"cluster\": \"cluster1\", \n        \"name\": \"server12\", \n        \"port\": \"8090\"\n      }, \n      {\n        \"cluster\": \"cluster2\", \n        \"name\": \"server21\", \n        \"port\": \"9080\"\n      }, \n      {\n        \"cluster\": \"cluster2\", \n        \"name\": \"server22\", \n        \"port\": \"9090\"\n      }\n    ]\n  }\n}"
+}
+
+TASK [Display indent yaml] *****************************************************************************************************************************
+Saturday 11 September 2021  10:15:16 -0400 (0:00:00.045)       0:00:00.290 **** 
+ok: [192.168.101.69] => {
+    "msg": "domain:\n        cluster:\n        -       name: cluster1\n        -       name: cluster2\n        library:\n        -       name: lib1\n                target: cluster1\n        -       name: lib2\n        server:\n        -       cluster: cluster1\n                name: server11\n                port: '8080'\n        -       cluster: cluster1\n                name: server12\n                port: '8090'\n        -       cluster: cluster2\n                name: server21\n                port: '9080'\n        -       cluster: cluster2\n                name: server22\n                port: '9090'\n"
+}
+
+PLAY RECAP *********************************************************************************************************************************************
+192.168.101.69             : ok=6    changed=0    unreachable=0    failed=0   
+
+Saturday 11 September 2021  10:15:16 -0400 (0:00:00.046)       0:00:00.336 **** 
+=============================================================================== 
+Display indent yaml ----------------------------------------------------------------------------------------------------------------------------- 0.05s
+Display yaml ------------------------------------------------------------------------------------------------------------------------------------ 0.05s
+Display json ------------------------------------------------------------------------------------------------------------------------------------ 0.05s
+Display nice yaml ------------------------------------------------------------------------------------------------------------------------------- 0.05s
+Display indent json ----------------------------------------------------------------------------------------------------------------------------- 0.05s
+Display nice json ------------------------------------------------------------------------------------------------------------------------------- 0.04s
 ```
