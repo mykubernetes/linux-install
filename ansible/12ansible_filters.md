@@ -447,3 +447,62 @@ http://jinja.pocoo.org/docs/2.10/templates/#builtin-filters
   - debug:
       msg: "{{ '123123' | password_hash('sha512', 65534|random(seed=inventory_hostname)|string) }}"
 ```
+
+
+# 六、Json数据查询过滤器
+
+```
+- hosts: all
+  remote_user: root
+  gather_facts: no
+  vars:
+    domain_definition:
+        domain:
+            cluster:
+                - name: "cluster1"
+                - name: "cluster2"
+            server:
+                - name: "server11"
+                  cluster: "cluster1"
+                  port: "8080"
+                - name: "server12"
+                  cluster: "cluster1"
+                  port: "8090"
+                - name: "server21"
+                  cluster: "cluster2"
+                  port: "9080"
+                - name: "server22"
+                  cluster: "cluster2"
+                  port: "9090"
+            library:
+                - name: "lib1"
+                  target: "cluster1"
+                - name: "lib2"
+  tasks:
+  - name: "Display all cluster names"
+    debug:
+      var: item
+    loop: "{{ domain_definition | json_query('domain.library[*].name') }}"
+```
+
+```
+# ansible-playbook -i host test1.yml 
+
+PLAY [all] **********************************************************************************************************
+
+TASK [Display all cluster names] ************************************************************************************
+Saturday 11 September 2021  09:47:10 -0400 (0:00:00.062)       0:00:00.062 **** 
+ok: [192.168.101.69] => (item=lib1) => {
+    "item": "lib1"
+}
+ok: [192.168.101.69] => (item=lib2) => {
+    "item": "lib2"
+}
+
+PLAY RECAP **********************************************************************************************************
+192.168.101.69             : ok=1    changed=0    unreachable=0    failed=0   
+
+Saturday 11 September 2021  09:47:10 -0400 (0:00:00.058)       0:00:00.120 **** 
+=============================================================================== 
+Display all cluster names ------------------------------------------------------------------------------------- 0.06s
+```
