@@ -747,6 +747,8 @@ debug --------------------------------------------------------------------------
 - hosts: all
   remote_user: root
   gather_facts: no
+  vars:
+    ansible_managed: "date: %Y-%m-%d %H:%M:%S"
   tasks:
   - name: "Display comment"
     debug:
@@ -769,4 +771,7 @@ debug --------------------------------------------------------------------------
   - name: "Display Cistom  comment"
     debug:
       msg: "{{ 'custom style' | comment('plain', prefix='#######\n#', postfix='#\n#######\n   ###\n    #') }}"       #美观输出，可以定制格式
+  - name: "Display Cistom  comment"
+    debug:
+      msg: "{{ ansible_managed | comment }}"                        # 通过变量注释
 ```
