@@ -15,7 +15,7 @@
 | with_nested | 嵌套循环 |
 | [with_dict](#with_dict) | 循环字典 |
 | [with_fileglob](#with_fileglob) | 循环指定目录中的所有文件 |
-| with_lines | 循环一个文件中的所有行 |
+| with_lines | 指令后跟一个命令，ansible会遍历命令的输出 |
 | [with_subelement](#with_subelements) | 遍历子元素 |
 
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
