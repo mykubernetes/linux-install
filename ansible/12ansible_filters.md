@@ -911,3 +911,131 @@ Display scheme -----------------------------------------------------------------
 Display urlsplit -------------------------------------------------------------------------------------------- 0.04s
 Display username -------------------------------------------------------------------------------------------- 0.04s
 ```
+
+# 十一、正则过滤器
+
+```
+- hosts: all
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - name: "search for 'foo' in 'foobar'"
+    debug:
+      msg: "{{ 'foobar' | regex_search('(foo)') }}"                                # 匹配到则显示匹配到的值
+  - name: "will return empty if it cannot find a match"
+    debug:
+      msg: "{{ 'ansible' | regex_search('(foobar)') }}"                            # 没匹配到则显示为空
+  - name: "case insensitive search in multiline mode"
+    debug:
+      msg: "{{ 'foo\nBAR' | regex_search('^bar', multiline=True, ignorecase=True) }}"      # 不区分大小写匹配     
+  - name: "Return a list of all IPv4 addresses in the string"
+    debug:
+      msg: "{{ 'Some DNS servers are 8.8.8.8 and 8.8.4.4' | regex_findall('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b') }}"   # 对所有事件进行查找
+  - name: 'convert "ansible" to "able"'
+    debug:
+      msg: "{{ 'ansible' | regex_replace('^a.*i(.*)$', 'a\\1') }}"                 # 将“ansible”转换为“able”
+  - neme: 'onvert "foobar" to "bar"'
+    debug:
+      msg: "{{ 'foobar' | regex_replace('^f.*o(.*)$', '\\1') }}"                   # 将“foobar”反转为“bar” 
+  - name: 'convert "localhost:80" to "localhost, 80" using named groups'
+    debug:
+      msg: "{{ 'localhost:80' | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<host>, \\g<port>') }}"    # 使用命名组将“localhost:80”转换为“localhost，80”
+  - name: 'convert "localhost:80" to "localhost"'
+    debug:
+      msg: "{{ 'localhost:80' | regex_replace(':80') }}"                            # 将“localhost:80”转换为“localhost”
+  - name: 'add "https://" prefix to each item in a list'
+    debug:
+      msg: "{{ 'hosts' | map('regex_replace', '^(.*)$', 'https://\\1') | list }}"   # 为列表中的每个项目添加“https://”前缀 
+  - name: 'convert "^f.*o(.*)$" to "\^f\.\*o\(\.\*\)\$" '
+    debug:
+      msg: "{{ '^f.*o(.*)$' | regex_escape() }}"                                    # 将“^f.*o（.*）”转换为“^f.\*o”（\.\*\）\$” 
+```
+
+```
+ansible-playbook -i host test1.yml 
+ [WARNING]: Ignoring invalid attribute: neme
+
+
+PLAY [all] ****************************************************************************************************************
+TASK [search for 'foo' in 'foobar'] ***************************************************************************************
+Saturday 11 September 2021  23:08:07 -0400 (0:00:00.073)       0:00:00.073 **** 
+ok: [192.168.101.69] => {
+    "msg": "foo"
+}
+
+TASK [will return empty if it cannot find a match] ************************************************************************
+Saturday 11 September 2021  23:08:07 -0400 (0:00:00.060)       0:00:00.134 **** 
+ok: [192.168.101.69] => {
+    "msg": ""
+}
+
+TASK [case insensitive search in multiline mode] **************************************************************************
+Saturday 11 September 2021  23:08:07 -0400 (0:00:00.056)       0:00:00.190 **** 
+ok: [192.168.101.69] => {
+    "msg": "BAR"
+}
+
+TASK [Return a list of all IPv4 addresses in the string] ******************************************************************
+Saturday 11 September 2021  23:08:07 -0400 (0:00:00.059)       0:00:00.249 **** 
+ok: [192.168.101.69] => {
+    "msg": [
+        "8.8.8.8", 
+        "8.8.4.4"
+    ]
+}
+
+TASK [convert "ansible" to "able"] ****************************************************************************************
+Saturday 11 September 2021  23:08:07 -0400 (0:00:00.045)       0:00:00.295 **** 
+ok: [192.168.101.69] => {
+    "msg": "able"
+}
+
+TASK [debug] **************************************************************************************************************
+Saturday 11 September 2021  23:08:08 -0400 (0:00:00.043)       0:00:00.339 **** 
+ok: [192.168.101.69] => {
+    "msg": "bar"
+}
+
+TASK [convert "localhost:80" to "localhost, 80" using named groups] *******************************************************
+Saturday 11 September 2021  23:08:08 -0400 (0:00:00.042)       0:00:00.382 **** 
+ok: [192.168.101.69] => {
+    "msg": "localhost, 80"
+}
+
+TASK [convert "localhost:80" to "localhost"] ******************************************************************************
+Saturday 11 September 2021  23:08:08 -0400 (0:00:00.044)       0:00:00.427 **** 
+ok: [192.168.101.69] =
+TASK [add "https://" prefix to each item in a list] ***********************************************************************
+Saturday 11 September 2021  23:08:08 -0400 (0:00:00.042)       0:00:00.469 **** 
+ok: [192.168.101.69] => {
+    "msg": [
+        "https://h", 
+        "https://o", 
+        "https://s", 
+        "https://t", 
+        "https://s"
+    ]
+}
+
+TASK [convert "^f.*o(.*)$" to "\^f\.\*o\(\.\*\)\$"] ***********************************************************************
+Saturday 11 September 2021  23:08:08 -0400 (0:00:00.047)       0:00:00.516 **** 
+ok: [192.168.101.69] => {
+    "msg": "\\^f\\.\\*o\\(\\.\\*\\)\\$"
+}
+
+PLAY RECAP ****************************************************************************************************************
+192.168.101.69             : ok=10   changed=0    unreachable=0    failed=0   
+
+Saturday 11 September 2021  23:08:08 -0400 (0:00:00.042)       0:00:00.559 **** 
+=============================================================================== 
+search for 'foo' in 'foobar' --------------------------------------------------------------------------------------- 0.06s
+case insensitive search in multiline mode -------------------------------------------------------------------------- 0.06s
+will return empty if it cannot find a match ------------------------------------------------------------------------ 0.06s
+add "https://" prefix to each item in a list ----------------------------------------------------------------------- 0.05s
+Return a list of all IPv4 addresses in the string ------------------------------------------------------------------ 0.05s
+convert "localhost:80" to "localhost, 80" using named groups ------------------------------------------------------- 0.04s
+convert "ansible" to "able" ---------------------------------------------------------------------------------------- 0.04s
+debug -------------------------------------------------------------------------------------------------------------- 0.04s
+convert "localhost:80" to "localhost" ------------------------------------------------------------------------------ 0.04s
+convert "^f.*o(.*)$" to "\^f\.\*o\(\.\*\)\$"  ---------------------------------------------------------------------- 0.04s
+```
