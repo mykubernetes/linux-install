@@ -317,6 +317,40 @@ debug:
 
 ## 10、注册变量（register）
 
+| name | description | returned | type |
+|------|-------------|----------|------|
+| start | 命令执行开始时间 | always | string |
+| end | 命令执行结束时间 | always | string |
+| delta | 命令执行时间 | always | string |
+| stdout | 命令的标准输出 | always | string |
+| stderr | 命令的错误输出 | always | string |
+| cmd | 命令内容 | always | string |
+| rc | 命令返回值（0代表OK） | always | int |
+| msg | changed | always | boolean |
+
+```
+ok: [192.168.101.69] => {
+    "msg": {
+        "changed": true, 
+        "cmd": [
+            "date", 
+            "+%F_%T"
+        ], 
+        "delta": "0:00:00.002093",                           # 命令执行时间 
+        "end": "2021-09-12 04:03:00.591410",                 # 命令执行结束时间
+        "failed": false,                                     # 命令是否执行失败
+        "rc": 0,                                             # 命令返回值（0代表OK）
+        "start": "2021-09-12 04:03:00.589317",               # 命令执行开始时间
+        "stderr": "",                                        # 命令的错误输出
+        "stderr_lines": [], 
+        "stdout": "2021-09-12_04:03:00",                     # 命令的标准输出
+        "stdout_lines": [
+            "2021-09-12_04:03:00"
+        ]
+    }
+}
+```
+
 ```
 - hosts: webservers 
     gather_facts: no
@@ -392,45 +426,3 @@ debug:
     debug:
       msg: "{{testvar1}}"
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
