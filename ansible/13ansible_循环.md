@@ -11,11 +11,12 @@
 | [with_indexed_items](#with_indexed_items) | 在循环处理列表时为列表中的每一项添加`数字索引`，`索引`从0开始 |
 | [with_sequence](#with_sequence) | 按照顺序生成数字序列，`start=1 end=5 stride=1`，其中start=1表示从1开始，end=5表示到5结束， stride=1表示步长为1 |
 | [with_random_choice](#with_random_choice) | 可以从列表的多个值中随机返回一个值 |
+| [with_file](#with_file) | 循环获取文件的内容 | 
 | with_nested | 嵌套循环 |
-| with_dict | 循环字典 |
-| with_fileglob | 循环指定目录中的所有文件 |
+| [with_dict](#with_dict) | 循环字典 |
+| [with_fileglob](#with_fileglob) | 循环指定目录中的所有文件 |
 | with_lines | 循环一个文件中的所有行 |
-| with_subelement | 遍历子元素 |
+| [with_subelement](#with_subelements) | 遍历子元素 |
 | with_together | 遍历数据并行集合 |
 
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
@@ -886,5 +887,381 @@ ok: [test70] => (item=number is 6.00) => {
     - 4
     - 5
 ```
+
+# with_dict
+
+## 九、with_dict字典循环
+
+### 1)使用字典的方式定义了users变量，users中一共有两个用户，alice和bob，从变量的键值对可以看出，alice是女性，bob是男性
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      alice: female
+      bob: male
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_dict: "{{users}}"
+```
+
+```
+TASK [debug] *************************************
+ok: [test70] => (item={'value': u'male', 'key': u'bob'}) => {
+    "changed": false,
+    "item": {
+        "key": "bob",
+        "value": "male"
+    },
+    "msg": {
+        "key": "bob",
+        "value": "male"
+    }
+}
+ok: [test70] => (item={'value': u'female', 'key': u'alice'}) => {
+    "changed": false,
+    "item": {
+        "key": "alice",
+        "value": "female"
+    },
+    "msg": {
+        "key": "alice",
+        "value": "female"
+    }
+}
+```
+
+### 2)字典中的每个键值对被放到了item变量中，而且，键值对中的”键”被放入了”key”关键字中，键值对中的”值”被放入了”value”关键字中
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      alice: female
+      bob: male
+  tasks:
+  - debug:
+      msg: "User name: {{item.key}} , User's gender: {{item.value}} "
+    with_dict: "{{users}}"
+```
+
+```
+TASK [debug] ************************************************
+ok: [test70] => (item={'value': u'male', 'key': u'bob'}) => {
+    "changed": false,
+    "item": {
+        "key": "bob",
+        "value": "male"
+    },
+    "msg": "User name: bob , User's gender: male "
+}
+ok: [test70] => (item={'value': u'female', 'key': u'alice'}) => {
+    "changed": false,
+    "item": {
+        "key": "alice",
+        "value": "female"
+    },
+    "msg": "User name: alice , User's gender: female "
+}
+```
+
+### 3)将alice和bob的信息完善了，每个人都有自己姓名，性别，电话等信息
+
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      alice:
+        name: Alice Appleworth
+        gender: female
+        telephone: 123-456-7890
+      bob:
+        name: Bob Bananarama
+        gender: male
+        telephone: 987-654-3210
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_dict: "{{users}}"
+```
+
+```
+TASK [debug] *****************************************
+ok: [test70] => (item={'value': {u'gender': u'male', u'name': u'Bob Bananarama', u'telephone': u'987-654-3210'}, 'key': u'bob'}) => {
+    "changed": false,
+    "item": {
+        "key": "bob",
+        "value": {
+            "gender": "male",
+            "name": "Bob Bananarama",
+            "telephone": "987-654-3210"
+        }
+    },
+    "msg": {
+        "key": "bob",
+        "value": {
+            "gender": "male",
+            "name": "Bob Bananarama",
+            "telephone": "987-654-3210"
+        }
+    }
+}
+ok: [test70] => (item={'value': {u'gender': u'female', u'name': u'Alice Appleworth', u'telephone': u'123-456-7890'}, 'key': u'alice'}) => {
+    "changed": false,
+    "item": {
+        "key": "alice",
+        "value": {
+            "gender": "female",
+            "name": "Alice Appleworth",
+            "telephone": "123-456-7890"
+        }
+    },
+    "msg": {
+        "key": "alice",
+        "value": {
+            "gender": "female",
+            "name": "Alice Appleworth",
+            "telephone": "123-456-7890"
+        }
+    }
+}
+```
+
+### 4)将字典遍历到变量中使用
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+      alice:
+        name: Alice Appleworth
+        gender: female
+        telephone: 123-456-7890
+      bob:
+        name: Bob Bananarama
+        gender: male
+        telephone: 987-654-3210
+  tasks:
+  - debug:
+      msg: "User {{ item.key }} is {{ item.value.name }}, Gender: {{ item.value.gender }}, Tel: {{ item.value.telephone }}"
+    with_dict: "{{users}}"
+```
+
+
+# with_subelements
+
+## 十、with_subelements循环
+
+### 1)复合结构的字典变量，`users`变量，`users`变量列表中有两个块序列，这两个块序列分别代表两个用户，bob和alice，alice是个妹子，bob是个汉子，bob的爱好是滑板和打游戏，alice的爱好是听音乐,在处理`users`变量的同时，还指定了一个属性，`hobby`属性是`users`变量中每个用户的`子属性`
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+    - name: bob
+      gender: male
+      hobby:
+        - Skateboard
+        - VideoGame
+    - name: alice
+      gender: female
+      hobby:
+        - Music
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_subelements:
+    - "{{users}}"
+    - hobby
+```
+
+```
+TASK [debug] ***********************************************************
+ok: [test70] => (item=({u'gender': u'male', u'name': u'bob'}, u'Skateboard')) => {
+    "changed": false,
+    "item": [
+        {
+            "gender": "male",
+            "name": "bob"
+        },
+        "Skateboard"
+    ],
+    "msg": [
+        {
+            "gender": "male",
+            "name": "bob"
+        },
+        "Skateboard"
+    ]
+}
+ok: [test70] => (item=({u'gender': u'male', u'name': u'bob'}, u'VideoGame')) => {
+    "changed": false,
+    "item": [
+        {
+            "gender": "male",
+            "name": "bob"
+        },
+        "VideoGame"
+    ],
+    "msg": [
+        {
+            "gender": "male",
+            "name": "bob"
+        },
+        "VideoGame"
+    ]
+}
+ok: [test70] => (item=({u'gender': u'female', u'name': u'alice'}, u'Music')) => {
+    "changed": false,
+    "item": [
+        {
+            "gender": "female",
+            "name": "alice"
+        },
+        "Music"
+    ],
+    "msg": [
+        {
+            "gender": "female",
+            "name": "alice"
+        },
+        "Music"
+    ]
+}
+```
+
+###  2)通过item.0获取到第一个小整体，即gender和name属性，然后通过item.1获取到第二个小整体，即hobby列表中的每一项
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  vars:
+    users:
+    - name: bob
+      gender: male
+      hobby:
+        - Skateboard
+        - VideoGame
+    - name: alice
+      gender: female
+      hobby:
+        - Music
+  tasks:
+  - debug:
+      msg: "{{ item.0.name }} 's hobby is {{ item.1 }}"
+    with_subelements:
+    - "{{users}}"
+    - hobby
+```
+
+```
+"msg": "bob 's hobby is Skateboard"
+"msg": "bob 's hobby is VideoGame"
+"msg": "alice 's hobby is Music"
+```
+
+# with_file
+
+## 十一、with_file循环获取文件内容
+
+### 1)列表中有两个文件路径，分别是”/testdir/testdir/a.log”和”/opt/testfile”，这两个文件都是ansible主机中的文件，通过`with_file`关键字处理了这个列表
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_file:
+    - /testdir/testdir/a.log
+    - /opt/testfile
+```
+
+```
+TASK [debug] *******************
+ok: [test70] => (item=aaa) => {
+    "changed": false,
+    "item": "aaa",
+    "msg": "aaa"
+}
+ok: [test70] => (item=test) => {
+    "changed": false,
+    "item": "test",
+    "msg": "test"
+}
+```
+- 无论目标主机是谁，都可以通过`with_file`关键字获取到ansible主机中的文件内容
+
+# with_fileglob
+
+## 十二、with_fileglob匹配文件名称
+
+- 通过`with_fileglob`关键字，在指定的目录中匹配符合模式的文件名，`with_file`与`with_fileglob`也有相同的地方，它们都是针对ansible主机的文件进行操作的，而不是目标主机
+
+### 1)定义了一个列表，这个列表中只有一个值，这个值是一个路径，路径中包含一个通配符,按照我们通常的理解，`/testdir/*`应该代表了`/testdir`目录中的所有文件
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_fileglob:
+    - /testdir/*
+```
+
+```
+TASK [debug] *************************
+ok: [test70] => (item=/testdir/testfile) => {
+    "changed": false,
+    "item": "/testdir/testfile",
+    "msg": "/testdir/testfile"
+}
+ok: [test70] => (item=/testdir/test.sh) => {
+    "changed": false,
+    "item": "/testdir/test.sh",
+    "msg": "/testdir/test.sh"
+}
+```
+
+可以看出`/testdir`目录有四项，两项是目录，两项是文件，剧本中只匹配到文件，不包含目录，所以`with_fileglob`只会匹配指定目录中的文件，而不会匹配指定目录中的目录
+```
+# ll /testdir
+total 16
+drwxr-xr-x 2 root root 4096 Jul 27 17:26 ansible
+drwxr-xr-x 2 root root 4096 Jul 19 16:05 testdir
+-rw-r--r-- 1 root root   99 May 25 14:06 testfile
+-rwxr--r-- 1 root root   81 Mar 17 13:28 test.sh
+```
+
+### 2)指定多个路径
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_fileglob:
+    - /testdir/*
+    - /opt/test*.???
+```
+- 第一项表示匹配”/testdir”目录下的文件，第二项表示匹配”/opt”目录下，以”test”开头，以”. 任意3个字符”结尾的文件，比如”testa.123″或者”testfile.yml
 
 [回到顶部](#循环语句)
