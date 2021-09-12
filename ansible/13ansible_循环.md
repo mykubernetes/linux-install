@@ -6,7 +6,7 @@
 | [with_items](#with_items) | 简单的列表循环 |
 | [with_flattened](#with_flattened) | 与with_items类似 |
 | [with_list](#with_list) | 每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中 |
-| [with_together](#with_together) | 可以将两个列表中的元素`对齐合并` | 
+| [with_together](#with_together) | 可以将两个列表中的元素`对齐合并`,遍历数据并行集合 | 
 | [with_cartesian](#with_cartesian) | 关键字的作用就是将每个小列表中的元素按照`笛卡尔的方式`组合后，循环的处理每个组合 |
 | [with_indexed_items](#with_indexed_items) | 在循环处理列表时为列表中的每一项添加`数字索引`，`索引`从0开始 |
 | [with_sequence](#with_sequence) | 按照顺序生成数字序列，`start=1 end=5 stride=1`，其中start=1表示从1开始，end=5表示到5结束， stride=1表示步长为1 |
@@ -17,7 +17,6 @@
 | [with_fileglob](#with_fileglob) | 循环指定目录中的所有文件 |
 | with_lines | 循环一个文件中的所有行 |
 | [with_subelement](#with_subelements) | 遍历子元素 |
-| with_together | 遍历数据并行集合 |
 
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
 - with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
