@@ -15,7 +15,7 @@
 | with_nested | 嵌套循环 |
 | [with_dict](#with_dict) | 循环字典 |
 | [with_fileglob](#with_fileglob) | 循环指定目录中的所有文件 |
-| with_lines | 指令后跟一个命令，ansible会遍历命令的输出 |
+| [with_lines](#with_lines) | 指令后跟一个命令，ansible会遍历命令的输出 |
 | [with_subelement](#with_subelements) | 遍历子元素 |
 
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
@@ -1262,5 +1262,65 @@ drwxr-xr-x 2 root root 4096 Jul 19 16:05 testdir
     - /opt/test*.???
 ```
 - 第一项表示匹配”/testdir”目录下的文件，第二项表示匹配”/opt”目录下，以”test”开头，以”. 任意3个字符”结尾的文件，比如”testa.123″或者”testfile.yml
+
+
+# with_lines
+
+## 十三、with_lines
+```
+- hosts: node001
+  remote_user: root
+  tasks:
+  - name: "command line"
+    debug: 
+      msg: "{{ item }} is a line from /etc/hosts"
+    with_lines:
+      - cat /etc/hosts
+```
+
+```
+# ansible-playbook -i host test1.yml 
+
+PLAY [node001] **************************************************************************************************************************
+
+TASK [Gathering Facts] ******************************************************************************************************************
+Sunday 12 September 2021  09:47:33 -0400 (0:00:00.060)       0:00:00.060 ****** 
+ok: [192.168.101.69]
+
+TASK [command line] *********************************************************************************************************************
+Sunday 12 September 2021  09:47:33 -0400 (0:00:00.800)       0:00:00.861 ****** 
+ok: [192.168.101.69] => (item=127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4) => {
+    "msg": "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 is a line from /etc/hosts"
+}
+ok: [192.168.101.69] => (item=::1         localhost localhost.localdomain localhost6 localhost6.localdomain6) => {
+    "msg": "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 is a line from /etc/hosts"
+}
+ok: [192.168.101.69] => (item=192.168.101.69 node01) => {
+    "msg": "192.168.101.69 node01 is a line from /etc/hosts"
+}
+ok: [192.168.101.69] => (item=192.168.101.70 node02) => {
+    "msg": "192.168.101.70 node02 is a line from /etc/hosts"
+}
+ok: [192.168.101.69] => (item=192.168.101.71 node03) => {
+    "msg": "192.168.101.71 node03 is a line from /etc/hosts"
+}
+ok: [192.168.101.69] => (item=192.168.101.69 192.168.101.69 node01 node01) => {
+    "msg": "192.168.101.69 192.168.101.69 node01 node01 is a line from /etc/hosts"
+}
+ok: [192.168.101.69] => (item=192.168.101.80 192.168.101.80) => {
+    "msg": "192.168.101.80 192.168.101.80 is a line from /etc/hosts"
+}
+
+PLAY RECAP ******************************************************************************************************************************
+192.168.101.69             : ok=2    changed=0    unreachable=0    failed=0   
+
+Sunday 12 September 2021  09:47:34 -0400 (0:00:00.136)       0:00:00.998 ****** 
+=============================================================================== 
+Gathering Facts ------------------------------------------------------------------------------------------------------------------ 0.80s
+command line --------------------------------------------------------------------------------------------------------------------- 0.14s
+
+```
+
+
 
 [回到顶部](#循环语句)
