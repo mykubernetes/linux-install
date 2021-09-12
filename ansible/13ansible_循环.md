@@ -12,7 +12,7 @@
 | [with_sequence](#with_sequence) | 按照顺序生成数字序列，`start=1 end=5 stride=1`，其中start=1表示从1开始，end=5表示到5结束， stride=1表示步长为1 |
 | [with_random_choice](#with_random_choice) | 可以从列表的多个值中随机返回一个值 |
 | [with_file](#with_file) | 循环获取文件的内容 | 
-| with_nested | 嵌套循环 |
+| with_nested | 嵌套循环,`ith_nested`与`with_cartesian`的效果一致，可以无差别使用他们 |
 | [with_dict](#with_dict) | 循环字典 |
 | [with_fileglob](#with_fileglob) | 循环指定目录中的所有文件 |
 | [with_lines](#with_lines) | 指令后跟一个命令，ansible会遍历命令的输出 |
