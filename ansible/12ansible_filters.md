@@ -442,6 +442,9 @@ http://jinja.pocoo.org/docs/2.10/templates/#builtin-filters
   #使用sha512算法对字符串进行哈希,并使用指定的字符串作为"盐"
   - debug:
       msg: "{{ '123123' | password_hash('sha512','ebzL.U5cjaHe55KK') }}"
+  #一些hash类型也允许提供「rounds」参数
+  - debug:
+      msg: "{{ '123123' | password_hash('sha256', 'mysecretsalt', rounds=10000) }}"
   #如下方法可以幂等的为每个主机的密码生成对应哈希串
   #有了之前总结的过滤器用法作为基础，你一定已经看懂了
   - debug:
