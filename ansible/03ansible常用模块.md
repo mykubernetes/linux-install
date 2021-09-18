@@ -1015,9 +1015,9 @@ ansible node01 -m replace -a 'path=/etc/sysconfig/selinux regexp="^SELINUX=.*" r
 | 参数 | 描述 |
 |------|------|
 | paths | 必须参数，指定在哪个目录中查找文件，可以指定多个路径，路径间用逗号隔开，此参数有别名，使用别名path或者别名name可以代替paths。 |
-| recurse | 默认情况下，只会在指定的目录中查找文件，也就是说，如果目录中还包含目录，ansible并不会递归的进入子目录查找对应文件，如果想要递归的查找文件，需要使用recurse参数，当recurse参数设置为yes时，表示在指定目录中递归的查找文件。 |
+| recurse | 默认情况下，只会在指定的目录中查找文件，如果目录中还包含目录，不会递归查找，如果想递归的查找文件，当需要将recurse参数设置为yes |
 | hidden | 默认情况下，隐藏文件会被忽略，当hidden参数的值设置为yes时，才会查找隐藏文件。 |
-| file_type | 默认情况下，ansible只会根据条件查找”文件”，并不会查找”目录”或”软链接”等文件类型，如果想要指定查找的文件类型，可以通过file_type指定文件类型，可指定的文件类型有any、directory、file、link 四种。 |
+| file_type | 默认情况下，ansible只会根据条件查找”文件”，并不会查找”目录”或”软链接”等文件类型，想要指定查找的文件类型，通过file_type指定文件类型，可指定文件类型有any、directory、file、link 四种。 |
 | patterns | 使用此参数指定需要查找的文件名称，支持使用shell（比如通配符）或者正则表达式去匹配文件名称，默认情况下，使用shell匹配对应的文件名，如果想要使用python的正则去匹配文件名，需要将use_regex参数的值设置为yes。 |
 | use_regex | 默认情况下，find模块不会使用正则表达式去解析patterns参数中对应的内容，当use_regex设置为yes时，表示使用python正则解析patterns参数中的表达式，否则，使用glob通配符解析patterns参数中的表达式。 |
 | contains | 用此参数可以根据文章内容查找文件，此参数的值为一个正则表达式，find模块会根据对应的正则表达式匹配文件内容。 |
