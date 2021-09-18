@@ -845,20 +845,89 @@ ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup
 
 ## 18、blockinfile模块
 
-- blockinfile模块可以帮助我们在指定的文件中插入`一段文本`，这段文本是被标记过的，换句话说就是，我们在这段文本上做了记号，以便在以后的操作中可以通过`标记`找到这段文本，然后修改或者删除它
+- blockinfile 在指定的文件中插入`一段文本`，这段文本是被标记过的，以便在以后的操作中可以通过`标记`找到这段文本，然后修改或者删除它
 
 ### 1)blockinfile模块常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
-| path参 | 必须参数，指定要操作的文件。 |
+| path | 必须参数，指定要操作的文件。 |
 | block | 此参数用于指定我们想要操作的那”一段文本”，此参数有一个别名叫”content”，使用content或block的作用是相同的。 |
 | marker | 假如我们想要在指定文件中插入一段文本，ansible会自动为这段文本添加两个标记，一个开始标记，一个结束标记，默认情况下，开始标记为# BEGIN ANSIBLE MANAGED BLOCK，结束标记为# END ANSIBLE MANAGED BLOCK，我们可以使用marker参数自定义”标记”，比如，marker=#{mark}test ，这样设置以后，开始标记变成了# BEGIN test，结束标记变成了# END test，没错，{mark}会自动被替换成开始标记和结束标记中的BEGIN和END，我们也可以插入很多段文本，为不同的段落添加不同的标记，下次通过对应的标记即可找到对应的段落。 |
 | state | state参数有两个可选值，present与absent，默认情况下，我们会将指定的一段文本”插入”到文件中，如果对应的文件中已经存在对应标记的文本，默认会更新对应段落，在执行插入操作或更新操作时，state的值为present，默认值就是present，如果对应的文件中已经存在对应标记的文本并且将state的值设置为absent，则表示从文件中删除对应标记的段落。 |
-| insertafter | 在插入一段文本时，默认会在文件的末尾插入文本，如果你想要将文本插入在某一行的后面，可以使用此参数指定对应的行，也可以使用正则表达式(python正则)，表示将文本插入在符合正则表达式的行的后面，如果有多行文本都能够匹配对应的正则表达式，则以最后一个满足正则的行为准，此参数的值还可以设置为EOF，表示将文本插入到文档末尾。 |
-| insertbefore | 在插入一段文本时，默认会在文件的末尾插入文本，如果你想要将文本插入在某一行的前面，可以使用此参数指定对应的行，也可以使用正则表达式(python正则)，表示将文本插入在符合正则表达式的行的前面，如果有多行文本都能够匹配对应的正则表达式，则以最后一个满足正则的行为准，此参数的值还可以设置为BOF，表示将文本插入到文档开头。 |
+| insertafter | 在插入一段文本时，默认会在文件的末尾插入文本，如果想要将文本插入在某一行的后面，可以使用此参数指定对应的行，也可以使用正则表达式(python正则)，表示将文本插入在符合正则表达式的行的后面，如果有多行文本都能够匹配对应的正则表达式，则以最后一个满足正则的行为准，此参数的值还可以设置为EOF，表示将文本插入到文档末尾。 |
+| insertbefore | 在插入一段文本时，默认会在文件的末尾插入文本，如果想要将文本插入在某一行的前面，可以使用此参数指定对应的行，也可以使用正则表达式(python正则)，表示将文本插入在符合正则表达式的行的前面，如果有多行文本都能够匹配对应的正则表达式，则以最后一个满足正则的行为准，此参数的值还可以设置为BOF，表示将文本插入到文档开头。 |
 | backup | 是否在修改文件之前对文件进行备份 |
 | create | 当要操作的文件并不存在时，是否创建对应的文件 |
+
+
+### 1)在主机中的/etc/rc.local文件尾部插入如下两行`systemctl start mariadb`,`systemctl start httpd`
+```
+ansible node01 -m blockinfile -a 'path=/etc/rc.local block="systemctl start mariadb\nsystemctl start httpd"'
+```
+
+插入后效果
+```
+# BEGIN ANSIBLE MANAGED BLOCK
+systemctl start mariadb
+systemctl start httpd
+# END ANSIBLE MANAGED BLOCK
+```
+
+### 2)自定义的标记但是标记也会`成对出现`，需要有开始标记和结束标记
+```
+ansible node01 -m blockinfile -a 'path=/etc/rc.local block="systemctl start mariadb\nsystemctl start httpd" marker="#{mark} serivce to start"'
+```
+
+插入后效果
+```
+#BEGIN serivce to start
+systemctl start mariadb
+systemctl start httpd
+#END serivce to start
+```
+
+### 3)在执行此命令时`标记`对应的文本块已经存在时，block参数对应的内容又与之前文本块的内容不同，对应文本块中的内容会被更新，而不会再一次插入新的文本块，这种用法相当于更新原来文本块中的内容。
+```
+ansible node01 -m blockinfile -a 'path=/etc/rc.local block="systemctl start mariadb" marker="#{mark} serivce to start"'
+```
+
+插入后效果
+```
+#BEGIN serivce to start
+systemctl start mariadb
+#END serivce to start
+```
+
+### 4)在执行此命令时`标记`对应的文本块已经存在时，block参数对应的内容为空，blockinfile模块会删除对应标记的文本块，可以使用如下命令删除对应的文本块。
+```
+ansible host node001 -m blockinfile -a 'path=/etc/rc.local block="" marker="#{mark} serivce to start"'
+```
+
+### 5)将文本块插入到文档的开头，可以使用insertbefore参数，将其值设置为BOF，BOF表示Begin Of File。
+```
+ansible node01 -m blockinfile -a 'path=/etc/rc.local block="####blockinfile test####"  marker="#{mark} test" insertbefore=BOF'
+```
+
+### 6)将文本块插入到文档的结尾，与默认操作相同，将insertafter参数设置为EOF表示End Of File。
+```
+ansible node01 -m blockinfile -a 'path=/etc/rc.local block="####blockinfile test####"  marker="#{mark} test" insertafter=EOF'
+```
+
+### 7)使用正则表达式匹配行，将文本块插入到`以#!/bin/bash开头的行`之后。
+```
+ansible node01 -m blockinfile -a 'path=/etc/rc.local block="####blockinfile test####"  marker="#{mark} test reg" insertafter="^#!/bin/bash"'
+```
+
+### 8)使用backup参数，可以在操作修改文件之前，对文件进行备份，备份的文件会在原文件名的基础上添加时间戳
+```
+ansible node01 -m blockinfile -a 'path=/etc/rc.local marker="#{mark} test" state=absent backup=yes'
+```
+
+### 9)使用create参数，如果指定的文件不存在，则创建它
+```
+ansible node01 -m blockinfile -a 'path=/etc/test block="test" marker="#{mark} test" create=yes'
+```
 
 
 ## 19、lineinfile模块
@@ -880,11 +949,35 @@ ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup
 | create | 当要操作的文件并不存在时，是否创建对应的文件 |
 
 
+### 1)指定的文本中的内容如果存在则不做任何操作，如果不存在，默认在文件的末尾插入这行文本。
+```
+ansible node01 -m lineinfile -a 'path=/testdir/test line="test text"'
+```
 
+### 2)正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么line中的内容会被添加到文件的最后一行。
+```
+ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^line" line="test text"'
+```
 
+### 3)根据正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么则不对文件进行任何操作。
+```
+ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^line" line="test text" backrefs=yes'
+```
 
+### 4)根据line参数的内容删除行，如果文件中有多行都与line参数的内容相同，那么这些相同的行都会被删除。
+```
+ansible node01 -m lineinfile -a 'path=/testdir/test line="lineinfile -" state=absent'
+```
 
+### 5)根据正则表达式删除对应行，如果有多行都满足正则表达式，那么所有匹配的行都会被删除。
+```
+ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^lineinfile" state=absent'
+```
 
+### 6)如果将backrefs设置为yes，表示开启支持后向引用，使用如下命令，可以将test示例文件中的”Hello ansible,Hiiii”替换成”Hiiii”，如果不设置backrefs=yes，则不支持后向引用，那么”Hello ansible,Hiiii”将被替换成”\2″
+```
+ansible node01 -m lineinfile -a 'path=/testdir/test regexp="(H.{4}).*(H.{4})" line="\2" backrefs=yes'
+```
 
 ## 20、template模块
 
