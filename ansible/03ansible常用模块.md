@@ -994,7 +994,7 @@ ansible node01 -m lineinfile -a 'path=/testdir/test regexp="(H.{4}).*(H.{4})" li
 
 ### 2)把主机中的/testdir/test文件中的所有ASM替换成asm
 ```
-ansible node01  replace -a 'path=/testdir/test regexp="ASM" replace=asm'
+ansible node01 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm'
 ```
 
 
@@ -1002,6 +1002,30 @@ ansible node01  replace -a 'path=/testdir/test regexp="ASM" replace=asm'
 ```
 ansible node01 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup=yes'
 ```
+
+### 4)关闭selinux
+```
+ansible node01 -m replace -a 'path=/etc/sysconfig/selinux regexp="^SELINUX=.*" replace="SELINUX=disabled"'
+```
+
+## 21、find模块
+
+- find模块可以帮助我们在远程主机中查找符合条件的文件，就像find命令一样。
+
+| 参数 | 描述 |
+|------|------|
+| paths | 必须参数，指定在哪个目录中查找文件，可以指定多个路径，路径间用逗号隔开，此参数有别名，使用别名path或者别名name可以代替paths。 |
+| recurse | 默认情况下，只会在指定的目录中查找文件，也就是说，如果目录中还包含目录，ansible并不会递归的进入子目录查找对应文件，如果想要递归的查找文件，需要使用recurse参数，当recurse参数设置为yes时，表示在指定目录中递归的查找文件。 |
+| hidden | 默认情况下，隐藏文件会被忽略，当hidden参数的值设置为yes时，才会查找隐藏文件。 |
+| file_type | 默认情况下，ansible只会根据条件查找”文件”，并不会查找”目录”或”软链接”等文件类型，如果想要指定查找的文件类型，可以通过file_type指定文件类型，可指定的文件类型有any、directory、file、link 四种。 |
+| patterns | 使用此参数指定需要查找的文件名称，支持使用shell（比如通配符）或者正则表达式去匹配文件名称，默认情况下，使用shell匹配对应的文件名，如果想要使用python的正则去匹配文件名，需要将use_regex参数的值设置为yes。 |
+| use_regex | 默认情况下，find模块不会使用正则表达式去解析patterns参数中对应的内容，当use_regex设置为yes时，表示使用python正则解析patterns参数中的表达式，否则，使用glob通配符解析patterns参数中的表达式。 |
+| contains | 用此参数可以根据文章内容查找文件，此参数的值为一个正则表达式，find模块会根据对应的正则表达式匹配文件内容。 |
+| age | 使用此参数可以根据时间范围查找文件，默认以文件的mtime为准与指定的时间进行对比，比如，如果想要查找mtime在3天之前的文件，那么可以设置age=3d,如果想要查找mtime在3天以内的文件，可以设置age=-3d，这里所说的3天是按照当前时间往前推3天，可以使用的单位有秒(s)、分(m)、时(h)、天(d)、星期(w)。 |
+| age_stamp | 文件的时间属性中有三个时间种类，atime、ctime、mtime，当我们根据时间范围查找文件时，可以指定以哪个时间种类为准，当根据时间查找文件时，默认以mtime为准。 |
+| size | 使用此参数可以根据文件大小查找文件，比如，如果想要查找大于3M的文件，那么可以设置size=3m,如果想要查找小于50k的文件，可以设置size=-50k，可以使用的单位有t、g、m、k、b。 |
+| get_checksum | 当有符合查找条件的文件被找到时，会同时返回对应文件的sha1校验码，如果要查找的文件比较大，那么生成校验码的时间会比较长。 |
+
 
 
 ## 22、template模块
