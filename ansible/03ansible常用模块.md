@@ -1026,7 +1026,64 @@ ansible node01 -m replace -a 'path=/etc/sysconfig/selinux regexp="^SELINUX=.*" r
 | size | 使用此参数可以根据文件大小查找文件，比如，如果想要查找大于3M的文件，那么可以设置size=3m,如果想要查找小于50k的文件，可以设置size=-50k，可以使用的单位有t、g、m、k、b。 |
 | get_checksum | 当有符合查找条件的文件被找到时，会同时返回对应文件的sha1校验码，如果要查找的文件比较大，那么生成校验码的时间会比较长。 |
 
+### 1)在主机的/testdir目录中查找文件内容中包含abc字符串的文件，隐藏文件会被忽略，不会进行递归查找。
+```
+ansible test70 -m find -a 'paths=/testdir contains=".*abc.*" '
+```
+ 
 
+### 2)在主机的/testdir目录以及其子目录中查找文件内容中包含abc字符串的文件，隐藏文件会被忽略。
+```
+ansible test70 -m find -a 'paths=/testdir contains=".*abc.*" recurse=yes '
+```
+ 
+
+### 3)在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，但是不包括目录或其他文件类型，不会进行递归查找。
+```
+ansible test70 -m find -a 'paths=/testdir patterns="*.sh" hidden=yes'
+```
+ 
+
+### 4)在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，包括所有文件类型，比如文件、目录、或者软链接，但是不会进行递归查找。
+```
+ansible test70 -m find -a 'paths=/testdir patterns="*.sh" file_type=any hidden=yes'
+```
+ 
+
+### 5)在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，包括所有文件类型，比如文件、目录、或者软链接，但是不会进行递归查找。
+```
+ansible test70 -m find -a 'paths=/testdir patterns="*.sh" file_type=any hidden=yes'
+```
+ 
+
+### 6)在主机的/testdir目录中查找以.sh结尾的文件，只不过patterns对应的表达式为正则表达式，查找范围包括隐藏文件，包括所有文件类型，但是不会进行递归查找，不会对/testdir目录的子目录进行查找。
+```
+ansible test70 -m find -a 'paths=/testdir patterns=".*\.sh" use_regex=yes file_type=any hidden=yes'
+```
+ 
+
+### 7)在主机的/testdir目录中以及其子目录中查找mtime在4天以内的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
+```
+ansible test70 -m find -a "path=/testdir age=-4d recurse=yes"
+```
+ 
+
+### 8)在主机的/testdir目录中以及其子目录中查找atime在2星期以内的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
+```
+ansible test70 -m find -a "path=/testdir age=-2w age_stamp=atime recurse=yes"
+```
+ 
+
+### 9)在主机的/testdir目录中以及其子目录中查找大于2G的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
+```
+ansible test70 -m find -a "paths=/testdir size=2g recurse=yes"
+```
+ 
+
+### 10)在主机的/testdir目录中以及其子目录中查找以.sh结尾的文件，并且返回符合条件文件的sha1校验码，包括隐藏文件
+```
+ansible test70 -m find -a "paths=/testdir patterns=*.sh get_checksum=yes  hidden=yes recurse=yes"
+```
 
 ## 22、template模块
 
@@ -1069,16 +1126,3 @@ bind {{ ansible_enp0s3.ipv4.address }}
 # cat /etc/redis.conf |grep ^bind
 bind 192.168.1.70
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
