@@ -207,6 +207,233 @@ ansible clsn -m script -a "creates=/opt/testfile /testdir/atest.sh"
 ansible clsn -m script -a "removes=/opt/testfile /testdir/atest.sh"
 ```
 
+## user
+
+1、user模块常用参数说明
+
+| 参数 | 参数说明 |
+|------|--------|
+| name | 必须参数，指定要操作的用户名称，可以使用别名user |
+| group | 指定用户所在的基本组
+| gourps | 指定用户所在的附加组，如果用户已经存在并且已经拥有多个附加组，那么想要继续添加新的附加组，需要结合append参数使用，否则再次使用groups参数设置附加组时，用户原来的附加组会被覆盖。
+| append | 如果用户原本就存在多个附加组，那么当使用groups参数时，当前设置会覆盖原来的附加组设置，如果不想覆盖原来的附加组设置，需要结合append参数，将append设置为yes，表示追加附加组到现有的附加组设置，append默认值为no。
+| shell | 指定用户的默认shell |
+| uid | 指定用户的uid号 | 
+| expires | 指定用户的过期时间 |
+| comment | 指定用户的注释信息 |
+| state | present创建用户，absent删除用户，默认值为present |
+| remove | state设置为absent时，在删除用户时，不会删除用户的家目录等信息，这是因为remoove参数的默认值为no，如果设置为yes，在删除用户的同时，会删除用户的家目录，当state=absent并且remove=yes时，相当于执行”userdel -remove”命令 |
+| password | 指定用户的密码，但是这个密码不能是明文的密码，而是一个对明文密码”加密后”的字符串，相当于/etc/shadow文件中的密码字段，是一个对明文密码进行哈希后的字符串 |
+| update_password | 1、always当前的加密过的密码字符串不一致，则直接更新用户的密码 2、on_create当前的加密过的密码字符串不一致，则不会更新用户的密码字符串，保持之前的密码设定，如果新创建的用户为on_create，会将密码设置为password的值。默认值即为always |
+| generate_ssh_key | 此参数默认值为no，如果设置为yes，表示为对应的用户生成ssh密钥对，默认在用户家目录的./ssh目录中生成名为id_rsa的私钥和名为id_rsa.pub的公钥，如果同名的密钥已经存在与对应的目录中，原同名密钥并不会被覆盖(不做任何操作)  |
+
+2、创建joh用户，uid是1040，主要的组是adm
+```
+ansible node02 -m user -a "name=joh uid=1040 group=adm state=present system=no" -i hosts
+```
+
+3、创建joh用户，登录shell是/sbin/nologin，追加bin、sys两个组
+```
+ansible node02 -m user -a "name=joh shell=/sbin/nologin groups=bin,sys" -i hosts 
+```
+
+4、创建jsm用户，为其添加123作为登录密码，并且创建家目录
+```
+#ansible localhost -m debug -a "msg={{ '123' | password_hash('sha512', 'salt') }}"
+$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1
+
+# ansible node02 -m user -a 'name=jsm password=$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1 create_home=yes'
+```
+
+5、移除joh用户
+```
+# ansible node02  -m user -a 'name=joh state=absent remove=yes' -i hosts 
+```
+
+6、创建http用户，并为该用户创建2048字节的私钥，存放在~/http/.ssh/id_rsa
+```
+# ansible node02  -m user -a 'name=http generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa' -i hosts
+```
+
+## group
+
+1、group模块常用参数说明
+
+| 参数 | 参数说明 |
+|------|--------|
+| name | 必须参数，用于指定要操作的组名称 |
+| state | 用于指定组的状态，两个值可选，present，absent，默认为present，设置为absent表示删除组 |
+| gid | 用于指定组的gid |
+
+
+2、创建news基本组，指定uid为9999
+```
+ansible node02 -m group -a "name=news gid=9999 state=present" -i hosts
+```
+
+3、创建http系统组，指定uid为8888
+```
+ansible node02 -m group -a "name=http gid=8888 system=yes state=present" -i hosts 
+```
+
+4、删除news基本组
+```
+ansible node02 -m group -a "name=news state=absent" -i hosts
+```
+
+## hostname
+```
+# ansible 172.16.1.8 -m hostname -a "name=web01"
+```
+
+## selinux
+```
+# ansible 172.16.1.8 -m selinux -a "state=disabled"
+```
+
+## firewalld
+
+1、启动防火墙
+```
+ansible node02 -m service -a "name=firewalld state=started"
+```
+
+2、永久放行https的流量,只有重启才会生效
+```
+ansible node02 -m firewalld -a "zone=public service=https permanent=yes state=enabled"
+```
+
+3、永久放行8081端口的流量,只有重启才会生效
+```
+# ansible node02 -m firewalld -a "zone=public port=8080/tcp permanent=yes state=enabled"
+```
+
+4、放行8080-8090的所有tcp端口流量,临时和永久都生效.
+```
+# ansible node02 -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled"
+```
+
+## service
+
+1、service模块常用参数说明
+
+| 参数 | 参数说明 |
+|------|--------|
+| name | 服务的名称 |
+| state | 服务状态信息为过去时stared/stoped/restarted/reloaded |
+| enabled | 设置开机自启动yes、no |
+
+2、启动Httpd服务
+```
+ansible web -m service -a "name=httpd state=started"
+```
+
+3、重载Httpd服务
+```
+ansible web -m service -a "name=httpd state=reloaded"
+```
+
+4、重启Httpd服务
+```
+ansible web -m service -a "name=httpd state=restarted"
+```
+
+5、停止Httpd服务
+```
+ansible web -m service -a "name=httpd state=stopped"
+```
+
+6、启动Httpd服务，并加入开机自启
+```
+ansible web -m service -a "name=httpd state=started enabled=yes"  
+```
+
+## yum
+
+1、yum 模块常用参数
+
+| 参数 | 参数说明 |
+|-----|-------|
+| name=name | 指定安装的软件 |
+| state | 1、安装present、installed 2、卸载absent 3、升级latest 4、排除exclude 5、指定仓库enablerepo |
+| disable_gpg_check | 用于禁用对rpm包的公钥gpg验证，默认值为no，表示不禁用验证，设置为yes表示禁用验证，即不验证包，直接安装，在对应的yum源没有开启gpg验证的情况下，需要将此参数的值设置为yes，否则会报错而无法进行安装 |
+| enablerepo | 用于指定安装软件包时临时启用的yum源，假如你想要从A源中安装软件，但是你不确定A源是否启用了，你可以在安装软件包时将此参数的值设置为yes，即使A源的设置是未启用，也可以在安装软件包时临时启用A源 |
+| disablerepo | 用于指定安装软件包时临时禁用的yum源，某些场景下需要此参数，比如，当多个yum源中同时存在要安装的软件包时，你可以使用此参数临时禁用某个源，这样设置后，在安装软件包时则不会从对应的源中选择安装包 |
+
+
+2、安装当前最新的Apache软件，如果存在则更新
+```
+ansible web -m yum -a "name=httpd state=latest"
+```
+
+3、安装当前最新的Apache软件，通过epel仓库安装
+```
+ansible web -m yum -a "name=httpd state=latest enablerepo=epel"
+```
+
+4、通过公网URL安装rpm软件
+```
+ansible web -m yum -a "name=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm state=latest"
+```
+
+5、更新所有的软件包，但排除和kernel相关的
+```
+ansible web -m yum -a "name=* state=latest exclude=kernel*,foo*"
+```
+
+6、删除Apache软件
+```
+ansible web -m yum -a "name=httpd state=absent"
+```
+
+## yum_repository
+
+1、yum_repository模块常用参数说明
+| 参数 | 参数说明 |
+|-----|-------|
+| name | 必须参数，用于指定要操作的唯一的仓库ID，也就是”.repo”配置文件中每个仓库对应的”中括号”内的仓库ID |
+| baseurl | 设置yum仓库的baseurl |
+| description | 设置仓库的注释信息，也就是”.repo”配置文件中每个仓库对应的”name字段”对应的内容。 |
+| file | 设置仓库的配置文件名称，即设置”.repo”配置文件的文件名前缀，不使用此参数情况下，默认以name参数的仓库ID作为”.repo”配置文件的文件名前缀，同一个’.repo’配置文件中可以存在多个yum源 |
+| enabled | 是否激活对应的yum源，此参数默认值为yes，表示启用对应的yum源，设置为no表示不启用对应的yum源。 |
+| gpgcheck | 是否开启rpm包验证功能，默认值为no，表示不启用包验证，设置为yes表示开启包验证功能。 |
+| gpgcakey | 当gpgcheck参数设置为yes时，需要使用此参数指定验证包所需的公钥 |
+| state | 默认值为present，当值设置为absent时，表示删除对应的yum源 |
+
+2、设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/aliEpel.repo
+```
+ansible web -m yum_repository -a 'name=aliEpel description="alibaba EPEL" baseurl=https://mirrors.aliyun.com/epel/$releasever\Server/$basearch/'
+```
+
+3、设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/alibaba.repo
+```
+ansible web -m yum_repository -a 'name=aliEpel description="alibaba EPEL" baseurl=https://mirrors.aliyun.com/epel/$releasever\Server/$basearch/ file=alibaba'
+```
+
+4、设置ID为local 的yum源，但是不启用它（local源使用系统光盘镜像作为本地yum源，以便测试举例，所以baseurl中的值以file:///开头）
+```
+ansible web -m yum_repository -a 'name=local baseurl=file:///media description="local cd yum" enabled=no'
+```
+
+5、设置ID为local的yum源，开启包验证功能，并指定验证包所需的公钥位置为/media/RPM-GPG-KEY-CentOS-7
+```
+ansible web -m yum_repository -a 'name=local baseurl=file:///media description="local cd yum" gpgcheck=yes gpgcakey=file:///media/RPM-GPG-KEY-CentOS-7'
+```
+
+6、删除/etc/yum.repos.d/alibaba.repo配置文件中的aliEpel源
+```
+ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
+```
+
+## get_url
+```
+# ansible 172.16.1.8 -m get_url -a "url=http://lan.znix.top/RDPWrap-v1.6.1.zip dest=/tmp/"
+```
+- url= 下载文件的地址 dest 下载到哪里
+- timeout 超时时间
+- url_password   密码
+- url_username  用户名
+
 ## copy
 
 1、copy模块 把本地文件发送到远端
@@ -327,309 +554,61 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 # ansible clsn -m fetch -a "dest=/tmp/backup/ src=/etc/hosts flat=yes"
 ```
 
-## mount
+## lineinfile
 
-1、mount模块常用参数
+- 确保`某一行文本`存在于指定的文件中，或者确保从文件中删除指定的`文本`（即确保指定的文本不存在于文件中），还可以根据正则表达式，替换`某一行文本`
 
-| 参数 | 参数说明 |
-|------|---------|
-| fstyp| 指定挂载文件类型 -t nfs == fstype=nfs |
-| opts| 设定挂载的参数选项信息 -o ro  == opts=ro |
-| path| 挂载点路径          path=/mnt |
-| src | 要被挂载的目录信息  src=172.16.1.31:/data |
-| state | 挂载的状态 |
-
-| state参数 | state状态说明 |
-|--------|-----------|
-| unmounted | 加载/etc/fstab文件 实现卸载 |
-| absent | 在fstab文件中删除挂载配置 |
-| present | 在fstab文件中添加挂载配置 |
-| mounted | 1.将挂载信息添加到/etc/fstab文件中 2.加载配置文件挂载 |
-
-2、挂载
-```
-# ansible 172.16.1.8 -m mount -a "fstype=nfs opts=rw path=/mnt/  src=172.16.1.31:/data/ state=mounted"
-```
-
-3、卸载
-```
-# ansible 172.16.1.8 -m mount -a "fstype=nfs opts=rw path=/mnt/  src=172.16.1.31:/data/ state=unmounted"
-```
-
-4、环境准备：将172.16.1.61作为nfs服务端，172.16.1.7、172.16.1.8作为nfs客户端挂载
-```
-# ansible localhost -m yum -a 'name=nfs-utils state=present'
-# ansible localhost -m file -a 'path=/ops state=directory'
-# ansible localhost -m copy -a 'content="/ops 172.16.1.0/24(rw,sync)" dest=/etc/exports'
-# ansible localhost -m service -a "name=nfs state=restarted"
-
-#1、挂载nfs存储至本地的/opt目录，并实现开机自动挂载
-# ansible node02 -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=mounted"  
-
-#2、永久卸载nfs的挂载，会清理/etc/fstab
-# ansible webservers -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=absent"
-```
-
-## cron
-
-1、cron模块常用参数
-
-| 参数 | 参数说明 |
-|------|---------|
-| minute 分 | Minute when the job should run ( 0-59, *, */2, etc ) |
-| hour 时 | Hour when the job should run ( 0-23, *, */2, etc ) |
-| day 日 | Day of the month the job should run ( 1-31, *, */2, etc ) |
-| month 月 | Month of the year the job should run ( 1-12, *, */2, etc ) |
-| weekday 周 | Day of the week that the job should run ( 0-6 for Sunday-Saturday, *, etc ) |
-| job | 工作 ;要做的事情 |
-| name | 定义定时任务的描述信息 |
-| disabled | 注释定时任务 |
-| state | 1、absent删除定时任务 2、present创建定时任务，默认为present  |
-
-2、添加定时任务
-```
-# ansible clsn -m cron -a "minute=0 hour=0 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null' name=clsn01"
-```
-
-3、删除定时任务
-```
-# ansible clsn -m cron -a "minute=00 hour=00 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null' name=clsn01 state=absent"
-```
-
-4、只用名字就可以删除
-```
-# ansible clsn -m cron -a "name=clsn01  state=absent"
-```
-
-5、注释定时任务
-- 注意： 注释定时任务的时候必须有job的参数
-```
-# ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=yes"
-```
-
-6、取消注释
-```
-# ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=no"
-```
-
-## yum
-
-1、yum 模块常用参数
-
-| 参数 | 参数说明 |
-|-----|-------|
-| name=name | 指定安装的软件 |
-| state | 1、安装present、installed 2、卸载absent 3、升级latest 4、排除exclude 5、指定仓库enablerepo |
-| disable_gpg_check | 用于禁用对rpm包的公钥gpg验证，默认值为no，表示不禁用验证，设置为yes表示禁用验证，即不验证包，直接安装，在对应的yum源没有开启gpg验证的情况下，需要将此参数的值设置为yes，否则会报错而无法进行安装 |
-| enablerepo | 用于指定安装软件包时临时启用的yum源，假如你想要从A源中安装软件，但是你不确定A源是否启用了，你可以在安装软件包时将此参数的值设置为yes，即使A源的设置是未启用，也可以在安装软件包时临时启用A源 |
-| disablerepo | 用于指定安装软件包时临时禁用的yum源，某些场景下需要此参数，比如，当多个yum源中同时存在要安装的软件包时，你可以使用此参数临时禁用某个源，这样设置后，在安装软件包时则不会从对应的源中选择安装包 |
-
-
-2、安装当前最新的Apache软件，如果存在则更新
-```
-ansible web -m yum -a "name=httpd state=latest"
-```
-
-3、安装当前最新的Apache软件，通过epel仓库安装
-```
-ansible web -m yum -a "name=httpd state=latest enablerepo=epel"
-```
-
-4、通过公网URL安装rpm软件
-```
-ansible web -m yum -a "name=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm state=latest"
-```
-
-5、更新所有的软件包，但排除和kernel相关的
-```
-ansible web -m yum -a "name=* state=latest exclude=kernel*,foo*"
-```
-
-6、删除Apache软件
-```
-ansible web -m yum -a "name=httpd state=absent"
-```
-
-## yum_repository
-
-1、yum_repository模块常用参数说明
-| 参数 | 参数说明 |
-|-----|-------|
-| name | 必须参数，用于指定要操作的唯一的仓库ID，也就是”.repo”配置文件中每个仓库对应的”中括号”内的仓库ID |
-| baseurl | 设置yum仓库的baseurl |
-| description | 设置仓库的注释信息，也就是”.repo”配置文件中每个仓库对应的”name字段”对应的内容。 |
-| file | 设置仓库的配置文件名称，即设置”.repo”配置文件的文件名前缀，不使用此参数情况下，默认以name参数的仓库ID作为”.repo”配置文件的文件名前缀，同一个’.repo’配置文件中可以存在多个yum源 |
-| enabled | 是否激活对应的yum源，此参数默认值为yes，表示启用对应的yum源，设置为no表示不启用对应的yum源。 |
-| gpgcheck | 是否开启rpm包验证功能，默认值为no，表示不启用包验证，设置为yes表示开启包验证功能。 |
-| gpgcakey | 当gpgcheck参数设置为yes时，需要使用此参数指定验证包所需的公钥 |
-| state | 默认值为present，当值设置为absent时，表示删除对应的yum源 |
-
-2、设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/aliEpel.repo
-```
-ansible web -m yum_repository -a 'name=aliEpel description="alibaba EPEL" baseurl=https://mirrors.aliyun.com/epel/$releasever\Server/$basearch/'
-```
-
-3、设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/alibaba.repo
-```
-ansible web -m yum_repository -a 'name=aliEpel description="alibaba EPEL" baseurl=https://mirrors.aliyun.com/epel/$releasever\Server/$basearch/ file=alibaba'
-```
-
-4、设置ID为local 的yum源，但是不启用它（local源使用系统光盘镜像作为本地yum源，以便测试举例，所以baseurl中的值以file:///开头）
-```
-ansible web -m yum_repository -a 'name=local baseurl=file:///media description="local cd yum" enabled=no'
-```
-
-5、设置ID为local的yum源，开启包验证功能，并指定验证包所需的公钥位置为/media/RPM-GPG-KEY-CentOS-7
-```
-ansible web -m yum_repository -a 'name=local baseurl=file:///media description="local cd yum" gpgcheck=yes gpgcakey=file:///media/RPM-GPG-KEY-CentOS-7'
-```
-
-6、删除/etc/yum.repos.d/alibaba.repo配置文件中的aliEpel源
-```
-ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
-```
-
-## service
-
-1、service模块常用参数说明
+1、lineinfile模块常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
-| name | 服务的名称 |
-| state | 服务状态信息为过去时stared/stoped/restarted/reloaded |
-| enabled | 设置开机自启动yes、no |
-
-2、启动Httpd服务
-```
-ansible web -m service -a "name=httpd state=started"
-```
-
-3、重载Httpd服务
-```
-ansible web -m service -a "name=httpd state=reloaded"
-```
-
-4、重启Httpd服务
-```
-ansible web -m service -a "name=httpd state=restarted"
-```
-
-5、停止Httpd服务
-```
-ansible web -m service -a "name=httpd state=stopped"
-```
-
-6、启动Httpd服务，并加入开机自启
-```
-ansible web -m service -a "name=httpd state=started enabled=yes"  
-```
-
-## hostname
-```
-# ansible 172.16.1.8 -m hostname -a "name=web01"
-```
-
-## selinux
-```
-# ansible 172.16.1.8 -m selinux -a "state=disabled"
-```
-
-## get_url
-```
-# ansible 172.16.1.8 -m get_url -a "url=http://lan.znix.top/RDPWrap-v1.6.1.zip dest=/tmp/"
-```
-- url= 下载文件的地址 dest 下载到哪里
-- timeout 超时时间
-- url_password   密码
-- url_username  用户名
-
-## firewalld
-```
-# ansible node02 -m service -a "name=firewalld state=started"
-
-#1、永久放行https的流量,只有重启才会生效
-# ansible node02 -m firewalld -a "zone=public service=https permanent=yes state=enabled"
-
-#2、永久放行8081端口的流量,只有重启才会生效
-# ansible node02 -m firewalld -a "zone=public port=8080/tcp permanent=yes state=enabled"
-	
-#3、放行8080-8090的所有tcp端口流量,临时和永久都生效.
-# ansible node02 -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled"
-```
-
-## group
-
-1、group模块常用参数说明
-
-| 参数 | 参数说明 |
-|------|--------|
-| name | 必须参数，用于指定要操作的组名称 |
-| state | 用于指定组的状态，两个值可选，present，absent，默认为present，设置为absent表示删除组 |
-| gid | 用于指定组的gid |
+| path | 必须参数，指定要操作的文件。 |
+| line | 使用此参数指定文本内容。 |
+| regexp | 使用正则表达式匹配对应的行，当替换文本时，如果有多行文本都能被匹配，则只有最后面被匹配到的那行文本才会被替换，当删除文本时，如果有多行文本都能被匹配，这么这些行都会被删除。 |
+| state | 当想要删除对应的文本时，需要将state参数的值设置为absent，absent为缺席之意，表示删除，state的默认值为present |
+| backrefs | 默认情况下，当根据正则替换文本时，即使regexp参数中的正则存在分组，在line参数中也不能对正则中的分组进行引用，除非将backrefs参数的值设置为yes，backrefs=yes表示开启后向引用，这样，line参数中就能对regexp参数中的分组进行后向引用了，这样说不太容易明白，参考下面的示例命令比较直观一点，backrefs=yes除了能够开启后向引用功能，还有另一个作用，默认情况下，当使用正则表达式替换对应行时，如果正则没有匹配到任何的行，那么line对应的内容会被插入到文本的末尾，不过，如果使用了backrefs=yes，情况就不一样了，当使用正则表达式替换对应行时，同时设置了backrefs=yes，那么当正则没有匹配到任何的行时，则不会对文件进行任何操作，相当于保持原文件不变，如果没有理解，就按照下面的示例命令，动手操作一下吧，那样更加直观。 |
+| insertafter | 借助insertafter参数可以将文本插入到“指定的行”之后，insertafter参数的值可以设置为EOF或者正则表达式，EOF为End Of File之意，表示插入到文档的末尾，默认情况下insertafter的值为EOF，如果将insertafter的值设置为正则表达式，表示将文本插入到匹配到正则的行之后，如果正则没有匹配到任何行，则插入到文件末尾，当使用backrefs参数时，此参数会被忽略。 |
+| insertbefore | 借助insertbefore参数可以将文本插入到“指定的行”之前，insertbefore参数的值可以设置为BOF或者正则表达式，BOF为Begin Of File之意，表示插入到文档的开头，如果将insertbefore的值设置为正则表达式，表示将文本插入到匹配到正则的行之前，如果正则没有匹配到任何行，则插入到文件末尾，当使用backrefs参数时，此参数会被忽略。 |
+| backup | 是否在修改文件之前对文件进行备份。 |
+| create | 当要操作的文件并不存在时，是否创建对应的文件 |
 
 
-2、创建news基本组，指定uid为9999
+2、指定的文本中的内容如果存在则不做任何操作，如果不存在，默认在文件的末尾插入这行文本。
 ```
-ansible node02 -m group -a "name=news gid=9999 state=present" -i hosts
-```
-
-3、创建http系统组，指定uid为8888
-```
-ansible node02 -m group -a "name=http gid=8888 system=yes state=present" -i hosts 
+ansible node01 -m lineinfile -a 'path=/testdir/test line="test text"'
 ```
 
-4、删除news基本组
+3、正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么line中的内容会被添加到文件的最后一行。
 ```
-ansible node02 -m group -a "name=news state=absent" -i hosts
-```
-
-## user
-
-1、user模块常用参数说明
-
-| 参数 | 参数说明 |
-|------|--------|
-| name | 必须参数，指定要操作的用户名称，可以使用别名user |
-| group | 指定用户所在的基本组
-| gourps | 指定用户所在的附加组，如果用户已经存在并且已经拥有多个附加组，那么想要继续添加新的附加组，需要结合append参数使用，否则再次使用groups参数设置附加组时，用户原来的附加组会被覆盖。
-| append | 如果用户原本就存在多个附加组，那么当使用groups参数时，当前设置会覆盖原来的附加组设置，如果不想覆盖原来的附加组设置，需要结合append参数，将append设置为yes，表示追加附加组到现有的附加组设置，append默认值为no。
-| shell | 指定用户的默认shell |
-| uid | 指定用户的uid号 | 
-| expires | 指定用户的过期时间 |
-| comment | 指定用户的注释信息 |
-| state | present创建用户，absent删除用户，默认值为present |
-| remove | state设置为absent时，在删除用户时，不会删除用户的家目录等信息，这是因为remoove参数的默认值为no，如果设置为yes，在删除用户的同时，会删除用户的家目录，当state=absent并且remove=yes时，相当于执行”userdel -remove”命令 |
-| password | 指定用户的密码，但是这个密码不能是明文的密码，而是一个对明文密码”加密后”的字符串，相当于/etc/shadow文件中的密码字段，是一个对明文密码进行哈希后的字符串 |
-| update_password | 1、always当前的加密过的密码字符串不一致，则直接更新用户的密码 2、on_create当前的加密过的密码字符串不一致，则不会更新用户的密码字符串，保持之前的密码设定，如果新创建的用户为on_create，会将密码设置为password的值。默认值即为always |
-| generate_ssh_key | 此参数默认值为no，如果设置为yes，表示为对应的用户生成ssh密钥对，默认在用户家目录的./ssh目录中生成名为id_rsa的私钥和名为id_rsa.pub的公钥，如果同名的密钥已经存在与对应的目录中，原同名密钥并不会被覆盖(不做任何操作)  |
-
-2、创建joh用户，uid是1040，主要的组是adm
-```
-ansible node02 -m user -a "name=joh uid=1040 group=adm state=present system=no" -i hosts
+ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^line" line="test text"'
 ```
 
-3、创建joh用户，登录shell是/sbin/nologin，追加bin、sys两个组
+4、根据正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么则不对文件进行任何操作。
 ```
-ansible node02 -m user -a "name=joh shell=/sbin/nologin groups=bin,sys" -i hosts 
-```
-
-4、创建jsm用户，为其添加123作为登录密码，并且创建家目录
-```
-#ansible localhost -m debug -a "msg={{ '123' | password_hash('sha512', 'salt') }}"
-$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1
-
-# ansible node02 -m user -a 'name=jsm password=$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1 create_home=yes'
+ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^line" line="test text" backrefs=yes'
 ```
 
-5、移除joh用户
+5、根据line参数的内容删除行，如果文件中有多行都与line参数的内容相同，那么这些相同的行都会被删除。
 ```
-# ansible node02  -m user -a 'name=joh state=absent remove=yes' -i hosts 
+ansible node01 -m lineinfile -a 'path=/testdir/test line="lineinfile -" state=absent'
 ```
 
-6、创建http用户，并为该用户创建2048字节的私钥，存放在~/http/.ssh/id_rsa
+6、根据正则表达式删除对应行，如果有多行都满足正则表达式，那么所有匹配的行都会被删除。
 ```
-# ansible node02  -m user -a 'name=http generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa' -i hosts
+ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^lineinfile" state=absent'
 ```
+
+7、如果将backrefs设置为yes，表示开启支持后向引用，使用如下命令，可以将test示例文件中的”Hello ansible,Hiiii”替换成”Hiiii”，如果不设置backrefs=yes，则不支持后向引用，那么”Hello ansible,Hiiii”将被替换成”\2″
+```
+ansible node01 -m lineinfile -a 'path=/testdir/test regexp="(H.{4}).*(H.{4})" line="\2" backrefs=yes'
+```
+
+
+
+
+
+
+
 
 ## replace
 
@@ -746,56 +725,90 @@ ansible node01 -m blockinfile -a 'path=/etc/rc.local marker="#{mark} test" state
 ansible node01 -m blockinfile -a 'path=/etc/test block="test" marker="#{mark} test" create=yes'
 ```
 
+## mount
 
-## lineinfile
-
-- 确保`某一行文本`存在于指定的文件中，或者确保从文件中删除指定的`文本`（即确保指定的文本不存在于文件中），还可以根据正则表达式，替换`某一行文本`
-
-1、lineinfile模块常用参数说明
+1、mount模块常用参数
 
 | 参数 | 参数说明 |
-|------|--------|
-| path | 必须参数，指定要操作的文件。 |
-| line | 使用此参数指定文本内容。 |
-| regexp | 使用正则表达式匹配对应的行，当替换文本时，如果有多行文本都能被匹配，则只有最后面被匹配到的那行文本才会被替换，当删除文本时，如果有多行文本都能被匹配，这么这些行都会被删除。 |
-| state | 当想要删除对应的文本时，需要将state参数的值设置为absent，absent为缺席之意，表示删除，state的默认值为present |
-| backrefs | 默认情况下，当根据正则替换文本时，即使regexp参数中的正则存在分组，在line参数中也不能对正则中的分组进行引用，除非将backrefs参数的值设置为yes，backrefs=yes表示开启后向引用，这样，line参数中就能对regexp参数中的分组进行后向引用了，这样说不太容易明白，参考下面的示例命令比较直观一点，backrefs=yes除了能够开启后向引用功能，还有另一个作用，默认情况下，当使用正则表达式替换对应行时，如果正则没有匹配到任何的行，那么line对应的内容会被插入到文本的末尾，不过，如果使用了backrefs=yes，情况就不一样了，当使用正则表达式替换对应行时，同时设置了backrefs=yes，那么当正则没有匹配到任何的行时，则不会对文件进行任何操作，相当于保持原文件不变，如果没有理解，就按照下面的示例命令，动手操作一下吧，那样更加直观。 |
-| insertafter | 借助insertafter参数可以将文本插入到“指定的行”之后，insertafter参数的值可以设置为EOF或者正则表达式，EOF为End Of File之意，表示插入到文档的末尾，默认情况下insertafter的值为EOF，如果将insertafter的值设置为正则表达式，表示将文本插入到匹配到正则的行之后，如果正则没有匹配到任何行，则插入到文件末尾，当使用backrefs参数时，此参数会被忽略。 |
-| insertbefore | 借助insertbefore参数可以将文本插入到“指定的行”之前，insertbefore参数的值可以设置为BOF或者正则表达式，BOF为Begin Of File之意，表示插入到文档的开头，如果将insertbefore的值设置为正则表达式，表示将文本插入到匹配到正则的行之前，如果正则没有匹配到任何行，则插入到文件末尾，当使用backrefs参数时，此参数会被忽略。 |
-| backup | 是否在修改文件之前对文件进行备份。 |
-| create | 当要操作的文件并不存在时，是否创建对应的文件 |
+|------|---------|
+| fstyp| 指定挂载文件类型 -t nfs == fstype=nfs |
+| opts| 设定挂载的参数选项信息 -o ro  == opts=ro |
+| path| 挂载点路径          path=/mnt |
+| src | 要被挂载的目录信息  src=172.16.1.31:/data |
+| state | 挂载的状态 |
 
+| state参数 | state状态说明 |
+|--------|-----------|
+| unmounted | 加载/etc/fstab文件 实现卸载 |
+| absent | 在fstab文件中删除挂载配置 |
+| present | 在fstab文件中添加挂载配置 |
+| mounted | 1.将挂载信息添加到/etc/fstab文件中 2.加载配置文件挂载 |
 
-2、指定的文本中的内容如果存在则不做任何操作，如果不存在，默认在文件的末尾插入这行文本。
+2、挂载
 ```
-ansible node01 -m lineinfile -a 'path=/testdir/test line="test text"'
-```
-
-3、正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么line中的内容会被添加到文件的最后一行。
-```
-ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^line" line="test text"'
+# ansible 172.16.1.8 -m mount -a "fstype=nfs opts=rw path=/mnt/  src=172.16.1.31:/data/ state=mounted"
 ```
 
-4、根据正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么则不对文件进行任何操作。
+3、卸载
 ```
-ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^line" line="test text" backrefs=yes'
-```
-
-5、根据line参数的内容删除行，如果文件中有多行都与line参数的内容相同，那么这些相同的行都会被删除。
-```
-ansible node01 -m lineinfile -a 'path=/testdir/test line="lineinfile -" state=absent'
+# ansible 172.16.1.8 -m mount -a "fstype=nfs opts=rw path=/mnt/  src=172.16.1.31:/data/ state=unmounted"
 ```
 
-6、根据正则表达式删除对应行，如果有多行都满足正则表达式，那么所有匹配的行都会被删除。
+4、环境准备：将172.16.1.61作为nfs服务端，172.16.1.7、172.16.1.8作为nfs客户端挂载
 ```
-ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^lineinfile" state=absent'
+# ansible localhost -m yum -a 'name=nfs-utils state=present'
+# ansible localhost -m file -a 'path=/ops state=directory'
+# ansible localhost -m copy -a 'content="/ops 172.16.1.0/24(rw,sync)" dest=/etc/exports'
+# ansible localhost -m service -a "name=nfs state=restarted"
+
+#1、挂载nfs存储至本地的/opt目录，并实现开机自动挂载
+# ansible node02 -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=mounted"  
+
+#2、永久卸载nfs的挂载，会清理/etc/fstab
+# ansible webservers -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=absent"
 ```
 
-7、如果将backrefs设置为yes，表示开启支持后向引用，使用如下命令，可以将test示例文件中的”Hello ansible,Hiiii”替换成”Hiiii”，如果不设置backrefs=yes，则不支持后向引用，那么”Hello ansible,Hiiii”将被替换成”\2″
+## cron
+
+1、cron模块常用参数
+
+| 参数 | 参数说明 |
+|------|---------|
+| minute 分 | Minute when the job should run ( 0-59, *, */2, etc ) |
+| hour 时 | Hour when the job should run ( 0-23, *, */2, etc ) |
+| day 日 | Day of the month the job should run ( 1-31, *, */2, etc ) |
+| month 月 | Month of the year the job should run ( 1-12, *, */2, etc ) |
+| weekday 周 | Day of the week that the job should run ( 0-6 for Sunday-Saturday, *, etc ) |
+| job | 工作 ;要做的事情 |
+| name | 定义定时任务的描述信息 |
+| disabled | 注释定时任务 |
+| state | 1、absent删除定时任务 2、present创建定时任务，默认为present  |
+
+2、添加定时任务
 ```
-ansible node01 -m lineinfile -a 'path=/testdir/test regexp="(H.{4}).*(H.{4})" line="\2" backrefs=yes'
+# ansible clsn -m cron -a "minute=0 hour=0 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null' name=clsn01"
 ```
 
+3、删除定时任务
+```
+# ansible clsn -m cron -a "minute=00 hour=00 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null' name=clsn01 state=absent"
+```
+
+4、只用名字就可以删除
+```
+# ansible clsn -m cron -a "name=clsn01  state=absent"
+```
+
+5、注释定时任务
+- 注意： 注释定时任务的时候必须有job的参数
+```
+# ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=yes"
+```
+
+6、取消注释
+```
+# ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=no"
+```
 
 ## find
 
@@ -876,7 +889,7 @@ ansible test70 -m find -a "paths=/testdir size=2g recurse=yes"
 ansible test70 -m find -a "paths=/testdir patterns=*.sh get_checksum=yes  hidden=yes recurse=yes"
 ```
 
-## 22、template模块
+## template模块
 
 1、template模块常用参数说明
 
