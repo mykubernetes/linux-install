@@ -386,3 +386,111 @@ jinja2 test
 jinja2 test
 3 1 7 8 2
 ```
+
+13、`for`除了能够循环操作列表，也能够循环操作字典
+
+- 在循环操作字典时，使用iteritems函数对字典进行处理。然后使用key和val两个变量作为迭代变量，分别用于存放字典中键值对的”键”和”值”。
+```
+# 1、编写剧本
+# cat test.j2
+jinja2 test
+{% for key,val in {'name':'bob','age':18}.iteritems() %}
+{{ key ~ ':' ~ val }}
+{% endfor %}
+
+#2、渲染后的结果
+# cat test
+jinja2 test
+age:18
+name:bob
+```
+- iteritems函数也可以替换成items函数，推荐使用iteritems函数
+
+| 变量名称 | 描述 |
+| loop.index | 当前循环操作为整个循环的第几次循环，序号从1开始 |
+| loop.index0 | 当前循环操作为整个循环的第几次循环，序号从0开始 |
+| loop.revindex | 当前循环操作距离整个循环结束还有几次，序号到1结束 |
+| loop.revindex0 | 当前循环操作距离整个循环结束还有几次，序号到0结束 |
+| loop.first | 当操作可迭代对象中的第一个元素时，此变量的值为true |
+| loop.last | 当操作可迭代对象中的最后一个元素时，此变量的值为true |
+| loop.length | 可迭代对象的长度 |
+| loop.depth | 当使用递归的循环时，当前迭代所在的递归中的层级，层级序号从1开始 |
+| loop.depth0 | 当使用递归的循环时，当前迭代所在的递归中的层级，层级序号从0开始 |
+| loop.cycle() | 这是一个辅助函数，通过这个函数我们可以在指定的一些值中进行轮询取值 |
+
+1、借助`loop.index`特殊变量,知道当前循环操作为整个循环的第几次操作
+```
+# 1、编写剧本文件
+# cat test.j2
+jinja2 test
+{% for i in [3,1,7,8,2] %}
+{{ i ~ '----' ~ loop.index }}
+{% endfor %}
+
+# 2、渲染后的结果
+# cat test
+jinja2 test
+3----1
+1----2
+7----3
+8----4
+2----5
+```
+
+2、对一段内容循环的生成指定的次数，则可以使用range函数完成。
+```
+# 1、编写jinja文件
+{% for i in range(3) %}
+something
+...
+{% endfor %}
+
+
+#2、渲染后的结果
+something
+...
+something
+...
+something
+...
+```
+
+3、range函数可以指定起始数字、结束数字、步长等，默认的起始数字为0。
+```
+# 1、编写jinja文件
+{% for i in range(1,4,2) %}
+  {{i}}
+{% endfor %}
+
+# 2、渲染后的结果
+  1
+  3
+```
+
+4、模板中的for循环不能像其他语言中的 for循环那样使用break或者continue跳出循环，但是你可以在”for”循环中添加”if”过滤条件，以便符合条件时，循环才执行真正的操作
+```
+# 1、编写jinja文件
+{% for i in [7,1,5,3,9] if i > 3 %}
+  {{ i }}
+{% endfor %}
+
+# 2、渲染后的结果
+  7
+  5
+  9
+```
+
+5、在for循环中使用if判断控制语句进行判断
+```
+# 1、编写jinja文件
+{% for i in [7,1,5,3,9] %}
+  {% if i>3 %}
+    {{ i }}
+  {%endif%}
+{% endfor %}
+
+# 2、渲染后的结果
+  7
+  5
+  9
+```
