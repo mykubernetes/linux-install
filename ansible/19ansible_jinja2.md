@@ -93,11 +93,139 @@ test {{ testvar1 }} test
 | Boolean | 布尔 | `{{ True }}`,`{{ true }}`,`{{ False }}`,`{{ false }}` | `True`,`True`,`False`,`False` |
 
 
+1、使用ad-hoc执行命令时，会把列表、数字、字典等数据类型当做参数传入，这些参数会被默认当做字符串，所以需要playbook的方式渲染模板。
+```
+# 1、配置jinja模板
+# /testdir/ansible/test.j2
+jinja2 test
+{{ teststr }}
+{{ testnum }}
+{{ testlist[1] }}
+{{ testlist1[1] }}
+{{ testdic['name'] }}
 
+# 2、编写剧本
+# cat temptest.yml
+---
+- hosts: web
+ remote_user: root
+ gather_facts: no
+ vars:
+   teststr: 'tstr'
+   testnum: 18
+   testlist: ['aA','bB','cC']
+   testlist1:
+   - AA
+   - BB
+   - CC
+   testdic:
+     name: bob
+     age: 18
+ tasks:
+ - template:
+     src: /testdir/ansible/test.j2
+     dest: /opt/test
 
+# 3、通过ansible-playbook方式运行
+# ansible-playbook temptest.yml
 
+# 4、查看渲染结果
+# cat /opt/test
+jinja2 test
+tstr
+18
+bB
+BB
+bob
+```
 
+2、除了变量和各种常用的运算符，过滤器也可以直接在`{{  }}`中使用。
+```
+模板文件内容
+# cat test.j2
+jinja2 test
+{{ 'abc' | upper }}
+ 
+ 
+生成文件内容
+# cat test
+jinja2 test
+ABC
+```
 
+3、jinja2的tests也能在`{{  }}`中使用。
+```
+# 1、模板文件内容
+# cat test.j2
+jinja2 test
+{{ testvar1 is defined }}
+{{ testvar1 is undefined }}
+{{ '/opt' is exists }}
+{{ '/opt' is file }}
+{{ '/opt' is directory }}
+ 
+# 2、执行命令时传入变量
+# ansible test70 -m template -e "testvar1=1 testvar2=2" -a "src=test.j2 dest=/opt/test"
+ 
+# 3、生成文件内容
+# cat test
+jinja2 test
+True
+False
+True
+False
+True
+```
 
+4、lookup也可以直接在`{{  }}`中使用。
+```
+# 1、模板文件内容如下
+# cat /testdir/ansible/test.j2
+jinja2 test
+ 
+{{ lookup('file','/testdir/testfile') }}
+ 
+{{ lookup('env','PATH') }}
+ 
+test jinja2
 
+ 
+# 2、ansible主机中的testfile内容如下
+# cat /testdir/testfile
+testfile in ansible
+These are for testing purposes only
+ 
+ 
+# 3、生成文件内容如下
+# cat test
+jinja2 test
+ 
+testfile in ansible
+These are for testing purposes only
+ 
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+ 
+test jinja2
+```
 
+5、在模板文件中对某些配置进行注释，则可以将注释信息写入到`{#   #}`
+```
+# 1、模板文件内容如下：
+# cat test.j2
+jinja2 test
+{#这是一行注释信息#}
+jinja2 test
+{#
+这是多行注释信息，
+模板被渲染以后，
+最终的文件中不会包含这些信息
+#}
+jinja2 test
+ 
+ 
+# 2、生成文件内容如下：
+# cat test
+jinja2 test
+jinja2 test
+jinja2 test
+```
