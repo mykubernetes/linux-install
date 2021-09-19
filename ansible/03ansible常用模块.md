@@ -90,9 +90,33 @@ ssh 192.168.0.2            #其他机器ip
 
 # 二、ansible常用模块
 
-## 1、command 模块 默认模块
+- [command](#command)
+- [shell](#shell)
+- [script](#script)
+- [user](#user)
+- [group](#group)
+- [hostname](#hostname)
+- [selinux](#selinux)
+- [firewalld](#firewalld)
+- [service](#service)
+- [yum](#yum)
+- [yum_repository](#yum_repository)
+- [get_url](#get_url)
+- [copy](#copy)
+- [file](#file)
+- [fetch](#fetch)
+- [lineinfile](#lineinfile)
+- [replace](#replace)
+- [blockinfile](#blockinfile)
+- [mount](#mount)
+- [cron](#cron)
+- [find](#find)
+- [template](#template)
 
-### 1）command命令常用参数说明
+
+## command
+
+1、command命令常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
@@ -105,44 +129,34 @@ ssh 192.168.0.2            #其他机器ip
 
 -  command不支持管道技术
 
-### 2）不指定模块的时候默认使用的模块就是command
+2、不指定模块的时候默认使用的模块就是command
 ```
 # ansible all -a "date"
-192.168.101.69 | SUCCESS | rc=0 >>
-Thu Oct 19 17:12:15 CST 2017
 ```
 
-### 3）使用ansible自带模块执行命令 如果要用 > < | & ' ' 使用shell模块
+3、使用ansible自带模块执行命令 如果要用 > < | & ' ' 使用shell模块
 ```
 # ansible all -m command -a "date"
-192.168.101.69 | SUCCESS | rc=0 >>
-Thu Oct 19 17:12:27 CST 2017
 ```
 
-### 4）chdir参数的使用：
+4、chdir参数的使用：
 ```
 # ansible clsn -m command -a "chdir=/tmp pwd"
-192.168.101.69 | SUCCESS | rc=0 >>
-/tmp
 ```
 
-### 5）creates 文件是否存在，不存在就执行命令
+5、creates 文件是否存在，不存在就执行命令
 ```
 # ansible clsn -m command -a "creates=/etc/hosts date"
-192.168.101.69 | SUCCESS | rc=0 >>
-skipped, since /etc/hosts exists
 ```
 
-### 6）removes 文件是否存在，不存在就不执行命令，
+6、removes 文件是否存在，不存在就不执行命令，
 ```
 # ansible clsn -m command -a "removes=/etc/hosts date"
-192.168.101.69 | SUCCESS | rc=0 >>
-Fri Oct 20 13:32:40 CST 2017
 ```
 
-## 2、shell模块 万能模块
+## shell
 
-### 1）shell命令常用参数说明
+1、shell命令常用参数说明
 | 选项参数 | 选项说明 |
 |---------|---------|
 | free_form | 必须参数，指定需要执行的脚本，脚本位于ansible主机本地，并没有具体的一个参数名叫free_form |
@@ -151,18 +165,19 @@ Fri Oct 20 13:32:40 CST 2017
 | removes | 使用此参数指定一个远程主机中的文件，当指定的文件不存在时，就不执行对应脚本 |
 | executable | 默认情况下，shell模块会调用远程主机中的/bin/sh去执行对应的命令，通常情况下，远程主机中的默认shell都是bash，如果你想要使用其他类型的shell执行命令，则可以使用此参数指定某种类型的shell去执行对应的命令，指定shell文件时，需要使用绝对路径 |
 
-### 2)shell 模块在远程执行脚本时，远程主机上一定要有相应的脚本
+2、shell 模块在远程执行脚本时，远程主机上一定要有相应的脚本
 ```
 # ansible clsn -m shell -a "/bin/sh /server/scripts/ssh-key.sh"
 192.168.101.69 | SUCCESS | rc=0 >>
 fenfa 192.168.101.69 [  OK  ]
 ```
 
-## 3、script 模块 执行脚本模块
+## script
 
 - script模块可以帮助我们在远程主机上执行ansible主机上的脚本，也就是说，脚本一直存在于ansible主机本地，不需要手动拷贝到远程主机后再执行。
 
-### 1）script命令常用参数说明
+1、script命令常用参数说明
+
 | 选项参数 | 选项说明 |
 |---------|---------|
 | free_form | 必须参数，指定需要执行的脚本，脚本位于ansible主机本地，并没有具体的一个参数名叫free_form |
@@ -171,42 +186,30 @@ fenfa 192.168.101.69 [  OK  ]
 | removes | 使用此参数指定一个远程主机中的文件，当指定的文件不存在时，就不执行对应脚本 |
 
 
-### 2)在本地执行脚本时，将脚本中的内容传输到远程节点上运行
+2、在本地执行脚本时，将脚本中的内容传输到远程节点上运行
 ```
 ansible all -m script -a "/server/scripts/free.sh"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "rc": 0,
-    "stderr": "Shared connection to 192.168.101.69 closed.\r\n",
-    "stdout": "             total       used       free     shared    buffers     cached\r\nMem:          474M       377M        97M       532K        54M       202M\r\n-/+ buffers/cache:       120M       354M\r\nSwap:         767M         0B       767M\r\n",
-    "stdout_lines": [
-        "             total       used       free     shared    buffers     cached",
-        "Mem:          474M       377M        97M       532K        54M       202M",
-        "-/+ buffers/cache:       120M       354M",
-        "Swap:         767M         0B       767M"
-    ]
-}
 ```
 - 使用scripts模块，不用将脚本传输到远程节点，脚本本身不用进行授权，即可利用script模块执行。直接执行脚本即可，不需要使用sh
 
-先进入到主机中的/opt目录,然后执行脚本
+3、先进入到主机中的/opt目录,然后执行脚本
 ```
 ansible clsn -m script -a "chdir=/opt /testdir/atest.sh"
 ```
 
-目标主机/opt/testfile文件存在，ansible主机中的/testdir/atest.sh脚本将不会在主机中执行，反之则执行。
+4、目标主机/opt/testfile文件存在，ansible主机中的/testdir/atest.sh脚本将不会在主机中执行，反之则执行。
 ```
 ansible clsn -m script -a "creates=/opt/testfile /testdir/atest.sh"
 ```
 
-目标主机中的/opt/testfile文件不存在，ansible主机中的/testdir/atest.sh脚本将不会在主机中执行，反之则执行。
+5、目标主机中的/opt/testfile文件不存在，ansible主机中的/testdir/atest.sh脚本将不会在主机中执行，反之则执行。
 ```
 ansible clsn -m script -a "removes=/opt/testfile /testdir/atest.sh"
 ```
 
-## 4、copy模块 把本地文件发送到远端
+## copy
 
-### 1）copy模块 把本地文件发送到远端
+1、copy模块 把本地文件发送到远端
 
 | 选项参数 | 选项说明 |
 |---------|---------|
@@ -223,81 +226,34 @@ ansible clsn -m script -a "removes=/opt/testfile /testdir/atest.sh"
 
 - src和content不能同时使用
 
-### 2)使用copy 模块，将/etc/hosts 文件 传输到各个服务器送，权限修改为0600 属主属组为clsn
+2、使用copy 模块，将/etc/hosts 文件 传输到各个服务器送，权限修改为0600 属主属组为clsn
 ```
 # ansible clsn -m copy -a "src=/etc/hosts dest=/tmp/ mode=0600 owner=clsn group=clsn"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "checksum": "b3c1ab140a1265cd7f6de9175a962988d93c629b",
-    "dest": "/tmp/hosts",
-    "gid": 500,
-    "group": "clsn",
-    "md5sum": "8c2b120b4742a806dcfdc8cfff6b6308",
-    "mode": "0600",
-    "owner": "clsn",
-    "size": 357,
-    "src": "/root/.ansible/tmp/ansible-tmp-1508410846.63-224022812989166/source",
-    "state": "file",
-    "uid": 500
-}
-
-# 检查结果
-# ansible all -m shell -a "ls -l /tmp/hosts"
-192.168.101.69 | SUCCESS | rc=0 >>
--rw------- 1 clsn clsn 357 Oct 19 19:00 /tmp/hosts
 ```
 
-### 3)将本地的httpd.conf文件推送到远端，检查远端是否存在上一次的备份文件
+3、将本地的httpd.conf文件推送到远端，检查远端是否存在上一次的备份文件
 ```
 ansible clsn -m copy -a "src=./httpd.conf dest=/etc/httpd/conf/httpd.conf owner=root group=root mode=644 backup=yes"
 ```
 
-### 4)移动远程主机上的文件 remote_src=true 参数
+4、移动远程主机上的文件 remote_src=true 参数
 ```
 # ansible clsn -m copy -a " src=/server/scripts/ssh-key.sh  dest=/tmp/ remote_src=true"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "checksum": "d27bd683bd37e15992d2493b50c9410e0f667c9c",
-    "dest": "/tmp/ssh-key.sh",
-    "gid": 0,
-    "group": "root",
-    "md5sum": "dc88a3a419e3657bae7d3ef31925cbde",
-    "mode": "0644",
-    "owner": "root",
-    "size": 397,
-    "src": "/server/scripts/ssh-key.sh",
-    "state": "file",
-    "uid": 0
-}
 ```
 
-### 5)定义文件中的内容 content=clsnedu.com 默认没有换行
+5、定义文件中的内容 content=clsnedu.com 默认没有换行
 ```
 # ansible clsn -m copy -a "content=clsnedu.com dest=/tmp/clsn666.txt"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "checksum": "291694840cd9f9c464263ea9b13421d8e74b7d00",
-    "dest": "/tmp/clsn666.txt",
-    "gid": 0,
-    "group": "root",
-    "md5sum": "0a6bb40847793839366d0ac014616d69",
-    "mode": "0644",
-    "owner": "root",
-    "size": 13,
-    "src": "/root/.ansible/tmp/ansible-tmp-1508466752.1-24733562369639/source",
-    "state": "file",
-    "uid": 0
-}
 ```
 
-### 6)拷贝目录
+6、拷贝目录
 ```
 ansible node02 -m copy -a "src=/etc/pam.d/ dest=/tmp/"
 ```
 
-## 4、file模块 设置文件属性
+## file
 
-### 1）file模块常用参数
+1、file模块常用参数
 
 | 参数 | 参数说明 |
 |-----|---------|
@@ -321,81 +277,37 @@ ansible node02 -m copy -a "src=/etc/pam.d/ dest=/tmp/"
 
 - 注意：重命名和创建多级目录不能同时实现
 
-### 1)创建目录,并设定属主、属组、权限
+2、创建目录,并设定属主、属组、权限
 ```
 # ansible clsn -m file -a "dest=/tmp/clsn_dir state=directory owner=apache group=apache mode=755"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "gid": 0,
-    "group": "apache",
-    "mode": "0755",
-    "owner": "apache",
-    "path": "/tmp/clsn_dir",
-    "size": 4096,
-    "state": "directory",
-    "uid": 0
-}
 ```
 
-### 2)创建文件,并设定属主、属组、权限
+3、创建文件,并设定属主、属组、权限
 ```
 # ansible clsn -m file -a "dest=/tmp/clsn_file state=touch owner=apache group=apache mode=644"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "dest": "/tmp/clsn_file",
-    "gid": 0,
-    "group": "apache",
-    "mode": "0644",
-    "owner": "apache",
-    "size": 0,
-    "state": "file",
-    "uid": 0
-} 
 ```
 
-### 3)创建软连接
+4、创建软连接
 ```
 # ansible clsn -m file -a "src=/tmp/clsn_file dest=/tmp/clsn_file_link state=link"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "dest": "/tmp/clsn_file_link",
-    "gid": 0,
-    "group": "root",
-    "mode": "0777",
-    "owner": "root",
-    "size": 16,
-    "src": "/tmp/clsn_file",
-    "state": "link",
-    "uid": 0
-}
 ```
 
-### 4)删除目录和文件信息
+5、删除目录和文件信息
 ```
 # ansible clsn -m file -a "dest=/tmp/clsn_dir state=absent"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "path": "/tmp/clsn_dir",
-    "state": "absent"
-
 # ansible clsn -m file -a "dest=/tmp/clsn_file state=absent"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "path": "/tmp/clsn_file",
-    "state": "absent"
 ```
 
-### 5)创建多级目录，同时递归的将目录中的文件的属主属组都设置为apache
+6、创建多级目录，同时递归的将目录中的文件的属主属组都设置为apache
 ```
 ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache mode=755"
 ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=yes"
 ```
-
 - 注意：重命名和创建多级目录不能同时实现
 
-## 5、fetch 模块  拉取文件
+## fetch
 
-### 1)fetch常用参数说明
+1、fetch常用参数说明
 
 | 参数 | 参数说明 |
 |----|---------|
@@ -405,33 +317,19 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 
 -从被控远端机器上拉取文件(和COPY模块整好相反)
 
-### 2）从远程拉取出来文件
+2、从远程拉取出来文件
 ```
 # ansible clsn -m fetch -a "dest=/tmp/backup src=/etc/hosts"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "checksum": "b3c1ab140a1265cd7f6de9175a962988d93c629b",
-    "dest": "/tmp/backup/172.16.1.8/etc/hosts",
-    "md5sum": "8c2b120b4742a806dcfdc8cfff6b6308",
-    "remote_checksum": "b3c1ab140a1265cd7f6de9175a962988d93c629b",
-    "remote_md5sum": null
-}
 ```
 
-### 3)flat 参数，拉去的时候不创建目录（同名文件会覆盖）
+3、flat 参数，拉去的时候不创建目录（同名文件会覆盖）
 ```
 # ansible clsn -m fetch -a "dest=/tmp/backup/ src=/etc/hosts flat=yes"
-192.168.101.69 | SUCCESS => {
-    "changed": false,
-    "checksum": "b3c1ab140a1265cd7f6de9175a962988d93c629b",
-    "dest": "/tmp/backup/hosts",
-    "file": "/etc/hosts",
-    "md5sum": "8c2b120b4742a806dcfdc8cfff6b6308"
 ```
 
-## 6、mount模块 配置挂载点模块
+## mount
 
-### 1）mount模块常用参数
+1、mount模块常用参数
 
 | 参数 | 参数说明 |
 |------|---------|
@@ -448,37 +346,17 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 | present | 在fstab文件中添加挂载配置 |
 | mounted | 1.将挂载信息添加到/etc/fstab文件中 2.加载配置文件挂载 |
 
-### 2）挂载
+2、挂载
 ```
 # ansible 172.16.1.8 -m mount -a "fstype=nfs opts=rw path=/mnt/  src=172.16.1.31:/data/ state=mounted"
-172.16.1.8 | SUCCESS => {
-    "changed": true,
-    "dump": "0",
-    "fstab": "/etc/fstab",
-    "fstype": "nfs",
-    "name": "/mnt/",
-    "opts": "rw",
- "passno": "0",
-  "src": "172.16.1.31:/data/"
-}
 ```
 
-### 3)卸载
+3、卸载
 ```
 # ansible 172.16.1.8 -m mount -a "fstype=nfs opts=rw path=/mnt/  src=172.16.1.31:/data/ state=unmounted"
-172.16.1.8 | SUCCESS => {
-   "changed": true,
-    "dump": "0",
-    "fstab": "/etc/fstab",
-    "fstype": "nfs",
-    "name": "/mnt/",
-    "opts": "rw",
-    "passno": "0",
-    "src": "172.16.1.31:/data/"
-}
 ```
 
-### 4)环境准备：将172.16.1.61作为nfs服务端，172.16.1.7、172.16.1.8作为nfs客户端挂载
+4、环境准备：将172.16.1.61作为nfs服务端，172.16.1.7、172.16.1.8作为nfs客户端挂载
 ```
 # ansible localhost -m yum -a 'name=nfs-utils state=present'
 # ansible localhost -m file -a 'path=/ops state=directory'
@@ -492,9 +370,9 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 # ansible webservers -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=absent"
 ```
 
-## 7、cron模块 定时任务
+## cron
 
-### 1）cron模块常用参数
+1、cron模块常用参数
 
 | 参数 | 参数说明 |
 |------|---------|
@@ -508,66 +386,35 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 | disabled | 注释定时任务 |
 | state | 1、absent删除定时任务 2、present创建定时任务，默认为present  |
 
-### 2)添加定时任务
+2、添加定时任务
 ```
 # ansible clsn -m cron -a "minute=0 hour=0 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null' name=clsn01"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "envs": [],
-    "jobs": [
-     "clsn01"
-    ]
-}
 ```
 
-### 3）删除定时任务
+3、删除定时任务
 ```
 # ansible clsn -m cron -a "minute=00 hour=00 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null' name=clsn01 state=absent"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "envs": [],
-    "jobs": []
-}
 ```
 
-### 4）只用名字就可以删除
+4、只用名字就可以删除
 ```
 # ansible clsn -m cron -a "name=clsn01  state=absent"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "envs": [],
-    "jobs": []
-}
 ```
 
-### 5）注释定时任务
+5、注释定时任务
 - 注意： 注释定时任务的时候必须有job的参数
 ```
 # ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=yes"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "envs": [],
-    "jobs": [
-    "clsn01"
-    ]
-}
 ```
 
-### 6）取消注释
+6、取消注释
 ```
 # ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=no"
-192.168.101.69 | SUCCESS => {
-    "changed": true,
-    "envs": [],
-   "jobs": [
-       "clsn01"
-    ]
-}
 ```
 
-## 8、yum 模块
+## yum
 
-### 1）yum 模块常用参数
+1、yum 模块常用参数
 
 | 参数 | 参数说明 |
 |-----|-------|
@@ -578,34 +425,34 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 | disablerepo | 用于指定安装软件包时临时禁用的yum源，某些场景下需要此参数，比如，当多个yum源中同时存在要安装的软件包时，你可以使用此参数临时禁用某个源，这样设置后，在安装软件包时则不会从对应的源中选择安装包 |
 
 
-### 2)安装当前最新的Apache软件，如果存在则更新
+2、安装当前最新的Apache软件，如果存在则更新
 ```
 ansible web -m yum -a "name=httpd state=latest"
 ```
 
-### 3)安装当前最新的Apache软件，通过epel仓库安装
+3、安装当前最新的Apache软件，通过epel仓库安装
 ```
 ansible web -m yum -a "name=httpd state=latest enablerepo=epel"
 ```
 
-### 4)通过公网URL安装rpm软件
+4、通过公网URL安装rpm软件
 ```
 ansible web -m yum -a "name=https://mirrors.aliyun.com/zabbix/zabbix/4.2/rhel/7/x86_64/zabbix-agent-4.2.3-2.el7.x86_64.rpm state=latest"
 ```
 
-### 5)更新所有的软件包，但排除和kernel相关的
+5、更新所有的软件包，但排除和kernel相关的
 ```
 ansible web -m yum -a "name=* state=latest exclude=kernel*,foo*"
 ```
 
-### 6）删除Apache软件
+6、删除Apache软件
 ```
 ansible web -m yum -a "name=httpd state=absent"
 ```
 
-## 9、yum_repository模块
+## yum_repository
 
-### 1)yum_repository模块常用参数说明
+1、yum_repository模块常用参数说明
 | 参数 | 参数说明 |
 |-----|-------|
 | name | 必须参数，用于指定要操作的唯一的仓库ID，也就是”.repo”配置文件中每个仓库对应的”中括号”内的仓库ID |
@@ -617,34 +464,34 @@ ansible web -m yum -a "name=httpd state=absent"
 | gpgcakey | 当gpgcheck参数设置为yes时，需要使用此参数指定验证包所需的公钥 |
 | state | 默认值为present，当值设置为absent时，表示删除对应的yum源 |
 
-### 2)设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/aliEpel.repo
+2、设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/aliEpel.repo
 ```
 ansible web -m yum_repository -a 'name=aliEpel description="alibaba EPEL" baseurl=https://mirrors.aliyun.com/epel/$releasever\Server/$basearch/'
 ```
 
-### 3)设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/alibaba.repo
+3、设置ID为aliEpel 的yum源，仓库配置文件路径为/etc/yum.repos.d/alibaba.repo
 ```
 ansible web -m yum_repository -a 'name=aliEpel description="alibaba EPEL" baseurl=https://mirrors.aliyun.com/epel/$releasever\Server/$basearch/ file=alibaba'
 ```
 
-### 4)设置ID为local 的yum源，但是不启用它（local源使用系统光盘镜像作为本地yum源，以便测试举例，所以baseurl中的值以file:///开头）
+4、设置ID为local 的yum源，但是不启用它（local源使用系统光盘镜像作为本地yum源，以便测试举例，所以baseurl中的值以file:///开头）
 ```
 ansible web -m yum_repository -a 'name=local baseurl=file:///media description="local cd yum" enabled=no'
 ```
 
-### 5)设置ID为local的yum源，开启包验证功能，并指定验证包所需的公钥位置为/media/RPM-GPG-KEY-CentOS-7
+5、设置ID为local的yum源，开启包验证功能，并指定验证包所需的公钥位置为/media/RPM-GPG-KEY-CentOS-7
 ```
 ansible web -m yum_repository -a 'name=local baseurl=file:///media description="local cd yum" gpgcheck=yes gpgcakey=file:///media/RPM-GPG-KEY-CentOS-7'
 ```
 
-### 6)删除/etc/yum.repos.d/alibaba.repo配置文件中的aliEpel源
+6、删除/etc/yum.repos.d/alibaba.repo配置文件中的aliEpel源
 ```
 ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
 ```
 
-## 10、service模块 服务管理
+## service
 
-### 1)service模块常用参数说明
+1、service模块常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
@@ -652,86 +499,51 @@ ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
 | state | 服务状态信息为过去时stared/stoped/restarted/reloaded |
 | enabled | 设置开机自启动yes、no |
 
-### 2)启动Httpd服务
+2、启动Httpd服务
 ```
 ansible web -m service -a "name=httpd state=started"
 ```
 
-### 3)重载Httpd服务
+3、重载Httpd服务
 ```
 ansible web -m service -a "name=httpd state=reloaded"
 ```
 
-### 4)重启Httpd服务
+4、重启Httpd服务
 ```
 ansible web -m service -a "name=httpd state=restarted"
 ```
 
-### 5)停止Httpd服务
+5、停止Httpd服务
 ```
 ansible web -m service -a "name=httpd state=stopped"
 ```
 
-### 6)启动Httpd服务，并加入开机自启
+6、启动Httpd服务，并加入开机自启
 ```
 ansible web -m service -a "name=httpd state=started enabled=yes"  
 ```
 
-## 11、hostname 修改主机名模块
+## hostname
 ```
 # ansible 172.16.1.8 -m hostname -a "name=web01"
-172.16.1.8 | SUCCESS => {
-    "ansible_facts": {
-        "ansible_domain": "etiantian.org",
-        "ansible_fqdn": "www.etiantian.org",
-       "ansible_hostname": "web01",
-        "ansible_nodename": "web01"
-    },
-    "changed": false,
-    "name": "web01"
-}
 ```
 
-## 12、selinux 管理模块
+## selinux
 ```
 # ansible 172.16.1.8 -m selinux -a "state=disabled"
-172.16.1.8 | SUCCESS => {
-    "changed": false,
-    "configfile": "/etc/selinux/config",
-    "msg": "",
-    "policy": "targeted",
-    "state": "disabled"
-}
 ```
 
-## 13、get_url 模块 == 【wget】
+## get_url
 ```
 # ansible 172.16.1.8 -m get_url -a "url=http://lan.znix.top/RDPWrap-v1.6.1.zip dest=/tmp/"
-172.16.1.8 | SUCCESS => {
-    "changed": true,
-    "checksum_dest": null,
-    "checksum_src": "ad402705624d06a6ff4b5a6a98c55fc2453b3a70",
-    "dest": "/tmp/RDPWrap-v1.6.1.zip",
-    "gid": 0,
-    "group": "root",
-    "md5sum": "b04dde546293ade71287071d187ed92d",
-    "mode": "0644",
-    "msg": "OK (1567232 bytes)",
-    "owner": "root",
-    "size": 1567232,
-    "src": "/tmp/tmp4X4Von",
-    "state": "file",
-    "status_code": 200,
-    "uid": 0,
-    "url": "http://lan.znix.top/RDPWrap-v1.6.1.zip"
-}
 ```
 - url= 下载文件的地址 dest 下载到哪里
 - timeout 超时时间
 - url_password   密码
 - url_username  用户名
 
-## 14、firewalld
+## firewalld
 ```
 # ansible node02 -m service -a "name=firewalld state=started"
 
@@ -745,9 +557,9 @@ ansible web -m service -a "name=httpd state=started enabled=yes"
 # ansible node02 -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled"
 ```
 
-## 15、group
+## group
 
-### 1)group模块常用参数说明
+1、group模块常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
@@ -756,24 +568,24 @@ ansible web -m service -a "name=httpd state=started enabled=yes"
 | gid | 用于指定组的gid |
 
 
-### 2)创建news基本组，指定uid为9999
+2、创建news基本组，指定uid为9999
 ```
 ansible node02 -m group -a "name=news gid=9999 state=present" -i hosts
 ```
 
-### 3)创建http系统组，指定uid为8888
+3、创建http系统组，指定uid为8888
 ```
 ansible node02 -m group -a "name=http gid=8888 system=yes state=present" -i hosts 
 ```
 
-### 4)删除news基本组
+4、删除news基本组
 ```
 ansible node02 -m group -a "name=news state=absent" -i hosts
 ```
 
-## 16、user
+## user
 
-### 1)user模块常用参数说明
+1、user模块常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
@@ -791,17 +603,17 @@ ansible node02 -m group -a "name=news state=absent" -i hosts
 | update_password | 1、always当前的加密过的密码字符串不一致，则直接更新用户的密码 2、on_create当前的加密过的密码字符串不一致，则不会更新用户的密码字符串，保持之前的密码设定，如果新创建的用户为on_create，会将密码设置为password的值。默认值即为always |
 | generate_ssh_key | 此参数默认值为no，如果设置为yes，表示为对应的用户生成ssh密钥对，默认在用户家目录的./ssh目录中生成名为id_rsa的私钥和名为id_rsa.pub的公钥，如果同名的密钥已经存在与对应的目录中，原同名密钥并不会被覆盖(不做任何操作)  |
 
-### 2)创建joh用户，uid是1040，主要的组是adm
+2、创建joh用户，uid是1040，主要的组是adm
 ```
 ansible node02 -m user -a "name=joh uid=1040 group=adm state=present system=no" -i hosts
 ```
 
-### 3)创建joh用户，登录shell是/sbin/nologin，追加bin、sys两个组
+3、创建joh用户，登录shell是/sbin/nologin，追加bin、sys两个组
 ```
 ansible node02 -m user -a "name=joh shell=/sbin/nologin groups=bin,sys" -i hosts 
 ```
 
-### 4)创建jsm用户，为其添加123作为登录密码，并且创建家目录
+4、创建jsm用户，为其添加123作为登录密码，并且创建家目录
 ```
 #ansible localhost -m debug -a "msg={{ '123' | password_hash('sha512', 'salt') }}"
 $6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1
@@ -809,21 +621,21 @@ $6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBo
 # ansible node02 -m user -a 'name=jsm password=$6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBoW1wJZPLyQ9Qx/1 create_home=yes'
 ```
 
-### 5)移除joh用户
+5、移除joh用户
 ```
 # ansible node02  -m user -a 'name=joh state=absent remove=yes' -i hosts 
 ```
 
-### 6)创建http用户，并为该用户创建2048字节的私钥，存放在~/http/.ssh/id_rsa
+6、创建http用户，并为该用户创建2048字节的私钥，存放在~/http/.ssh/id_rsa
 ```
 # ansible node02  -m user -a 'name=http generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa' -i hosts
 ```
 
-## 17、replace模块
+## replace
 
 - replace模块可以根据我们指定的正则表达式替换文件中的字符串，文件中所有被正则匹配到的字符串都会被替换。
 
-### 1)user模块常用参数说明
+1、replace模块常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
@@ -833,21 +645,26 @@ $6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBo
 | backup | 是否在修改文件之前对文件进行备份，最好设置为yes |
 
 
-### 2)把文件中的所有ASM替换成asm
+2、把文件中的所有ASM替换成asm
 ```
 ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm'
 ```
 
-### 3)把文件中的所有ASM替换成asm，但是在操作文件之前进行备份。
+3、把文件中的所有ASM替换成asm，但是在操作文件之前进行备份。
 ```
 ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup=yes'
 ```
 
-## 18、blockinfile模块
+4、关闭selinux
+```
+ansible node01 -m replace -a 'path=/etc/sysconfig/selinux regexp="^SELINUX=.*" replace="SELINUX=disabled"'
+```
+
+## blockinfile
 
 - blockinfile 在指定的文件中插入`一段文本`，这段文本是被标记过的，以便在以后的操作中可以通过`标记`找到这段文本，然后修改或者删除它
 
-### 1)blockinfile模块常用参数说明
+1、blockinfile模块常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
@@ -861,7 +678,7 @@ ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup
 | create | 当要操作的文件并不存在时，是否创建对应的文件 |
 
 
-### 1)在主机中的/etc/rc.local文件尾部插入如下两行`systemctl start mariadb`,`systemctl start httpd`
+2、在主机中的/etc/rc.local文件尾部插入如下两行`systemctl start mariadb`,`systemctl start httpd`
 ```
 ansible node01 -m blockinfile -a 'path=/etc/rc.local block="systemctl start mariadb\nsystemctl start httpd"'
 ```
@@ -874,7 +691,7 @@ systemctl start httpd
 # END ANSIBLE MANAGED BLOCK
 ```
 
-### 2)自定义的标记但是标记也会`成对出现`，需要有开始标记和结束标记
+3、自定义的标记但是标记也会`成对出现`，需要有开始标记和结束标记
 ```
 ansible node01 -m blockinfile -a 'path=/etc/rc.local block="systemctl start mariadb\nsystemctl start httpd" marker="#{mark} serivce to start"'
 ```
@@ -887,7 +704,7 @@ systemctl start httpd
 #END serivce to start
 ```
 
-### 3)在执行此命令时`标记`对应的文本块已经存在时，block参数对应的内容又与之前文本块的内容不同，对应文本块中的内容会被更新，而不会再一次插入新的文本块，这种用法相当于更新原来文本块中的内容。
+4、在执行此命令时`标记`对应的文本块已经存在时，block参数对应的内容又与之前文本块的内容不同，对应文本块中的内容会被更新，而不会再一次插入新的文本块，这种用法相当于更新原来文本块中的内容。
 ```
 ansible node01 -m blockinfile -a 'path=/etc/rc.local block="systemctl start mariadb" marker="#{mark} serivce to start"'
 ```
@@ -899,42 +716,42 @@ systemctl start mariadb
 #END serivce to start
 ```
 
-### 4)在执行此命令时`标记`对应的文本块已经存在时，block参数对应的内容为空，blockinfile模块会删除对应标记的文本块，可以使用如下命令删除对应的文本块。
+5、在执行此命令时`标记`对应的文本块已经存在时，block参数对应的内容为空，blockinfile模块会删除对应标记的文本块，可以使用如下命令删除对应的文本块。
 ```
 ansible host node001 -m blockinfile -a 'path=/etc/rc.local block="" marker="#{mark} serivce to start"'
 ```
 
-### 5)将文本块插入到文档的开头，可以使用insertbefore参数，将其值设置为BOF，BOF表示Begin Of File。
+6、将文本块插入到文档的开头，可以使用insertbefore参数，将其值设置为BOF，BOF表示Begin Of File。
 ```
 ansible node01 -m blockinfile -a 'path=/etc/rc.local block="####blockinfile test####"  marker="#{mark} test" insertbefore=BOF'
 ```
 
-### 6)将文本块插入到文档的结尾，与默认操作相同，将insertafter参数设置为EOF表示End Of File。
+7、将文本块插入到文档的结尾，与默认操作相同，将insertafter参数设置为EOF表示End Of File。
 ```
 ansible node01 -m blockinfile -a 'path=/etc/rc.local block="####blockinfile test####"  marker="#{mark} test" insertafter=EOF'
 ```
 
-### 7)使用正则表达式匹配行，将文本块插入到`以#!/bin/bash开头的行`之后。
+8、使用正则表达式匹配行，将文本块插入到`以#!/bin/bash开头的行`之后。
 ```
 ansible node01 -m blockinfile -a 'path=/etc/rc.local block="####blockinfile test####"  marker="#{mark} test reg" insertafter="^#!/bin/bash"'
 ```
 
-### 8)使用backup参数，可以在操作修改文件之前，对文件进行备份，备份的文件会在原文件名的基础上添加时间戳
+9、使用backup参数，可以在操作修改文件之前，对文件进行备份，备份的文件会在原文件名的基础上添加时间戳
 ```
 ansible node01 -m blockinfile -a 'path=/etc/rc.local marker="#{mark} test" state=absent backup=yes'
 ```
 
-### 9)使用create参数，如果指定的文件不存在，则创建它
+10、使用create参数，如果指定的文件不存在，则创建它
 ```
 ansible node01 -m blockinfile -a 'path=/etc/test block="test" marker="#{mark} test" create=yes'
 ```
 
 
-## 19、lineinfile模块
+## lineinfile
 
 - 确保`某一行文本`存在于指定的文件中，或者确保从文件中删除指定的`文本`（即确保指定的文本不存在于文件中），还可以根据正则表达式，替换`某一行文本`
 
-### 1)lineinfile模块常用参数说明
+1、lineinfile模块常用参数说明
 
 | 参数 | 参数说明 |
 |------|--------|
@@ -949,68 +766,42 @@ ansible node01 -m blockinfile -a 'path=/etc/test block="test" marker="#{mark} te
 | create | 当要操作的文件并不存在时，是否创建对应的文件 |
 
 
-### 1)指定的文本中的内容如果存在则不做任何操作，如果不存在，默认在文件的末尾插入这行文本。
+2、指定的文本中的内容如果存在则不做任何操作，如果不存在，默认在文件的末尾插入这行文本。
 ```
 ansible node01 -m lineinfile -a 'path=/testdir/test line="test text"'
 ```
 
-### 2)正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么line中的内容会被添加到文件的最后一行。
+3、正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么line中的内容会被添加到文件的最后一行。
 ```
 ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^line" line="test text"'
 ```
 
-### 3)根据正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么则不对文件进行任何操作。
+4、根据正则表达式替换`某一行`，如果不止一行能够匹配正则，那么只有最后一个匹配正则的行才会被替换，被匹配行会被替换成line参数指定的内容，但是如果指定的表达式没有匹配到任何一行，那么则不对文件进行任何操作。
 ```
 ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^line" line="test text" backrefs=yes'
 ```
 
-### 4)根据line参数的内容删除行，如果文件中有多行都与line参数的内容相同，那么这些相同的行都会被删除。
+5、根据line参数的内容删除行，如果文件中有多行都与line参数的内容相同，那么这些相同的行都会被删除。
 ```
 ansible node01 -m lineinfile -a 'path=/testdir/test line="lineinfile -" state=absent'
 ```
 
-### 5)根据正则表达式删除对应行，如果有多行都满足正则表达式，那么所有匹配的行都会被删除。
+6、根据正则表达式删除对应行，如果有多行都满足正则表达式，那么所有匹配的行都会被删除。
 ```
 ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^lineinfile" state=absent'
 ```
 
-### 6)如果将backrefs设置为yes，表示开启支持后向引用，使用如下命令，可以将test示例文件中的”Hello ansible,Hiiii”替换成”Hiiii”，如果不设置backrefs=yes，则不支持后向引用，那么”Hello ansible,Hiiii”将被替换成”\2″
+7、如果将backrefs设置为yes，表示开启支持后向引用，使用如下命令，可以将test示例文件中的”Hello ansible,Hiiii”替换成”Hiiii”，如果不设置backrefs=yes，则不支持后向引用，那么”Hello ansible,Hiiii”将被替换成”\2″
 ```
 ansible node01 -m lineinfile -a 'path=/testdir/test regexp="(H.{4}).*(H.{4})" line="\2" backrefs=yes'
 ```
 
-## 20、replace模块
 
-- replace模块可以根据我们指定的正则表达式替换文件中的字符串，文件中所有被正则匹配到的字符串都会被替换。
-
-### 1)replace模块常用参数说明
-
-| 参数 | 描述 |
-|------|------|
-| path | 必须参数，指定要操作的文件，2.3版本之前，只能使用dest, destfile, name指定要操作的文件，2.4版本中，仍然可以使用这些参数名，这些参数名作为path参数的别名使用。 |
-| regexp | 必须参数，指定一个python正则表达式，文件中与正则匹配的字符串将会被替换。 |
-| replace | 指定最终要替换成的字符串。 |
-| backup | 是否在修改文件之前对文件进行备份，最好设置为yes。 |
-
-### 2)把主机中的/testdir/test文件中的所有ASM替换成asm
-```
-ansible node01 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm'
-```
-
-
-### 3）把机中的/testdir/test文件中的所有ASM替换成asm，但是在操作文件之前进行备份。
-```
-ansible node01 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup=yes'
-```
-
-### 4)关闭selinux
-```
-ansible node01 -m replace -a 'path=/etc/sysconfig/selinux regexp="^SELINUX=.*" replace="SELINUX=disabled"'
-```
-
-## 21、find模块
+## find
 
 - find模块可以帮助我们在远程主机中查找符合条件的文件，就像find命令一样。
+
+1、template模块常用参数说明
 
 | 参数 | 描述 |
 |------|------|
@@ -1026,68 +817,68 @@ ansible node01 -m replace -a 'path=/etc/sysconfig/selinux regexp="^SELINUX=.*" r
 | size | 使用此参数可以根据文件大小查找文件，比如，如果想要查找大于3M的文件，那么可以设置size=3m,如果想要查找小于50k的文件，可以设置size=-50k，可以使用的单位有t、g、m、k、b。 |
 | get_checksum | 当有符合查找条件的文件被找到时，会同时返回对应文件的sha1校验码，如果要查找的文件比较大，那么生成校验码的时间会比较长。 |
 
-### 1)在主机的/testdir目录中查找文件内容中包含abc字符串的文件，隐藏文件会被忽略，不会进行递归查找。
+2、在主机的/testdir目录中查找文件内容中包含abc字符串的文件，隐藏文件会被忽略，不会进行递归查找。
 ```
 ansible test70 -m find -a 'paths=/testdir contains=".*abc.*" '
 ```
  
 
-### 2)在主机的/testdir目录以及其子目录中查找文件内容中包含abc字符串的文件，隐藏文件会被忽略。
+3、在主机的/testdir目录以及其子目录中查找文件内容中包含abc字符串的文件，隐藏文件会被忽略。
 ```
 ansible test70 -m find -a 'paths=/testdir contains=".*abc.*" recurse=yes '
 ```
  
 
-### 3)在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，但是不包括目录或其他文件类型，不会进行递归查找。
+4、在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，但是不包括目录或其他文件类型，不会进行递归查找。
 ```
 ansible test70 -m find -a 'paths=/testdir patterns="*.sh" hidden=yes'
 ```
  
 
-### 4)在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，包括所有文件类型，比如文件、目录、或者软链接，但是不会进行递归查找。
+5、在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，包括所有文件类型，比如文件、目录、或者软链接，但是不会进行递归查找。
 ```
 ansible test70 -m find -a 'paths=/testdir patterns="*.sh" file_type=any hidden=yes'
 ```
  
 
-### 5)在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，包括所有文件类型，比如文件、目录、或者软链接，但是不会进行递归查找。
+6、在主机的/testdir目录中查找以.sh结尾的文件，包括隐藏文件，包括所有文件类型，比如文件、目录、或者软链接，但是不会进行递归查找。
 ```
 ansible test70 -m find -a 'paths=/testdir patterns="*.sh" file_type=any hidden=yes'
 ```
  
 
-### 6)在主机的/testdir目录中查找以.sh结尾的文件，只不过patterns对应的表达式为正则表达式，查找范围包括隐藏文件，包括所有文件类型，但是不会进行递归查找，不会对/testdir目录的子目录进行查找。
+7、在主机的/testdir目录中查找以.sh结尾的文件，只不过patterns对应的表达式为正则表达式，查找范围包括隐藏文件，包括所有文件类型，但是不会进行递归查找，不会对/testdir目录的子目录进行查找。
 ```
 ansible test70 -m find -a 'paths=/testdir patterns=".*\.sh" use_regex=yes file_type=any hidden=yes'
 ```
  
 
-### 7)在主机的/testdir目录中以及其子目录中查找mtime在4天以内的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
+8、在主机的/testdir目录中以及其子目录中查找mtime在4天以内的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
 ```
 ansible test70 -m find -a "path=/testdir age=-4d recurse=yes"
 ```
  
 
-### 8)在主机的/testdir目录中以及其子目录中查找atime在2星期以内的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
+9、在主机的/testdir目录中以及其子目录中查找atime在2星期以内的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
 ```
 ansible test70 -m find -a "path=/testdir age=-2w age_stamp=atime recurse=yes"
 ```
  
 
-### 9)在主机的/testdir目录中以及其子目录中查找大于2G的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
+10、在主机的/testdir目录中以及其子目录中查找大于2G的文件，不包含隐藏文件，不包含目录或软链接文件等文件类型。
 ```
 ansible test70 -m find -a "paths=/testdir size=2g recurse=yes"
 ```
  
 
-### 10)在主机的/testdir目录中以及其子目录中查找以.sh结尾的文件，并且返回符合条件文件的sha1校验码，包括隐藏文件
+11、在主机的/testdir目录中以及其子目录中查找以.sh结尾的文件，并且返回符合条件文件的sha1校验码，包括隐藏文件
 ```
 ansible test70 -m find -a "paths=/testdir patterns=*.sh get_checksum=yes  hidden=yes recurse=yes"
 ```
 
 ## 22、template模块
 
-### 1)template模块常用参数说明
+1、template模块常用参数说明
 
 | 参数 | 描述 |
 |------|------|
