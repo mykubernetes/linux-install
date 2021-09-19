@@ -407,6 +407,7 @@ name:bob
 - iteritems函数也可以替换成items函数，推荐使用iteritems函数
 
 | 变量名称 | 描述 |
+|--------|-------|
 | loop.index | 当前循环操作为整个循环的第几次循环，序号从1开始 |
 | loop.index0 | 当前循环操作为整个循环的第几次循环，序号从0开始 |
 | loop.revindex | 当前循环操作距离整个循环结束还有几次，序号到1结束 |
@@ -494,3 +495,65 @@ something
   5
   9
 ```
+
+6、在循环中使用到loop.index计数变量时，语法显示的索引地址不同
+```
+# 1、编写jinja文件
+{% for i in [7,1,5,3,9] if i>3 %}
+{{ i ~'----'~ loop.index }}
+{% endfor %}
+ 
+{% for i in [7,1,5,3,9] %}
+{% if i>3 %}
+{{ i ~'----'~ loop.index}}
+{% endif %}
+{% endfor %}
+
+
+# 2、渲染后的结果
+# cat test
+7----1
+5----2
+9----3
+ 
+7----1
+5----3
+9----5
+```
+- 当使用if内联表达式时，如果不满足对应条件，则不会进入当次迭代，所以loop.index也不会进行计算，而当使用if控制语句进行判断时，其实已经进入了当次迭代，loop.index也已经进行了计算。
+
+7、使用了if内联表达式时，还可以与else控制语句结合使用
+```
+# 1、编写jinja文件
+{% for i in [7,1,5,3,9] if i>10 %}
+{{ i }}
+{%else%}
+no one is greater than 10
+{% endfor %}
+
+# 2、所有条件都不满足是才执行else语句
+no one is greater than 10
+```
+
+8、for循环也支持递归操作
+```
+# 1、编写jinja文件
+{% set dictionary={ 'name':'bob','son':{ 'name':'tom','son':{ 'name':'jerry' } } }  %}
+ 
+{% for key,value in dictionary.iteritems() recursive %}
+  {% if key == 'name' %}
+    {% set fathername=value %}
+  {% endif %}
+ 
+  {% if key == 'son' %}
+    {{ fathername ~"'s son is "~ value.name}}
+    {{ loop( value.iteritems() ) }}
+  {% endif %}
+{% endfor %}
+
+# 2、渲染后的结果
+      bob's son is tom
+           
+      tom's son is jerry
+```
+- 从字典中可以看出，bob的儿子是tom，tom的儿子是jerry，然后我们使用for循环操作了这个字典,使用了iteritems函数，在for循环的末尾，我们添加了recursive 修饰符，当for循环中有recursive时，表示这个循环是一个递归的循环，当我们需要在for循环中进行递归时，只要在需要进行递归的地方调用loop函数即可，没错，如你所见，上例中的”loop( value.iteritems() )”即为调用递归的部分，由于value也是一个字典，所以需要使用iteritems函数进行处理。
