@@ -88,6 +88,8 @@
 ssh 192.168.0.2            #其他机器ip
 ```
 
+常用模块
+
 # 二、ansible常用模块
 
 - [command](#command)
@@ -889,7 +891,7 @@ ansible test70 -m find -a "paths=/testdir size=2g recurse=yes"
 ansible test70 -m find -a "paths=/testdir patterns=*.sh get_checksum=yes  hidden=yes recurse=yes"
 ```
 
-## template模块
+## template
 
 1、template模块常用参数说明
 
@@ -930,3 +932,5 @@ bind {{ ansible_enp0s3.ipv4.address }}
 # cat /etc/redis.conf |grep ^bind
 bind 192.168.1.70
 ```
+
+[回到列表](#常用模块)
