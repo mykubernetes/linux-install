@@ -210,7 +210,7 @@ test jinja2
 
 5、在模板文件中对某些配置进行注释，则可以将注释信息写入到`{#   #}`
 ```
-# 1、模板文件内容如下：
+# 1、模板文件，在渲染后不会显示注释信息
 # cat test.j2
 jinja2 test
 {#这是一行注释信息#}
@@ -228,4 +228,161 @@ jinja2 test
 jinja2 test
 jinja2 test
 jinja2 test
+```
+
+6、if用来进行条件判断
+```
+# 1、编写jinja模板,判断testnum变量如果大于3那么执行该语句，否则删除该语句
+# cat test.j2
+jinja2 test
+ 
+{% if testnum > 3 %}
+greater than {{ testnum }}
+{% endif %}
+
+# 2、编写ploybook剧本
+# cat temptest.yml
+---
+- hosts: node
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - template:
+      src: /testdir/ansible/test.j2
+      dest: /opt/test
+    vars:
+      testnum: 5
+
+# 3、查看适配后的文件
+# cat /opt/test
+jinja2 test
+ 
+greater than 5
+```
+
+### jinja语法`if…else…`结构
+```
+{% if 条件 %}
+...
+{% else %}
+...
+{% endif %}
+```
+
+### jinja的`if…else if…`语法结构
+```
+{% if 条件一 %}
+...
+{% elif 条件二 %}
+...
+{% elif 条件N %}
+...
+{% endif %}
+```
+
+### jinja的`if..elif..else..`语法语法结构
+```
+{% if 条件一 %}
+...
+{% elif 条件N %}
+...
+{% else %}
+...
+{% endif %}
+```
+
+7、`if`表达式实现类似三元运算的效果
+```
+# 编写jinja模板，如果2>1条件为真，则显示a,否则显示b
+# cat test.j2
+jinja2 test
+{{ 'a' if 2>1 else 'b' }}
+
+# 渲染后的结果
+# cat /opt/test
+jinja2 test
+a
+```
+
+8、在模板文件中使用{{ set ...}} 语法定义变量
+```
+# 1、使用set语句定义变量
+# cat test.j2
+jinja2 test
+{% set teststr='abc' %}
+{{ teststr }}
+
+# 2、查看渲染后的结果
+# cat /opt/test
+jinja2 test
+abc
+```
+
+### for循环的基本语法
+```
+{% for 迭代变量 in 可迭代对象 %}
+{{ 迭代变量 }}
+{% endfor %}
+```
+
+9、定义一个循环，并输出
+```
+# 1、编辑jinja模板
+# cat test.j2
+jinja2 test
+{% for i in [3,1,7,8,2] %}
+{{ i }}
+{% endfor %}
+
+# 2、渲染结果如下
+# cat /opt/test
+jinja2 test
+3
+1
+7
+8
+2
+```
+
+10、从生成的内容可以看出，每次循环后都会自动换行，如果不想要换行，则可以使用如下语法
+```
+# 1、编写剧本文件
+# cat test.j2
+jinja2 test
+{% for i in [3,1,7,8,2] -%}
+{{ i }}
+{%- endfor %}
+
+# 2、渲染后的结果
+# cat test
+jinja2 test
+31782
+```
+- 在for的结束控制符`%}`之前添加了减号`-`,在endfor的开始控制符`{%`之后添加到了减号`-`来实现输出结果不换行
+
+11、列表中的每一项都没有换行，而是连在了一起显示，如果你觉得这样显示有些”拥挤”，则可以稍微改进一下上述模板
+```
+# 1、编写剧本文件
+jinja2 test
+{% for i in [3,1,7,8,2] -%}
+{{ i }}{{ ' ' }}
+{%- endfor %}
+
+# 2、渲染后的结果
+# cat test
+jinja2 test
+3 1 7 8 2
+```
+
+12、上一步简洁的写法
+```
+# cat test.j2
+jinja2 test
+{% for i in [3,1,7,8,2] -%}
+{{ i~' ' }}
+{%- endfor %}
+
+# cat test
+jinja2 test
+3 1 7 8 2
 ```
