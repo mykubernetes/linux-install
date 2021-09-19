@@ -128,3 +128,31 @@ when条件判断
       msg: "Command execution failed"
     when: returnmsg.rc != 0
 ```
+
+9、为所有的web主机名添加nginx仓库，其余的都跳过添加
+```
+- hosts: all
+  tasks:
+    - name: Create YUM Repo
+      yum_repository:
+        name: ansible_nginx
+        description: ansible_test
+        baseurl: https://mirrors.aliyun.com/repo/Centos-7.repo
+        gpgcheck: no
+        enabled: no
+      when: ( ansible_fqdn is match ("web*"))
+```
+
+10、主机名称是web*或主机名称是lb*的则添加这个nginx源
+```
+- hosts: all
+  tasks:
+    - name: Create YUM Repo
+      yum_repository:
+        name: ansible_nginx
+        description: ansible_test
+        baseurl: https://mirrors.aliyun.com/repo/Centos-7.repo
+        gpgcheck: no
+        enabled: no
+      when: ( ansible_fqdn is match ("web*")) or ( ansible_fqdn is match ("lb*"))
+```
