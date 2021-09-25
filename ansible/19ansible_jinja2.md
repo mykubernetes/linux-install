@@ -815,15 +815,77 @@ True
 
 4)与其说是caller变量，不如称其为caller函数或者caller方法，caller可以帮助我们将宏中的内容进行替换
 ```
+# 1、编写jinja文件
 {% macro testfunc() %}
   test string
   {{caller()}}
 {% endmacro %}
+ 
+{%call testfunc()%}
+something~~~~~
+something else~~~~~
+{%endcall%}
+
+
+# 2、渲染后的结果
+
+  test string
+  something~~~~~
+something else~~~~~
+
 ```
+- 使用了”{%call%}”语句块调用了testfunc宏，”{%call%}”和”{%endcall%}”之间的内容将会替换testfunc宏中的”{{caller()}}”部分
 
 
+5)跟传参数的效果一模一样，就像传了一个参数给testfunc宏一样，当我们要传入大段内容或者复杂的内容时，可以借助caller进行传递，当然，上例只是 为了让你能够更加直观的了解caller的用法，caller其实还能够帮助我们在一个宏中调用另一个宏
+```
+# 1、编写jinja文件
+{% macro testfunc() %}
+  test string
+  {{caller()}}
+{% endmacro %}
+ 
+{% macro testfunc1() %}
+  {% for i in range(3) %}
+    {{i}}
+  {% endfor %}
+{% endmacro %}
+ 
+{%call testfunc()%}
+{{testfunc1()}}
+{%endcall%}
 
 
+# 2、渲染后的结果
+
+  test string
+        0
+      1
+      2
 
 
+```
+- 我们定义了两个宏，testfunc和testfunc1，我们将testfunc1传递到了testfunc中。
 
+
+6)`caller()`可以接收参数，只要在call块中提前定义好，在caller中传入参数即可
+```
+# 1、编写jinja文件
+{% macro testfunc() %}
+  test string
+  {{caller('somethingElse~~')}}
+{% endmacro %}
+ 
+{%call(testvar) testfunc()%}
+something~~~~
+{{testvar}}
+{%endcall%}
+
+
+# 2、渲染后的结果
+ 
+  test string
+  something~~~~
+somethingElse~~
+```
+- 当testfunc中的某些内容需要循环的进行替换时，这种方法非常有效
