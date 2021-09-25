@@ -964,3 +964,161 @@ somethingElse~~
  
   True
 ```
+
+
+# 包含
+
+1、ansible可以使用`include`在jinja模板中对其他文件进行包含。
+```
+# 1、定义两个jinja模板，其中一个jinja被包含在另外一个中
+# cat test.j2
+test...................
+test...................
+{% include 'test1.j2' %}
+ 
+test...................
+ 
+# cat test1.j2
+test1.j2 start
+{% for i in range(3) %}
+{{i}}
+{% endfor %}
+test1.j2 end
+
+# 2、剧本文件
+---
+- hosts: node01
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - template:
+      src: /root/test/test.j2
+      dest: /opt/test
+      
+# 3、渲染后的结果
+test...................
+test...................
+test1.j2 start
+0
+1
+2
+test1.j2 end
+test...................
+```
+
+2、在test.j2中定义了一个变量，那么在被包含的test1.j2中也可以使用test.j2中的变量。
+```
+# 1、定义两个jinja模板，其中一个jinja被包含在另外一个中,并且test中设置变量，被包含的模板也可以使用test中的变量
+# cat test.j2
+{% set varintest='var in test.j2' %}
+test...................
+test...................
+{% include 'test1.j2' %}
+ 
+test...................
+ 
+# cat test1.j2
+test1.j2 start
+{{ varintest }}
+test1.j2 end
+
+# 2、渲染后的结果
+test...................
+test...................
+test1.j2 start
+var in test.j2
+test1.j2 end
+test...................
+```
+
+3、如果不想让被包含文件能够使用到外部文件中定义的变量，则可以使用`without context`显式的设置`include`，当`include`中存在`without context`时，表示不导入对应的上下文。
+```
+# 1、使用without context显示设置定义变量不能导入上下文。
+# cat test.j2
+{% set varintest='var in test.j2' %}
+test...................
+test...................
+{% include 'test1.j2' without context %}
+ 
+test...................
+ 
+# cat test1.j2
+test1.j2 start
+{{ varintest }}
+test1.j2 end
+
+# 2、在渲染test.j2文件，则会报错，这是因为设置了不导入上下文，所以无法在test1.j2中使用test.j2中定义的变量，去渲染test1.j2文件中的变量
+# ansible node -m template -a "src=test.j2 dest=/opt/test"
+node01 | FAILED! => {
+    "changed": false, 
+    "msg": "AnsibleError: Unexpected templating type error occurred on ({% set varintest='var in test.j2' %}\ntest...................\ntest...................\n{% include 'test1.j2' without context  %}\n \ntest...................\n): argument of type 'NoneType' is not iterable"
+}
+```
+
+4、如果在`include`时设置了`without context`，那么在被包含的文件中使用for循环时，不能让使用range()函数，也就是说，下例中的test.j2文件无法被正常渲染
+```
+# 1、编辑jinja模板
+# cat test.j2
+test...................
+test...................
+{% include 'test1.j2' without context %}
+ 
+test...................
+ 
+# cat test1.j2
+test1.j2 start
+{% for i in range(3) %}
+{{i}}
+{% endfor %}
+test1.j2 end
+
+# 2、在ansible中渲染上例中的test.j2文件，会报错，报错信息中同样包含”argument of type ‘NoneType’ is not iterable”。
+# ansible node -m template -a "src=test.j2 dest=/opt/test"
+node01 | FAILED! => {
+    "changed": false, 
+    "msg": "AnsibleError: Unexpected templating type error occurred on ({% set varintest='var in test.j2' %}\ntest...................\ntest...................\n{% include 'test1.j2' without context  %}\n \ntest...................\n): argument of type 'NoneType' is not iterable"
+}
+```
+
+5、可以通过显式的指定`with context`，表示导入上下文
+```
+# cat test.j2
+test...................
+test...................
+{% include 'test1.j2' with context %}
+ 
+test...................
+```
+
+在默认情况下，即使不使用`with context`，`include`也会导入对应的上下文，所以两种写法是等效的。
+```
+{% include 'test1.j2' %}
+{% include 'test1.j2' with context %}
+```
+
+6、如果指定包含的文件不存在执行文件的时候会报`TemplateNotFound: 文件名`错误，可以使用`ignore missing`进行标记即可。
+```
+# 1、编辑2个jinja模板其中test会包含一个不存在的test2.j2模板，执行过程中会报错
+test...................
+test...................
+{% include 'test1.j2' with context %}
+ 
+test...................
+{% include 'test2.j2' with context %}
+
+# 2、因为没有编写所谓的test2.j2，所以渲染test.j2模板时会报错
+# ansible node -m template -a "src=test.j2 dest=/opt/test"
+node01 | FAILED! => {
+    "changed": false, 
+    "msg": "TemplateNotFound: test2.j2"
+}
+
+# 3、使用”ignore missing”标记，自动忽略不存在的文件
+# cat test.j2
+test...................
+test...................
+{% include 'test1.j2' with context %}
+ 
+test...................
+{% include 'test2.j2' ignore missing with context %}
+```
