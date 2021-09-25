@@ -1260,10 +1260,237 @@ Some of the options that might be replaced
 something in test.j2...
 something in test.j2...
 
-# 2、test.j2就是刚才描述的”父模板”文件，这个文件中并没有太多内容，只是有一些文本，以及一个”块”，这个块通过”{% block %}”和”{% endblock %}”定义，块的名字为”test”，test块中有一行文本，我们可以直接渲染这个文件，渲染后的结果如下
+# 2、执行命令
+# ansible node -m template -a "src=test1.j2 dest=/opt/test"
+
+# 3、test.j2就是刚才描述的”父模板”文件，这个文件中并没有太多内容，只是有一些文本，以及一个”块”，这个块通过”{% block %}”和”{% endblock %}”定义，块的名字为”test”，test块中有一行文本，我们可以直接渲染这个文件，渲染后的结果如下
 something in test.j2...
 something in test.j2...
 Some of the options that might be replaced
 something in test.j2...
 something in test.j2...
+
+# 4、直接渲染这个父模板，父模板中的块并没有对父模板有任何影响，现在，定义一个子模板文件，并且指明这个子模板继承自这个父模板
+# cat test1.j2
+{% extends 'test.j2' %}
+ 
+{% block test %}
+aaaaaaaaaaaaaa
+11111111111111
+{% endblock %}
+
+# 5、执行命令
+# ansible node -m template -a "src=test1.j2 dest=/opt/test"
+
+# 6、最终生成的内容中，子模板中的test块中的内容覆盖了父模板中的test块的内容
+something in test.j2...
+something in test.j2...
+aaaaaaaaaaaaaa
+11111111111111
+something in test.j2...
+something in test.j2...
 ```
+
+可以在父模板的块中不写任何内容，而是靠子模板去填充对应的内容
+```
+# 在父模板的块中没有默认的内容，之前的示例中父模板的块中有默认的内容
+# cat test.j2
+something in test.j2...
+something in test.j2...
+{% block test %}
+{% endblock %}
+something in test.j2...
+something in test.j2...
+ 
+# cat test1.j2
+{% extends 'test.j2' %}
+ 
+{% block test %}
+aaaaaaaaaaaaaa
+11111111111111
+{% endblock %}
+```
+
+使用继承的一些优点如下：
+- 1、将公共的部分提取出来，规范统一公共部分
+- 2、将稳定的部分提取出来 ，提高复用率
+- 3、灵活的覆盖或者填充可能需要修改的部分，同时保留其他大部分未修改的默认配置
+- 4、为别人的修改留下一定的空间，并且不会影响默认的配置
+
+块中也可以嵌套另一个块
+```
+something in test.j2...
+{% block test %}
+ 
+something in block test
+{% block t1 %}
+something in block t1
+{% endblock %}
+something in block test
+ 
+{% endblock %}
+```
+
+test块中还有一个t1块，这样也是完全可行的，不过，上例中存在一个小问题，问题就是无论test块还是t1块，都使用”{% endblock %}”作为结尾，虽然能够正常 解析，但是可读性比较差，所以，我们可以在endblock中也加入对应的块名称以提高可读性
+```
+something in test.j2...
+{% block test %}
+ 
+something in block test
+{% block t1 %}
+something in block t1
+{% endblock t1 %}
+something in block test
+ 
+{% endblock test %}
+something in test.j2...
+```
+在子模板替换对应的块时，也可以在endblock块中写入对应的块名称。
+
+如果你需要在一个模板中多次的引用同一个块，则可以使用self特殊变量来引用模板自身的某个块，示例如下：
+```
+# cat test.j2
+something in test.j2...
+ 
+{% block test %}
+something in block test
+something else in block test
+{% endblock test %}
+ 
+{{ self.test() }}
+ 
+something in test.j2...
+```
+
+如上例所示，模板中定义了一个test块，在这个块之后，使用了”{{ self.test() }}”，这表示调用当前模板中的test块，上例模板渲染后结果如下
+```
+# cat test
+something in test.j2...
+ 
+something in block test
+something else in block test
+ 
+something in block test
+something else in block test
+ 
+ 
+something in test.j2...
+```
+test块中的内容被引用了两次，如果还有其他块名，你也可以使用”self.blockname()”来调用，如果你修改了上例中test块中的内容，所有引用test块中的内容都会随之改变，同理，如果你在子模板中覆盖了test块，那么所有引用test块的部分都会被覆盖。
+
+如果你并不想完全覆盖父模板中的块，而是想要在父模板某个块的基础之上进行扩展，那么则可以子模板中使用super块来完成，这样说可能不太容易理解，不如先来看一个小示例，如下：
+```
+# cat test.j2
+something in test.j2...
+ 
+{% block test %}
+something in block test
+something else in block test
+{% endblock test %}
+ 
+something in test.j2...
+ 
+# cat test1.j2
+{% extends 'test.j2' %}
+ 
+{% block test%}
+aaaaaaaaaaaaaa
+{{ super() }}
+11111111111111
+{% endblock test %}
+```
+如上例所示，test1.j2继承自test.j2文件，同时，test1.j2中指明要修改test块，如你所见，子模板的test块中包含”{{ super() }}”，这表示父模板中test块中的内容会替换到”{{ super() }}”对应的位置，换句话说就是，我们可以通过”{{ super() }}”来获取父级块中的内容，上例test1.j2的渲染结果如下：
+```
+# cat test1
+something in test.j2...
+ 
+aaaaaaaaaaaaaa
+something in block test
+something else in block test
+ 
+11111111111111
+ 
+something in test.j2...
+```
+如你所见，父级块中的内容保留了，我们加入的两行文本也在对应的位置生成了，这样就能够在保留父级块内容的前提下，加入更多的内容，不过上例中有一个小问题，就是super块在渲染后会自动换行，细心如你一定已经发现了，之前示例中使用”self”变量时，也会出现相同的问题，解决这个问题很简单，我们之前在使用for循环时就遇到过类似的问题，没错，使用”空白控制符”即可，在super块的末尾加入空白控制符”减号”就可以将自动换行去掉，示例如下：
+```
+{{ super() -}}
+```
+ 
+
+你有可能会使用for循环去迭代一个块，但是你在块中无法获取到for的循环变量，示例如下：
+```
+# cat test.j2
+something in test.j2...
+ 
+{%set testvar=123%}
+{% block test %}
+something in block test ---- {{testvar}}
+{% endblock %}
+ 
+{% for i in range(3) -%}
+ 
+{% block test1 %}
+something in block test1 ---- {{i}}
+{% endblock %}
+ 
+{%- endfor %}
+ 
+something in test.j2...
+```
+上述模板中有两个块，test块和test1块，test块未使用for循环，test1块使用for循环进行处理，渲染上述模板，会报如下错误
+```
+"msg": "AnsibleUndefinedVariable: 'i' is undefined"
+```
+提示未定义变量，这是因为当test1块被for循环处理时，无法在块中获取到for的循环变量造成的，如果想要在上述情况中获取到for的循环变量，则可以在块中使用scoped修饰符，示例如下
+```
+# cat test.j2
+something in test.j2...
+ 
+{%set testvar=123%}
+{% block test %}
+something in block test ---- {{testvar}}
+{% endblock %}
+ 
+{% for i in range(3) -%}
+ 
+{% block test1 scoped %}
+something in block test1 ---- {{i}}
+{% endblock %}
+ 
+{%- endfor %}
+ 
+something in test.j2...
+```
+上例渲染后结果如下
+```
+something in test.j2...
+ 
+something in block test ---- 123
+ 
+something in block test1 ---- 0
+something in block test1 ---- 1
+something in block test1 ---- 2
+ 
+something in test.j2...
+```
+ 
+
+在继承模板时，如果父模板在当前目录的子目录中，则可以使用如下方法继承对应的父模板
+```
+# tree
+.
+├── parent
+│    └── test.j2
+└── test1.j2
+ 
+# cat test1.j2
+{% extends 'parent/test.j2' %}
+ 
+{% block test%}
+{{ super() -}}
+11111111111111
+{% endblock test %}
+```
+如上例所示，test1.j2为子模板，test.j2为父模板，父模板在子模板所在目录的子目录中，此时，可以使用’parent/test.j2’引用test.j2模板。
+
