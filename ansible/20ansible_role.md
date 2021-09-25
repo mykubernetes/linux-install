@@ -31,6 +31,16 @@ roles_path    = /etc/ansible/roles:/opt:/testdir
   - role: testrole
 ```
 
+同时定义多个角色
+```
+- hosts: master
+  roles:
+    - { role: kubespray-defaults, tags: always }
+    - { role: ceph, tags: always }
+    - { role: mysql, tags: always }
+```
+
+
 在调用角色时，也可以使用变量，以便对应的任务可以使用这个变量。
 ```
 - hosts: node
