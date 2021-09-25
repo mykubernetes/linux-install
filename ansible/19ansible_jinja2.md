@@ -557,3 +557,88 @@ no one is greater than 10
       tom's son is jerry
 ```
 - 从字典中可以看出，bob的儿子是tom，tom的儿子是jerry，然后我们使用for循环操作了这个字典,使用了iteritems函数，在for循环的末尾，我们添加了recursive 修饰符，当for循环中有recursive时，表示这个循环是一个递归的循环，当我们需要在for循环中进行递归时，只要在需要进行递归的地方调用loop函数即可，没错，如你所见，上例中的”loop( value.iteritems() )”即为调用递归的部分，由于value也是一个字典，所以需要使用iteritems函数进行处理。
+
+# 转义的一些操作
+
+1、如果想将变量中的符合或者变量保持原样，需要在`{{  }}`中使用单引号引起，当做字符串进行处理。
+```
+# 1、编写jinja文件
+{{  '{{' }}
+{{  '}}' }}
+{{ '{{ test string }}' }}
+{{ '{% test string %}' }}
+{{ '{# test string #}' }}
+
+# 2、渲染后的结果
+{{
+}}
+{{ test string }}
+{% test string %}
+{# test string #}
+```
+
+2、如果有较多的符号都需要保持原样（不被jinja2解析），如果有较大的段落时，可以借助`{% raw %}`块进行处理。
+```
+# 1、编写jinja文件
+{% raw %}
+  {{ test }}
+  {% test %}
+  {# test #}
+  {% if %}
+  {% for %}
+{% endraw %}
+
+# 2、渲染后的结果
+ 
+  {{ test }}
+  {% test %}
+  {# test #}
+  {% if %}
+  {% for %}
+```
+
+3、默认情况下，变量和表达式被包含在`{{  }}`中，控制语句被包含在`{%  %}`中。也可以在调用模板时，手动指定一些符号替换默认的`{{  }}`和`{%  %}`,使用`variable_start_string`参数指定一个符号替代`{{`,variable_end_string参数指定一个符号替代`}}`
+```
+# 1、编写jinja文件
+{% set test='abc' %}
+ 
+(( test ))
+ 
+{{ test }}
+{{ test1 }}
+{{ 'test' }}
+{{ 'test1' }}
+
+# 2、在调用templdate模块时，执行如下命令，注意，如下命令表示使用”((“代替”{{“，使用”))”代替”}}”。
+# ansible node -m template -a "src=test.j2 dest=/opt/test variable_start_string='((' variable_end_string='))'"
+
+# 3、渲染后的结果
+ 
+abc
+ 
+{{ test }}
+{{ test1 }}
+{{ 'test' }}
+{{ 'test1' }}
+```
+
+4、使用block_start_string参数指定一个符号替换`{%  %}`中的`{% `,使用block_end_string参数指定一个符号替换`{%  %}`中的`%}`
+```
+# 1、编写jinja文件
+(( set test='abc' ))
+{{ test }}
+
+{% set test1='cbd' %}
+{{ test1 | default(true)}}
+{{ 'test1' }}
+
+# 2、在调用templdate模块时，执行如下命令，注意，如下命令表示使用”((“代替”{%“，使用”))”代替”%}”。
+# ansible node -m template -a "src=test.j2 dest=/opt/test block_start_string='((' block_end_string='))'"
+
+# 3、渲染后的结果
+abc
+
+{% set test1='cbd' %}
+True
+```
+
