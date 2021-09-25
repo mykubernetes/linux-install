@@ -642,3 +642,67 @@ abc
 True
 ```
 
+
+# 宏相关总结
+
+1、jinja2中也有类似函数的东西，它叫做”宏”，利用宏，我们可以方便快捷的重复的利用一段内容，并且把这段内容当做一个独立的逻辑单元，与其他语言中的函数一样，jinja2的宏也可以传入参数
+```
+{% macro testfunc() %}
+  test string
+{% endmacro %}
+ 
+{{ testfunc() }}
+```
+- 定义宏时需要使用`{% macro %}`开头，使用`{% endmacro %}`结束,与大多数语言中的函数一样，宏的括号中可以传入参数
+
+2、在定义宏时，定义两个参数，然后在调用宏时，传入了提前定义好的testvar1变量和testvar2变量，但是示例中有一个很明显的问题，就是如果宏在定义的时候有对应的参数，在调用宏时就必须传入对应的参数，否则就会报错。
+```
+# 1、编写jinja文件
+{% set testvar1='teststr1' %}
+{% set testvar2=2 %}
+ 
+{% macro testfunc(tv1,tv2) %}
+  test string
+  {{tv1}}
+  {{tv2}}
+{% endmacro %}
+ 
+{{ testfunc(testvar1,testvar2) }}
+
+
+# 2、渲染后的结果
+
+
+  test string
+  teststr1
+  2
+```
+
+3、在定义宏时，为对应的参数指定一个默认值，当在调用宏时没有显式的指定对应的参数时，宏就使用参数的默认值
+```
+# 1、编写jinja文件
+{% macro testfunc(tv1=111) %}
+  test string
+  {{tv1}}
+{% endmacro %}
+ 
+{{ testfunc( ) }}
+{{ testfunc(666) }}
+
+# 2、渲染后的结果
+
+ 
+  test string
+  111
+ 
+  test string
+  666
+```
+- 为tv1参数定义了默认值111，然后调用了两次testfunc宏，第一次没有传入对应参数，使用了默认值，第二次调用宏时传入了对应参数，于是使用了传入的值
+
+
+
+
+
+
+
