@@ -157,6 +157,7 @@ when条件判断
       when: ( ansible_fqdn is match ("web*")) or ( ansible_fqdn is match ("lb*"))
 ```
 
+11、布尔型判断
 
 | 用法 | 描述 |
 |-----|-----|
