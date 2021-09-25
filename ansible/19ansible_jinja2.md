@@ -701,6 +701,127 @@ True
 - 为tv1参数定义了默认值111，然后调用了两次testfunc宏，第一次没有传入对应参数，使用了默认值，第二次调用宏时传入了对应参数，于是使用了传入的值
 
 
+4、调用宏时传入的值会按照顺序与没有默认值的参数进行对应。
+```
+# 1、编写jinja文件
+{% macro testfunc(tv1,tv2,tv3=3,tv4=4) %}
+  test string
+  {{tv1}}
+  {{tv2}}
+  {{tv3}}
+  {{tv4}}
+{% endmacro %}
+ 
+{{ testfunc( 'aa','a' ) }}
+
+# 2、渲染后的结果
+
+
+  test string
+  aa
+  a
+  3
+  4
+```
+
+5、在传入参数时，也可以显式的指明参数的名称
+```
+# 1、编写jinja文件
+{% macro testfunc(tv1,tv2=2,tv3=3) %}
+  test string
+  {{tv1}}
+  {{tv2}}
+  {{tv3}}
+{% endmacro %}
+ 
+{{ testfunc( 111,tv3='ccc' ) }}
+
+# 2、渲染后的结果
+  test string
+  111
+  2
+  ccc
+```
+
+6、在宏的内部，有三个默认的内置特殊变量可供我们使用，它们分别是varargs、kwargs、caller
+
+1）在调用宏时，多传入几个额外的参数，这些额外的参数会作为一个元组保存在varargs变量上，可以通过获取varargs变量的值获取到额外传入的参数
+```
+# 1、编写jinja文件
+{% macro testfunc(testarg1=1,testarg2=2) %}
+  test string
+  {{testarg1}}
+  {{testarg2}}
+  {{varargs}}
+{% endmacro %}
+ 
+{{ testfunc('a','b','c','d','e') }}
+
+
+# 2、渲染后的结果
+ 
+  test string
+  a
+  b
+  ('c', 'd', 'e')
+```
+
+2)既然varargs变量里面存储了多余的参数，那么如果宏压根就没有定义任何参数，我们却传入了一些参数，那么这些所有传入的参数都是“多余”出的参数，也可以使用varargs变量处理这些参数
+```
+# 1、编写jinja文件
+{% macro testfunc() %}
+  test string
+  {%for i in varargs%}
+  {{i}}
+  {%endfor%}
+  {{ '--------' }}
+{% endmacro %}
+ 
+{{ testfunc() }}
+{{ testfunc(1,2,3) }}
+
+
+# 2、渲染后的结果
+  test string
+    --------
+ 
+  test string
+    1
+    2
+    3
+    --------
+```
+
+3)kwargs变量与varargs变量的作用很像，但是kwargs变量只是针对’关键字参数’而言的，而varargs变量是针对’非关键字参数’而言的
+
+在定义宏时，定义了一个参数tv1，并且设置了默认值，在宏中，我们输出了varargs变量和kwargs变量，在调用宏时，我们多传入了3个参数，最后一个参数是一个带有参数名的关键字参数
+```
+# 1、编写jinja文件
+{% macro testfunc(tv1='tv1') %}
+  test string
+  {{varargs}}
+  {{kwargs}}
+{% endmacro %}
+ 
+{{ testfunc('a',2,'test',testkeyvar='abc') }}
+
+# 2、渲染后的结果
+ 
+  test string
+  (2, 'test')
+  {'testkeyvar': 'abc'}
+```
+- 多余的非关键字参数都会保存在varargs变量中，varargs变量的结构是一个元组，而多余的关键字参数都会保存在kwargs变量中，kwargs变量的结构是一个字典，kwargs变量实现的效果与Python的关键字参数效果类似。
+
+4)与其说是caller变量，不如称其为caller函数或者caller方法，caller可以帮助我们将宏中的内容进行替换
+```
+{% macro testfunc() %}
+  test string
+  {{caller()}}
+{% endmacro %}
+```
+
+
 
 
 
