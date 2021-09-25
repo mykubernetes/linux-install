@@ -1244,3 +1244,26 @@ something in test macro
  
 {{_test()}}
 ```
+
+# 继承
+
+- 可以先定义一个父模板，然后在父模板中定义一些”块”，不同的内容放在不同的块中，之后再定义一个子模板，这个子模板继承自刚才定义的父模板，我们可以在子模板中写一些内容，这些内容可以覆盖父模板中对应的内容
+
+```
+# 1、编写jinja模板
+# cat test.j2
+something in test.j2...
+something in test.j2...
+{% block test %}
+Some of the options that might be replaced
+{% endblock %}
+something in test.j2...
+something in test.j2...
+
+# 2、test.j2就是刚才描述的”父模板”文件，这个文件中并没有太多内容，只是有一些文本，以及一个”块”，这个块通过”{% block %}”和”{% endblock %}”定义，块的名字为”test”，test块中有一行文本，我们可以直接渲染这个文件，渲染后的结果如下
+something in test.j2...
+something in test.j2...
+Some of the options that might be replaced
+something in test.j2...
+something in test.j2...
+```
