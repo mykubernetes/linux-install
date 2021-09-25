@@ -1122,3 +1122,125 @@ test...................
 test...................
 {% include 'test2.j2' ignore missing with context %}
 ```
+
+# 导入import
+
+- include的作用是在模板中包含另一个模板文件，而import的作用是在一个文件中导入其他文件中的宏，所有宏都是在当前文件中定义的也就是说，无论是定义宏，还是调用宏，都是在同一个模板文件中完成的，可以通过`import`实现在A文件中定义宏，在B文件中使用宏。
+
+import语法：
+```
+方法一：
+{% import 'function_lib.j2' as funclib %}
+表示一次性导入'function_lib.j2' 文件中的所有宏，调用宏时使用对应的变量进行调用。
+ 
+方法二:
+{% from 'function_lib.j2' import testfunc1 as tf1  %}
+表示导入'function_lib.j2' 文件中指定的宏，调用宏时使用对应的新名称进行调用。
+```
+
+
+```jinja
+# 1、编写两个jinja模板，一个通过import调用另外一个文件的宏
+# cat function_lib.j2
+{% macro testfunc() %}
+test function
+{% for i in varargs %}
+{{ i }}
+{% endfor %}
+{% endmacro %}
+ 
+{% macro testfunc1(tv1=1) %}
+{{tv1}}
+{% endmacro %}
+ 
+# cat test.j2
+{% import 'function_lib.j2' as funclib %}
+something in test.j2
+{{ funclib.testfunc(1,2,3) }}
+ 
+something in test.j2
+{{ funclib.testfunc1('aaaa') }}
+
+# 通过命令进行渲染
+# ansible node -m template -a "src=test.j2 dest=/opt/test"
+
+# 3、渲染后的结果
+something in test.j2
+test function
+1
+2
+3
+
+
+something in test.j2
+aaaa
+```
+- 在function_lib.j2文件中定义了两个宏，testfunc宏和testfunc1宏，并且没有在function_lib.j2文件中调用这两个宏，而是在test.j2文件中调用这些宏，所以使用`import`将function_lib.j2文件中的宏导入到了当前文件中。由于已经将`function_lib.j2`文件中的宏导入到了”funclib”变量中，所以当需要调用`function_lib.j2`文件中的testfunc宏时可以直接使用。
+
+
+
+```
+# cat function_lib.j2
+{% macro testfunc() %}
+test function
+{% for i in varargs %}
+{{ i }}
+{% endfor %}
+{% endmacro %}
+ 
+{% macro testfunc1(tv1=111) %}
+test function1
+{{tv1}}
+{% endmacro %}
+ 
+ 
+# cat test1.j2
+{% from 'function_lib.j2' import testfunc as tf, testfunc1 as tf1  %}
+something in test1.j2
+{{ tf(1,2) }}
+ 
+something in test1.j2
+{{ tf1('a') }}
+```
+- 从`function_lib.j2`文件中将`testfunc`宏导入为`tf`宏
+- 从`function_lib.j2`文件中将`testfunc1`宏导入为t`f1`宏
+- 导入后，直接调用`tf`宏和t`f1`宏，即为调用`function_lib.j2`文件中对应的宏
+
+
+
+import和include不同，include默认会导入上下文环境，而import默认则不会，所以，如果想要让宏被import以后能够使用到对应的上下文环境，则需要显式的配置`with context`
+```
+# cat function_lib.j2
+{% macro testfunc1(tv1=111) %}
+test function1
+{{tv1}}
+{{outvartest}}
+{% endmacro %}
+ 
+# cat test.j2
+{% set outvartest='00000000' %}
+ 
+{% import 'function_lib.j2' as funclib with context%}
+something in test.j2
+{{ funclib.testfunc1() }}
+```
+
+在使用`import`并且显式的配置`with context`时，有如下两个注意点。
+- 一、在外部定义变量的位置需要在import之前，也就是说，上例中定义outvartest变量的位置在import之前。
+- 二、只能使用上述方法一对宏进行导入，经测试，使用方法二导入宏后，即使显式的指定了”with context”，仍然无法找到对应的变量。
+
+注意：宏中如果包含for循环并且for循环中使用了range()函数，那么在`import`宏时则必须显式的指定`with context`，否则在ansible中渲染对应模板时，会出现包含如下信息的报错。
+```
+"argument of type 'NoneType' is not iterable"
+```
+ 
+
+注意：宏如果以一个或多个下划线开头，则表示这个宏为私有宏，这个宏不能被导入到其他文件中使用，示例如下：
+```
+# cat func.j2
+{% macro _test() %}
+something in test macro
+{% endmacro %}
+ 
+{{_test()}}
+```
