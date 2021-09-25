@@ -889,3 +889,78 @@ something~~~~
 somethingElse~~
 ```
 - 当testfunc中的某些内容需要循环的进行替换时，这种方法非常有效
+
+
+7)除了varargs、kwargs、caller这些内部变量，宏还有一些属性可以使用。
+
+| 属性| 属性描述 |
+|-----|---------|
+| name | 宏的名称。 |
+| arguments | 宏中定义的所有参数的参数名，这些参数名组成了一个元组存放在arguments中。 |
+| defaults | 宏中定义的参数如果有默认值，这些默认值组成了一个元组存放在defaults中。 |
+| catch_varargs | 如果宏中使用了varargs变量，此属性的值为true。 |
+| catch_kwargs属 | 如果宏中使用了kwargs变量，此属性的值为true。 |
+| caller | 如果宏中使用了caller变量，此属性值为true。 |
+
+上述宏属性的使用示例如下，可以对比着渲染后的结果查看：
+```
+# cat test.j2
+{% macro testfunc(tv1,tv2,tv3=3,tv4=4) %}
+  test string
+  {{tv1}}
+  {{tv2}}
+  {{tv3}}
+  {{tv4}}
+{% endmacro %}
+ 
+  {{testfunc.name}}
+  {{testfunc.arguments}}
+  {{testfunc.defaults}}
+  {{testfunc.catch_varargs}}
+  {{testfunc.catch_kwargs}}
+  {{testfunc.caller}}
+ 
+{{'################################'}}
+ 
+{% macro testfunc1(tv1='a',tv2='b') %}
+  test string
+  {{tv1}}
+  {{tv2}}
+  {{varargs}}
+  {{kwargs}}
+{% endmacro %}
+ 
+  {{testfunc1.catch_varargs}}
+  {{testfunc1.catch_kwargs}}
+  {{testfunc1.caller}}
+ 
+{{'################################'}}
+ 
+{% macro testfunc2() %}
+  test string
+  {{caller()}}
+{% endmacro %}
+ 
+  {{testfunc2.caller}}
+```
+如你所见，我并没有调用宏，但是可以直接使用宏的属性，上例模板内容渲染后的结果如下：
+```
+  testfunc
+  ('tv1', 'tv2', 'tv3', 'tv4')
+  (3, 4)
+  False
+  False
+  False
+ 
+################################
+ 
+ 
+  True
+  True
+  False
+ 
+################################
+ 
+ 
+  True
+```
