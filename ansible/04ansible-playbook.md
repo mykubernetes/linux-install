@@ -14,7 +14,7 @@ ansible-playbook -C first.yaml
 
 ### 3、检查运行的主机
 ```
-ansible-playbook --list-host first.yaml
+ansible-playbook --list-hosts first.yaml
 ```
 
 ### 4、运行加密playbook文件时提示输入密码
@@ -28,43 +28,38 @@ ansible-playbook example.yaml -i inventory
 ansible-playbook example.yaml --inventory-file=inventory
 ```
 
-### 6、列出执行匹配到的主机，但并不会执行任何动作。
-```
-ansible-playbook example.yaml --list-hosts
-```
-
-### 7、列出所有tags
+### 6、列出所有tags
 ```
 ansible-playbook example.yaml --list-tags
 ```
 
-### 8、列出所有即将被执行的任务
+### 7、列出所有即将被执行的任务
 ```
 ansible-playbook example.yaml --list-tasks  
 ```
 
-### 9、指定tags
+### 8、指定tags
 ```
 ansible-playbook example.yaml --tags "configuration,install"
 ```
 
-### 10、跳过tags
+### 9、跳过tags
 ```
 ansible-playbook example.yaml --skip-tags "install"
 ```
 
-### 11、并行任务数。FORKS被指定为一个整数,默认是5
+### 10、并行任务数。FORKS被指定为一个整数,默认是5
 ```
 ansible-playbook example.yaml -f 5
 ansible-playbook example.yaml --forks=5
 ```
 
-### 12、指定运行的主机
+### 11、指定运行的主机
 ```
 ansible-playbook example.yaml --limit node01
 ```
 
-### 13、查看主机变量
+### 12、查看主机变量
 ```
 ansible node01 -m setup
 
