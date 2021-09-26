@@ -1,6 +1,26 @@
 # 条件判断与错误处理
 
-1、ansible在执行fail模块时，fail模块默认的输出信息为`Failed as requested from task`，可以通过fail模块的msg参数自定义报错的信息
+## 一、fail模块
+
+- 在执行playbook时，如果playbook中的任何一个任务执行失败，playbook都会停止运行，除非这个任务设置了`ignore_errors: true`，在任务没有设置`ignore_errors: true`的情况下，任务执行失败后，playbook就会自动终止，而fail模块天生就是一个用来"执行失败"的模块，当fail模块执行后，playbook就会认为有任务失败，从而终止运行
+
+### 1、下列playbook中一共有4个debug任务，在第2个debug任务之后，调用了fail模块，
+```
+- hosts: web
+  remote_user: root
+  tasks:
+  - debug:
+      msg: "1"
+  - debug:
+      msg: "2"
+  - fail:
+  - debug:
+      msg: "3"
+  - debug:
+      msg: "4"
+```
+
+### 2、fail模块默认的输出信息为`Failed as requested from task`，可以通过fail模块的msg参数自定义报错的信息
 ```
 ---
 - hosts: web
@@ -14,7 +34,7 @@
       msg: "2"
 ```
 
-2、对某些条件进行判断，如果条件满足，则中断剧本.
+### 3、`fail`模块通常需要对某些条件进行判断，如果条件满足，则中断剧本，所以，fail模块通常与when结合使用,比如如果之前模块执行后的标准输出信息中包含字符串’error’，则认为中断剧本的条件成立，就立即调用fail模块，以终断playbook
 ```
 ---
 - hosts: web
@@ -35,7 +55,9 @@ when: ' "successful" not in return_value.stdout '
 when: " 'successful' not in return_value.stdout "
 ```
 
-3、借助`failed_when`功能实现失败判断，`failed_when`的作用就是，当对应的条件成立时，将对应任务的执行状态设置为失败
+## 二、failed_when模块
+
+### 1、借助`failed_when`功能实现失败判断，`failed_when`的作用就是，当对应的条件成立时，将对应任务的执行状态设置为失败
 ```
 ---
 - hosts: web
@@ -50,8 +72,39 @@ when: " 'successful' not in return_value.stdout "
       msg: "I never execute,Because the playbook has stopped"
 ```
 
+```
+# ansible-playbook test.yml 
 
-4、`changed_when`作用是在条件成立时，将对应任务的执行状态设置为changed
+PLAY [node] ********************************************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************************************
+Sunday 26 September 2021  10:13:27 -0400 (0:00:00.093)       0:00:00.093 ****** 
+ok: [node01]
+
+TASK [debug] *******************************************************************************************************************************************
+Sunday 26 September 2021  10:13:27 -0400 (0:00:00.788)       0:00:00.881 ****** 
+ok: [node01] => {
+    "msg": "I execute normally"
+}
+
+TASK [shell] *******************************************************************************************************************************************
+Sunday 26 September 2021  10:13:27 -0400 (0:00:00.067)       0:00:00.949 ****** 
+fatal: [node01]: FAILED! => {"changed": true, "cmd": "echo 'This is a string for testing error'", "delta": "0:00:00.002876", "end": "2021-09-26 10:13:28.316925", "failed_when_result": true, "rc": 0, "start": "2021-09-26 10:13:28.314049", "stderr": "", "stderr_lines": [], "stdout": "This is a string for testing error", "stdout_lines": ["This is a string for testing error"]}
+	to retry, use: --limit @/root/test.retry
+
+PLAY RECAP *********************************************************************************************************************************************
+node01                     : ok=2    changed=0    unreachable=0    failed=1   
+
+Sunday 26 September 2021  10:13:28 -0400 (0:00:00.377)       0:00:01.327 ****** 
+=============================================================================== 
+Gathering Facts --------------------------------------------------------------------------------------------------------------------------------- 0.79s
+shell ------------------------------------------------------------------------------------------------------------------------------------------- 0.38s
+debug ------------------------------------------------------------------------------------------------------------------------------------------- 0.07s
+```
+
+## 三、changed_when模块
+
+### 1、`changed_when`模块的作用是在条件成立时，将对应任务的执行状态设置为changed
 ```
 ---
 - hosts: web
@@ -62,7 +115,7 @@ when: " 'successful' not in return_value.stdout "
     changed_when: 2 > 1
 ```
 
-5、将任务设置成永远不为changed状态
+###  2、将任务设置成永远不为changed状态
 ```
 ---
 - hosts: test70
@@ -71,6 +124,7 @@ when: " 'successful' not in return_value.stdout "
   - shell: "ls /opt"
     changed_when: false
 ```
+
 
 ```
 1.强制调用handlers
