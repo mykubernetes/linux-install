@@ -333,19 +333,27 @@ print two lines of messages ----------------------------------------------------
 
 - 可以使用debugger关键字为play、role、block或task开启或关闭调试器。一般情况下，在新增或修改task时开启调试器，这样当失败时可以进行调试，快速修复错误。
 
+| debugger参数的值| debugger参数描述|
+|----------------|----------------|
+| always | 无论如何都会调用debugger。 |
+| never | 无论如何都不会调用debugger。 |
+| on_failed | 只有当任务失败的时候再调用debugger。 |
+| on_unreachable | 只有当主机不可达时再调用debugger。 |
+| on_skipped | 只有当任务skipped再调用debugger。 |
 
-always：无论如何都会调用debugger。
-never：无论如何都不会调用debugger。
-on_failed：只有当任务失败的时候再调用debugger。
-on_unreachable：只有当主机不可达时再调用debugger。
-on_skipped：只有当任务skipped再调用debugger。
+## 1、在全局开启debugger，可以在ansible.cfg文件中设置，默认是task级别。
+```
+[defaults]
+enable_task_debugger = True
+```
+
+## 2、在环境变量中进行设置，默认是task级别
+```
+ANSIBLE_ENABLE_TASK_DEBUGGER = True
+```
 
 
-
-
-
-
-## 1、在play级别设置debugger
+## 3、在play级别设置debugger
 ```
 ---
 - hosts: node01
@@ -357,7 +365,7 @@ on_skipped：只有当任务skipped再调用debugger。
     when: False
 ```
 
-
+## 4、在task级别设置debugger
 ```
 ---
 - hosts: node01
@@ -369,13 +377,75 @@ on_skipped：只有当任务skipped再调用debugger。
 ```
 
 
+## 5、在多个级别设置debugger
+```
+---
+- hosts: node01
+  debugger: never
+  tasks:
+  - name: Execute a command
+    debug:
+      var: "{{ absible }}"
+    debugger: on_failed
+```
 
 
+## Debugger中可用的命令
 
+- 在使用debugger进行调试时，是进入到一个交互模式窗口下，使用debugger提供的命令进行调试
 
+| 命令使用方法 | 命令描述 |
+|-------------|--------|
+| p task | 打印出任务的名称 |
+| p task_vars | 打印任务的变量 |
+| p task_args | 打印任务的参数 |
+| p host | 打印当前主机 |
+| p result | 打印任务执行结果 |
+| task.args[key]=value | 修改模块参数的值 |
+| task.vars[key]=value | 修改模块变量的值 |
+| u（update_task） | 根据更新后的变量或参数值从新创建该task |
+| r（redo） | 重新执行该task |
+| c（continue） | 继续执行后续的tasks |
+| q（quit） | 从debugger会话中退出 |
+| help | 查看帮助信息 |
 
+## 6、使用debugger调试
+```
+---
+- hosts: node
+  debugger: on_failed
+  gather_facts: no
+  vars:
+    info: debug this playbook
+  tasks:
+  - name: print the wrong variable
+    ping: data={{wrong_info}}
+```
+- 设置了play级别的debugger值为on_failed，也就是当task失败时调用debugger进行调试。在task中使用了一个错误的变量，执行时肯定会失败。在debugger中修改变量名，然后再次成功执行该任务。
 
+```
+# ansible-playbook debugger_test.yml 
 
+PLAY [node] ********************************************************************************************************************************************
 
+TASK [print the wrong variable] ************************************************************************************************************************
+Sunday 26 September 2021  09:41:09 -0400 (0:00:00.073)       0:00:00.073 ****** 
+fatal: [node01]: FAILED! => {"msg": "The task includes an option with an undefined variable. The error was: 'wrong_info' is undefined\n\nThe error appears to have been in '/root/test/te.yml': line 8, column 5, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n  tasks:\n  - name: print the wrong variable\n    ^ here\n"}
+[node01] TASK: print the wrong variable (debug)> p task
+TASK: print the wrong variable
+[node01] TASK: print the wrong variable (debug)> p task.args
+{u'data': u'{{wrong_info}}'}
+[node01] TASK: print the wrong variable (debug)> task.args['data']='{{info}}'
+[node01] TASK: print the wrong variable (debug)> p task.args
+{u'data': '{{info}}'}
+[node01] TASK: print the wrong variable (debug)> r
+ok: [node01]
 
+PLAY RECAP *********************************************************************************************************************************************
+node01                     : ok=1    changed=0    unreachable=0    failed=0   
 
+Sunday 26 September 2021  09:42:21 -0400 (0:01:12.164)       0:01:12.237 ****** 
+=============================================================================== 
+print the wrong variable ----------------------------------------------------------------------------------------------------------------------- 72.16s
+```
+- 通过p task_args命令查看当前的参数列表，通过task.args['data'] = '{{info}}'设置参数名，然后通过r命令重新执行该任务，再次执行时执行成功。
