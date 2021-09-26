@@ -329,3 +329,53 @@ show uptime result -------------------------------------------------------------
 print two lines of messages --------------------------------------------------------------------------------------------------------------------- 0.05s
 ```
 
+# 六、debugger
+
+- 可以使用debugger关键字为play、role、block或task开启或关闭调试器。一般情况下，在新增或修改task时开启调试器，这样当失败时可以进行调试，快速修复错误。
+
+
+always：无论如何都会调用debugger。
+never：无论如何都不会调用debugger。
+on_failed：只有当任务失败的时候再调用debugger。
+on_unreachable：只有当主机不可达时再调用debugger。
+on_skipped：只有当任务skipped再调用debugger。
+
+
+
+
+
+
+## 1、在play级别设置debugger
+```
+---
+- hosts: node01
+  debugger: on_skipped
+  tasks:
+  - name: Execute a command
+    debug:
+      msg: test
+    when: False
+```
+
+
+```
+---
+- hosts: node01
+  tasks:
+  - name: Execute a command
+    debug:
+      var: "{{ absible }}"
+    debugger: on_failed
+```
+
+
+
+
+
+
+
+
+
+
+
+
