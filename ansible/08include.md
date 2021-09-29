@@ -3,42 +3,7 @@ include
 
 # 一、在task中通过include引入文件
 
-1、分别用于安装LAMP环境和LNMP环境，编写playbook,发现有共同的剧本mysql和php
-```
-# cat lamp.yml
----
-- hosts: test70
-  remote_user: root
-  gather_facts: no
-  tasks:
-  - yum:
-      name: mysql
-      state: present
-  - yum:
-      name: php-fpm
-      state: present
-  - yum:
-      name: httpd
-      state: present
- 
-# cat lnmp.yml
----
-- hosts: test70
-  remote_user: root
-  gather_facts: no
-  tasks:
-  - yum:
-      name: mysql
-      state: present
-  - yum:
-      name: php-fpm
-      state: present
-  - yum:
-      name: nginx
-      state: present
-```
-
-2、把mysql和php部分的任务提取到install_MysqlAndPhp.yml文件中，可以重复利用
+1、分别用于安装LAMP环境和LNMP环境，编写playbook,发现有共同的剧本mysql和php，可以把mysql和php部分的任务提取到install_MysqlAndPhp.yml文件中，通过include模块引入需要重复利用的剧本。
 ```
 # cat install_MysqlAndPhp.yml
 - yum:
@@ -47,13 +12,11 @@ include
 - yum:
     name: php-fpm
     state: present
-```
 
-3、通过include模块引入需要重复利用的剧本
-```
+
 # cat lamp.yml
 ---
-- hosts: test70
+- hosts: node
   remote_user: root
   gather_facts: no
   tasks:
@@ -64,7 +27,7 @@ include
  
 # cat lnmp.yml
 ---
-- hosts: test70
+- hosts: node
   remote_user: root
   gather_facts: no
   tasks:
@@ -74,12 +37,11 @@ include
       state: present
 ```
 
-# 二、在handlers中使用include
-
+# 二、在handlers关键字中，也可以使用include，当`test include handlers`被触发时，`include_handler.yml`中的任务将会执行
 ```
 # cat test_include.yml
 ---
-- hosts: test70
+- hosts: node
   remote_user: root
   gather_facts: no
   tasks:
@@ -102,12 +64,12 @@ include
 ```
 
 
-# 三、`include`不仅能够引用任务列表，还能够引用playbook
+# 三、ansible还可以在一个playbook中引用另外一个playbook。
 
 ```
 # cat lamp.yml
 ---
-- hosts: test70
+- hosts: node
   remote_user: root
   gather_facts: no
   tasks:
@@ -125,7 +87,7 @@ include
 ```
 # cat test_include1.yml
 ---
-- hosts: test70
+- hosts: node
   remote_user: root
   gather_facts: no
   tasks:
