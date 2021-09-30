@@ -147,12 +147,13 @@ radosgw-admin subuser create --uid=johndoe --subuser=johndoe:swift --access=full
 radosgw-admin user info --uid=johndoe
 ```
 
-4、修改用户信息,典型的修改项主要是access和secret密钥，邮件地址，显示名称和访问级别。
+4、修改用户信息,主要的修改项是access和secret密钥，邮件地址，显示名称和访问级别。
 ```
 radosgw-admin user modify --uid=johndoe --display-name="John E. Doe"
 ```
 
 5、修改子用户的信息
+```
 radosgw-admin subuser modify --uid=johndoe:swift --access=full
 ```
 
