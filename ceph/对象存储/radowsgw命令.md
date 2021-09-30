@@ -123,8 +123,8 @@
 ## 用户管理
 
 1、新建一个用户
+> 执行下面的命令新建一个用户 (S3 接口)
 ```
-执行下面的命令新建一个用户 (S3 接口):
 语法
 radosgw-admin user create --uid={username} --display-name="{display-name}" [--email={email}]
 演示
@@ -132,8 +132,8 @@ radosgw-admin user create --uid=johndoe --display-name="John Doe" --email=john@e
 ```
 
 2、新建一个子用户
+> 为了给用户新建一个子用户 (Swift 接口) ,必须为该子用户指定用户的 ID(--uid={username})，子用户的ID以及访问级别
 ```
-为了给用户新建一个子用户 (Swift 接口) ，必须为该子用户指定用户的 ID(--uid={username})，子用户的 ID 以及访问级别
 语法
 radosgw-admin subuser create --uid={uid} --subuser={uid} --access=[ read | write | readwrite | full ]
 演示
@@ -144,20 +144,19 @@ radosgw-admin subuser create --uid=johndoe --subuser=johndoe:swift --access=full
 
 3、获取用户信息
 ```
-获取一个用户的信息，必须使用 user info 子命令并且制定一个用户 ID(--uid={username}) .
 radosgw-admin user info --uid=johndoe
 ```
 
-4、修改用户信息
+4、修改用户信息,典型的修改项主要是access和secret密钥，邮件地址，显示名称和访问级别。
 ```
-修改一个用户的信息必须指定用户的ID (--uid={username})，还有想要修改的属性值。典型的修改项主要是 access 和secret 密钥，邮件地址，显示名称和访问级别。
 radosgw-admin user modify --uid=johndoe --display-name="John E. Doe"
+```
 
-修改子用户的信息。 
+5、修改子用户的信息
 radosgw-admin subuser modify --uid=johndoe:swift --access=full
 ```
 
-5、用户的启用/停用
+6、用户的启用/停用
 ```
 当创建一个用户默认情况下是处于启用状态。可以暂停用户权限并在以后随时重新启用它们。暂停一个用户使用user suspend子命令然后指定用户的ID。
 radosgw-admin user suspend --uid=johndoe
@@ -167,7 +166,7 @@ radosgw-admin user enable --uid=johndoe
 ```
 - Note:停用一个用户后，它的子用户也会一起被停用.
 
-6、删除用户
+7、删除用户
 ```
 删除用户时，这个用户以及他的子用户都会被删除。当然也可以只删除子用户。要删除用户（及其子用户），可使用 user rm 子命令并指明用户 ID 
 radosgw-admin user rm --uid=johndoe
@@ -182,13 +181,13 @@ radosgw-admin user rm --uid=johnny --purge-data
 - Purge Data: 加 --purge-data 选项可清除与此 UID 相关的所有数据。
 - Purge Keys: 加 --purge-keys 选项可清除与此 UID 相关的所有密钥。
 
-7、新建一个密钥
+8、新建一个密钥
 ```
 为用户新建一个密钥，需要使用 key create 子命令。对于用户来说，需要指明用户的 ID 以及新建的密钥类型为s3。要为子用户新建一个密钥，则需要指明子用户的ID以及密钥类型为swift。
 radosgw-admin key create --subuser=johndoe:swift --key-type=swift --gen-secret
 ```
 
-8、新建/删除 ACCESS 密钥
+9、新建/删除 ACCESS 密钥
 
 用户和子用户要能使用S3和Swift接口，必须有access密钥。在你新建用户或者子用户的时候，如果没有指明 access 和 secret 密钥，这两 个密钥会自动生成。你可能需要新建 access 和/或 secret 密钥，不管是 手动指定还是自动生成的方式。你也可能需要删除一个 access 和 secret 。可用的选项有
 - --secret=<key> 指明一个 secret 密钥 (e.即手动生成).
@@ -206,7 +205,7 @@ radosgw-admin key create --uid=johndoe --key-type=s3 --gen-access-key --gen-secr
 radosgw-admin key rm --uid=johndoe
 ```
   
-9、添加/删除 管理权限
+10、添加/删除 管理权限
 - Ceph 存储集群提供了一个管理API，它允许用户通过 REST API 执行管理功能。默认情况下，用户没有访问 这个 API 的权限。要启用用户的管理功能，需要为用 户提供管理权限。
 
 ```
@@ -220,17 +219,17 @@ radosgw-admin caps add --uid=johndoe --caps="users=*"
 radosgw-admin caps rm --uid=johndoe --caps={caps}
 ```
 
-10、查看用户列表
+11、查看用户列表
 ```
 radosgw-admin user list
 ```
   
-11、检查用户信息
+12、检查用户信息
 ```
 radosgw-admin user check --uid=johndoe
 ```
 
-12、获取用户用量统计信息
+13、获取用户用量统计信息
 ```
 radosgw-admin user stats --uid=uid
 ```
