@@ -120,6 +120,206 @@
 | --max-size | 指定最大尺寸（单位为字节，负数为禁用）。 |
 | --quota-scope | 配额有效范围（桶、用户）。 |
 
+## 用户管理
+
+1、新建一个用户
+```
+执行下面的命令新建一个用户 (S3 接口):
+语法
+radosgw-admin user create --uid={username} --display-name="{display-name}" [--email={email}]
+演示
+radosgw-admin user create --uid=johndoe --display-name="John Doe" --email=john@example.com
+```
+
+2、新建一个子用户
+```
+为了给用户新建一个子用户 (Swift 接口) ，必须为该子用户指定用户的 ID(--uid={username})，子用户的 ID 以及访问级别:
+语法
+radosgw-admin subuser create --uid={uid} --subuser={uid} --access=[ read | write | readwrite | full ]
+演示
+radosgw-admin subuser create --uid=johndoe --subuser=johndoe:swift --access=full
+```
+- Note：full 并不表示 readwrite, 因为它还包括访问权限策略.
+
+
+3、获取用户信息
+```
+获取一个用户的信息，必须使用 user info 子命令并且制定一个用户 ID(--uid={username}) .
+radosgw-admin user info --uid=johndoe
+```
+
+4、修改用户信息
+```
+修改一个用户的信息必须指定用户的ID (--uid={username})，还有想要修改的属性值。典型的修改项主要是 access 和secret 密钥，邮件地址，显示名称和访问级别。
+radosgw-admin user modify --uid=johndoe --display-name="John E. Doe"
+
+修改子用户的信息。 
+radosgw-admin subuser modify --uid=johndoe:swift --access=full
+```
+
+5、用户的启用/停用
+```
+当创建一个用户默认情况下是处于启用状态。可以暂停用户权限并在以后随时重新启用它们。暂停一个用户使用 user suspend 子命令然后哦指定用户的 ID。
+radosgw-admin user suspend --uid=johndoe
+
+重新启用已经被停用的用户，使用 user enable 子命令并指明用户的 ID.
+radosgw-admin user enable --uid=johndoe
+```
+- Note:停用一个用户后，它的子用户也会一起被停用.
+
+6、删除用户
+```
+删除用户时，这个用户以及他的子用户都会被删除。当然也可以只删除子用户。要删除用户（及其子用户），可使用 user rm 子命令并指明用户 ID ：
+radosgw-admin user rm --uid=johndoe
+
+只想删除子用户时，可使用 subuser rm 子命令并指明子用户 ID 。
+radosgw-admin subuser rm --subuser=johndoe:swift
+```
+其它可选操作：
+- Purge Data: 加 --purge-data 选项可清除与此 UID 相关的所有数据。
+- Purge Keys: 加 --purge-keys 选项可清除与此 UID 相关的所有密钥。
+
+7、新建一个密钥
+```
+为用户新建一个密钥，需要使用 key create 子命令。对于用户来说，需要指明用户的 ID 以及新建的密钥类型为s3。要为子用户新建一个密钥，则需要指明子用户的ID以及密钥类型为swift。
+radosgw-admin key create --subuser=johndoe:swift --key-type=swift --gen-secret
+```
+
+8、新建/删除 ACCESS 密钥
+
+用户和子用户要能使用 S3 和Swift 接口，必须有 access 密钥。在你新 建用户或者子用户的时候，如果没有指明 access 和 secret 密钥，这两 个密钥会自动生成。你可能需要新建 access 和/或 secret 密钥，不管是 手动指定还是自动生成的方式。你也可能需要删除一个 access 和 secret 。可用的选项有：
+- --secret=<key> 指明一个 secret 密钥 (e.即手动生成).
+- --gen-access-key 生成一个随机的 access 密钥 (新建 S3 用户的默认选项).
+- --gen-secret 生成一个随机的 secret 密钥.
+- --key-type=<type> 指定密钥类型. 这个选项的值可以是: swift, s3
+  
+```
+要新建密钥，需要指明用户ID.
+radosgw-admin key create --uid=johndoe --key-type=s3 --gen-access-key --gen-secret
+
+也可以使用指定 access 和 secret 密钥的方式.
+
+删除一个access密钥, 也需要指定用户ID.
+radosgw-admin key rm --uid=johndoe
+```
+  
+9、添加/删除 管理权限
+
+Ceph 存储集群提供了一个管理API，它允许用户通过 REST API 执行管理功能。默认情况下，用户没有访问 这个 API 的权限。要启用用户的管理功能，需要为用 户提供管理权限。
+```
+为一个用户添加管理权限:
+radosgw-admin caps add --uid={uid} --caps={caps}
+
+你可以给一个用户添加对用户、bucket、元数据和用量(存储使用信息)等数据的 读、写或者所有权限。举例如下:
+--caps="[users|buckets|metadata|usage|zone]=[*|read|write|read, write]"
+
+为一个用户添加管理权限实例如下:
+radosgw-admin caps add --uid=johndoe --caps="users=*"
+
+要删除某用户的管理权限，可用下面的命令：
+radosgw-admin caps rm --uid=johndoe --caps={caps}
+```
+
+10、查看用户列表
+```
+radosgw-admin user list 
+```
+  
+## 配额管理
+
+1、设置用户配额
+```
+在启用用户的配额前，需要先设置配额参数。 
+radosgw-admin quota set --quota-scope=user --uid=<uid> [--max-objects=<num objects>] [--max-size=<max size>]
+
+示例
+radosgw-admin quota set --quota-scope=user --uid=johndoe --max-objects=1024 --max-size=1024
+```
+- 最大对象数和最大存储用量的值是负数则表示不启用指定的配额参数。
+
+2、启用/禁用用户配额
+```
+在设置了用户配额之后，可以启用这个配额。
+radosgw-admin quota enable --quota-scope=user --uid=<uid>
+
+也可以禁用已经启用了配额的用户的配额。
+radosgw-admin quota-disable --quota-scope=user --uid=<uid>
+```
+  
+3、设置BUCKET配额
+```
+Bucket配额作用于用户的某一个bucket，通过uid指定用户。这些配额设置是独立于用户之外的。
+radosgw-admin quota set --uid=<uid> --quota-scope=bucket [--max-objects=<num objects>] [--max-size=<max size>]
+```
+- 最大对象数和最大存储用量的值是负数则表示不启用指定的配额参数。
+
+4、启用/禁用 BUCKET 配额
+```
+在设置了bucket配额之后，可以启用这个配额。
+radosgw-admin quota enable --quota-scope=bucket --uid=<uid>
+
+也可以禁用已经启用了配额的bucket的配额。
+radosgw-admin quota-disable --quota-scope=bucket --uid=<uid>
+```
+  
+5、获取配额信息
+```
+通过用户信息API来获取每一个用户的配额设置。通过CLI接口读取用户的配额设置信息
+radosgw-admin user info --uid=<uid>
+```
+  
+6、更新配额统计信息
+```
+配额的统计数据的同步是异步的。可以通过手动获取最新的配额统计数据为所有用户和所有bucket更新配额统计数据
+radosgw-admin user stats --uid=<uid> --sync-stats
+```
+  
+7、获取用户用量统计信息
+```
+获取当前用户已经消耗了配额的多少
+radosgw-admin user stats --uid=<uid>
+```
+- Note:你应该在执行 radosgw-admin user stats 的时候带上 --sync-stats 参数来获取最新的数据.
+
+8、读取/设置全局配额
+```
+在region map中读取和设置配额。
+radosgw-admin regionmap get > regionmap.json
+
+为整个region设置配额，只需要简单的修改region map中的配额设置。然后使用 region set 来更新 region map即可
+radosgw-admin region set < regionmap.json
+```
+- Note:在更新 region map 后，你必须重启网关.
+
+## 用量管理
+
+- Ceph对象网关会为每一个用户记录用量数据。可以通过指定日期范围来跟踪用户的用量数据。
+
+可用选项如下:
+- Start Date: 选项 --start-date 允许你指定一个起始日期来过滤用量数据 (format: yyyy-mm-dd[HH:MM:SS]).
+- End Date: 选项 --end-date 允许你指定一个截止日期来过滤用量数据 (format: yyyy-mm-dd[HH:MM:SS]).
+- Log Entries: 选项 --show-log-entries 允许你 指明显示用量数据的时候是否要包含日志条目。 (选项值: true | false).
+
+- Note：你可以指定时间为分钟和秒，但是数据存储是以一个小时的间隔存储的.
+
+
+1、展示用量信息
+```
+显示用量统计数据，使用 usage show 子命令。显示某一个特定 用户的用量数据，你必须指定该用户的 ID。你也可以指定开始日期、结 束日期以及是否显示日志条目。:
+radosgw-admin usage show --uid=johndoe --start-date=2012-03-01 --end-date=2012-04-01
+
+通过去掉用户的 ID，你也可以获取所有用户的汇总的用量信息
+radosgw-admin usage show --show-log-entries=false
+```
+                                         
+2、删除用量信息
+
+对于大量使用的集群而言，用量日志可能会占用大量存储空间。你可以为所有用户或者一个特定的用户删除部分用量日志。你也可以为删除操作指定日期范围。:
+```
+radosgw-admin usage trim --start-date=2010-01-01 --end-date=2010-12-31
+radosgw-admin usage trim --uid=johndoe
+radosgw-admin usage trim --uid=johndoe --end-date=2013-12-31
+```
 
 
 
@@ -129,9 +329,11 @@
 
 
 
-
-
-新建一个用户
+  
+  
+  
+  
+1、新建一个用户
 ```
 radosgw-admin user create --uid=admin --display-name=admin --access_key=admin --secret=123456
 ```
@@ -185,9 +387,7 @@ $ radosgw-admin usage trim --uid=johnny --end-date=2012-04-01
 
 
 ```
-radosgw-admin user list                                       # 查看用户列表
 radosgw-admin bucket stats --uid 100004603027                 # 查看某个用户下面桶的状态
-radosgw-admin user info --uid 100004603175                    # 查看某个租户的配额信息，数据库里没有此信息
 radosgw-admin bucket list                                     # 列出存储桶，存储网关节点上执行
 radosgw-admin bucket list --uid=***                           # 列出属于某个uin的存储桶有哪些
 radosgw-admin bucket stats --bucket=cbssnapbox-1255000337     # 查看桶状态
