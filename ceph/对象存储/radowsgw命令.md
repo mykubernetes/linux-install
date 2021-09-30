@@ -1,3 +1,5 @@
+# 命令
+
 | 命令 | 命令描述 |
 |------|--------|
 | user create | 创建一个新用户。 |
@@ -63,6 +65,67 @@
 | opstate rm | 删除条目（需指定 client_id 、 op_id 、对象）。 |
 | replicalog get | 读取复制元数据日志条目。 |
 | replicalog delete | 删除复制元数据日志条目。 |
+
+# 选项
+
+| 选项 | 选项描述 |
+|-----|---------|
+| -c ceph.conf, --conf=ceph.conf | 用指定的 ceph.conf 配置文件而非默认的 /etc/ceph/ceph.conf 来确定启动时所需的监视器地址。 |
+| -m monaddress[:port] | 连接到指定监视器，而非通过 ceph.conf 查询。 |
+| --uid=uid | radosgw 用户的 ID 。 |
+| --subuser=<name> | 子用户名字。 |
+| --email=email | 用户的电子邮件地址。 |
+| --display-name=name | 配置用户的显示名称（昵称） |
+| --access-key=<key> | S3 访问密钥。 |
+| --gen-access-key | 生成随机访问密钥（给 S3 ）。 |
+| --secret=secret | 指定密钥的密文。 |
+| --gen-secret | 生成随机密钥。 |
+| --key-type=<type> | 密钥类型，可用的有： swift 、 S3 。 |
+| --temp-url-key[-2]=<key> | 临时 URL 密钥。 |
+| --system | 给用户设置系统标识。 |
+| --bucket=bucket | 指定桶名 |
+| --object=object | 指定对象名 |
+| --date=yyyy-mm-dd | 某些命令所需的日期 |
+| --start-date=yyyy-mm-dd | 某些命令所需的起始日期 |
+| --end-date=yyyy-mm-dd | 某些命令所需的终结日期 |
+| --shard-id=<shard-id> | 执行 mdlog list 时为可选项。对 mdlog trim 、 replica mdlog get/delete 、 replica datalog get/delete 来说是必须的。 |
+| --auth-uid=auid | librados 认证所需的 auid 。 |
+| --purge-data | 删除用户前先删除用户数据。 |
+| --purge-keys | 若加了此选项，删除子用户时将一起删除其所有密钥。 |
+| --purge-objects | 删除桶前先删除其内所有对象。 |
+| --metadata-key=<key> | 用 metadata get 检索元数据时用的密钥。 |
+| --rgw-region=<region> | radosgw 所在的 region 。 |
+| --rgw-zone=<zone> | radosgw 所在的区域。 |
+| --fix | 除了检查桶索引，还修复它。 |
+| --check-objects | 检查桶：根据对象的实际状态重建桶索引。 |
+| --format=<format> | 为某些操作指定输出格式： xml 、 json 。 |
+| --sync-stats | user stats 的选项，收集用户的桶索引状态、并同步到用户状态。 |
+| --show-log-entries=<flag> | 执行 log show 时，显示或不显示日志条目。 |
+| --show-log-sum=<flag> | 执行 log show 时，显示或不显示日志汇总。 |
+| --skip-zero-entries | 让 log show 只显示数字字段非零的日志。 |
+| --infile | 设置时指定要读取的文件。 |
+| --state=<state string> | 给 opstate set 命令指定状态。 |
+| --replica-log-type | 复制日志类型（ metadata 、 data 、 bucket ），操作复制日志时需要。 |
+| --categories=<list> | 逗号分隔的一系列类目，显示使用情况时需要。 |
+| --caps=<caps> | 能力列表，如 “usage=read, write; user=read” 。 |
+| --yes-i-really-mean-it | 某些特定操作需要。 |
+
+
+# 磁盘配额选项
+
+| 配额选项 | 选项描述 |
+|--------|----------|
+| --bucket | 为配额命令指定桶。 |
+| --max-objects | 指定最大对象数（负数为禁用）。 |
+| --max-size | 指定最大尺寸（单位为字节，负数为禁用）。 |
+| --quota-scope | 配额有效范围（桶、用户）。 |
+
+
+
+
+
+
+
 
 
 
