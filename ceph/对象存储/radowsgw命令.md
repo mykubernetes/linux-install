@@ -159,7 +159,7 @@ radosgw-admin subuser modify --uid=johndoe:swift --access=full
 
 5、用户的启用/停用
 ```
-当创建一个用户默认情况下是处于启用状态。可以暂停用户权限并在以后随时重新启用它们。暂停一个用户使用 user suspend 子命令然后哦指定用户的 ID。
+当创建一个用户默认情况下是处于启用状态。可以暂停用户权限并在以后随时重新启用它们。暂停一个用户使用user suspend子命令然后指定用户的ID。
 radosgw-admin user suspend --uid=johndoe
 
 重新启用已经被停用的用户，使用 user enable 子命令并指明用户的 ID.
@@ -172,8 +172,11 @@ radosgw-admin user enable --uid=johndoe
 删除用户时，这个用户以及他的子用户都会被删除。当然也可以只删除子用户。要删除用户（及其子用户），可使用 user rm 子命令并指明用户 ID ：
 radosgw-admin user rm --uid=johndoe
 
-只想删除子用户时，可使用 subuser rm 子命令并指明子用户 ID 。
+只删除子用户
 radosgw-admin subuser rm --subuser=johndoe:swift
+
+删除一个用户和与他相关的桶及内容
+radosgw-admin user rm --uid=johnny --purge-data
 ```
 其它可选操作：
 - Purge Data: 加 --purge-data 选项可清除与此 UID 相关的所有数据。
@@ -187,7 +190,7 @@ radosgw-admin key create --subuser=johndoe:swift --key-type=swift --gen-secret
 
 8、新建/删除 ACCESS 密钥
 
-用户和子用户要能使用 S3 和Swift 接口，必须有 access 密钥。在你新 建用户或者子用户的时候，如果没有指明 access 和 secret 密钥，这两 个密钥会自动生成。你可能需要新建 access 和/或 secret 密钥，不管是 手动指定还是自动生成的方式。你也可能需要删除一个 access 和 secret 。可用的选项有：
+用户和子用户要能使用S3和Swift接口，必须有access密钥。在你新建用户或者子用户的时候，如果没有指明 access 和 secret 密钥，这两 个密钥会自动生成。你可能需要新建 access 和/或 secret 密钥，不管是 手动指定还是自动生成的方式。你也可能需要删除一个 access 和 secret 。可用的选项有
 - --secret=<key> 指明一个 secret 密钥 (e.即手动生成).
 - --gen-access-key 生成一个随机的 access 密钥 (新建 S3 用户的默认选项).
 - --gen-secret 生成一个随机的 secret 密钥.
@@ -204,25 +207,32 @@ radosgw-admin key rm --uid=johndoe
 ```
   
 9、添加/删除 管理权限
+- Ceph 存储集群提供了一个管理API，它允许用户通过 REST API 执行管理功能。默认情况下，用户没有访问 这个 API 的权限。要启用用户的管理功能，需要为用 户提供管理权限。
 
-Ceph 存储集群提供了一个管理API，它允许用户通过 REST API 执行管理功能。默认情况下，用户没有访问 这个 API 的权限。要启用用户的管理功能，需要为用 户提供管理权限。
 ```
-为一个用户添加管理权限:
-radosgw-admin caps add --uid={uid} --caps={caps}
+语法：给一个用户添加对用户、bucket、元数据和用量(存储使用信息)等数据的 读、写或者所有权限。
+radosgw-admin caps add --uid={uid} --caps={caps}      # --caps="[users|buckets|metadata|usage|zone]=[*|read|write|read, write]"
 
-你可以给一个用户添加对用户、bucket、元数据和用量(存储使用信息)等数据的 读、写或者所有权限。举例如下:
---caps="[users|buckets|metadata|usage|zone]=[*|read|write|read, write]"
-
-为一个用户添加管理权限实例如下:
+为用户添加管理权限
 radosgw-admin caps add --uid=johndoe --caps="users=*"
 
-要删除某用户的管理权限，可用下面的命令：
+要删除某用户的管理权限
 radosgw-admin caps rm --uid=johndoe --caps={caps}
 ```
 
 10、查看用户列表
 ```
-radosgw-admin user list 
+radosgw-admin user list
+```
+  
+11、检查用户信息
+```
+radosgw-admin user check --uid=johndoe
+```
+
+12、获取用户用量统计信息
+```
+radosgw-admin user stats --uid=uid
 ```
   
 ## 配额管理
@@ -261,19 +271,19 @@ radosgw-admin quota enable --quota-scope=bucket --uid=<uid>
 也可以禁用已经启用了配额的bucket的配额。
 radosgw-admin quota-disable --quota-scope=bucket --uid=<uid>
 ```
-  
+
 5、获取配额信息
 ```
 通过用户信息API来获取每一个用户的配额设置。通过CLI接口读取用户的配额设置信息
 radosgw-admin user info --uid=<uid>
 ```
-  
+
 6、更新配额统计信息
 ```
 配额的统计数据的同步是异步的。可以通过手动获取最新的配额统计数据为所有用户和所有bucket更新配额统计数据
 radosgw-admin user stats --uid=<uid> --sync-stats
 ```
-  
+
 7、获取用户用量统计信息
 ```
 获取当前用户已经消耗了配额的多少
@@ -321,76 +331,97 @@ radosgw-admin usage trim --uid=johndoe
 radosgw-admin usage trim --uid=johndoe --end-date=2013-12-31
 ```
 
+## 存储桶
 
+1、列出所有桶
+```
+列出所有桶
+radosgw-admin bucket list
 
+查看某一个用户，存储桶有哪些
+radosgw-admin bucket list --uid=johndoe
+```
 
+2、把桶关联到指定用户
+```
+radosgw-admin metadata get bucket:s3test1&lt;/span&gt;
+	&lt;span class="s1"&gt;radosgw-admin bucket link --uid=johndoe --bucket=s3test1 --bucket-id=xxx
+```
+- note：一个桶只能连接给一个用户。连接给一个用户了，上个用户会自动取消链接    
 
+3、取消连接
+```
+radosgw-admin bucket unlink --uid=johndoe --bucket=s3test1
+```
 
+4、返回桶的统计
+```
+信息输出bucket详细信息
+radosgw-admin bucket stats
 
+查看某个bucket具体信息
+radosgw-admin bucket stats --bucket=s3test1
 
+查看某个用户下面桶的状态
+radosgw-admin bucket stats --uid 100004603027
+```
+- 输出信息中，有bucket的objects个数和占用空间。
+
+5、删除一个桶
+```
+radosgw-admin bucket rm --bucket=s3test1
+```
+
+6、默认只能删空的bucket，强制删除非空的bucket需要加上“—purge-objects ”
+```
+radosgw-admin bucket rm --bucket=s3test1 --purge-objects
+```
+
+7、查看桶的索引信息
+```
+radosgw-admin bucket check --bucket=s3test1
+```
+
+8、删除一个对象
+```
+radosgw-admin object rm --object=1.jpg --bucket=s3test3
+```
+
+9、从桶索引里去除对象
+```
+radosgw-admin object unlink --bucket=s3test3 --object=1.jpg
+```
+
+10、删除存储桶的索引
+```
+radosgw-admin bucket unindex --bucket=桶名称
+```
+
+11、将存储桶置为不可删除
+```
+radosgw-admin bucket delete disable --bucket=桶名称
+```
 
   
-  
-  
-  
-1、新建一个用户
-```
-radosgw-admin user create --uid=admin --display-name=admin --access_key=admin --secret=123456
-```
 
-为admin用户添加读写权限
-```
-radosgw-admin caps add --uid=admin --caps="users=read, write"
-```
 
-删除一用户：
-```
-radosgw-admin user rm --uid=johnny
-```
-
-删除一个用户和与他相关的桶及内容：
-```
-radosgw-admin user rm --uid=johnny --purge-data
-```
-
-删除一个桶：
-```
-radosgw-admin bucket unlink --bucket=foo
-```
 
 显示一个桶从 2012 年 4 月 1 日起的日志：
 ```
-$ radosgw-admin log show --bucket=foo --date=2012-04-01
+radosgw-admin log show --bucket=foo --date=2012-04-01
 ```
 
 显示某用户 2012 年 3 月 1 日（不含）到 4 月 1 日期间的使用情况：
 ```
-$ radosgw-admin usage show --uid=johnny --start-date=2012-03-01 --end-date=2012-04-01
+radosgw-admin usage show --uid=johnny --start-date=2012-03-01 --end-date=2012-04-01
 ```
 
 只显示所有用户的使用情况汇总：
 ```
-$ radosgw-admin usage show --show-log-entries=false
+radosgw-admin usage show --show-log-entries=false
 ```
 
 裁剪掉某用户 2012 年 4 月 1 日之前的使用信息：
 ```
-$ radosgw-admin usage trim --uid=johnny --end-date=2012-04-01
-```
-
-
-
-
-
-
-
-
-
-```
-radosgw-admin bucket stats --uid 100004603027                 # 查看某个用户下面桶的状态
-radosgw-admin bucket list                                     # 列出存储桶，存储网关节点上执行
-radosgw-admin bucket list --uid=***                           # 列出属于某个uin的存储桶有哪些
-radosgw-admin bucket stats --bucket=cbssnapbox-1255000337     # 查看桶状态
-radosgw-admin bucket unindex --bucket=桶名称                   # 删除存储桶的索引
-radosgw-admin bucket delete disable --bucket=桶名称            # 将存储桶置为不可删除
+radosgw-admin usage trim --uid=johnny --end-date=2012-04-01
 ```
