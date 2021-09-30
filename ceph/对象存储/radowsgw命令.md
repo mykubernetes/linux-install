@@ -139,8 +139,7 @@ radosgw-admin subuser create --uid={uid} --subuser={uid} --access=[ read | write
 演示
 radosgw-admin subuser create --uid=johndoe --subuser=johndoe:swift --access=full
 ```
-- Note：full 并不表示 readwrite, 因为它还包括访问权限策略.
-
+- full并不表示readwrite, 因为它还包括访问权限策略.
 
 3、获取用户信息
 ```
@@ -158,43 +157,49 @@ radosgw-admin subuser modify --uid=johndoe:swift --access=full
 ```
 
 6、用户的启用/停用
-```
-当创建一个用户默认情况下是处于启用状态。可以暂停用户权限并在以后随时重新启用它们。暂停一个用户使用user suspend子命令然后指定用户的ID。
-radosgw-admin user suspend --uid=johndoe
 
-重新启用已经被停用的用户，使用 user enable 子命令并指明用户的 ID.
+> 当创建一个用户默认情况下是处于启用状态。
+```
+radosgw-admin user suspend --uid=johndoe
+```
+
+> 重新启用已经被停用的用户。
+```
 radosgw-admin user enable --uid=johndoe
 ```
-- Note:停用一个用户后，它的子用户也会一起被停用.
+- 停用一个用户后,它的子用户也会一起被停用.
 
 7、删除用户
-```
-删除用户时这个用户以及他的子用户都会被删除，当然也可以只删除子用户。
-radosgw-admin user rm --uid=johndoe
 
-只删除子用户
+> 删除用户时这个用户以及他的子用户都会被删除，当然也可以只删除子用户。
+```
+radosgw-admin user rm --uid=johndoe
+```
+
+> 只删除子用户
+```
 radosgw-admin subuser rm --subuser=johndoe:swift
 
-删除一个用户和与他相关的桶及内容
+> 删除一个用户和与他相关的桶及内容
+```
 radosgw-admin user rm --uid=johnny --purge-data
 ```
-其它可选操作
-- Purge Data: 加 --purge-data 选项可清除与此 UID 相关的所有数据。
-- Purge Keys: 加 --purge-keys 选项可清除与此 UID 相关的所有密钥。
+- `--purge-data` 清除与此UID相关的所有数据。
+- `--purge-keys` 清除与此UID相关的所有密钥。
 
 8、新建一个密钥
+> 为用户新建一个密钥，需要使用 key create 子命令。对于用户来说，需要指明用户的 ID 以及新建的密钥类型为s3。要为子用户新建一个密钥，则需要指明子用户的ID以及密钥类型为swift。
 ```
-为用户新建一个密钥，需要使用 key create 子命令。对于用户来说，需要指明用户的 ID 以及新建的密钥类型为s3。要为子用户新建一个密钥，则需要指明子用户的ID以及密钥类型为swift。
 radosgw-admin key create --subuser=johndoe:swift --key-type=swift --gen-secret
 ```
 
 9、新建/删除 ACCESS 密钥
 
 用户和子用户要能使用S3和Swift接口，必须有access密钥。在你新建用户或者子用户的时候，如果没有指明 access 和 secret 密钥，这两 个密钥会自动生成。你可能需要新建 access 和/或 secret 密钥，不管是 手动指定还是自动生成的方式。你也可能需要删除一个 access 和 secret 。可用的选项有
-- --secret=<key> 指明一个 secret 密钥 (e.即手动生成).
-- --gen-access-key 生成一个随机的 access 密钥 (新建 S3 用户的默认选项).
-- --gen-secret 生成一个随机的 secret 密钥.
-- --key-type=<type> 指定密钥类型. 这个选项的值可以是: swift, s3
+- `--secret=<key>` 指明一个 secret 密钥 (e.即手动生成).
+- `--gen-access-key` 生成一个随机的 access 密钥 (新建 S3 用户的默认选项).
+- `--gen-secret` 生成一个随机的 secret 密钥.
+- `--key-type=<type>` 指定密钥类型. 这个选项的值可以是: swift, s3
   
 ```
 要新建密钥，需要指明用户ID.
@@ -207,6 +212,7 @@ radosgw-admin key rm --uid=johndoe
 ```
   
 10、添加/删除 管理权限
+
 - Ceph 存储集群提供了一个管理API，它允许用户通过 REST API 执行管理功能。默认情况下，用户没有访问 这个 API 的权限。要启用用户的管理功能，需要为用 户提供管理权限。
 
 ```
