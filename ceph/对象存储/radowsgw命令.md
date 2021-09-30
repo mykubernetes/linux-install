@@ -169,7 +169,7 @@ radosgw-admin user enable --uid=johndoe
 
 7、删除用户
 ```
-删除用户时，这个用户以及他的子用户都会被删除。当然也可以只删除子用户。要删除用户（及其子用户），可使用 user rm 子命令并指明用户 ID 
+删除用户时这个用户以及他的子用户都会被删除，当然也可以只删除子用户。
 radosgw-admin user rm --uid=johndoe
 
 只删除子用户
@@ -178,7 +178,7 @@ radosgw-admin subuser rm --subuser=johndoe:swift
 删除一个用户和与他相关的桶及内容
 radosgw-admin user rm --uid=johnny --purge-data
 ```
-其它可选操作：
+其它可选操作
 - Purge Data: 加 --purge-data 选项可清除与此 UID 相关的所有数据。
 - Purge Keys: 加 --purge-keys 选项可清除与此 UID 相关的所有密钥。
 
@@ -234,7 +234,7 @@ radosgw-admin user check --uid=johndoe
 ```
 radosgw-admin user stats --uid=uid
 ```
-  
+
 ## 配额管理
 
 1、设置用户配额
@@ -289,7 +289,7 @@ radosgw-admin user stats --uid=<uid> --sync-stats
 获取当前用户已经消耗了配额的多少
 radosgw-admin user stats --uid=<uid>
 ```
-- Note:你应该在执行 radosgw-admin user stats 的时候带上 --sync-stats 参数来获取最新的数据.
+- Note:你应该在执行 radosgw-admin user stats 的时候带上 --sync-stats 参数来获取最新的数据
 
 8、读取/设置全局配额
 ```
@@ -299,22 +299,21 @@ radosgw-admin regionmap get > regionmap.json
 为整个region设置配额，只需要简单的修改region map中的配额设置。然后使用 region set 来更新 region map即可
 radosgw-admin region set < regionmap.json
 ```
-- Note:在更新 region map 后，你必须重启网关.
+- 在更新region map后，必须重启网关
 
 ## 用量管理
 
-- Ceph对象网关会为每一个用户记录用量数据。可以通过指定日期范围来跟踪用户的用量数据。
+Ceph对象网关会为每一个用户记录用量数据。可以通过指定日期范围来跟踪用户的用量数据。
+- `--start-date` 指定一个起始日期来过滤用量数据`(format: yyyy-mm-dd[HH:MM:SS])`
+- `--end-date` 指定一个截止日期来过滤用量数据 `(format: yyyy-mm-dd[HH:MM:SS])`
+- `--show-log-entries` 指明显示用量数据的时候是否要包含日志条目。`(选项值: true | false)`
 
-可用选项如下:
-- Start Date: 选项 --start-date 允许你指定一个起始日期来过滤用量数据 (format: yyyy-mm-dd[HH:MM:SS]).
-- End Date: 选项 --end-date 允许你指定一个截止日期来过滤用量数据 (format: yyyy-mm-dd[HH:MM:SS]).
-- Log Entries: 选项 --show-log-entries 允许你 指明显示用量数据的时候是否要包含日志条目。 (选项值: true | false).
 - Note：你可以指定时间为分钟和秒，但是数据存储是以一个小时的间隔存储的.
 
 
 1、展示用量信息
 ```
-显示用量统计数据，使用 usage show 子命令。显示某一个特定 用户的用量数据，你必须指定该用户的 ID。你也可以指定开始日期、结 束日期以及是否显示日志条目。
+显示用量统计数据。显示某一个特定用户的用量数据，你必须指定该用户的ID。你也可以指定开始日期、结束日期以及是否显示日志条目。
 radosgw-admin usage show --uid=johndoe --start-date=2012-03-01 --end-date=2012-04-01
 
 通过去掉用户的 ID，你也可以获取所有用户的汇总的用量信息
@@ -328,6 +327,26 @@ radosgw-admin usage show --show-log-entries=false
 radosgw-admin usage trim --start-date=2010-01-01 --end-date=2010-12-31
 radosgw-admin usage trim --uid=johndoe
 radosgw-admin usage trim --uid=johndoe --end-date=2013-12-31
+```
+
+3、显示一个桶从2012年4月1日起的日志
+```
+radosgw-admin log show --bucket=foo --date=2012-04-01
+```
+
+4、显示某用户2012年3月1日（不含）到4月1日期间的使用情况
+```
+radosgw-admin usage show --uid=johnny --start-date=2012-03-01 --end-date=2012-04-01
+```
+
+5、只显示所有用户的使用情况汇总
+```
+radosgw-admin usage show --show-log-entries=false
+```
+
+6、裁剪掉某用户 2012 年 4 月 1 日之前的使用信息
+```
+radosgw-admin usage trim --uid=johnny --end-date=2012-04-01
 ```
 
 ## 存储桶
@@ -399,29 +418,4 @@ radosgw-admin bucket unindex --bucket=桶名称
 11、将存储桶置为不可删除
 ```
 radosgw-admin bucket delete disable --bucket=桶名称
-```
-
-  
-
-
-## 日志相关
-
-1、显示一个桶从 2012 年 4 月 1 日起的日志：
-```
-radosgw-admin log show --bucket=foo --date=2012-04-01
-```
-
-2、显示某用户 2012 年 3 月 1 日（不含）到 4 月 1 日期间的使用情况：
-```
-radosgw-admin usage show --uid=johnny --start-date=2012-03-01 --end-date=2012-04-01
-```
-
-3、只显示所有用户的使用情况汇总：
-```
-radosgw-admin usage show --show-log-entries=false
-```
-
-4、裁剪掉某用户 2012 年 4 月 1 日之前的使用信息：
-```
-radosgw-admin usage trim --uid=johnny --end-date=2012-04-01
 ```
