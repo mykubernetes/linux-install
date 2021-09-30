@@ -133,7 +133,7 @@ radosgw-admin user create --uid=johndoe --display-name="John Doe" --email=john@e
 
 2、新建一个子用户
 ```
-为了给用户新建一个子用户 (Swift 接口) ，必须为该子用户指定用户的 ID(--uid={username})，子用户的 ID 以及访问级别:
+为了给用户新建一个子用户 (Swift 接口) ，必须为该子用户指定用户的 ID(--uid={username})，子用户的 ID 以及访问级别
 语法
 radosgw-admin subuser create --uid={uid} --subuser={uid} --access=[ read | write | readwrite | full ]
 演示
@@ -169,7 +169,7 @@ radosgw-admin user enable --uid=johndoe
 
 6、删除用户
 ```
-删除用户时，这个用户以及他的子用户都会被删除。当然也可以只删除子用户。要删除用户（及其子用户），可使用 user rm 子命令并指明用户 ID ：
+删除用户时，这个用户以及他的子用户都会被删除。当然也可以只删除子用户。要删除用户（及其子用户），可使用 user rm 子命令并指明用户 ID 
 radosgw-admin user rm --uid=johndoe
 
 只删除子用户
@@ -255,7 +255,7 @@ radosgw-admin quota enable --quota-scope=user --uid=<uid>
 也可以禁用已经启用了配额的用户的配额。
 radosgw-admin quota-disable --quota-scope=user --uid=<uid>
 ```
-  
+
 3、设置BUCKET配额
 ```
 Bucket配额作用于用户的某一个bucket，通过uid指定用户。这些配额设置是独立于用户之外的。
@@ -309,13 +309,12 @@ radosgw-admin region set < regionmap.json
 - Start Date: 选项 --start-date 允许你指定一个起始日期来过滤用量数据 (format: yyyy-mm-dd[HH:MM:SS]).
 - End Date: 选项 --end-date 允许你指定一个截止日期来过滤用量数据 (format: yyyy-mm-dd[HH:MM:SS]).
 - Log Entries: 选项 --show-log-entries 允许你 指明显示用量数据的时候是否要包含日志条目。 (选项值: true | false).
-
 - Note：你可以指定时间为分钟和秒，但是数据存储是以一个小时的间隔存储的.
 
 
 1、展示用量信息
 ```
-显示用量统计数据，使用 usage show 子命令。显示某一个特定 用户的用量数据，你必须指定该用户的 ID。你也可以指定开始日期、结 束日期以及是否显示日志条目。:
+显示用量统计数据，使用 usage show 子命令。显示某一个特定 用户的用量数据，你必须指定该用户的 ID。你也可以指定开始日期、结 束日期以及是否显示日志条目。
 radosgw-admin usage show --uid=johndoe --start-date=2012-03-01 --end-date=2012-04-01
 
 通过去掉用户的 ID，你也可以获取所有用户的汇总的用量信息
@@ -324,7 +323,7 @@ radosgw-admin usage show --show-log-entries=false
                                          
 2、删除用量信息
 
-对于大量使用的集群而言，用量日志可能会占用大量存储空间。你可以为所有用户或者一个特定的用户删除部分用量日志。你也可以为删除操作指定日期范围。:
+对于大量使用的集群而言，用量日志可能会占用大量存储空间。你可以为所有用户或者一个特定的用户删除部分用量日志。你也可以为删除操作指定日期范围。
 ```
 radosgw-admin usage trim --start-date=2010-01-01 --end-date=2010-12-31
 radosgw-admin usage trim --uid=johndoe
@@ -344,8 +343,8 @@ radosgw-admin bucket list --uid=johndoe
 
 2、把桶关联到指定用户
 ```
-radosgw-admin metadata get bucket:s3test1&lt;/span&gt;
-	&lt;span class="s1"&gt;radosgw-admin bucket link --uid=johndoe --bucket=s3test1 --bucket-id=xxx
+radosgw-admin metadata get bucket:s3test1&lt;/span&gt;&lt;span class="s1"&gt;
+radosgw-admin bucket link --uid=johndoe --bucket=s3test1 --bucket-id=xxx
 ```
 - note：一个桶只能连接给一个用户。连接给一个用户了，上个用户会自动取消链接    
 
@@ -372,7 +371,7 @@ radosgw-admin bucket stats --uid 100004603027
 radosgw-admin bucket rm --bucket=s3test1
 ```
 
-6、默认只能删空的bucket，强制删除非空的bucket需要加上“—purge-objects ”
+6、默认只能删空的bucket，强制删除非空的bucket需要加上"—purge-objects"
 ```
 radosgw-admin bucket rm --bucket=s3test1 --purge-objects
 ```
@@ -405,23 +404,24 @@ radosgw-admin bucket delete disable --bucket=桶名称
   
 
 
+## 日志相关
 
-显示一个桶从 2012 年 4 月 1 日起的日志：
+1、显示一个桶从 2012 年 4 月 1 日起的日志：
 ```
 radosgw-admin log show --bucket=foo --date=2012-04-01
 ```
 
-显示某用户 2012 年 3 月 1 日（不含）到 4 月 1 日期间的使用情况：
+2、显示某用户 2012 年 3 月 1 日（不含）到 4 月 1 日期间的使用情况：
 ```
 radosgw-admin usage show --uid=johnny --start-date=2012-03-01 --end-date=2012-04-01
 ```
 
-只显示所有用户的使用情况汇总：
+3、只显示所有用户的使用情况汇总：
 ```
 radosgw-admin usage show --show-log-entries=false
 ```
 
-裁剪掉某用户 2012 年 4 月 1 日之前的使用信息：
+4、裁剪掉某用户 2012 年 4 月 1 日之前的使用信息：
 ```
 radosgw-admin usage trim --uid=johnny --end-date=2012-04-01
 ```
