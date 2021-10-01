@@ -107,17 +107,20 @@ set pool 4 min_size to 1
 
 3、两种解决方案，回退旧版或者直接删除
 ```
+revert选项：回滚到对象的前一个版本
 # ceph pg 4.210 mark_unfound_lost revert
 Error EINVAL: pg has 1 unfound objects but we haven't probed all sources,not marking lost
 
+
+delete选项：完全删除这个对象
 # ceph pg 4.210 mark_unfound_lost delete
 Error EINVAL: pg has 1 unfound objects but we haven't probed all sources,not marking lost
 ```
+
 - 提示报错，pg那个未发现的块还没有探查所有的资源，不能标记为丢失，也就是不会回退也不可以删除,可能是已经down的osd22和26未探查，刚好坏的节点也重装完成，重新添加osd
 
 
-
-3、添加完成后，再次查看pg 4.210
+4、添加完成后，再次查看pg 4.210
 ```
     "recovery_state": [
             {
@@ -195,10 +198,13 @@ set pool 4 min_size to 2
 
 
 
+列出带有丢失对象的PG的名字
+```
+ceph pg {pgname} list_missing
+```
 
 
-
-
-
-
+```
+ceph pg {pgname} list_unfound
+```
 
