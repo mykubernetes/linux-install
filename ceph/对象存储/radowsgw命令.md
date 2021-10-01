@@ -267,62 +267,70 @@ radosgw-admin user stats --uid=uid
 ## 配额管理
 
 1、设置用户配额
-```
-在启用用户的配额前，需要先设置配额参数。 
-radosgw-admin quota set --quota-scope=user --uid=<uid> [--max-objects=<num objects>] [--max-size=<max size>]
 
-示例
+> 语法
+```
+radosgw-admin quota set --quota-scope=user --uid=<uid> [--max-objects=<num objects>] [--max-size=<max size>]
+```
+
+> 在启用用户的配额前，需要先设置配额参数。 
 radosgw-admin quota set --quota-scope=user --uid=johndoe --max-objects=1024 --max-size=1024
 ```
 - 最大对象数和最大存储用量的值是负数则表示不启用指定的配额参数。
 
 2、启用/禁用用户配额
-```
-在设置了用户配额之后，可以启用这个配额。
-radosgw-admin quota enable --quota-scope=user --uid=<uid>
 
-也可以禁用已经启用了配额的用户的配额。
+> 在设置了用户配额之后，可以启用这个配额。
+```
+radosgw-admin quota enable --quota-scope=user --uid=<uid>
+```
+  
+> 也可以禁用已经启用了配额的用户的配额。
+```
 radosgw-admin quota-disable --quota-scope=user --uid=<uid>
 ```
 
 3、设置BUCKET配额
+
+> Bucket配额作用于用户的某一个bucket，通过uid指定用户。这些配额设置是独立于用户之外的。
 ```
-Bucket配额作用于用户的某一个bucket，通过uid指定用户。这些配额设置是独立于用户之外的。
 radosgw-admin quota set --uid=<uid> --quota-scope=bucket [--max-objects=<num objects>] [--max-size=<max size>]
 ```
 - 最大对象数和最大存储用量的值是负数则表示不启用指定的配额参数。
 
 4、启用/禁用 BUCKET 配额
-```
-在设置了bucket配额之后，可以启用这个配额。
-radosgw-admin quota enable --quota-scope=bucket --uid=<uid>
 
-也可以禁用已经启用了配额的bucket的配额。
+> 在设置了bucket配额之后，可以启用这个配额。
+```
+radosgw-admin quota enable --quota-scope=bucket --uid=<uid>
+```
+  
+> 禁用已经启用了配额的bucket的配额。
+```
 radosgw-admin quota-disable --quota-scope=bucket --uid=<uid>
 ```
 
 5、获取配额信息
 ```
-通过用户信息API来获取每一个用户的配额设置。通过CLI接口读取用户的配额设置信息
 radosgw-admin user info --uid=<uid>
 ```
 
 6、更新配额统计信息
+
+> 配额的统计数据的同步是异步的。通过手动获取最新的配额统计数据为所有用户和所有bucket更新配额统计数据
 ```
-配额的统计数据的同步是异步的。可以通过手动获取最新的配额统计数据为所有用户和所有bucket更新配额统计数据
 radosgw-admin user stats --uid=<uid> --sync-stats
 ```
 
 7、获取用户用量统计信息
 ```
-获取当前用户已经消耗了配额的多少
 radosgw-admin user stats --uid=<uid>
 ```
-- Note:你应该在执行 radosgw-admin user stats 的时候带上 --sync-stats 参数来获取最新的数据
+- 执行radosgw-admin user stats时带上--sync-stats 参数获取最新的数据
 
 8、读取/设置全局配额
 ```
-在region map中读取和设置配额。
+在region map中读取和设置配额
 radosgw-admin regionmap get > regionmap.json
 
 为整个region设置配额，只需要简单的修改region map中的配额设置。然后使用 region set 来更新 region map即可
