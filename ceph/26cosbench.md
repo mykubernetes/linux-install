@@ -223,6 +223,26 @@ Accepted with ID: w1
 - dispose 阶段：删除存储桶。
 
 
+| Op-Type | Op-Count | Byte-Count | Avg-ResTime | Avg-ProcTime | Throughput | Bandwidth | Succ-Ratio |
+|---------|----------|------------|-------------|--------------|-------------|----------|------------|
+| op1: init-write | 0 ops | 0B | N/A | N/A | 0 op/s | 0 B/S | N/A |
+| op1: prepare-write | 20 ops | 1.28 MB | 16.4 ms | 15.45 ms | 59 op/s | 3.78 MB/S | 100% |
+| op1: read | 26.1 kops | 1.67G | 12.12 ms | 5.62 ms | 435.22 ops/s | 27.85 MB/S | 92.89% |
+| op2: write | 6.97 kops | 446.27 MB | 37.08 ms | 36.68 ms | 116.25 op/s | 7.44 MB/S | 100% |
+| op1: cleanup-delete | 40 ops | 0 B | 8.38 ms | 8.38 ms | 119.05 op/s | 0B/S | 100% |
+| op1: dispose-delete | 0 ops | 0 B | N/A | N/A | 0 op/s | 0 B/S | N/A |
+
+- Op-Type : 操作类型
+- Op-Count : 操作总数
+- Byte-Count : 操作产生的Byte
+- Avg-ResTime : 操作产生的平均时间
+- Avg-ProcTime : 操作的平均时间，这个是主要的延时参考，它反映了平均每次请求的时延
+- Throughput : 吞吐量，主要反映了操作的并发程度，也是重要的参考
+- Bandwidth : 带宽，反映了操作过程中的平均带宽情况
+- Succ-Ratio : 操作的成功率
+
+
+
 执行以下命令，停止测试服务
 ```
 sh stop-all.sh
