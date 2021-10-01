@@ -99,10 +99,10 @@ set pool 4 min_size to 1
 - 字面上理解，pg 4.210的自我恢复状态，它已经探查了osd4、6、15、17、20、23,osd22和26已经down了，而我这里的osd22和26都已经移出了集群
 
 2、might_have_unfound的osd有以下四种状态
-- already probed
-- querying
-- OSD is down
-- not queried (yet)
+- already probed: 已经探测到
+- querying: 在查询
+- OSD is down: OSD 挂了
+- not queried (yet): 尚未查询
 
 
 3、两种解决方案，回退旧版或者直接删除
