@@ -377,7 +377,12 @@ ssh-copy-id ceph@node04
 
 二）新节点查看可用的磁盘
 
-1、查看可用的磁盘
+1、安装ceph包 
+```
+$ sudo yum install -y ceph ceph-radosgw         #安装 ceph包，替代 ceph-deploy install node04 ,不过下面的命令需要在每台node上安装
+```  
+
+2、查看可用的磁盘
 ```
 # lsblk
 NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
@@ -392,10 +397,24 @@ sdd 8:48 0 40G 0 disk
 sr0 11:0 1 906M 0 rom
 ```  
 
-2、安装ceph包 
+也可以使用ceph-deploy命令查看磁盘列表
 ```
-$ sudo yum install -y ceph ceph-radosgw         #安装 ceph包，替代 ceph-deploy install node04 ,不过下面的命令需要在每台node上安装
-```  
+# ceph-deploy disk list node04
+......
+[ceph_deploy.osd][DEBUG ] Listing disks on node01...
+[node01][DEBUG ] find the location of an executable
+[node01][INFO  ] Running command: /usr/sbin/ceph-disk list
+[node01][DEBUG ] /dev/dm-0 other, xfs, mounted on /
+[node01][DEBUG ] /dev/dm-1 swap, swap
+[node01][DEBUG ] /dev/sda :
+[node01][DEBUG ] /dev/sda2 other, LVM2_member
+[node01][DEBUG ] /dev/sda1 other, xfs, mounted on /boot
+[node01][DEBUG ] /dev/sdb :
+[node01][DEBUG ] /dev/sdb2 other
+[node01][DEBUG ] /dev/sdb1 ceph data, active, cluster ceph, osd.0
+[node01][DEBUG ] /dev/sr0 other, unknown
+......
+```
 
 3、ceph-deploy 节点部署
 
@@ -418,7 +437,19 @@ ID CLASS WEIGHT TYPE NAME STATUS REWEIGHT PRI-AFF
 8 hdd 0.01949 osd.8 up 1.00000 1.00000
 ```  
 
-2)添加osd  
+2）验证磁盘是否处于干净状态
+```
+# ceph-deploy disk zap node01 /dev/sde              # 清除分区
+# lsblk
+```
+
+3）单独添加添加磁盘到集群中
+```
+# ceph-deploy osd create node01 --data /dev/sde
+# lsblk
+```
+
+4)使用脚本批量添加osd  
 ```
 for dev in /dev/sdb /dev/sdc /dev/sdd
 do
@@ -429,13 +460,16 @@ done
 - 新的OSD添加到Ceph集群后，Ceph集群数据就会开始重新平衡到新的OSD，过一段时间后，Ceph 集群就变得稳定了。 生产中，就不能这样添加，否则会影响性能。
 - 添加磁盘会自动将主机加入集群
 
-3）查看
+5）查看
 ```
 # watch ceph -s
+# ceph osd stat
 # rados df
 # ceph df
 # ceph osd tree
-```  
+``` 
+- 一旦ceph-disk prepare命令完成后，集群将执行回填操作并将开始将PG从辅助OSD移动到新的OSD。恢复操作可能需要一段时间，但在此之后，Ceph集群将HEALTH_OK再次出现3、3
+
 
 # 四、Ceph 集群缩减
 
