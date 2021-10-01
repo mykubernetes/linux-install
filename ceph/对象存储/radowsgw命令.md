@@ -132,7 +132,7 @@ radosgw-admin user create --uid=johndoe --display-name="John Doe" --email=john@e
 ```
 
 2、新建一个子用户
-> 为了给用户新建一个子用户 (Swift 接口) ,必须为该子用户指定用户的 ID(--uid={username})，子用户的ID以及访问级别
+> 为了给用户新建一个子用户 (Swift 接口)
 ```
 语法
 radosgw-admin subuser create --uid={uid} --subuser={uid} --access=[ read | write | readwrite | full ]
@@ -202,21 +202,31 @@ radosgw-admin key create --subuser=johndoe:swift --key-type=swift --gen-secret
 - `--gen-secret` 生成一个随机的 secret 密钥.
 - `--key-type=<type>` 指定密钥类型. 这个选项的值可以是: swift, s3
   
-> 要新建密钥。
+> 创建s3用户key
 ```
 radosgw-admin key create --uid=johndoe --key-type=s3 --gen-access-key --gen-secret
 ```
 
-> 手动使用指定access和secret密钥的方式。
+> 创建swift用户key
 ```
-radosgw-admin key create --uid=johndoe --key-type=s3 --access=123456   secret=123456
+radosgw-admin key create --subuser=testuser:swift --key-type=swift --gen-secret
 ```
 
-> 删除一个access密钥。
+> 手动使用指定access和secret密钥的方式。
 ```
-radosgw-admin key rm --uid=johndoe
+radosgw-admin key create --uid=johndoe --key-type=s3 --access-key=123456   secret=123456
 ```
-  
+
+> 删除s3用户key
+```
+radosgw-admin key rm --uid=johndoe --access-key=9JEB64N3OFDODAZAIZ8H
+```
+
+> 删除swift用户key
+```
+radosgw-admin key rm --subuser=testuser:swift --key-type=swift
+```
+
 10、添加/删除 管理权限
 
 - Ceph 存储集群提供了一个管理API，它允许用户通过 REST API 执行管理功能。默认情况下，用户没有访问 这个 API 的权限。要启用用户的管理功能，需要为用 户提供管理权限。
@@ -250,6 +260,11 @@ radosgw-admin user check --uid=johndoe
 13、获取用户用量统计信息
 ```
 radosgw-admin user stats --uid=uid
+```
+
+14、列出所有的用户
+```
+radosgw-admin meatadata list user
 ```
 
 ## 配额管理
