@@ -158,16 +158,16 @@ radosgw-admin subuser modify --uid=johndoe:swift --access=full
 
 6、用户的启用/停用
 
-> 当创建一个用户默认情况下是处于启用状态。
+> 将用户设置为停用
 ```
 radosgw-admin user suspend --uid=johndoe
 ```
 
-> 重新启用已经被停用的用户。
+> 启用已被停用的用户
 ```
 radosgw-admin user enable --uid=johndoe
 ```
-- 停用一个用户后,它的子用户也会一起被停用.
+- 停用一个用户后,它的子用户也会一起被停用
 
 7、删除用户
 
@@ -214,7 +214,7 @@ radosgw-admin key create --subuser=testuser:swift --key-type=swift --gen-secret
 
 > 手动使用指定access和secret密钥的方式。
 ```
-radosgw-admin key create --uid=johndoe --key-type=s3 --access-key=123456   secret=123456
+radosgw-admin key create --uid=johndoe --key-type=s3 --access-key=123456   --secret-key=123456
 ```
 
 > 删除s3用户key
@@ -262,10 +262,7 @@ radosgw-admin user check --uid=johndoe
 radosgw-admin user stats --uid=uid
 ```
 
-14、列出所有的用户
-```
-radosgw-admin meatadata list user
-```
+
 
 ## 配额管理
 
@@ -387,11 +384,14 @@ radosgw-admin usage trim --uid=johnny --end-date=2012-04-01
 ## 存储桶
 
 1、列出所有桶
-```
-列出所有桶
-radosgw-admin bucket list
 
-查看某一个用户，存储桶有哪些
+> 列出所有桶
+```
+radosgw-admin bucket list
+```
+
+> 查看某一个用户，存储桶有哪些
+```
 radosgw-admin bucket list --uid=johndoe
 ```
 
@@ -458,4 +458,15 @@ radosgw-admin bucket unindex --bucket=桶名称
 11、将存储桶置为不可删除
 ```
 radosgw-admin bucket delete disable --bucket=桶名称
+```
+
+## Metadata 
+```
+radosgw-admin metadata list
+radosgw-admin metadata list user
+radosgw-admin metadata list bucket
+radosgw-admin metadata list bucket.instance
+radosgw-admin metadata list bucket.instance
+radosgw-admin metadata get user:test
+radosgw-admin metadata put user
 ```
