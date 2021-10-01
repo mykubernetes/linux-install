@@ -36,6 +36,9 @@ pool vms id 4
   1/492811 objects unfound (0.000%)
   client io 680 B/s rd, 399 kB/s wr, 0 op/s rd, 25 op/s wr
 ```
+- `objects degraded (0.065%)` 0.065%的数据副本不足，需要恢复
+- `objects misplaced (0.033%)` 0.033%的数据需要重新分布
+- `objects unfound (0.000%)` 0.000%的数据可能丢失
 
 ```
 # ceph osd pool ls detail|grep vms
@@ -95,14 +98,14 @@ set pool 4 min_size to 1
 ```
 - 字面上理解，pg 4.210的自我恢复状态，它已经探查了osd4、6、15、17、20、23,osd22和26已经down了，而我这里的osd22和26都已经移出了集群
 
-might_have_unfound的osd有以下四种状态
+2、might_have_unfound的osd有以下四种状态
 - already probed
 - querying
 - OSD is down
 - not queried (yet)
 
 
-两种解决方案，回退旧版或者直接删除
+3、两种解决方案，回退旧版或者直接删除
 ```
 # ceph pg 4.210 mark_unfound_lost revert
 Error EINVAL: pg has 1 unfound objects but we haven't probed all sources,not marking lost
@@ -114,7 +117,7 @@ Error EINVAL: pg has 1 unfound objects but we haven't probed all sources,not mar
 
 
 
-添加完成后，再次查看pg 4.210
+3、添加完成后，再次查看pg 4.210
 ```
     "recovery_state": [
             {
@@ -166,19 +169,19 @@ Error EINVAL: pg has 1 unfound objects but we haven't probed all sources,not mar
                     ],
 ```
 
-可以看到所有的资源都probed了，此时执行回退命令
+4、可以看到所有的资源都probed了，此时执行回退命令
 ```
 # ceph pg  4.210  mark_unfound_lost revert
 pg has 1 objects unfound and apparently lost marking
 ```
 
-查看集群状态
+5、查看集群状态
 ```
 # ceph health detail
 HEALTH_OK
 ```
 
-恢复池vms的min_size为2
+6、恢复池vms的min_size为2
 ```
 # ceph osd pool set vms min_size 2
 set pool 4 min_size to 2
