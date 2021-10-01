@@ -273,7 +273,8 @@ radosgw-admin user stats --uid=uid
 radosgw-admin quota set --quota-scope=user --uid=<uid> [--max-objects=<num objects>] [--max-size=<max size>]
 ```
 
-> 在启用用户的配额前，需要先设置配额参数。 
+> 在启用用户的配额前，需要先设置配额参数
+```
 radosgw-admin quota set --quota-scope=user --uid=johndoe --max-objects=1024 --max-size=1024
 ```
 - 最大对象数和最大存储用量的值是负数则表示不启用指定的配额参数。
