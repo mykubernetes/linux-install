@@ -470,3 +470,206 @@ radosgw-admin metadata list bucket.instance
 radosgw-admin metadata get user:test
 radosgw-admin metadata put user
 ```
+
+  
+## policy
+```
+storage-policy list        list all storage policy
+storage-policy get         get storage policy
+storage-policy set         set storage policy
+storage-policy rm          delete storage policy
+```
+
+
+## user
+```
+user create                create a new user
+user modify                modify user
+user info                  get user info
+user rm                    remove user
+user suspend               suspend a user
+user enable                re-enable user after suspension
+user check                 check user info
+user stats                 show user stats as accounted by quota subsystem
+user list                  list users
+
+
+
+caps add                   add user capabilities
+caps rm                    remove user capabilities
+subuser create             create a new subuser
+subuser modify             modify subuser
+subuser rm                 remove subuser
+key create                 create access key
+key rm                     remove access key
+```
+
+
+## bucket
+  
+```
+bucket list                list buckets (specify --allow-unordered for
+                           faster, unsorted listing)
+bucket limit check         show bucket sharding stats
+bucket link                link bucket to specified user
+bucket unlink              unlink bucket from specified user
+bucket stats               returns bucket statistics
+bucket rm                  remove bucket
+bucket check               check bucket index
+bucket reshard             reshard bucket
+bucket rewrite             rewrite all objects in the specified bucket
+bucket sync disable        disable bucket sync
+bucket sync enable         enable bucket sync
+bucket storage-policy get  get bucket storage policy
+bucket storage-policy set  set bucket storage policy
+bucket storage-policy rm   delete bucket storage policy
+
+
+bi get                     retrieve bucket index object entries
+bi put                     store bucket index object entries
+bi list                    list raw bucket index entries
+bi purge                   purge bucket index entries
+```
+
+## object
+```
+object rm                  remove object
+object put                 put object
+object stat                stat an object for its metadata
+object unlink              unlink object from bucket index
+object rewrite             rewrite the specified object
+object transition          transition the specified object
+objects expire             run expired objects cleanup
+objects expire-stale list  list stale expired objects (caused by reshard)
+objects expire-stale rm    remove stale expired objects
+
+
+period rm                  remove a period
+period get                 get period info
+period get-current         get current period info
+period pull                pull a period
+period push                push a period
+period list                list all periods
+period update              update the staging period
+period commit              commit the staging period
+quota set                  set quota params
+quota enable               enable quota
+quota disable              disable quota
+global quota get           view global quota params
+global quota set           set global quota params
+global quota enable        enable a global quota
+global quota disable       disable a global quota
+realm create               create a new realm
+realm rm                   remove a realm
+realm get                  show realm info
+realm get-default          get default realm name
+realm list                 list realms
+realm list-periods         list all realm periods
+realm rename               rename a realm
+realm set                  set realm info (requires infile)
+realm default              set realm as default
+realm pull                 pull a realm and its current period
+zonegroup add              add a zone to a zonegroup
+zonegroup create           create a new zone group info
+zonegroup default          set default zone group
+zonegroup rm               remove a zone group info
+zonegroup get              show zone group info
+zonegroup modify           modify an existing zonegroup
+zonegroup set              set zone group info (requires infile)
+zonegroup rm               remove a zone from a zonegroup
+zonegroup rename           rename a zone group
+zonegroup list             list all zone groups set on this cluster
+zonegroup placement list   list zonegroup's placement targets
+zonegroup placement get    get a placement target of a specific zonegroup
+zonegroup placement add    add a placement target id to a zonegroup
+zonegroup placement modify modify a placement target of a specific zonegroup
+zonegroup placement rm     remove a placement target from a zonegroup
+zonegroup placement default  set a zonegroup's default placement target
+zone create                create a new zone
+zone rm                    remove a zone
+zone get                   show zone cluster params
+zone modify                modify an existing zone
+zone set                   set zone cluster params (requires infile)
+zone list                  list all zones set on this cluster
+zone rename                rename a zone
+zone placement list        list zone's placement targets
+zone placement get         get a zone placement target
+zone placement add         add a zone placement target
+zone placement modify      modify a zone placement target
+zone placement rm          remove a zone placement target
+metadata sync status       get metadata sync status
+metadata sync init         init metadata sync
+metadata sync run          run metadata sync
+data sync status           get data sync status of the specified source zone
+data sync init             init data sync for the specified source zone
+data sync run              run data sync for the specified source zone
+pool add                   add an existing pool for data placement
+pool rm                    remove an existing pool from data placement set
+pools list                 list placement active set
+policy                     read bucket/object policy
+log list                   list log objects
+log show                   dump a log from specific object or (bucket + date
+                           + bucket-id)
+                           (NOTE: required to specify formatting of date
+                           to "YYYY-MM-DD-hh")
+log rm                     remove log object
+usage show                 show usage (by user, date range, network, bucket)
+usage trim                 trim usage (by user, date range, network, bucket)
+usage list-network         list usage network
+usage clear                reset all the usage stats for the cluster
+gc list                    dump expired garbage collection objects (specify
+                           --include-all to list all entries, including unexpired)
+                           --pool  
+                           --shard_id 
+gc process                 manually process garbage (specify
+                           --include-all to process all entries, including unexpired)
+                           --pool  
+                           --shard_id  
+                           --num_shards  
+lc list                    list all bucket lifecycle progress
+lc get                     get a lifecycle bucket configuration
+lc process                 manually process lifecycle
+lc reshard fix             fix LC for a resharded bucket
+bl list                    list all bucket logging deliver progress
+bl process                 deliver bucket logging manually
+metadata get               get metadata info
+metadata put               put metadata info
+metadata rm                remove metadata info
+metadata list              list metadata info
+mdlog list                 list metadata log
+mdlog trim                 trim metadata log (use start-date, end-date or
+                           start-marker, end-marker)
+mdlog status               read metadata log status
+bilog list                 list bucket index log
+bilog trim                 trim bucket index log (use start-marker, end-marker)
+datalog list               list data log
+datalog trim               trim data log
+datalog status             read data log status
+orphans find               init and run search for leaked rados objects (use job-id, pool)
+orphans finish             clean up search for leaked rados objects
+orphans list-jobs          list the current job-ids for orphans search
+role create                create a AWS role for use with STS
+role rm                    remove a role
+role get                   get a role
+role list                  list roles with specified path prefix
+role modify                modify the assume role policy of an existing role
+role-policy put            add/update permission policy to role
+role-policy list           list policies attached to a role
+role-policy get            get the specified inline policy document embedded with the given role
+role-policy rm             remove policy attached to a role
+reshard add                schedule a resharding of a bucket
+reshard list               list all bucket resharding or scheduled to be resharded
+reshard status             read bucket resharding status
+reshard process            process of scheduled reshard jobs
+reshard cancel             cancel resharding a bucket
+reshard stale-instances list list stale-instances from bucket resharding
+reshard stale-instances rm   cleanup stale-instances from bucket resharding
+sync error list            list sync error
+sync error trim            trim sync error
+mfa create                 create a new MFA TOTP token
+mfa list                   list MFA TOTP tokens
+mfa get                    show MFA TOTP token
+mfa remove                 delete MFA TOTP token
+mfa check                  check MFA TOTP token
+mfa resync                 re-sync MFA TOTP token
+```
