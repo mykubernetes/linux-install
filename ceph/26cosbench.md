@@ -39,7 +39,8 @@
 
 2、启动cosbench
 ```
-[root@k8s-01 0.4.2.c4]# sh start-all.sh 
+# sh start-all.sh 
+
 Launching osgi framwork ... 
 Successfully launched osgi framework!
 Booting cosbench driver ... 
@@ -108,6 +109,19 @@ http://${IP}:19088/controller/
 
 
 # 三、cosbench配置文件说明
+
+## 参数说明
+
+| 参数 | 描述 |
+|------|-----|
+| accesskey、secretkey | 密钥信息，分别替换为用户的 SecretId 和 SecretKey |
+| cprefix | 存储桶名称前缀，例如 examplebucket |
+| containers | 为存储桶名称数值区间，最后的存储桶名称由 cprefix 和 containers 组成，例如：examplebucket1，examplebucket2 |
+| csuffix | 用户的 APPID，需注意 APPID 前面带上符号-，例如 -1250000000 |
+| runtime | 压测运行时间 |
+| ratio | 读和写的比例 |
+| workers | 压测线程数 |
+
 
 1、进入conf目录下，查看s3-config-sample.xml配置文件内容如下
 ```
@@ -201,3 +215,15 @@ http://${IP}:19088/controller/
 Accepted with ID: w1
 ```
 
+任务配置主要包含如下五个阶段
+- init 阶段：创建存储桶。
+- prepare 阶段：worker 线程，PUT 上传指定大小的对象，用于 main 阶段读取。
+- main 阶段：worker 线程混合读写对象，运行指定时长。
+- cleanup 阶段，删除生成的对象。
+- dispose 阶段：删除存储桶。
+
+
+执行以下命令，停止测试服务
+```
+sh stop-all.sh
+```
