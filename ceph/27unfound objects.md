@@ -12,6 +12,7 @@ OBJECT_UNFOUND 1/1882532 objects unfound (0.000%)
 PG_DEGRADED Degraded data redundancy: 965/5647596 objects degraded (0.017%), 1 pg degraded, 1 pg undersized
     pg 4.210 is stuck undersized for 38159.843116, current state active+recovery_wait+undersized+degraded+remapped, last acting [2]
 ```
+- `pg 4.210`: `pg 4.210`是pg的id,前面的4表示这个pg对应的哪个存储池
 
 # 处理过程
 
