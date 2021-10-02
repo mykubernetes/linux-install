@@ -85,7 +85,7 @@ PG_DAMAGED Possible data damage: 1 pg inconsistent
                     "osd": 138,
                     "primary": false,
                     "errors": [
-                        "read_error"                         # 
+                        "read_error"                         # 有read_error报错
                     ],
                     "size": 4194304
                 },
