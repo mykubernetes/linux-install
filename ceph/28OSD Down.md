@@ -217,6 +217,7 @@ pveceph createosd /dev/sdf
   io:
     client:   1.03MiB/s wr, 0op/s rd, 129op/s wr
     recovery: 297MiB/s, 0keys/s, 74objects/s
+
 root@OB004:~# ceph status
   cluster:
     id:     b1cf0cd3-28f9-4fc4-a495-d5bafb3195ec
