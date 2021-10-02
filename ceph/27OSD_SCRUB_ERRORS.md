@@ -8,9 +8,34 @@ PG_DAMAGED Possible data damage: 1 pg inconsistent
     pg 2.33c6 is active+clean+inconsistent, acting [355,138,29]
 ```
 
+
+```
+ceph pg dump | grep inconsistent
+dumped all
+ 2.33c6    76    0    0    0    0 551575468  569   569 active+clean+inconsistent 2020-12-10 20:58:11.528662   205'569    205:1522  [355,138,29]  20 [355,138,29]
+```
+- 可以看到2.22c6这样开头的，这就是pg的id，前面的2表示这个pg是对应哪个存储池
+
 # 二、问题定位
 
-1、查看对应PG的不一致对象列表
+1、获取osd所在节点的IP信息和挂载信息。
+```
+# OSD_ID=355
+# ceph $OSD_ID | grep -E 'hostname|osd_data'
+
+# OSD_ID=138
+# ceph osd metadata $OSD_ID | grep -E 'hostname|osd_data'
+
+# OSD_ID=29
+# ceph osd metadata $OSD_ID | grep -E 'hostname|osd_data'
+```
+
+或者查询osd所在服务器的ip地址
+```
+# ceph osd find $OSD_ID
+```
+
+2、查看对应PG的不一致对象列表
 ```
 # rados list-inconsistent-obj 2.33c6 --format=json-pretty
 {
@@ -85,7 +110,7 @@ PG_DAMAGED Possible data damage: 1 pg inconsistent
                     "osd": 138,
                     "primary": false,
                     "errors": [
-                        "read_error"                         # 有read_error报错
+                        "read_error"                         # 可以看到osd138上read_error报错
                     ],
                     "size": 4194304
                 },
@@ -102,9 +127,15 @@ PG_DAMAGED Possible data damage: 1 pg inconsistent
     ]
 }
 ```
-- 需要到osd138对应的服务器上检查
+- 需要到osd138对应的服务器上检查，对应的挂载盘是否也显示有`read error`
 
-2、发现有一个对象的一个138副本出现了read_error，去主osd355上查看日志可以看到具体scrub-error日志
+2、查看138对应的盘符
+```
+df -h |grep 138
+/dev/sdh        11T   11G   11T    1% /var/lib/ceph/osd/ceph-138
+```
+
+3、发现有一个对象的一个138副本出现了read_error，去主osd355上查看日志可以看到具体scrub-error日志
 ```
 # grep '2.33c6' ceph-osd.355.log-20201125
 2020-12-08 23:00:00.469371 7ff5b8c43700  0 log_channel(cluster) log [DBG] : 2.33c6 scrub starts
@@ -115,7 +146,7 @@ PG_DAMAGED Possible data damage: 1 pg inconsistent
 2020-12-10 23:00:19.938052 7ff5b8c43700 -1 log_channel(cluster) log [ERR] : 2.33c6 deep-scrub 1 errors
 ```
 
-3、去osd138上查看系统日志发现sdh坏道
+4、去osd138上查看系统日志发现sdh坏道
 ```
 [四 12月 10 23:03:02 2020] Process accounting resumed
 [四 12月 10 23:03:15 2020] megaraid_sas 0000:02:00.0: 5305 (660927610s/0x0002/FATAL) - Unrecoverable medium error during recovery on PD 06(e0x20/s6) at 255d319
@@ -147,7 +178,7 @@ PG_DAMAGED Possible data damage: 1 pg inconsistent
 [四 12月 10 23:04:02 2020] Process accounting resumed
 ```
 
-4、sdh正是osd138对应的硬盘
+5、sdh正是osd138对应的硬盘
 ```
 # pwd
 /var/lib/ceph/osd/ceph-138
@@ -184,13 +215,15 @@ lrwxrwxrwx 1 ceph ceph  93 11月 23 18:05 block -> /dev/ceph-799147d1-13d6-4229-
   /dev/sdm   ceph-1fc4f01f-bc05-489a-a15c-33834adc197b lvm2 a--  <3.64t    0
 ```
 
-5、数据修复
+6、数据修复
 ```
 # ceph pg repair 2.33c6
 instructing pg 2.33c6 on osd.355 to repair
 # ...
+
 # ceph health detail
 HEALTH_OK
+
 # rados list-inconsistent-obj 2.33c6 --format=json-pretty
 {
     "epoch": 560,
@@ -199,7 +232,7 @@ HEALTH_OK
 # 
 ```
 
-
+7、如果无法恢复，只能更换硬盘盘。
 
 
 
