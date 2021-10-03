@@ -13,6 +13,83 @@ Crush map 编辑
 3、此时，可以在编辑器中编辑了  
 ```
 # vim crushmap_decompiled_file
+
+# begin crush map 选择存放副本位置时的选择算法策略中的变量配置
+tunable choose_local_tries 0
+tunable choose_local_fallback_tries 0
+tunable choose_total_tries 50
+tunable chooseleaf_descend_once 1
+tunable straw_calc_version 1
+
+# devices              # 一般指的是叶子节点osd
+device 0 osd.0
+device 1 osd.1
+device 2 osd.2
+
+# types                # 树形下的多种类型
+type 0 osd             # osd守护进程，一般一个osd对应一个磁盘
+type 1 host            # 一个包含一个或多个osds的主机名，表示是一个主机。
+type 2 chassis         # 系列
+type 3 rack            # 一个包含一个或多个主机的计算机机柜
+type 4 row             # 第几排机柜
+type 5 pdu             # 
+type 6 pod             # 
+type 7 room            # 一个房间包含机柜和排，主机
+type 8 datacenter      # 一个数据中心包含多个房间
+type 9 region          # 一个区域包含多个数据中心
+type 10 root           # 根
+
+# buckets              # 躯干部分 host一般是表示一个物理节点，root是树形的根部
+host thinstack-test0 {
+id -2    # do not change unnecessarily
+# weight 0.031
+alg straw              # ceph作者实现的选择item的算法
+hash 0                 # rjenkins1 这代表的是使用哪个hash算法，0表示选择rjenkins1这种hash算法
+item osd.0 weight 0.031
+}
+host thinstack-test1 {
+id -3                  # do not change unnecessarily
+# weight 0.031
+alg straw
+hash 0                 # rjenkins1
+item osd.1 weight 0.031
+}
+host thinstack-test2 {
+id -4                  # do not change unnecessarily
+# weight 0.031
+alg straw
+hash 0    # rjenkins1
+item osd.2 weight 0.031
+}
+root default {
+id -1                  # do not change unnecessarily
+# weight 0.094
+alg straw
+hash 0    # rjenkins1
+item thinstack-test0 weight 0.031
+item thinstack-test1 weight 0.031
+item thinstack-test2 weight 0.031
+}
+
+# rules                # 副本选取规则的设定
+rule replicated_ruleset {
+ruleset 0
+type replicated
+min_size 1
+max_size 10
+step take default      # 以default root为入口
+step chooseleaf firstn 0 type host    # 看如下 解释1
+step emit              # 提交
+}
+
+# end crush map
+
+解释1：
+step chooseleaf firstn {num} type {bucket-type}
+chooseleaf表示选择bucket-type的bucket并选择其的叶子节点（osd）
+当num等于0时：表示选择副本数量个bucket
+当num > 0 and num < 副本数量时：表示选择num个bucket
+当num < 0： 表示选择 副本数量 - num 个bucket
 ```  
 
 4、完成编辑后，编译这些更改  
