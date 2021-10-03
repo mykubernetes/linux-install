@@ -1,5 +1,77 @@
 http://docs.ceph.org.cn/rados/operations/crush-map/
 
+1、查看每个pool的详细信息，可以查看每个pool使用的crush_rule规则
+```
+# ceph osd pool ls detail
+pool 1 '.rgw.root' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 8 pgp_num 8 last_change 977 flags hashpspool stripe_width 0 application rgw
+pool 2 '00000000-default.rgw.buckets.index' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 256 pgp_num 256 last_change 885 flags hashpspool stripe_width 0 application rgw
+pool 3 'default.rgw.meta' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 4 pgp_num 4 last_change 886 flags hashpspool stripe_width 0 application rgw
+pool 4 'default.rgw.control' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 4 pgp_num 4 last_change 887 flags hashpspool stripe_width 0 application rgw
+pool 5 '00000000-default.rgw.buckets.non-ec' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 16 pgp_num 16 last_change 888 flags hashpspool stripe_width 0 application rgw
+pool 6 'default.rgw.log' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 4 pgp_num 4 last_change 890 flags hashpspool stripe_width 0 application rgw
+pool 7 '00000000-default.rgw.buckets.data' replicated size 3 min_size 2 crush_rule 7 object_hash rjenkins pg_num 4096 pgp_num 4096 last_change 1241 flags hashpspool stripe_width 0 expected_num_objects 819200000 application rgw
+```
+
+2、查看存储池有哪些规则
+```
+# ceph -c $(ls /data/cos/ceph.*.conf | head -1) osd crush rule ls
+replicated_rule
+rep_00000000-default_datacenter
+ec_8_3_00000000-default_datacenter
+rep_00000000-default_room
+ec_8_3_00000000-default_room
+rep_00000000-default_rack
+ec_8_3_00000000-default_rack
+rep_00000000-default_host
+ec_8_3_00000000-default_host
+crep_00000000-fast_datacenter
+ec_8_3_00000000-fast_datacenter
+rep_00000000-fast_room
+cec_8_3_00000000-fast_room
+rep_00000000-fast_rack
+ec_8_3_00000000-fast_rack
+rep_00000000-fast_host
+ec_8_3_00000000-fast_host
+```
+
+3、查看存储池有哪些规则的详细信息
+```
+# ceph osd crush rule dump
+[
+    {
+        "rule_id": 0,
+        "rule_name": "replicated_rule",
+        "ruleset": 0,
+        "type": 1,
+        "min_size": 1,
+        "max_size": 10,
+        "steps": [
+            {
+                "op": "take",
+                "item": -1,
+                "item_name": "default"
+            },
+            {
+                "op": "chooseleaf_firstn",
+                "num": 0,
+                "type": "host"
+            },
+            {
+                "op": "emit"
+            }
+        ]
+    },
+......
+]
+```
+
+4、这是存储池使用哪条规则
+```
+# 语法ceph osd pool set {{pool_name}} crush_rule {{crush_rule_name}}
+# ceph osd pool set .rgw.root crush_rule rep_0000000-fast_host
+```
+
+
 Crush map 编辑
 ===
 1、从任何Mon节点获取Crush map  
