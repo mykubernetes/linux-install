@@ -6,7 +6,6 @@
 | 博客 | https://blog.51cto.com/michaelkang/category9.html |
 | 博客 | https://www.jianshu.com/u/305dfce65e38 |
 | 博客 | https://www.jianshu.com/u/e2dfdb98f630 |
-| 博客 | https://www.kancloud.cn/willseecloud/ceph/1788301 |
 | 书 | https://www.kancloud.cn/willseecloud/ceph/1788233 |
 | 书 | https://www.bookstack.cn/read/zxj_ceph/deploy |
 
