@@ -163,8 +163,6 @@ Monitor 状态和查看仲裁状态
 
 ## 查看osd状态
 ```
-# ceph osd tree
-# ceph osd dump
 # ceph osd stat
 # ceph osd status 
 # ceph osd dump
