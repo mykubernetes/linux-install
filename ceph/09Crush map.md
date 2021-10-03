@@ -26,65 +26,67 @@ device 0 osd.0
 device 1 osd.1
 device 2 osd.2
 
-# types                # 树形下的多种类型
-type 0 osd             # osd守护进程，一般一个osd对应一个磁盘
-type 1 host            # 一个包含一个或多个osds的主机名，表示是一个主机。
-type 2 chassis         # 系列
-type 3 rack            # 一个包含一个或多个主机的计算机机柜
-type 4 row             # 第几排机柜
-type 5 pdu             # 
-type 6 pod             # 
-type 7 room            # 一个房间包含机柜和排，主机
-type 8 datacenter      # 一个数据中心包含多个房间
-type 9 region          # 一个区域包含多个数据中心
-type 10 root           # 根
+# types                   # 树形下的多种类型
+type 0 osd                # osd守护进程，一般一个osd对应一个磁盘
+type 1 host               # 一个包含一个或多个osds的主机名，表示是一个主机。
+type 2 chassis            # 系列
+type 3 rack               # 一个包含一个或多个主机的计算机机柜
+type 4 row                # 第几排机柜
+type 5 pdu                # 
+type 6 pod                # 
+type 7 room               # 一个房间包含机柜和排，主机
+type 8 datacenter         # 一个数据中心包含多个房间
+type 9 region             # 一个区域包含多个数据中心
+type 10 root              # 根
 
-# buckets              # 躯干部分 host一般是表示一个物理节点，root是树形的根部
+# buckets                 # 躯干部分 host一般是表示一个物理节点，root是树形的根部
 host thinstack-test0 {
-id -2    # do not change unnecessarily
+id -2 
 # weight 0.031
-alg straw              # ceph作者实现的选择item的算法
-hash 0                 # rjenkins1 这代表的是使用哪个hash算法，0表示选择rjenkins1这种hash算法
+alg straw                 # ceph作者实现的选择item的算法
+hash 0                    # rjenkins1 这代表的是使用哪个hash算法，0表示选择rjenkins1这种hash算法
 item osd.0 weight 0.031
 }
-host thinstack-test1 {
-id -3                  # do not change unnecessarily
-# weight 0.031
-alg straw
-hash 0                 # rjenkins1
+host thinstack-test1 {    # 类型host，名字为thinstack-test1
+id -3                     # bucket的id，一般为负值
+# weight 0.031            # 权重，默认为子item的权重之和
+alg straw                 # bucket随机选择的算法
+hash 0                    # bucket随机选择的算法使用的hash函数，这里0代表使用hash函数rjenkins1
 item osd.1 weight 0.031
 }
 host thinstack-test2 {
-id -4                  # do not change unnecessarily
+id -4
 # weight 0.031
 alg straw
-hash 0    # rjenkins1
+hash 0
 item osd.2 weight 0.031
 }
-root default {
-id -1                  # do not change unnecessarily
+root default {            # root类型的bucket，名字为default
+id -1                     # id号
 # weight 0.094
-alg straw
-hash 0    # rjenkins1
+alg straw                 # 随机选择的算法
+hash 0                    # rjenkins1
 item thinstack-test0 weight 0.031
 item thinstack-test1 weight 0.031
 item thinstack-test2 weight 0.031
 }
 
-# rules                # 副本选取规则的设定
+# rules                                # 副本选取规则的设定
 rule replicated_ruleset {
-ruleset 0
-type replicated
-min_size 1
-max_size 10
-step take default      # 以default root为入口
-step chooseleaf firstn 0 type host    # 看如下 解释1
-step emit              # 提交
+ruleset 0                              # ruleset的编号id
+type replicated                        # 类型:repliated或者erasure code
+min_size 1                             # 副本数最小值
+max_size 10                            # 副本数最大值
+step take default                      # 选择一个root bucket，做下一步的输入
+step choose firstn  1 type row         # 选择一个row，同一排
+step choose firstn  3 type cabinet     # 选择三个cabinet, 三副本分别在不同的cabinet
+step choose firstn  1 type osd         # 在上一步输出的三个cabinet中，分别选择一个osd
+step emit                              # 提交
 }
 
 # end crush map
 
-解释1：
+
 step chooseleaf firstn {num} type {bucket-type}
 chooseleaf表示选择bucket-type的bucket并选择其的叶子节点（osd）
 当num等于0时：表示选择副本数量个bucket
