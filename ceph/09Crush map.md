@@ -1,3 +1,5 @@
+http://docs.ceph.org.cn/rados/operations/crush-map/
+
 Crush map 编辑
 ===
 1、从任何Mon节点获取Crush map  
