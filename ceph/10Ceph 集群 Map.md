@@ -6,7 +6,7 @@ monitor map
 ---
 它包含关于监视器节点的端到端信息，包括Ceph集群ID、监视器主机名和带有端口号的IP地址。它还存储用于创建map的当前纪元和最后更改的时间。
 ```
-$ ceph mon dump
+# ceph mon dump
 dumped monmap epoch 1
 epoch 1
 fsid bc8b9fe7-18de-4dc5-ac07-6ca0ee22966a
@@ -21,7 +21,7 @@ OSD map
 ---
 它存储一些常见字段，如集群ID、用于创建OSD映射和最后更改的历元，以及与池相关的信息，如池名称、池ID、类型、复制级别和PGs。它还存储OSD信息，如计数、状态、权重、最后一次清洁间隔和OSD主机信息。
 ```
-$ ceph osd dump
+# ceph osd dump
 epoch 62
 fsid bc8b9fe7-18de-4dc5-ac07-6ca0ee22966a
 created 2019-04-28 13:10:16.058337
@@ -45,7 +45,7 @@ PG map
 ---
 它包含PG版本、时间戳、最后的OSD map纪元、完整比例和接近完整比例的信息。它还跟踪每个PGID、对象计数、状态、状态戳、up和代理OSD集，最后是擦除细节。
 ```
-$ ceph pg dump
+# ceph pg dump
 dumped all
 version 10247
 stamp 2019-04-28 20:39:49.514994
@@ -76,6 +76,7 @@ crush map
 ---
 它保存关于集群设备、存储桶、故障域层次结构和存储数据时为故障域定义的规则的信息。要检查集群rush map，请执行以下操作
 ```
+# ceph osd crush dump
 {
     "devices": [
         {
@@ -136,7 +137,7 @@ MDS map
 ---
 它存储关于当前MDS地图历元、map创建和修改时间、数据和元数据池ID、集群MDS计数和MDS状态的信息。要检查集群MDS映射，请执行以下操作:
 ```
-$ ceph mds dump
+# ceph mds dump
 dumped fsmap epoch 8
 fs_name cephfs
 epoch 7
