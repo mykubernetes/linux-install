@@ -8,16 +8,16 @@ PG (Placement Group)，pg是一个虚拟的概念，用于存放object，PGP(Pla
 
 1、准备是3个测试环境节点，每个节点3个osd，首先创建以个名为pool_1的存储池，包含6个pg
 ```
-[root@node1 ~]# ceph osd pool create pool_1 6 6
+# ceph osd pool create pool_1 6 6
 pool 'pool_1' created
 
-[root@node1 ~]# ceph osd pool set pool_1 size 2   #设置存储池副本数为2
+# ceph osd pool set pool_1 size 2   #设置存储池副本数为2
 set pool 2 size to 2
 ```
 
 2、使用ceph pg dump pgs查看pg的分布：因为存储池为双副本，可以看到每个pg会分布在两个osd上，整个集群有9个osd，按照排列组合会有很多种，此时pgp=6，就会选择这些组合中的6种组合来供pg存放，可以看到最右侧的6中组合均不重复。
 ```
-[root@node1 ~]#  ceph pg dump pgs |grep active |awk '{print $1,$2,$15}'
+#  ceph pg dump pgs |grep active |awk '{print $1,$2,$15}'
 2.5 0 [1,2]
 2.4 0 [6,0]
 2.3 0 [5,2]
@@ -28,12 +28,12 @@ set pool 2 size to 2
 
 3、使用ceph自带的bench工具写入数据，来观察pg内的对象有没有移动
 ```
-rados -p pool_1 bench 20 write --no-cleanu
+rados -p pool_1 bench 20 write --no-cleanup
 ```
 
 4、再次查询结果如下：第2列为每个pg的对象数，第3列为pg所在的osd，可以看到存储创建好了pg设置固定了其osd的分布不会随着对象的增加而改变。
 ```
-[root@node1 ~]#  ceph pg dump pgs |grep active |awk '{print $1,$2,$15}'
+#  ceph pg dump pgs |grep active |awk '{print $1,$2,$15}'
 2.5 178 [1,2]
 2.4 162 [6,0]
 2.3 368 [5,2]
@@ -44,13 +44,13 @@ rados -p pool_1 bench 20 write --no-cleanu
 
 5、增加PG数，改变下pg数，将pg数扩大到12
 ```
-[root@node1 ~]# ceph osd pool set pool_1 pg_num 12
+# ceph osd pool set pool_1 pg_num 12
 set pool 2 pg_num to 12
 ```
 
 6、再次查看存储池pg分布结果如下
 ```
-[root@node1 ~]# ceph pg dump pgs |grep active |awk '{print $1,$2,$15}'
+# ceph pg dump pgs |grep active |awk '{print $1,$2,$15}'
 2.b 96 [5,2]
 2.a 73 [5,6]
 2.0 76 [0,6]
@@ -70,10 +70,10 @@ set pool 2 pg_num to 12
 
 7、增加PGP，将PGP从6调整为12：
 ```
-[root@node1 ~]# ceph osd pool set pool_1 pgp_num 12
+# ceph osd pool set pool_1 pgp_num 12
 set pool 2 pgp_num to 12
      
-[root@node1 ~]# ceph pg dump pgs |grep active |awk '{print $1,$2,$15}'
+# ceph pg dump pgs |grep active |awk '{print $1,$2,$15}'
 2.b 96 [8,0]
 2.a 73 [2,4]
 2.0 76 [0,6]
