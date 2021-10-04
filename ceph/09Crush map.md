@@ -1,5 +1,7 @@
 http://docs.ceph.org.cn/rados/operations/crush-map/
 
+# 一、手动设置存储池规则
+
 1、查看每个pool的详细信息，可以查看每个pool使用的crush_rule规则
 ```
 # ceph osd pool ls detail
@@ -72,8 +74,8 @@ ec_8_3_00000000-fast_host
 ```
 
 
-Crush map 编辑
-===
+# 二、编辑 Crush map
+
 1、从任何Mon节点获取Crush map  
 ```
 # ceph osd getcrushmap -o crushmap_compiled_file
@@ -106,7 +108,7 @@ Crush map 编辑
 
 
 
-# Crush map 介绍
+# 三、Crush map 介绍
 
 1)tunable（可调参数）
 ```
@@ -253,7 +255,7 @@ step emit                              # 提交
 - step choose firstn `<num>` type `<bucket-type>`： 为一个桶类型，选择存储数，
 - step emit： 这首先输出当前值并清空堆栈。这通常在规则的末尾使用.
 
-# 特定OSD上创建 Ceph 池
+# 四、自定义OSD上创建Ceph池
 
 1、实验介绍
 
@@ -392,9 +394,9 @@ osdmap e101 pool 'sata-pool' (9) object 'dummy_object1' -> pg 9.71968e96 (9.6) -
 
 
 
-# ceph Luminous新功能之crush class
+# 五、ceph Luminous新功能之crush class
 	
-## CRUSH devices class
+### CRUSH devices class
 
 - 这么做是为ceph不同类型的设备（HDD,SSD,NVMe）提供一个合理的默认，以便用户不必自己手动编辑指定。这相当于给磁盘组一个统一的class标签，根据class创建rule，然后根据role创建pool，整个操作不需要手动修改crushmap。
 
@@ -427,7 +429,7 @@ ceph-disk prepare --crush-device-class <class> /dev/XXX
 ceph osd crush set-device-class osd.<id> <class>
 ```
 
-**以下对第二种操作进行实验，也是使用最多的**
+### 以下对第二种操作进行实验，也是使用最多的
 
 1、当前OSD 分布
 ```
@@ -583,7 +585,7 @@ rule ssd_rule {
 ]
 ```
 
-有了新创建的两个rule，测试一下，rule 绑定 class是否成功
+### 有了新创建的两个rule，测试一下，rule 绑定 class是否成功
 
 1、在 ssd_rule 上创建一个 pool
 ```
@@ -603,7 +605,7 @@ osdmap e46 pool 'testpool' (7) object 'object1' -> pg 7.bac5debc (7.3c) -> up ([
 ```
 
 
-# 完整版crush map示例
+# 六、完整版crush map示例
 ```
 # begin crush map
 tunable choose_local_tries 0
