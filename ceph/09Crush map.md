@@ -89,6 +89,25 @@ Crush map 编辑
 # vim crushmap_decompiled_file
 ```
 
+4、完成编辑后，编译这些更改  
+```
+# crushtool -c crushmap_decompiled_file -o newcrushmap
+```  
+
+5、将新映射应用到集群前，使用crushtool命令及--show-mappings选项来验证
+```
+# crushool -i newcrushmap --test --show-mappings --rule=5 --num-rep 3
+```
+
+6、将新编译后的 Crush map 注入 Ceph 集群  
+```
+# ceph osd setcrushmap -i newcrushmap
+```
+
+
+
+# Crush map 介绍
+
 1)tunable（可调参数）
 ```
 # begin crush map                     # 选择存放副本位置时的选择算法策略中的变量配置
@@ -136,12 +155,22 @@ ceph tell mon.\* config set mon_warn_on_legacy_crush_tunables false
 - 请注意，这可能会导致一些数据移动。
 
 2）devices（设备）
+- 包含集群中所有 OSD 设备列表。OSD 是与ceph-osd守护程序对应的物理磁盘。要将PG映射到OSD设备，CRUSH需要OSD设备列表。
 ```
-# devices              # 一般指的是叶子节点osd
-device 0 osd.0
-device 1 osd.1
-device 2 osd.2
+# devices
+device 0 osd.0 class hdd
+device 1 osd.1 class hdd
+device 2 osd.2 class hdd
+device 3 osd.3 class hdd
+device 4 osd.4 class hdd
+device 5 osd.5 class hdd
+device 6 osd.6 class hdd
+device 7 osd.7 class hdd
+device 8 osd.8 class hdd
 ```
+
+3）types（存储桶类型）
+- 存储桶由物理位置（例如，行，机架，机箱，主机等）的分层聚合及其分配的权重组成。它们促进节点和叶子的层次结构，其中节点桶表示物理位置，叶片桶代表ceph-osd守护进程及其底层物理设备。
 ```
 # types                   # 树形下的多种类型
 type 0 osd                # osd守护进程，一般一个osd对应一个磁盘
@@ -155,39 +184,52 @@ type 7 room               # 一个房间包含机柜和排，主机
 type 8 datacenter         # 一个数据中心包含多个房间
 type 9 region             # 一个区域包含多个数据中心
 type 10 root              # 根
+```
 
-# buckets                 # 躯干部分 host一般是表示一个物理节点，root是树形的根部
-host thinstack-test0 {
-id -2 
-# weight 0.031
-alg straw                 # ceph作者实现的选择item的算法
-hash 0                    # rjenkins1 这代表的是使用哪个hash算法，0表示选择rjenkins1这种hash算法
-item osd.0 weight 0.031
-}
-host thinstack-test1 {    # 类型host，名字为thinstack-test1
-id -3                     # bucket的id，一般为负值
-# weight 0.031            # 权重，默认为子item的权重之和
-alg straw                 # bucket随机选择的算法
-hash 0                    # bucket随机选择的算法使用的hash函数，这里0代表使用hash函数rjenkins1
-item osd.1 weight 0.031
-}
-host thinstack-test2 {
-id -4
-# weight 0.031
-alg straw
-hash 0
-item osd.2 weight 0.031
-}
-root default {            # root类型的bucket，名字为default
-id -1                     # id号
-# weight 0.094
-alg straw                 # 随机选择的算法
-hash 0                    # rjenkins1
-item thinstack-test0 weight 0.031
-item thinstack-test1 weight 0.031
-item thinstack-test2 weight 0.031
-}
+通过以下方式获取集群的 Crush 简单的层次结构
+```
+ceph osd crush tree
+```
 
+4）buckets（存储桶实例）
+
+定义存储桶后您必须为主机声明存储桶实例。存储桶实例需要以下字段
+- 存储桶类型
+- 唯一名称（字符串）：表示为负整数的唯一ID
+- 权重：相对于其项目总容量的权重
+- 存储区算法：（straw默认情况下 straw2）
+- 哈希：（默认为 0，CRUSH哈希rjenkins1）
+```
+# buckets
+host c720102 {
+id -3 # do not change unnecessarily
+id -4 class hdd # do not change unnecessarily
+# weight 0.117
+alg straw2
+hash 0 # rjenkins1
+item osd.0 weight 0.039
+item osd.3 weight 0.039
+item osd.6 weight 0.039
+}
+...
+```
+参数详解：
+- bucket-type： 桶类型，我们必须在CRUSH层次结构中指定OSD的位置。
+- bucket-name： 唯一的存储桶名称。
+- id： 唯一ID,使用负整数表示。
+- weight： Ceph在群集磁盘上均匀地写入数据，这有助于提高性能并改善数据分发。这会强制所有磁盘都参与群集，并确保所有群集磁盘的使用均等，而不管其容量如何。为此，Ceph使用加权机制。CRUSH为每个OSD分配权重。OSD的权重越高，它的物理存储容量就越大。权重是设备容量之间的相对差异。我们建议使用1.00作为1 TB存储设备的相对重量。类似地，0.5的重量代表大约500GB，而3.00的重量代表大约3TB。
+- alg： Ceph支持多种算法桶类型供您选择。这些算法在性能和重组效率的基础上彼此不同。让我们简要介绍一下这些桶类型
+  - uniform： 如果存储设备 具有完全相同的权重 ，则可以使用。对于非均匀权重，不应使用此桶类型。添加或删除此存储桶类型中的设备需要对数据进行完全重新调整，这使得此存储桶类型的效率降低。
+  - list： 将其内容聚合为链接列表，并且可以包含具有任意权重的存储设备。在群集扩展的情况下，可以将新的存储设备添加到链表的头部，并且数据迁移最少。但是，存储设备的移除需要大量的数据移动。此外，list对于小文件有效，但它们可能不适合大型文件。
+  - tree： 将其项目存储在二叉树中。它比列表桶更有效，因为桶包含更多的项目。树桶结构为加权二叉搜索树，叶子上有项目。每个内部节点知道其左右子树的总权重，并根据固定策略进行标记。该tree桶是一个全能的福音，提供了出色的性能和不俗的重组效率。
+  - straw： 要使用list和tree桶选择项目，需要计算有限数量的哈希值并按权重进行比较。他们使用分而治之的策略，该策略优先于某些项目（例如，列表开头的那些项目）。这提高了副本放置过程的性能，但是当桶内容由于添加，删除或重新加权而发生变化时，它会引入适度的重组。
+  - straw2： 这是一个改进的straw存储桶，当A和B的权重都没有改变时，它可以正确地避免A和B项之间的任何数据移动。换句话说，如果我们通过向其添加新设备来调整项目C的权重，或者通过完全删除它来调整项目C的权重，则数据移动将发生在C中或从C发生，永远不会发生在存储桶中的其他项目之间。因此，straw2桶算法减少了对群集进行更改时所需的数据迁移量。
+  - hash： 每个桶使用哈希算法。0为默认设置，即 rjenkins1
+  - item： 桶可能有一个或多个项目。这些项目可能包含节点桶或叶子
+
+5）rules（规则）
+- CRUSH map 包含CRUSH规则确定池的数据放置。顾名思义，这些是定义池属性和数据存储在池中的方式的规则。它们定义了允许CRUSH在Ceph集群中存储对象的复制和放置策略。默认CRUSH映射包含默认池的规则，即rbd。
+```
 # rules                                # 副本选取规则的设定
 rule replicated_ruleset {
 ruleset 0                              # ruleset的编号id
@@ -200,35 +242,20 @@ step choose firstn  3 type cabinet     # 选择三个cabinet, 三副本分别在
 step choose firstn  1 type osd         # 在上一步输出的三个cabinet中，分别选择一个osd
 step emit                              # 提交
 }
-
 # end crush map
-
-
-step chooseleaf firstn {num} type {bucket-type}
-chooseleaf表示选择bucket-type的bucket并选择其的叶子节点（osd）
-当num等于0时：表示选择副本数量个bucket
-当num > 0 and num < 副本数量时：表示选择num个bucket
-当num < 0： 表示选择 副本数量 - num 个bucket
 ```  
-
-4、完成编辑后，编译这些更改  
-```
-# crushtool -c crushmap_decompiled_file -o newcrushmap
-```  
-
-5、将新映射应用到集群前，使用crushtool命令及--show-mappings选项来验证
-```
-# crushool -i newcrushmap --test --show-mappings --rule=5 --num-rep 3
-```
-
-6、将新编译后的 Crush map 注入 Ceph 集群  
-```
-# ceph osd setcrushmap -i newcrushmap
-```
+规则参数
+- id： 整数值
+- type： 字符串值; 它是复制或擦除编码的池类型。
+- min_size： 整数值; 如果池的副本数少于此数，则CRUSH将不会选择此规则。
+- max_size： 整数值; 如果池的副本数量多于此数字，则CRUSH将不会选择此规则。
+- step take： 这需要一个存储桶名称并开始在树中迭代。
+- step choose firstn `<num>` type `<bucket-type>`： 为一个桶类型，选择存储数，
+- step emit： 这首先输出当前值并清空堆栈。这通常在规则的末尾使用.
 
 
-
-
+# ceph Luminous新功能之crush class
+	
 # CRUSH devices class
 
 - 这么做是为ceph不同类型的设备（HDD,SSD,NVMe）提供一个合理的默认，以便用户不必自己手动编辑指定。这相当于给磁盘组一个统一的class标签，根据class创建rule，然后根据role创建pool，整个操作不需要手动修改crushmap。
