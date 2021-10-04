@@ -321,14 +321,14 @@ $ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
 4、从topic消费消息
 ```
 # 老版本
-$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic test
-$ bin/kafka-console-consumer.sh --zookeeper node001:2181 --from-beginning --topic test
+# bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic test
+# bin/kafka-console-consumer.sh --zookeeper node001:2181 --from-beginning --topic test
 
 #新版本
-$ bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic test
+# bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic test
 
-# 创建hncscwc消费者组, 并从 2号分区 偏移量为1的位置开始消费 2条消息
-$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --group hncscwc --partition 2 --offset 1 --max-messages 2
+# 创建hncscwc消费者组, 并从2号分区 偏移量为1的位置开始消费 2条消息
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --group hncscwc --partition 2 --offset 1 --max-messages 2
 ```
 - --from-beginning 读取主题中所有的数据
 -  --partition 从指定的分区消费消息
@@ -336,6 +336,44 @@ $ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test -
 - --group 以指定消费者组的形式消费消息
 - --max-messages 指定消费消息的最大个数
 - --zookeeper已经被弃用 改为 --bootstrap-server参数
+
+在创建consumer时指定消费组
+```
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning --consumer-property group.id=test-group1
+```
+
+查询consumer消费信息
+```
+在kafka 0.9版本之后，kafka的consumer group和offset信息就不保存在zookeeper中了。因此我们要查看所有消费组，我们得先区分kafka版本：
+
+#0.9版本之前kafka查看所有消费组
+# ./kafka-consumer-groups.sh --zookeeper localhost:2181 --list
+
+# 0.9及之后版本kakfa查看所有消费组
+# kafka-consumer-groups.sh --new-consumer --bootstrap-server localhost:9092 --list 
+
+# 2.4.0版本已经不支持--new-consumer选项
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+console-consumer-54559
+console-consumer-97891
+test-group2
+test-group1
+console-consumer-81258
+```
+
+```
+# 0.9版本之前kafka查看consumer的消费情况
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper localhost:2181 --group logstash-new
+
+# 0.9及之后版本kakfa查看consumer消费情况
+# bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server localhost:9092 --describe --group console-consumer-99512
+
+# 说明2.4.0版本已经不支持--new-consumer选项
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group test-group1
+Consumer group 'test-group1' has no active members.
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+test-group1     test-ken-io     0          10              10              0               -               -            
+```
 
 5、增加partitions分区数
 ```
