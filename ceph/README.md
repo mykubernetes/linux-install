@@ -8,6 +8,7 @@
 | 博客 | https://www.jianshu.com/u/e2dfdb98f630 |
 | 书 | https://www.kancloud.cn/willseecloud/ceph/1788233 |
 | 书 | https://www.bookstack.cn/read/zxj_ceph/deploy |
+| 如何计算 Ceph 读写性能 | https://blog.ucloud.cn/archives/3434?tdsourcetag=s_pcqq_aiomsg |
 
 # Ceph核心概念
 ## RADOS
