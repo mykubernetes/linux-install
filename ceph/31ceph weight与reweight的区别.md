@@ -1,4 +1,4 @@
-1. ceph weight和reweight的区别
+# ceph weight和reweight的区别
 
 用ceph osd tree命令查看ceph集群，会发现有weight和reweight两个值：
 ```
