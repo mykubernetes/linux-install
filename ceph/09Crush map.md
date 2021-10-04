@@ -253,10 +253,148 @@ step emit                              # 提交
 - step choose firstn `<num>` type `<bucket-type>`： 为一个桶类型，选择存储数，
 - step emit： 这首先输出当前值并清空堆栈。这通常在规则的末尾使用.
 
+# 特定OSD上创建 Ceph 池
+
+1、实验介绍
+
+创建一个名为ssd-pool SSD磁盘支持的池，以及另一个名为sata-pool SATA的池，该池由SATA磁盘支持。为此，我们将编辑CRUSH地图并进行必要的配置。
+- 假设 osd.0、osd.3、osd.6是 SSD 磁盘，osd.1、osd.5、osd.7是 SATA 磁盘
+
+2、编译 crush map
+
+（1）获取当前的 Crush map 并对其反编译
+```
+$ ceph osd getcrushmap -o crushmapdump
+18
+$ crushtool -d crushmapdump -o crushmapdump-decompiled
+```
+
+（2）编辑 crushmapdump-decompiled map 文件
+```
+$ vim crushmapdump-decompiled
+# begin crush map
+...
+root ssd {
+        id -9
+        id -10
+        alg straw2
+        hash 0
+        item osd.0 weight 0.010
+        item osd.3 weight 0.010
+        item osd.6 weight 0.010
+}
+root sata {
+        id -11
+        id -12
+        alg straw2
+        hash 0
+        item osd.1 weight 0.010
+        item osd.4 weight 0.010
+        item osd.7 weight 0.010
+}
+...
+rule ssd-pool {
+        id 1
+        type replicated
+        min_size 1
+        max_size 10
+        step take ssd
+        step chooseleaf firstn 0 type osd
+        step emit
+}
+rule sata-pool {
+        id 3
+        type replicated
+        min_size 1
+        max_size 10
+        step take sata
+        step chooseleaf firstn 0 type osd
+        step emit
+}
+# end crush map
+```
+- 上面分别创建了 ssd 和 sata 条目，然后创建了两条 rule,分别指向 两个条目。
+
+（3）Ceph集群中编译并注入新的CRUSH映射
+```
+$ crushtool -c crushmapdump-decompiled -o crushmapdump-compiled
+
+$ ceph osd setcrushmap -i crushmapdump-compiled
+
+$ ceph osd tree                  # 查看应用后的 OSD 树状图
+ID  CLASS WEIGHT  TYPE  NAME  STATUS  REWEIGHT  PRI-AFF
+-12       0.02998 root  sata
+  1   hdd 0.00999       osd.1    up    1.00000  1.00000
+  4   hdd 0.00999       osd.4    up    1.00000  1.00000
+  7   hdd 0.00999       osd.7    up    1.00000  1.00000
+-10     0.02998   root ssd
+  0   hdd 0.00999       osd.0    up    1.00000  1.00000
+  3   hdd 0.00999       osd.3    up    1.00000  1.00000
+  6   hdd 0.00999       osd.6    up    1.00000  1.00000
+-1        0.35097 root default
+-3        0.11699 host c720102
+  0   hdd 0.03899       osd.0    up    1.00000  1.00000
+  3   hdd 0.03899       osd.3    up    1.00000  1.00000
+  6   hdd 0.03899       osd.6    up    1.00000  1.00000
+...
+```
+
+3、创建池验证
+
+（1）创建 ssd-pool
+```
+ceph osd pool create ssd-pool 8 8
+ceph osd pool create sata-pool 8 8
+```
+
+(2)验证存储池，crush_rule默认是0
+```
+# ceph osd dump | grep -i ssd
+pool 8 'ssd-pool' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_nus hashpspool stripe_width 0
+
+# ceph osd dump|grep -i sata
+pool 9 'sata-pool' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_num 8 last_change 95 flags hashpspool stripe_width 0
+```
+
+（3）更改存储池规则
+```
+# 修改ssd存储池规则
+# ceph osd pool set ssd-pool crush_rule ssd-pool
+set pool 8 crush_rule to ssd-pool
+# ceph osd dump | grep -i ssd
+pool 8 'ssd-pool' replicated size 3 min_size 2 crush_rule 1 object_hash rjenkins pg_num 8 pgp_num 8 last_change 93 flags hashpspool stripe_width 0
+
+# 修改stat存储池规则
+# ceph osd pool set sata-pool crush_rule sata-pool
+set pool 9 crush_rule to sata-pool
+# ceph osd dump|grep -i sata
+pool 9 'sata-pool' replicated size 3 min_size 2 crush_rule 3 object_hash rjenkins pg_num 8 pgp_num 8 last_change 99 flags hashpspool stripe_width 0
+```
+
+（4）添加一些对象，查看放置的对象存储在自定义的osd上
+```
+# rados -p ssd-pool ls                                   # 由于我们还没放置任何对象，应该为空
+# rados -p sata-pool ls
+# rados -p ssd-pool put dummy_object1 /etc/hosts         # 上传文件到存储池
+# rados -p sata-pool put dummy_object1 /etc/hosts
+
+# rados -p ssd-pool ls                                   # 查看存储池的对象
+dummy_object1
+# rados -p sata-pool ls
+dummy_object1
+
+# ceph osd map ssd-pool dummy_object1                    # 查看对象是否存储在我们定义的 OSD 上
+osdmap e101 pool 'ssd-pool' (8) object 'dummy_object1' -> pg 8.71968e96 (8.6) -> up ([0,6,3], p0) acting ([0,6,3], p0)
+# ceph osd map sata-pool dummy_object1
+osdmap e101 pool 'sata-pool' (9) object 'dummy_object1' -> pg 9.71968e96 (9.6) -> up ([4,1,7], p4) acting ([4,1,7], p4)
+```
+- 创建的对象ssd-pool实际上存储在OSD集上 [0，6，3] ，并且创建的对象sata-pool存储在OSD集上 [4，1，7] 此输出是预期的，它验证我们创建的池使用我们请求的正确OSD集。这种类型的配置在生产设置中非常有用，您可以在其中创建仅基于SSD的快速池，以及基于机械磁盘的中/慢性池。
+
+
 
 # ceph Luminous新功能之crush class
 	
-# CRUSH devices class
+## CRUSH devices class
 
 - 这么做是为ceph不同类型的设备（HDD,SSD,NVMe）提供一个合理的默认，以便用户不必自己手动编辑指定。这相当于给磁盘组一个统一的class标签，根据class创建rule，然后根据role创建pool，整个操作不需要手动修改crushmap。
 
@@ -465,7 +603,7 @@ osdmap e46 pool 'testpool' (7) object 'object1' -> pg 7.bac5debc (7.3c) -> up ([
 ```
 
 
-
+# 完整版crush map示例
 ```
 # begin crush map
 tunable choose_local_tries 0
