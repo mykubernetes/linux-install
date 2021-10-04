@@ -87,19 +87,62 @@ Crush map 编辑
 3、此时，可以在编辑器中编辑了  
 ```
 # vim crushmap_decompiled_file
+```
 
-# begin crush map 选择存放副本位置时的选择算法策略中的变量配置
+1)tunable（可调参数）
+```
+# begin crush map                     # 选择存放副本位置时的选择算法策略中的变量配置
 tunable choose_local_tries 0
 tunable choose_local_fallback_tries 0
 tunable choose_total_tries 50
 tunable chooseleaf_descend_once 1
+tunable chooseleaf_vary_r 1
+tunable chooseleaf_stable 1
 tunable straw_calc_version 1
+tunable allowed_bucket_algs 54
+```
 
+从版本v0.74开始，如果当前CRUSH可调参数不包含default配置文件中的所有最佳值，Ceph将发出运行状况警告。要使此警告消失，您有两种选择：  
+
+方法一：切换为最优版  
+```
+# ceph osd crush tunables optimal
+```  
+
+方法二：不让它警告  
+```
+## 在 ceph.conf [mon] 部分 添加
+mon warn on legacy crush tunables = false
+
+## 使用命令立即生效
+ceph tell mon.\* config set mon_warn_on_legacy_crush_tunables false
+```  
+
+可调参数最简单的使用方法，就是使用 crush 内置的配置文件  
+- legacy：来自argonaut和更早的遗留行为。
+- argonaut：原始argonaut版本支持的遗留值
+- bobtail：bobtail发行版支持的值
+- firefly：firefly发行版支持的值
+- hammer：锤子释放支持的值
+- jewel：宝石版本支持的值
+- optimal：当前版本Ceph的最佳（即最佳）值
+- default：默认为default。这些值取决于当前版本的Ceph，是硬编码的，通常是最佳值和传统值的混合。这些值通常与optimal之前LTS版本的配置文件相匹配，或者通常与我们通常除了更多用户拥有最新客户端的最新版本匹配。
+
+设置  
+```
+# ceph osd crush tunables {PROFILE}
+# ceph osd crush show-tunables          # 查看目前使用的参数
+```  
+- 请注意，这可能会导致一些数据移动。
+
+2）devices（设备）
+```
 # devices              # 一般指的是叶子节点osd
 device 0 osd.0
 device 1 osd.1
 device 2 osd.2
-
+```
+```
 # types                   # 树形下的多种类型
 type 0 osd                # osd守护进程，一般一个osd对应一个磁盘
 type 1 host               # 一个包含一个或多个osds的主机名，表示是一个主机。
@@ -183,49 +226,216 @@ chooseleaf表示选择bucket-type的bucket并选择其的叶子节点（osd）
 # ceph osd setcrushmap -i newcrushmap
 ```
 
-7、 tunable (可调参数)  
-```
-# cat crushmap_compiled_file 
-# begin crush map
-tunable choose_local_tries 0
-tunable choose_local_fallback_tries 0
-tunable choose_total_tries 50
-tunable chooseleaf_descend_once 1
-tunable chooseleaf_vary_r 1
-tunable chooseleaf_stable 1
-tunable straw_calc_version 1
-tunable allowed_bucket_algs 54
-```  
 
-从版本v0.74开始，如果当前CRUSH可调参数不包含default配置文件中的所有最佳值，Ceph将发出运行状况警告。要使此警告消失，您有两种选择：  
-1、方法一：切换为最优版  
-```
-# ceph osd crush tunables optimal
-```  
 
-2、方法二：不让它警告  
-```
-## 在 ceph.conf [mon] 部分 添加
-mon warn on legacy crush tunables = false
-## 使用命令立即生效
-ceph tell mon.\* config set mon_warn_on_legacy_crush_tunables false
-```  
 
-可调参数最简单的使用方法，就是使用 crush 内置的配置文件  
-- legacy：来自argonaut和更早的遗留行为。
-- argonaut：原始argonaut版本支持的遗留值
-- bobtail：bobtail发行版支持的值
-- firefly：firefly发行版支持的值
-- hammer：锤子释放支持的值
-- jewel：宝石版本支持的值
-- optimal：当前版本Ceph的最佳（即最佳）值
-- default：从头开始安装的新群集的默认值。这些值取决于当前版本的Ceph，是硬编码的，通常是最佳值和传统值的混合。这些值通常与optimal之前LTS版本的配置文件相匹配，或者通常与我们通常除了更多用户拥有最新客户端的最新版本匹配。
+# CRUSH devices class
 
-设置  
+- 这么做是为ceph不同类型的设备（HDD,SSD,NVMe）提供一个合理的默认，以便用户不必自己手动编辑指定。这相当于给磁盘组一个统一的class标签，根据class创建rule，然后根据role创建pool，整个操作不需要手动修改crushmap。
+
+
+1、创建两个 class
 ```
-# ceph osd crush tunables {PROFILE}
-# ceph osd crush show-tunables #查看目前使用的参数
-```  
+# ceph osd crush class ls
+[]
+# ceph osd crush class create hdd
+created class hdd with id 0 to crush map
+# ceph osd crush class create ssd
+created class ssd with id 1 to crush map
+# ceph osd crush class ls
+[
+    "hdd",
+    "ssd"
+]
+```
+
+
+2、根据class，可以对osd进行以下两种操作
+
+1）部署OSD时指定 class，比如，指定部署磁盘所在的 OSD 到指定 class 中
+```
+ceph-disk prepare --crush-device-class <class> /dev/XXX
+```
+
+2）将现有 osd 加入到指定 class 中，命令如下
+```
+ceph osd crush set-device-class osd.<id> <class>
+```
+
+**以下对第二种操作进行实验，也是使用最多的**
+
+1、当前OSD 分布
+```
+# ceph osd tree
+ID WEIGHT  TYPE NAME          UP/DOWN REWEIGHT PRIMARY-AFFINITY
+-1 0.05814 root default
+-2 0.01938     host luminous0
+ 1 0.00969         osd.1           up  1.00000          1.00000
+ 5 0.00969         osd.5           up  1.00000          1.00000
+-3 0.01938     host luminous2
+ 0 0.00969         osd.0           up  1.00000          1.00000
+ 4 0.00969         osd.4           up  1.00000          1.00000
+-4 0.01938     host luminous1
+ 2 0.00969         osd.2           up  1.00000          1.00000
+ 3 0.00969         osd.3           up  1.00000          1.00000
+```
+ 
+
+2、为class添加osd，将0、1、2分到hdd class，3、4、5分到ssd class
+```
+# for i in 0 1 2; do ceph osd crush set-device-class osd.$i hdd; done
+set-device-class item id 3 name 'osd.0' device_class hdd
+set-device-class item id 4 name 'osd.1' device_class hdd
+set-device-class item id 5 name 'osd.2' device_class hdd
+
+# for i in 3 4 5; do ceph osd crush set-device-class osd.$i ssd; done
+set-device-class item id 3 name 'osd.3' device_class ssd
+set-device-class item id 4 name 'osd.4' device_class ssd
+set-device-class item id 5 name 'osd.5' device_class ssd
+```
+
+3、再查看osd分布
+```
+# ceph osd tree
+ID  WEIGHT  TYPE NAME              UP/DOWN REWEIGHT PRIMARY-AFFINITY
+-12 0.02907 root default~ssd
+ -9 0.00969     host luminous0~ssd
+  5 0.00969         osd.5               up  1.00000          1.00000
+-10 0.00969     host luminous2~ssd
+  4 0.00969         osd.4               up  1.00000          1.00000
+-11 0.00969     host luminous1~ssd
+  3 0.00969         osd.3               up  1.00000          1.00000
+ -8 0.02907 root default~hdd
+ -5 0.00969     host luminous0~hdd
+  1 0.00969         osd.1               up  1.00000          1.00000
+ -6 0.00969     host luminous2~hdd
+  0 0.00969         osd.0               up  1.00000          1.00000
+ -7 0.00969     host luminous1~hdd
+  2 0.00969         osd.2               up  1.00000          1.00000
+ -1 0.05814 root default
+ -2 0.01938     host luminous0
+  1 0.00969         osd.1               up  1.00000          1.00000
+  5 0.00969         osd.5               up  1.00000          1.00000
+ -3 0.01938     host luminous2
+  0 0.00969         osd.0               up  1.00000          1.00000
+  4 0.00969         osd.4               up  1.00000          1.00000
+ -4 0.01938     host luminous1
+  2 0.00969         osd.2               up  1.00000          1.00000
+  3 0.00969         osd.3               up  1.00000          1.00000
+```
+
+4、创建rule
+```
+# ceph osd crush rule create-simple hdd-rule default~ssd host firstn
+Invalid command:  invalid chars ~ in default~ssd
+osd crush rule create-simple <name> <root> <type> {firstn|indep} :  create crush rule <name> to start from <root>, replicate across buckets of type <type>, using a choose mode of <firstn|indep> (default firstn; indep best for erasure pools)
+Error EINVAL: invalid command
+```
+
+5、这里出现错误，我在想，是不是 class name 不用带上 default~ 这个符号，于是
+```
+# ceph osd crush rule create-simple hdd-rule ssd host firstn
+Error ENOENT: root item ssd does not exist
+```
+- 依然出错，这是个bug，还在 merge 中,先跳过这个直接创建rule关联class的命令，后续BUG修复了再来实验
+
+6、手动来创建rule
+
+6.1、首先查看当前rule的状况
+```
+# ceph osd crush rule ls
+[
+    "replicated_rule"
+]
+```
+- 只有一个默认的rule
+
+6.2、第一步：获取crushmap *
+```
+# ceph osd getcrushmap -o c1
+11
+```
+
+6.3、第二步：反编译crushmap
+```
+# crushtool -d c1 -o c2.txt
+```
+
+6.4、编辑crushmap
+```
+# vim c2.txt
+# 在 # rule 那一栏 replicated_rule 的后面添加 hdd_rule 和 ssd_rule
+# rules
+rule replicated_rule {
+        ruleset 0
+        type replicated
+        min_size 1
+        max_size 10
+        step take default
+        step chooseleaf firstn 0 type host
+        step emit
+}
+
+rule hdd_rule {
+        ruleset 1
+        type replicated
+        min_size 1
+        max_size 10
+        step take default class hdd
+        step chooseleaf firstn 0 type osd
+        step emit
+}
+
+rule ssd_rule {
+        ruleset 2
+        type replicated
+        min_size 1
+        max_size 10
+        step take default class ssd
+        step chooseleaf firstn 0 type osd
+        step emit
+}
+```
+
+6.5、第三步：编译crushmap
+```
+# crushtool -c c2.txt -o c1.new
+```
+
+6.6、第四步：注入crushmap
+```
+# ceph osd setcrushmap -i c1.new
+12
+```
+
+6.7、此时，查看rule
+```
+# ceph osd crush rule ls
+[
+    "replicated_rule",
+    "hdd_rule",
+    "ssd_rule"
+]
+```
+
+有了新创建的两个rule，测试一下，rule 绑定 class是否成功
+
+1、在 ssd_rule 上创建一个 pool
+```
+# ceph osd pool create testpool 64 64 ssd_rule
+pool 'testpool' created
+```
+
+2、写一个对象
+```
+# rados -p testpool put object1 c2.txt
+```
+
+3、查看对象的osdmap
+```
+# ceph osd map testpool object1
+osdmap e46 pool 'testpool' (7) object 'object1' -> pg 7.bac5debc (7.3c) -> up ([5,3,4], p5) acting ([5,3,4], p5)
+```
 
 
 
