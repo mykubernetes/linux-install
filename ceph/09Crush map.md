@@ -308,7 +308,7 @@ root default {
 	alg straw2
 	hash 0	# rjenkins1
 }
-host 00000000-default-172.20.0.17 {
+host 00000000-default-172.16.0.1 {
 	id -3		# do not change unnecessarily
 	id -7 class hdd		# do not change unnecessarily
 	id -23 class ssd		# do not change unnecessarily
@@ -326,16 +326,16 @@ host 00000000-default-172.20.0.17 {
 	item osd.32 weight 10.656
 	item osd.35 weight 10.205
 }
-rack 00000000-default-rack.5AJ01 {
+rack 00000000-default-rack.1D02 {
 	id -4		# do not change unnecessarily
 	id -8 class hdd		# do not change unnecessarily
 	id -24 class ssd		# do not change unnecessarily
 	# weight 108.934
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-172.20.0.17 weight 108.934
+	item 00000000-default-172.16.0.1 weight 108.934
 }
-host 00000000-default-172.20.1.15 {
+host 00000000-default-172.16.1.1 {
 	id -11		# do not change unnecessarily
 	id -13 class hdd		# do not change unnecessarily
 	id -25 class ssd		# do not change unnecessarily
@@ -353,16 +353,16 @@ host 00000000-default-172.20.1.15 {
 	item osd.31 weight 10.986
 	item osd.36 weight 10.409
 }
-rack 00000000-default-rack.5AJ11 {
+rack 00000000-default-rack.1D01 {
 	id -12		# do not change unnecessarily
 	id -14 class hdd		# do not change unnecessarily
 	id -26 class ssd		# do not change unnecessarily
 	# weight 110.164
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-172.20.1.15 weight 110.164
+	item 00000000-default-172.16.1.1 weight 110.164
 }
-host 00000000-default-172.20.0.145 {
+host 00000000-default-172.16.0.2 {
 	id -15		# do not change unnecessarily
 	id -17 class hdd		# do not change unnecessarily
 	id -27 class ssd		# do not change unnecessarily
@@ -380,16 +380,16 @@ host 00000000-default-172.20.0.145 {
 	item osd.33 weight 11.115
 	item osd.37 weight 10.791
 }
-rack 00000000-default-rack.5AJ04 {
+rack 00000000-default-rack.1D03 {
 	id -16		# do not change unnecessarily
 	id -18 class hdd		# do not change unnecessarily
 	id -28 class ssd		# do not change unnecessarily
 	# weight 108.928
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-172.20.0.145 weight 108.928
+	item 00000000-default-172.16.0.2 weight 108.928
 }
-host 00000000-default-172.20.0.18 {
+host 00000000-default-172.16.0.3 {
 	id -19		# do not change unnecessarily
 	id -21 class hdd		# do not change unnecessarily
 	id -29 class ssd		# do not change unnecessarily
@@ -397,7 +397,7 @@ host 00000000-default-172.20.0.18 {
 	alg straw2
 	hash 0	# rjenkins1
 	item osd.3 weight 10.377
-	item osd.7 weight 10.188
+	item osd.7 weight 10.38
 	item osd.11 weight 10.220
 	item osd.15 weight 10.688
 	item osd.19 weight 11.269
@@ -407,14 +407,14 @@ host 00000000-default-172.20.0.18 {
 	item osd.38 weight 11.555
 	item osd.42 weight 11.403
 }
-rack 00000000-default-rack.5AJ02 {
+rack 00000000-default-rack.1D04 {
 	id -20		# do not change unnecessarily
 	id -22 class hdd		# do not change unnecessarily
 	id -30 class ssd		# do not change unnecessarily
 	# weight 108.592
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-172.20.0.18 weight 108.592
+	item 00000000-default-172.16.0.3 weight 108.592
 }
 datacenter 00000000-default-datacenter.lhlt8f {
 	id -5		# do not change unnecessarily
@@ -423,10 +423,10 @@ datacenter 00000000-default-datacenter.lhlt8f {
 	# weight 436.618
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-rack.5AJ01 weight 108.934
-	item 00000000-default-rack.5AJ11 weight 110.164
-	item 00000000-default-rack.5AJ04 weight 108.928
-	item 00000000-default-rack.5AJ02 weight 108.592
+	item 00000000-default-rack.1D02 weight 108.934
+	item 00000000-default-rack.1D01 weight 110.164
+	item 00000000-default-rack.1D03 weight 108.928
+	item 00000000-default-rack.1D04 weight 108.592
 }
 root 00000000-default {
 	id -6		# do not change unnecessarily
@@ -437,7 +437,7 @@ root 00000000-default {
 	hash 0	# rjenkins1
 	item 00000000-default-datacenter.lhlt8f weight 436.618
 }
-host 00000000-fast-172.20.1.15 {
+host 00000000-fast-172.16.1.1 {
 	id -34		# do not change unnecessarily
 	id -38 class hdd		# do not change unnecessarily
 	id -42 class ssd		# do not change unnecessarily
@@ -446,16 +446,16 @@ host 00000000-fast-172.20.1.15 {
 	hash 0	# rjenkins1
 	item osd.40 weight 5.822
 }
-rack 00000000-fast-rack.5AJ11 {
+rack 00000000-fast-rack.1D01 {
 	id -35		# do not change unnecessarily
 	id -39 class hdd		# do not change unnecessarily
 	id -43 class ssd		# do not change unnecessarily
 	# weight 5.822
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-172.20.1.15 weight 5.822
+	item 00000000-fast-172.16.1.1 weight 5.822
 }
-host 00000000-fast-172.20.0.17 {
+host 00000000-fast-172.16.0.1 {
 	id -46		# do not change unnecessarily
 	id -48 class hdd		# do not change unnecessarily
 	id -50 class ssd		# do not change unnecessarily
@@ -464,16 +464,16 @@ host 00000000-fast-172.20.0.17 {
 	hash 0	# rjenkins1
 	item osd.39 weight 5.822
 }
-rack 00000000-fast-rack.5AJ01 {
+rack 00000000-fast-rack.1D02 {
 	id -47		# do not change unnecessarily
 	id -49 class hdd		# do not change unnecessarily
 	id -51 class ssd		# do not change unnecessarily
 	# weight 5.822
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-172.20.0.17 weight 5.822
+	item 00000000-fast-172.16.0.1 weight 5.822
 }
-host 00000000-fast-172.20.0.145 {
+host 00000000-fast-172.16.0.2 {
 	id -52		# do not change unnecessarily
 	id -54 class hdd		# do not change unnecessarily
 	id -56 class ssd		# do not change unnecessarily
@@ -482,16 +482,16 @@ host 00000000-fast-172.20.0.145 {
 	hash 0	# rjenkins1
 	item osd.41 weight 5.822
 }
-rack 00000000-fast-rack.5AJ04 {
+rack 00000000-fast-rack.1D03 {
 	id -53		# do not change unnecessarily
 	id -55 class hdd		# do not change unnecessarily
 	id -57 class ssd		# do not change unnecessarily
 	# weight 5.822
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-172.20.0.145 weight 5.822
+	item 00000000-fast-172.16.0.2 weight 5.822
 }
-host 00000000-fast-172.20.0.18 {
+host 00000000-fast-172.16.0.3 {
 	id -58		# do not change unnecessarily
 	id -60 class hdd		# do not change unnecessarily
 	id -62 class ssd		# do not change unnecessarily
@@ -500,14 +500,14 @@ host 00000000-fast-172.20.0.18 {
 	hash 0	# rjenkins1
 	item osd.43 weight 5.822
 }
-rack 00000000-fast-rack.5AJ02 {
+rack 00000000-fast-rack.1D04 {
 	id -59		# do not change unnecessarily
 	id -61 class hdd		# do not change unnecessarily
 	id -63 class ssd		# do not change unnecessarily
 	# weight 5.822
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-172.20.0.18 weight 5.822
+	item 00000000-fast-172.16.0.3 weight 5.822
 }
 datacenter 00000000-fast-datacenter.lhlt8f {
 	id -36		# do not change unnecessarily
@@ -516,10 +516,10 @@ datacenter 00000000-fast-datacenter.lhlt8f {
 	# weight 23.288
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-rack.5AJ11 weight 5.822
-	item 00000000-fast-rack.5AJ01 weight 5.822
-	item 00000000-fast-rack.5AJ04 weight 5.822
-	item 00000000-fast-rack.5AJ02 weight 5.822
+	item 00000000-fast-rack.1D01 weight 5.822
+	item 00000000-fast-rack.1D02 weight 5.822
+	item 00000000-fast-rack.1D03 weight 5.822
+	item 00000000-fast-rack.1D04 weight 5.822
 }
 root 00000000-fast {
 	id -37		# do not change unnecessarily
