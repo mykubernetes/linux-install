@@ -591,9 +591,15 @@ my-topic                       0          2               4               2     
 my-topic                       1          2               3               1          consumer-1-029af89c-873c-4751-a720-cefd41a669d6   /127.0.0.1                     consumer-1
 my-topic                       2          2               3               1          consumer-2-42c1abd4-e3b2-425d-a8bb-e1ea49b29bb2   /127.0.0.1                     consumer-2
 ```
-- CURRENT-OFFSET: consumer在一个分区的当前消费偏移
-- LOG-END-OFFSET: 一个分区的日志结束的偏移量
-- LAG: consumer消费消息时落后的偏移量(可以理解为未消费的记录条数）
+- TOPIC：该group里消费的topic名称
+- PARTITION：分区编号
+- CURRENT-OFFSET：该分区当前消费到的offset
+- LOG-END-OFFSET：该分区当前latest offset
+- LAG：消费滞后区间，为LOG-END-OFFSET-CURRENT-OFFSET，具体大小需要看应用消费速度和生产者速度，一般过大则可能出现消费跟不上，需要引起应用注意
+- CONSUMER-ID：server端给该分区分配的consumer编号
+- HOST：消费者所在主机
+- CLIENT-ID：消费者id，一般由应用指定
+
 
 如果想控制当前offset，需要注意的是这里面的消息消费过后可能超出了kafka日志留存策略，所以你只能控制到近期仍保留的日志偏移。
 ```
@@ -601,6 +607,32 @@ my-topic                       2          2               3               1     
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group your_consumper_group_name
 ```
 
+# 查看kafka topic的消息offset范围
+
+1、查看各个patition消息的最大Offset
+```
+# bin/kafka-run-class.sh kafka.tools.GetOffsetShell \
+--topic topic_name \
+--time -1 \
+--broker-list host1:9092,host2:9092,host3:9092
+```
+
+2、查看各个partition消息的最小Offset
+```
+# bin/kafka-run-class.sh kafka.tools.GetOffsetShell \
+--topic topic_name \
+--time -2 \
+--broker-list host1:9092,host2:9092,host3:9092
+```
+
+3、计算可消费的消息个数
+```
+# max=`sh kafka-run-class.sh kafka.tools.GetOffsetShell --topic topic_name --time -1 --broker-list host1:9092,host2:9092,host3:9092|awk -F':' '{print $3}'| awk ' { SUM += $1 } END { print SUM }'`
+
+# min=`sh kafka-run-class.sh kafka.tools.GetOffsetShell --topic topic_name --time -2 --broker-list host1:9092,host2:9092,host3:9092|awk -F':' '{print $3}'| awk ' { SUM += $1 } END { print SUM }'`
+
+# echo $(($max-$min))
+```
 
 六、kafka manager安装配置
 ---
