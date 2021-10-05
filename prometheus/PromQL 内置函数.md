@@ -2,45 +2,45 @@
 
 ## 常用的函数
 ```
-abs()                 #绝对值
+abs()                 #绝对值，返回输入向量的所有样本的绝对值。
 absent()              #取布尔值
 ceil()                #向上取整
 changes()             #显示变更次数
 clamp_max()           #当大于最大值时，则为最大值
 clamp_min()           #当小于最小值时，则为最小值
-day_of_month()
-day_of_week()
-days_in_month()
+day_of_month()        #月内的第几天，返回被给定 UTC 时间所在月的第几天。返回值范围：1~31。
+day_of_week()         #周内的第几天，返回被给定 UTC 时间所在周的第几天。返回值范围：0~6，0 表示星期天。
+days_in_month()       #月内共多少天，返回当月一共有多少天。返回值范围：28~31。
 delta()               #计算区间向量里最大最小的差值
-deriv()
-exp()
+deriv()               #计算时间序列的导数
+exp()                 #样本值的e的指数值
 floor()               #向下取整
-histogram_quantile()
-holt_winters()
-hour()
-idelta()
+histogram_quantile()  #百分位计算
+holt_winters()        #平滑因子
+hour()                #一天内的第几个小时，返回被给定UTC时间的当前第几个小时，时间范围：0~23。
+idelta()              #时间范围最后两个指标的差
 increase()            #计算区间向量里最后一个值和第一个值的差值
 irate()               #计算区间向量内最新和最后的瞬时向量的增长率
 label_join()          #新增标签
 label_replace()       #替换标签
-ln()
-log2()
-log10()
-minute()
-month()
+ln()                  #自然对数
+log2()                #二进制对数
+log10()               #十进制对数
+minute()              #当前小时里的第多少分钟,返回给定 UTC 时间当前小时的第多少分钟。结果范围：0~59。
+month()               #第几个月，返回给定 UTC 时间当前属于第几个月，结果范围：0~12。
 predict_linear()      #基于一段时间内的增长值来预测多久后会溢出
 rate()                #计算区间向量里的平均增长率
-resets()
+resets()              #时间范围内数值重置次数
 round()               #四舍五入取整
-scalar()
+scalar()              #转为标量
 sort()                #升序排序
 sort_desc()           #降序排序
 sqrt()                #平方根
-time()
-timestamp()
-vector()
-year()
-<aggregation>_over_time()
+time()                #时间戳，返回从 1970-01-01 到现在的秒数。注意：它不是直接返回当前时间，而是时间戳
+timestamp()           #样本的时间戳，返回向量v中的每个样本的时间戳（从 1970-01-01 到现在的秒数）
+vector()              #转为向量
+year()                #哪一年，返回被给定 UTC 时间的当前年份。
+<aggregation>_over_time()   #聚合时间序列计算
 ```
 
 ## 一.absent() 取布尔值
