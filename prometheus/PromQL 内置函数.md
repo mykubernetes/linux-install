@@ -36,7 +36,7 @@ round()               #四舍五入取整
 scalar()
 sort()                #升序排序
 sort_desc()           #降序排序
-sqrt()
+sqrt()                #平方根
 time()
 timestamp()
 vector()
