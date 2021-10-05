@@ -677,7 +677,8 @@ broker.rack=my-rack-id
 kafka中为broker分配replicas的算法会确保每个broker的leader都会是一个常量，而不管broker的跨rack情况如何。这从整体上保证了集群的平衡。
 
 然而，假如rack之间brokers数量是不相等的，则副本的指定将会是不平衡的。那些brokers数量更少的rack会有更多的replicas，这就意味着会在这些brokers上面存储更多的数据。因此，我们最好保证每个rack上都有相等的broker数量。
-集群之间镜像(mirror)数据
+
+# 集群之间镜像(mirror)数据
 
 为区分单个kafka集群broker节点之间的数据复制，这里我们将集群之间复制(replicate)数据的过程称为mirroring。kafka提供了一个相应的工具来在集群之间进行数据镜像，该工具会从source cluster消费数据，然后发布到destination cluster。这种数据镜像(mirror)的常见使用场景是：在其他的数据中保存一个副本。
 
@@ -689,9 +690,7 @@ source及destination cluster是两个完全独立的entry: 两个集群可以有
 
 如下我们给出一个示例展示如何mirror一个topic:
 ```
-#  bin/kafka-mirror-maker.sh
-      --consumer.config consumer.properties
-      --producer.config producer.properties --whitelist my-topic
+#  bin/kafka-mirror-maker.sh --consumer.config consumer.properties --producer.config producer.properties --whitelist my-topic
 ```
 上面我们注意到使用了`--whitelist`选项来指定topic列表，该选项允许使用任何java风格的正则表达式。因此你可以使用`--whitelist 'A|B'`来mirror topic A以及topic B。或者你也可以使用`--whitelist '*'`来mirror所有的topic。请使用单引号(`''`)把正则表达式括起来，以免shell将其解释为文件路径。此外，为了使用方便我们允许使用,'来代替|用于指定多个topic。之后再配合使用`auto.create.topics.enable=true`，使得在Mirror数据时自动的进行topic数据创建.
 
