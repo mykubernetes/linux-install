@@ -153,7 +153,15 @@ Reassignment of partition heima-par-3 completed successfully
 Reassignment of partition heima-par-0 is still in progress
 Reassignment of partition heima-par-2 is still in progress
 Reassignment of partition heima-par-1 is still in progress
+
+# kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file result.json --verify
+Status of partition reassignment:
+Reassignment of partition heima-par-3 completed successfully
+Reassignment of partition heima-par-0 completed successfully
+Reassignment of partition heima-par-2 completed successfully
+Reassignment of partition heima-par-1 completed successfully
 ```
+- 可以看出，分区正在Reassignment的状态是still in progress；如果分区Reassignment完成则completed successfully
 
 kafka-reassign-partitions.sh工具来重新分布分区。该工具有三种使用模式：
 - generate模式，给定需要重新分配的Topic，自动生成reassign plan（并不执行）
