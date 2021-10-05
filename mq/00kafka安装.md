@@ -259,8 +259,8 @@ kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partit
 | group.initial.rebalance.delay.ms=0 |  |	
 
 ```
-$ cd config/
-$ vim server.properties
+# cd config/
+# vim server.properties
 broker.id=0                              #broker的全局唯一编号，不能重复
 listeners=PLAINTEXT://:9092              #监听所有地址
 port=9092                                #用来监听链接的端口，producer或consumer将在此端口建立连接
@@ -313,7 +313,7 @@ test
 
 3、往topic发送消息
 ```
-$ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
+# bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
 >hello world
 >kafka  kafka
 ```
@@ -337,16 +337,16 @@ $ bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
 - --max-messages 指定消费消息的最大个数
 - --zookeeper已经被弃用 改为 --bootstrap-server参数
 
-在创建consumer时指定消费组
+5、在创建consumer时指定消费组
 ```
 # bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning --consumer-property group.id=test-group1
 ```
 
-查询consumer消费信息
+6、查询consumer消费信息
 ```
 在kafka 0.9版本之后，kafka的consumer group和offset信息就不保存在zookeeper中了。因此我们要查看所有消费组，我们得先区分kafka版本：
 
-#0.9版本之前kafka查看所有消费组
+# 0.9版本之前kafka查看所有消费组
 # ./kafka-consumer-groups.sh --zookeeper localhost:2181 --list
 
 # 0.9及之后版本kakfa查看所有消费组
