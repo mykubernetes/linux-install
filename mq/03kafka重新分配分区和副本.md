@@ -136,7 +136,7 @@ Proposed partition reassignment configuration
 }
 ```
 
-4）执行副本搬迁
+4) 执行副本搬迁
 ```
 # kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file result.json --execute
 Current partition replica assignment
