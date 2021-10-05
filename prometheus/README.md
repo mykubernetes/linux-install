@@ -2,6 +2,8 @@ https://blog.csdn.net/han949417140/article/details/112462319
 
 https://www.jianshu.com/p/c21d399c140a?utm_campaign=haruki&utm_content=note&utm_medium=reader_share&utm_source=weixin
 
+https://blog.csdn.net/qq_42883074/category_10860341.html
+
 | 名称 | 地址 | 说明 |
 |-----|------|-----|
 | 官方采集组件 | https://prometheus.io/download/ | 包含prometheus、alertmanager、blackbox_exporter、consul_exporter、graphite_exporter、haproxy_exporter、memcached_exporter、mysqld_exporter、node_exporter、pushgateway、statsd_exporter等组件 |
