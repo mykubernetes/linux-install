@@ -247,3 +247,44 @@ Accepted with ID: w1
 ```
 sh stop-all.sh
 ```
+
+
+
+```
+<?xml version="1.0" encoding="UTF-8" ?>  
+<workload name="1mb-64workers-10w-test" description="1mb-64workers-10w-test">  
+  <!--- accesskey/secretkey: 测试账号的一对密钥secretId/secretKey -->
+  <!--- endpoint: 对象存储访问域名  -->
+  <!--- csuffix: 测试账号的appid 1255000033 -->
+  <storage type="s3" config="accesskey=AKID1tRfZ9NHr61f05rMYQzD7hwrSkiMggMi;secretkey=9xRbS0FAl2yaspSkhMluoUw92bqlMcY9;endpoint=http://cos.luohe.csp.cloud.weilongsys.com" />  
+  
+  <workflow>  
+    
+    <workstage name="init">  
+      <work type="init" workers="1" config="cprefix=chen-1255000033;csuffix=-1255000033;containers=r(1,1)" />  
+    </workstage>  
+  
+    <workstage name="write">  
+      <work name="write" workers="64" totalOps="100000">  
+        <operation type="write" config="cprefix=chen-1255000033;csuffix=-1255000033;containers=r(1,1);objects=r(1,100000);sizes=c(1024)KB" />  
+      </work>  
+    </workstage>  
+      
+    <workstage name="read">  
+      <work name="read" workers="64" totalOps="100000">  
+        <operation type="read" config="cprefix=chen-1255000033;csuffix=-1255000033;containers=r(1,1);objects=r(1,100000)" />  
+      </work>  
+    </workstage>    
+  
+    <workstage name="cleanup">  
+      <work type="cleanup" workers="64" config="cprefix=chen-1255000033;csuffix=-1255000033;containers=r(1,1);objects=r(1,100000)" />  
+    </workstage>  
+      
+    <workstage name="dispose">  
+      <work type="dispose" workers="1" config="cprefix=chen-1255000033;csuffix=-1255000033;containers=r(1,1)" />  
+    </workstage>  
+      
+  </workflow>  
+  
+</workload>
+```
