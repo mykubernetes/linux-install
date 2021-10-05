@@ -279,7 +279,94 @@ step emit                              # 提交
 - step choose firstn `<num>` type `<bucket-type>`： 为一个桶类型，选择存储数，
 - step emit： 这首先输出当前值并清空堆栈。这通常在规则的末尾使用.
 
-# 五、自定义OSD上创建Ceph池
+
+# 五、命令创建crush rule示例
+
+1、添加root类型的bucket
+```
+ceph osd crush add-bucket ssd root
+```
+
+2、添加host类型的bucket
+```
+ceph osd crush add-bucket node1-ssd host
+ceph osd crush add-bucket node2-ssd host
+ceph osd crush add-bucket node3-ssd host
+```
+
+3、将host bucket加入到ssd bucket中
+```
+ceph osd crush move node1-ssd root=ssd
+ceph osd crush move node2-ssd root=ssd
+ceph osd crush move node3-ssd root=ssd
+```
+
+4、bucket填充数据，将osd 012移至root ssd
+```
+ceph osd crush move osd.0 host=node1-ssd root=ssd
+ceph osd crush move osd.1 host=node2-ssd root=ssd
+ceph osd crush move osd.2 host=node3-ssd root=ssd
+```
+
+5、修改osd类型
+```
+ceph osd crush rm-device-class osd.0
+ceph osd crush set-device-class ssd osd.0
+
+ceph osd crush rm-device-class osd.1
+ceph osd crush set-device-class ssd osd.1
+
+ceph osd crush rm-device-class osd.2
+ceph osd crush set-device-class ssd osd.2
+```
+
+6、查看osd tree
+```
+# ceph osd tree
+ID  CLASS WEIGHT  TYPE NAME          STATUS REWEIGHT PRI-AFF 
+ -9       0.14699 root ssd                                   
+-10       0.04900     host node1-ssd                         
+  0   ssd 0.04900         osd.0          up  1.00000 1.00000 
+-11       0.04900     host node2-ssd                         
+  1   ssd 0.04900         osd.1          up  1.00000 1.00000 
+-12       0.04900     host node3-ssd                         
+  2   ssd 0.04900         osd.2          up  1.00000 1.00000 
+ -1       0.05699 root default                               
+ -3       0.01900     host node1                             
+  3   hdd 0.01900         osd.3          up  1.00000 1.00000 
+ -5       0.01900     host node2                             
+  4   hdd 0.01900         osd.4          up  1.00000 1.00000 
+ -7       0.01900     host node3                             
+  5   hdd 0.01900         osd.5          up  1.00000 1.00000
+```
+
+7、创建规则
+```
+ceph osd crush rule create-replicated ssd-demo ssd host ssd
+
+# ceph osd crush rule ls
+replicated_rule
+ssd-demo
+
+# ceph osd crush rule dump
+```
+
+8、修改存储池crush rule
+```
+ceph osd pool set ceph-demo crush_rule ssd-demo
+
+# ceph osd pool get ceph-demo crush_rule
+crush_rule: ssd-demo
+
+# rbd -p ceph-demo ls
+crush-demo.img
+
+# ceph osd map ceph-demo crush-demo.img
+osdmap e519 pool 'ceph-demo' (10) object 'crush-demo.img' -> pg 10.d267742c (10.c) -> up ([0,1,2], p0) acting ([0,1,
+```
+
+
+# 六、自定义OSD上创建Ceph池
 
 1、实验介绍
 
@@ -418,7 +505,7 @@ osdmap e101 pool 'sata-pool' (9) object 'dummy_object1' -> pg 9.71968e96 (9.6) -
 
 
 
-# 六、ceph Luminous新功能之crush class
+# 七、ceph Luminous新功能之crush class
 	
 ### CRUSH devices class
 
@@ -628,7 +715,7 @@ pool 'testpool' created
 osdmap e46 pool 'testpool' (7) object 'object1' -> pg 7.bac5debc (7.3c) -> up ([5,3,4], p5) acting ([5,3,4], p5)
 ```
 
-# 七、ceph-创建一个使用该rule-ssd规则的存储池
+# 八、ceph-创建一个使用该rule-ssd规则的存储池
 
 1、实验环境
 ```
