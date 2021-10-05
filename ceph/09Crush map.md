@@ -80,7 +80,7 @@ ceph osd set norecover
 ceph osd set nobackfill
 ceph osd set norebalance
 
-# 创建`crush map`使用ssd作为存储的规则
+# 创建crush map使用ssd作为存储的规则
 ceph osd crush rule create-simple rule-ssd default host
 
 # 将hdd_rule的存储规则切换到ssd_rule
