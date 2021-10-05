@@ -412,34 +412,7 @@ Note: This will have no impact if delete.topic.enable is not set to true.
 ```  
 - 需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
 
-
-分区副本的分配
-- 见官方文档：http://kafka.apache.org/documentation/#topicconfigs
-```
-Configurations pertinent to topics have both a server default as well an
-optional per-topic override. If no per-topic configuration is given the server
-default is used. The override can be set at topic creation time by giving one or
-more --config options. This example creates a topic named my-topic with a custom
-max message size and flush rate:
-
-> bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic my-topic --partitions 1 --replication-factor 1 --config max.message.bytes=64000 --config flush.messages=1
-Overrides can also be changed or set later using the alter configs command. This
-example updates the max message size for my-topic:
-
-> bin/kafka-configs.sh --zookeeper localhost:2181 --entity-type topics --entity-name my-topic --alter --add-config max.message.bytes=128000
-To check overrides set on the topic you can do
-
-> bin/kafka-configs.sh --zookeeper localhost:2181 --entity-type topics --entity-name my-topic --describe
-To remove an override you can do
-
-> bin/kafka-configs.sh --zookeeper localhost:2181 --entity-type topics --entity-name my-topic --alter --delete-config max.message.bytes
-The following are the topic-level configurations. The server's default
-configuration for this property is given under the Server Default Property
-heading. A given server default config value only applies to a topic if it does
-not have an explicit topic config override.
-```
-
-7、查看topic的分区及副本
+6、查看topic的分区及副本
 ```
 kafka-topics.sh --zookeeper node001:2181 --describe --topic test
 Topic:test  PartitionCount:20  ReplicationFactor:3  Configs:
@@ -499,37 +472,99 @@ test0:0:
 #     --time 为 -2时用来请求分区最早有效的offset
 ```
 
-9、显示所有消费者
+# 管理consumer group
+
+- `consumer group`命令行可以list、describe或者delete消费组。`consumer group`可以手工删除，或者是根据日志留存策略在过期后被自动删除。如果要手动删除，那就必须要保证该group当前已经没有活跃的成员(active members)了。
+
+1、列出所有topic的消费组
 ```
 ./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
-# 结果如下
-Note: This will not show information about old Zookeeper-based consumers.
- 
-console-consumer-22568
-hncscwc
+test-consumer-group
 ```
 
-10、检查 consumer  位置
+2、查看消费偏移，可以describe消费组
 ```
-# 这将仅显示使⽤Java consumer API（基于⾮ZooKeeper的 consumer）的 consumer 的信息。
-> bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
-  
-TOPIC       PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG       CONSUMER-ID                                      HOST
-my-topic    0         2              4              2         consumer-1-029af89c-873c-4751-a720-cefd41a669d6  /127.0.0.1
-my-topic    1         2              3              1         consumer-1-029af89c-873c-4751-a720-cefd41a669d6  /127.0.0.1
-my-topic    2         2              3              1         consumer-2-42c1abd4-e3b2-425d-a8bb-e1ea49b29bb2  /127.0.0.1
-
-
-# 这只会显示关于使⽤ZooKeeper的 consumer 的信息（不是那些使⽤Java consumer API的消费者）。
-> bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --describe --group my-group
-TOPIC       PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG       CONSUMER-ID
-my-topic    0         2              4              2         my-group_consumer-1
-my-topic    1         2              3              1         my-group_consumer-1
-my-topic    2         2              3              1         my-group_consumer-2
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                    HOST            CLIENT-ID
+topic3          0          241019          395308          154289          consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer2
+topic2          1          520678          803288          282610          consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer2
+topic3          1          241018          398817          157799          consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer2
+topic1          0          854144          855809          1665            consumer1-3fc8d6f1-581a-4472-bdf3-3515b4aee8c1 /127.0.0.1      consumer1
+topic2          0          460537          803290          342753          consumer1-3fc8d6f1-581a-4472-bdf3-3515b4aee8c1 /127.0.0.1      consumer1
+topic3          2          243655          398812          155157          consumer4-117fe4d3-c6c1-4178-8ee9-eb4a3954bee0 /127.0.0.1      consumer4
 ```
 - CURRENT-OFFSET 表示当前消费的offset
 - LOG-END-OFFSET 表示最新的offset，也就是生产者最新的offset,总共的offset
 - LAG 表示堆积
+
+3、`--members`选项，获取一个`consumer group`中所有的active members。
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --members
+CONSUMER-ID                                    HOST            CLIENT-ID       #PARTITIONS
+consumer1-3fc8d6f1-581a-4472-bdf3-3515b4aee8c1 /127.0.0.1      consumer1       2
+consumer4-117fe4d3-c6c1-4178-8ee9-eb4a3954bee0 /127.0.0.1      consumer4       1
+consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer2       3
+consumer3-ecea43e4-1f01-479f-8349-f9130b75d8ee /127.0.0.1      consumer3       0
+```
+- 上面显示consumer1当前正在消费两个分区，consumer4正在消费1个分区。
+
+4、`--members` `--verbose`选项,在--members选项的基础上，本选项用于列出consumer正在消费哪些分区。
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --members --verbose
+
+CONSUMER-ID                                    HOST            CLIENT-ID       #PARTITIONS     ASSIGNMENT
+consumer1-3fc8d6f1-581a-4472-bdf3-3515b4aee8c1 /127.0.0.1      consumer1       2               topic1(0), topic2(0)
+consumer4-117fe4d3-c6c1-4178-8ee9-eb4a3954bee0 /127.0.0.1      consumer4       1               topic3(2)
+consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer2       3               topic2(1), topic3(0,1)
+consumer3-ecea43e4-1f01-479f-8349-f9130b75d8ee /127.0.0.1      consumer3       0               -
+```
+
+5、`--offsets`选项，这是默认的describe选项，提供的输出与--describe相同。
+
+6、 `--state`选项，提供一些有用的group级别的信息。
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --state
+COORDINATOR (ID)          ASSIGNMENT-STRATEGY       STATE                #MEMBERS
+localhost:9092 (0)        range                     Stable               4
+```
+
+7、 `--delete`选项，手动的删除一个或多个consumer group(s)。
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group my-group --group my-other-group
+Deletion of requested consumer groups ('my-group', 'my-other-group') was successful.
+```
+
+8、如果想要重置一个consumer group的offsets，我们可以使用--reset-offsets选项。本选项只支持一次重置一个consumer group，在重置offsets时还需要指定作用域： --all-topics或--topic。另外，还需要确保在重置是consumer处于Inactive状态。
+
+执行offsets重置时，有3个执行选项：
+- (default): 显示哪些offsets会被重置
+- --execute: 用于执行--reset-offsets进程
+- --export: 将结果导出为CSV格式
+
+--reset-offsets可以通过如下方式来指定要重置到哪个位置：
+```
+--to-datetime <String: datetime>: 将offsets重置指定的日期。日期格式为'YYYY-MM-DDTHH:mm:SS.sss'
+--to-earliest : 重置offsets到earliest
+--to-latest: 重置offsets到latest
+--shift-by <Long: number-of-offsets>: 将offsets重置为当前值+'n'，这里'n'可以可以是正数也可以是负数
+--from-file : 将offsets重置到CSV文件中指定的位置
+--to-current: 将offsets重置到当前位置
+--to-offset: 将offsets重置到一个指定的偏移值
+```
+需要注意的是，如果要重置的offsets已经超出了当前可用的offset，那么就只会被重置为当前可用offset的结尾处。例如，假如offset end是10，我们使用offset shift请求来设置偏移到15，那么最后offset仍只能被重置为10。
+
+如下我们给出一个示例，将一个consumer group的offsets重置为latest:
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --to-latest
+ 
+TOPIC                          PARTITION  NEW-OFFSET
+topic1                         0          0
+```
+
+假如你使用的是较老版本的kafka，那么consumer的消费偏移信息可能存放在zookeeper中，此时你可以传递--zookeeper参数而不是--bootstrap-server参数：
+```
+# bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
+```
 
 
 11、查看topic消费进度
