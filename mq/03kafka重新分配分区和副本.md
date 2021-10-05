@@ -202,3 +202,58 @@ Topic: topic0703    Partition: 0  Leader: 0    Replicas: 0,1,2 Isr: 0,1
 Topic: topic0703    Partition: 1  Leader: 1    Replicas: 0,1,2 Isr: 1,0
 Topic: topic0703    Partition: 2  Leader: 2    Replicas: 0,1,2 Isr: 2,0
 ```
+
+# kafka对topic leader 进行自动负载均衡
+
+在创建一个topic时，kafka尽量将partition均分在所有的brokers上，并且将replicas也j均分在不同的broker上。
+
+每个partitiion的所有replicas叫做”assigned replicas”，”assigned replicas”中的第一个replicas叫”preferred replica”，刚创建的topic一般”preferred replica”是leader。leader replica负责所有的读写。
+
+但随着时间推移，broker可能会停机，会导致leader迁移，导致机群的负载不均衡。我们期望对topic的leader进行重新负载均衡，让partition选择”preferred replica”做为leader。
+
+1、查看topic详情
+```
+./kafka-topics.sh --zookeeper 127.0.0.1:2181 --describe  --topic logdata-es
+
+Topic:logdata-es        PartitionCount:6        ReplicationFactor:2     Configs:
+        Topic: logdata-es       Partition: 0    Leader: 2       Replicas: 3,2   Isr: 2,3
+        Topic: logdata-es       Partition: 1    Leader: 2       Replicas: 5,2   Isr: 2,5
+        Topic: logdata-es       Partition: 2    Leader: 1       Replicas: 4,1   Isr: 1,4
+        Topic: logdata-es       Partition: 3    Leader: 2       Replicas: 5,2   Isr: 2,5
+        Topic: logdata-es       Partition: 4    Leader: 1       Replicas: 1,3   Isr: 1,3
+        Topic: logdata-es       Partition: 5    Leader: 2       Replicas: 2,5   Isr: 2,5
+```
+
+2、编辑相应topic的json文件
+```
+vim logdata-es-autu.json
+{
+ "partitions":
+  [
+    {"topic": "logdata-es", "partition": 0},
+    {"topic": "logdata-es", "partition": 1},
+    {"topic": "logdata-es", "partition": 2},
+    {"topic": "logdata-es", "partition": 3},
+    {"topic": "logdata-es", "partition": 4},
+    {"topic": "logdata-es", "partition": 5}
+  ]
+}
+```
+
+3、执行
+```
+./kafka-preferred-replica-election.sh --zookeeper 127.0.0.1:2181 --path-to-json-file logdata-es-autu.json 
+
+Successfully started preferred replica election for partitions Set([logdata-es,3], [logdata-es,2], [logdata-es,1], [logdata-es,5], [logdata-es,0], [logdata-es,4])
+```
+
+4、之后在查看
+```
+Topic:logdata-es        PartitionCount:6        ReplicationFactor:2     Configs:
+        Topic: logdata-es       Partition: 0    Leader: 3       Replicas: 3,2   Isr: 2,3
+        Topic: logdata-es       Partition: 1    Leader: 5       Replicas: 5,2   Isr: 2,5
+        Topic: logdata-es       Partition: 2    Leader: 4       Replicas: 4,1   Isr: 1,4
+        Topic: logdata-es       Partition: 3    Leader: 5       Replicas: 5,2   Isr: 2,5
+        Topic: logdata-es       Partition: 4    Leader: 1       Replicas: 1,3   Isr: 1,3
+        Topic: logdata-es       Partition: 5    Leader: 2       Replicas: 2,5   Isr: 2,5
+```
