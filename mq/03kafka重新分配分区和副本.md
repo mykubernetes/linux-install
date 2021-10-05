@@ -19,7 +19,7 @@ Topic: heima-par    Partition: 2  Leader: 1    Replicas: 1,0,2 Isr: 1,0,2
 
 3、主题 heima-par 再添加一个分区
 ```
-itcast@Server-node:/mnt/d/kafka-cluster/kafka-1$ bin/kafka-topics.sh --alter --zookeeper localhost:2181 --topic heima-par --partitions 4
+# bin/kafka-topics.sh --alter --zookeeper localhost:2181 --topic heima-par --partitions 4
 WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
 Adding partitions succeeded!
 ```
