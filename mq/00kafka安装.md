@@ -580,6 +580,11 @@ topic1                         0          0
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --shift-by -10
 ```
 
+5、删除group
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group consumergroup1 --delete
+```
+
 # 检查consumer的消费偏移
 
 要查看consumer的消费偏移信息。
@@ -633,6 +638,63 @@ my-topic                       2          2               3               1     
 
 # echo $(($max-$min))
 ```
+
+# 优雅的关闭
+
+kafka集群会自动的侦测任何broker的关闭或者是失效，然后为相应的分区重新选举出新的leader。这在broker因故障失效，或者人为的主动关闭(如进行系统维护），或者配置修改均会触发相应的Leader选举动作。对于后面的一些场景（系统维护、配置修改），kafka支持一种更加优雅的机制来进行关闭，而不是直接将其kill掉。当kafka是被优雅的关闭时，其主要是做了如下两方面的优化：
+- 主动的将日志数据同步到硬盘，以避免在进行重启时需要进行日志恢复（校验日志文件尾部的若干消息的checksum)，从而可以提高系统的启动速度
+- 在broker关闭之前，会迁移Leader是该broker的分区。这可以加快后续相应分区Leader的选举的速度，并降低相应分区处于不可用状态的时间。
+
+无论broker是被优雅的关闭，还是直接kill，都会触发日志的同步。但是受控的Leadership迁移需要如下特殊设置：
+```
+controlled.shutdown.enable=true
+```
+值得注意的是，受控的关闭只在该broker有replicas(即副本数大于等于1，并且至少要有一个副本处于alive状态)的情况下才有效。
+
+# 平衡leadership
+
+无论什么时候一个broker关闭或者崩溃，如果某些partitions的leadership在该broker上，那么将会进行leadship转移。这就意味着在默认情况下，当broker重启，该broker只会成为相应分区的follower，从而不会在该broker上进行任何的读写操作。
+
+为了避免这样导致的不平衡，kafka有一个首选副本的概念。假如某一个分区的副本列表是1、5、9，则node1会更被倾向于成为leader，因为node1排在整个副本列表的首位。你可以运行如下命令，尝试让kafka集群恢复leadership到原来的broker上：
+```
+# bin/kafka-preferred-replica-election.sh --zookeeper zk_host:port/chroot
+```
+由于每次运行此命名可能会十分繁琐，因此我们可以通过如下配置来让kafka自动的来完成：
+```
+auto.leader.rebalance.enable=true
+```
+
+# 跨rack平衡replicas
+
+kafka的rack感知特性(rack awareness feature)分区的副本放到不同的rack上。此扩展保证了kafka能够应对因rack故障导致的broker失效问题，从而降低了数据丢失的风险。
+
+你可以通过broker的配置参数指定broker是属于哪一个特定的rack：
+```
+broker.rack=my-rack-id
+```
+当创建、修改topic，或者replicas redistributed时，此rack参数的限制就会起作用，确保副本之间尽量分布到不同的rack上面。
+
+kafka中为broker分配replicas的算法会确保每个broker的leader都会是一个常量，而不管broker的跨rack情况如何。这从整体上保证了集群的平衡。
+
+然而，假如rack之间brokers数量是不相等的，则副本的指定将会是不平衡的。那些brokers数量更少的rack会有更多的replicas，这就意味着会在这些brokers上面存储更多的数据。因此，我们最好保证每个rack上都有相等的broker数量。
+集群之间镜像(mirror)数据
+
+为区分单个kafka集群broker节点之间的数据复制，这里我们将集群之间复制(replicate)数据的过程称为mirroring。kafka提供了一个相应的工具来在集群之间进行数据镜像，该工具会从source cluster消费数据，然后发布到destination cluster。这种数据镜像(mirror)的常见使用场景是：在其他的数据中保存一个副本。
+
+我们可以运行多个镜像(mirror)进程来增加吞吐率和容错性（假如一个进程失效，则其他的进程将会接管相应的负载）。
+
+kafka-mirror-maker.sh会从source cluster相应的topic中读取数据，然后将其写到destination cluster相同名称的topic中。实际上mirror maker相当于把consumer以及producer相应功能组合到了一起。
+
+source及destination cluster是两个完全独立的entry: 两个集群可以有不同的partitions数量，offsets也会不同。 由于这样的原因，镜像(mirror)一个cluster其实并不能作为一个很好的容错机制，我们还是建议采用使用单个集群内的副本复制。mirror maker进程会使用相同的message key来映射分区，因此消息之间的整体排列还是不会被打乱。
+
+如下我们给出一个示例展示如何mirror一个topic:
+```
+#  bin/kafka-mirror-maker.sh
+      --consumer.config consumer.properties
+      --producer.config producer.properties --whitelist my-topic
+```
+上面我们注意到使用了`--whitelist`选项来指定topic列表，该选项允许使用任何java风格的正则表达式。因此你可以使用`--whitelist 'A|B'`来mirror topic A以及topic B。或者你也可以使用`--whitelist '*'`来mirror所有的topic。请使用单引号(`''`)把正则表达式括起来，以免shell将其解释为文件路径。此外，为了使用方便我们允许使用,'来代替|用于指定多个topic。之后再配合使用`auto.create.topics.enable=true`，使得在Mirror数据时自动的进行topic数据创建.
+
 
 六、kafka manager安装配置
 ---
