@@ -1,6 +1,6 @@
-# 分区重新分配
+# 一、分区重新分配
 
-## 一、条件准备
+## 1、条件准备
 1、创建一个有三个节点的集群
 ```
 bin/kafka-topics.sh --create --zookeeper localhost:2181 --topic heima-par --partitions 3 --replication-factor 3
@@ -17,7 +17,7 @@ Topic: heima-par    Partition: 2  Leader: 1    Replicas: 1,0,2 Isr: 1,0,2
 ```
 - 从上面的输出可以看出heima-par这个主题一共有三个分区，有三个副本
 
-## 二、扩容前准备
+## 2、扩容前准备
 
 1、主题heima-par再添加一个分区
 ```
@@ -48,7 +48,7 @@ Topic: heima-par    Partition: 3  Leader: 2    Replicas: 2,1,0 Isr: 2,1,0
 ```
 - 从上面输出信息可以看出新添加的节点并没有分配之前主题的分区
 
-## 三、重新分配Partition
+## 3、重新分配Partition
 
 1) 将原先分布在broker 1-3节点上的分区重新分布到broker 1-4节点上
 ```
@@ -168,8 +168,8 @@ kafka-reassign-partitions.sh工具来重新分布分区。该工具有三种使�
 - execute模式，根据指定的reassign plan重新分配Partition
 - verify模式，验证重新分配Partition是否成功
 
-修改副本因子
-===
+# 二、修改副本因子
+
 
 1、配置topic的副本，保存为json文件
 ```
@@ -203,7 +203,7 @@ Topic: topic0703    Partition: 1  Leader: 1    Replicas: 0,1,2 Isr: 1,0
 Topic: topic0703    Partition: 2  Leader: 2    Replicas: 0,1,2 Isr: 2,0
 ```
 
-# kafka对topic leader 进行自动负载均衡
+# 三、kafka对topic leader 进行自动负载均衡
 
 在创建一个topic时，kafka尽量将partition均分在所有的brokers上，并且将replicas也j均分在不同的broker上。
 
