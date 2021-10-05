@@ -580,6 +580,28 @@ topic1                         0          0
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --shift-by -10
 ```
 
+# 检查consumer的消费偏移
+
+要查看consumer的消费偏移信息。
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+ 
+TOPIC                          PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG        CONSUMER-ID                                       HOST                           CLIENT-ID
+my-topic                       0          2               4               2          consumer-1-029af89c-873c-4751-a720-cefd41a669d6   /127.0.0.1                     consumer-1
+my-topic                       1          2               3               1          consumer-1-029af89c-873c-4751-a720-cefd41a669d6   /127.0.0.1                     consumer-1
+my-topic                       2          2               3               1          consumer-2-42c1abd4-e3b2-425d-a8bb-e1ea49b29bb2   /127.0.0.1                     consumer-2
+```
+- CURRENT-OFFSET: consumer在一个分区的当前消费偏移
+- LOG-END-OFFSET: 一个分区的日志结束的偏移量
+- LAG: consumer消费消息时落后的偏移量(可以理解为未消费的记录条数）
+
+如果想控制当前offset，需要注意的是这里面的消息消费过后可能超出了kafka日志留存策略，所以你只能控制到近期仍保留的日志偏移。
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group your_consumer_group_name --topic your_topic_name --execute --reset-offsets --to-offset 80
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group your_consumper_group_name
+```
+
+
 六、kafka manager安装配置
 ---
 常用的kafka管理工具
