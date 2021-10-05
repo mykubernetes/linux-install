@@ -291,8 +291,9 @@ group.initial.rebalance.delay.ms=0
 # kafka-server-stop.sh stop
 ```
 
-五、Kafka命令行操作
----
+# 五、Kafka命令行操作
+
+## topic的常用操作
 
 1、创建topic  
 ```
@@ -305,77 +306,48 @@ group.initial.rebalance.delay.ms=0
 - --partitions  定义分区数
 - --config x=y 创建时指定配置
 
-2、查看当前服务器中的所有topic  
+2、常用创建topic参数
+```
+bin/kafka-topics.sh --create \
+--zookeeper $zookeeper_address \
+--topic $topic \
+--replication-factor 3 \
+--partitons 3 \
+--config retention.ms=86400000 \        # topic过期时间，86400000 为一天，单位是毫秒
+--config retention.bytes=1073741824 \   #topic过期时间，86400000 为一天，单位是毫秒
+--if-not-exists
+```
+
+3、查看当前服务器中的所有topic  
 ```
 # bin/kafka-topics.sh --list --zookeeper node001:2181
 test
 ```
 
-3、往topic发送消息
+4、往topic发送消息
 ```
 # bin/kafka-console-producer.sh --broker-list node001:9092 --topic test
 >hello world
 >kafka  kafka
 ```
 
-4、从topic消费消息
+5、从topic消费消息
 ```
-# 老版本
-# bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic test
-# bin/kafka-console-consumer.sh --zookeeper node001:2181 --from-beginning --topic test
-
-#新版本
+# bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --topic test
 # bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic test
 
 # 创建hncscwc消费者组, 并从2号分区 偏移量为1的位置开始消费 2条消息
 # bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --group hncscwc --partition 2 --offset 1 --max-messages 2
 ```
 - --from-beginning 读取主题中所有的数据
--  --partition 从指定的分区消费消息
+- --partition 从指定的分区消费消息
 - --offset 从指定的偏移位置消费消息
 - --group 以指定消费者组的形式消费消息
 - --max-messages 指定消费消息的最大个数
-- --zookeeper已经被弃用 改为 --bootstrap-server参数
+- --zookeeper 0.9之前的版本使用
+- --bootstrap-server 0.9之后的版本使用
 
-5、在创建consumer时指定消费组
-```
-# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning --consumer-property group.id=test-group1
-```
-
-6、查询consumer消费信息
-```
-在kafka 0.9版本之后，kafka的consumer group和offset信息就不保存在zookeeper中了。因此我们要查看所有消费组，我们得先区分kafka版本：
-
-# 0.9版本之前kafka查看所有消费组
-# ./kafka-consumer-groups.sh --zookeeper localhost:2181 --list
-
-# 0.9及之后版本kakfa查看所有消费组
-# kafka-consumer-groups.sh --new-consumer --bootstrap-server localhost:9092 --list 
-
-# 2.4.0版本已经不支持--new-consumer选项
-# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
-console-consumer-54559
-console-consumer-97891
-test-group2
-test-group1
-console-consumer-81258
-```
-
-```
-# 0.9版本之前kafka查看consumer的消费情况
-# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper localhost:2181 --group logstash-new
-
-# 0.9及之后版本kakfa查看consumer消费情况
-# bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server localhost:9092 --describe --group console-consumer-99512
-
-# 说明2.4.0版本已经不支持--new-consumer选项
-# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group test-group1
-Consumer group 'test-group1' has no active members.
-GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
-test-group1     test-ken-io     0          10              10              0               -               -            
-```
-
-5、修改topics
+6、修改topics
 ```
 # kafka-topics.sh --zookeeper node001:2181 --alter --topic test --partitions 40
 WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
@@ -412,7 +384,7 @@ Note: This will have no impact if delete.topic.enable is not set to true.
 ```  
 - 需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
 
-6、查看topic的分区及副本
+7、查看topic的分区及副本
 ```
 kafka-topics.sh --zookeeper node001:2181 --describe --topic test
 Topic:test  PartitionCount:20  ReplicationFactor:3  Configs:
@@ -441,7 +413,6 @@ Topic: test  Partition: 19     Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
 - Leader:1 表示为做为读写的broker的编号
 - Replicas:表示该topic的每个分区在那些borker中保存
 - Isr:表示当前有效的broker, Isr是Replicas的子集
-
 
 8、查看topic消费到的offset
 ```
@@ -476,13 +447,52 @@ test0:0:
 
 - `consumer group`命令行可以list、describe或者delete消费组。`consumer group`可以手工删除，或者是根据日志留存策略在过期后被自动删除。如果要手动删除，那就必须要保证该group当前已经没有活跃的成员(active members)了。
 
-1、列出所有topic的消费组
+1、在创建consumer时指定消费组
+```
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning --consumer-property group.id=test-group1
+```
+
+2、查询consumer消费信息
+
+- 在kafka 0.9版本之后，kafka的consumer group和offset信息就不保存在zookeeper中了。
+
+```
+# 0.9版本之前kafka查看所有消费组
+# ./kafka-consumer-groups.sh --zookeeper localhost:2181 --list
+
+# 0.9及之后版本kakfa查看所有消费组
+# kafka-consumer-groups.sh --new-consumer --bootstrap-server localhost:9092 --list 
+
+# 2.4.0版本已经不支持--new-consumer选项
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+console-consumer-54559
+console-consumer-97891
+test-group2
+test-group1
+console-consumer-81258
+```
+
+```
+# 0.9版本之前kafka查看consumer的消费情况
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper localhost:2181 --group logstash-new
+
+# 0.9及之后版本kakfa查看consumer消费情况
+# bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server localhost:9092 --describe --group console-consumer-99512
+
+# 说明2.4.0版本已经不支持--new-consumer选项
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group test-group1
+Consumer group 'test-group1' has no active members.
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+test-group1     test-ken-io     0          10              10              0               -               -            
+```
+
+3、列出所有topic的消费组
 ```
 ./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 test-consumer-group
 ```
 
-2、查看消费偏移，可以describe消费组
+4、查看消费偏移，可以describe消费组
 ```
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
 TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                    HOST            CLIENT-ID
@@ -497,7 +507,7 @@ topic3          2          243655          398812          155157          consu
 - LOG-END-OFFSET 表示最新的offset，也就是生产者最新的offset,总共的offset
 - LAG 表示堆积
 
-3、`--members`选项，获取一个`consumer group`中所有的active members。
+4.1、`--members`选项，获取一个`consumer group`中所有的active members。
 ```
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --members
 CONSUMER-ID                                    HOST            CLIENT-ID       #PARTITIONS
@@ -508,7 +518,7 @@ consumer3-ecea43e4-1f01-479f-8349-f9130b75d8ee /127.0.0.1      consumer3       0
 ```
 - 上面显示consumer1当前正在消费两个分区，consumer4正在消费1个分区。
 
-4、`--members` `--verbose`选项,在--members选项的基础上，本选项用于列出consumer正在消费哪些分区。
+4.2、`--members` `--verbose`选项,在--members选项的基础上，本选项用于列出consumer正在消费哪些分区。
 ```
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --members --verbose
 
@@ -519,22 +529,22 @@ consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer2       3
 consumer3-ecea43e4-1f01-479f-8349-f9130b75d8ee /127.0.0.1      consumer3       0               -
 ```
 
-5、`--offsets`选项，这是默认的describe选项，提供的输出与--describe相同。
+4.3、`--offsets`选项，这是默认的describe选项，提供的输出与--describe相同。
 
-6、 `--state`选项，提供一些有用的group级别的信息。
+4.4、`--state`选项，提供一些有用的group级别的信息。
 ```
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --state
 COORDINATOR (ID)          ASSIGNMENT-STRATEGY       STATE                #MEMBERS
 localhost:9092 (0)        range                     Stable               4
 ```
 
-7、 `--delete`选项，手动的删除一个或多个consumer group(s)。
+4.5、`--delete`选项，手动的删除一个或多个consumer group(s)。
 ```
 # bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group my-group --group my-other-group
 Deletion of requested consumer groups ('my-group', 'my-other-group') was successful.
 ```
 
-8、如果想要重置一个consumer group的offsets，我们可以使用--reset-offsets选项。本选项只支持一次重置一个consumer group，在重置offsets时还需要指定作用域： --all-topics或--topic。另外，还需要确保在重置是consumer处于Inactive状态。
+4.6、如果想要重置一个consumer group的offsets，可以使用`--reset-offsets`选项。本选项只支持一次重置一个consumer group，在重置offsets时还需要指定作用域：`--all-topics`或`--topic`。另外，还需要确保在重置是consumer处于Inactive状态。
 
 执行offsets重置时，有3个执行选项：
 - (default): 显示哪些offsets会被重置
@@ -551,67 +561,24 @@ Deletion of requested consumer groups ('my-group', 'my-other-group') was success
 --to-current: 将offsets重置到当前位置
 --to-offset: 将offsets重置到一个指定的偏移值
 ```
-需要注意的是，如果要重置的offsets已经超出了当前可用的offset，那么就只会被重置为当前可用offset的结尾处。例如，假如offset end是10，我们使用offset shift请求来设置偏移到15，那么最后offset仍只能被重置为10。
+- 如果要重置的offsets已经超出了当前可用的offset，那么就只会被重置为当前可用offset的结尾处。例如，假如offset end是10，我们使用offset shift请求来设置偏移到15，那么最后offset仍只能被重置为10。
 
-如下我们给出一个示例，将一个consumer group的offsets重置为latest:
+将偏移量设置为最早的
 ```
-# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --to-latest
- 
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --to-earliest --topic topic1
+```
+
+将偏移量设置为最新的
+```
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --to-latest --topic topic1
 TOPIC                          PARTITION  NEW-OFFSET
 topic1                         0          0
 ```
 
-假如你使用的是较老版本的kafka，那么consumer的消费偏移信息可能存放在zookeeper中，此时你可以传递--zookeeper参数而不是--bootstrap-server参数：
+分别将指定主题的指定分区的偏移量向前移动10个消息
 ```
-# bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
+# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --shift-by -10
 ```
-
-
-11、查看topic消费进度
-- 显示出consumer group的offset情况， 必须参数为--group， 不指定--topic，默认为所有topic
-```
-# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker
-required argument: [group] 
-Option Description 
------- ----------- 
---broker-info Print broker info 
---group Consumer group. 
---help Print this message. 
---topic Comma-separated list of consumer 
-   topics (all topics if absent). 
---zkconnect ZooKeeper connect string. (default: localhost:2181)
-Example,
-
-# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group pv
-
-Group           Topic              Pid Offset   logSize    Lag    Owner 
-pv              page_visits        0   21       21         0      none 
-pv              page_visits        1   19       19         0      none 
-pv              page_visits        2   20       20         0      none
-```
-- topic：创建时topic名称
-- pid：分区编号
-- offset：表示该parition已经消费了多少条message
-- logSize：表示该partition已经写了多少条message
-- Lag：表示有多少条message没有被消费。
-- Owner：表示消费者
-
-
-12、常用创建topic参数
-```
-bin/kafka-topics.sh --create \
---zookeeper $zookeeper_address \
---topic $topic \
---replication-factor 1 \
---partitons 32 \
---config retention.ms=86400000 \
---config retention.bytes=1073741824 \
---if-not-exists
-```
-- --config retention.ms=86400000 #topic过期时间，86400000 为一天，单位是毫秒
-- --config retention.bytes=1073741824 # 日志数据存储的最大字节数。超过这个时间会根据policy处理数据。
-
-
 
 六、kafka manager安装配置
 ---
