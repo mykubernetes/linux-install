@@ -16,7 +16,7 @@ pool 7 '00000000-default.rgw.buckets.data' replicated size 3 min_size 2 crush_ru
 
 2、查看存储池有哪些规则
 ```
-# ceph -c $(ls /data/cos/ceph.*.conf | head -1) osd crush rule ls
+# ceph osd crush rule ls
 replicated_rule
 rep_00000000-default_datacenter
 ec_8_3_00000000-default_datacenter
@@ -73,8 +73,32 @@ ec_8_3_00000000-fast_host
 # ceph osd pool set .rgw.root crush_rule rep_0000000-fast_host
 ```
 
+# 二、生成环境存储池迁移
+```
+# 暂时关闭数据迁移
+ceph osd set norecover
+ceph osd set nobackfill
+ceph osd set norebalance
 
-# 二、编辑 Crush map
+# 创建`crush map`使用ssd作为存储的规则
+ceph osd crush rule create-simple rule-ssd default host
+
+# 将hdd_rule的存储规则切换到ssd_rule
+ceph osd pool set ssd_rule crush_rule ssd_rule
+    
+# 观察ceph -s的输出，直到PG状态都离开peering进入active+
+watch ceph -s
+
+# 发动数据迁移
+ceph osd unset norecover
+ceph osd unset nobackfill
+ceph osd unset norebalance
+
+# 观察ceph -s的输出，直到PG状态都离开进入active+clean
+watch ceph -s
+```
+
+# 三、编辑 Crush map
 
 1、从任何Mon节点获取Crush map  
 ```
@@ -108,7 +132,7 @@ ec_8_3_00000000-fast_host
 
 
 
-# 三、Crush map 介绍
+# 四、Crush map 介绍
 
 1)tunable（可调参数）
 ```
@@ -255,7 +279,7 @@ step emit                              # 提交
 - step choose firstn `<num>` type `<bucket-type>`： 为一个桶类型，选择存储数，
 - step emit： 这首先输出当前值并清空堆栈。这通常在规则的末尾使用.
 
-# 四、自定义OSD上创建Ceph池
+# 五、自定义OSD上创建Ceph池
 
 1、实验介绍
 
@@ -394,7 +418,7 @@ osdmap e101 pool 'sata-pool' (9) object 'dummy_object1' -> pg 9.71968e96 (9.6) -
 
 
 
-# 五、ceph Luminous新功能之crush class
+# 六、ceph Luminous新功能之crush class
 	
 ### CRUSH devices class
 
@@ -604,8 +628,258 @@ pool 'testpool' created
 osdmap e46 pool 'testpool' (7) object 'object1' -> pg 7.bac5debc (7.3c) -> up ([5,3,4], p5) acting ([5,3,4], p5)
 ```
 
+# 七、ceph-创建一个使用该rule-ssd规则的存储池
 
-# 六、完整版crush map示例
+1、实验环境
+```
+# cat /etc/redhat-release 
+CentOS Linux release 7.3.1611 (Core) 
+
+# ceph -v
+    ceph version 12.2.1 (3e7492b9ada8bdc9a5cd0feafd42fbca27f9c38e) luminous (stable)
+```
+
+2、修改crush class
+
+2.1、查看当前集群布局
+```
+# ceph osd tree
+ID CLASS WEIGHT  TYPE NAME      STATUS REWEIGHT PRI-AFF 
+-1       0.05878 root default                           
+-3       0.01959     host node1                         
+ 0   hdd 0.00980         osd.0      up  1.00000 1.00000 
+ 3   hdd 0.00980         osd.3      up  1.00000 1.00000 
+-5       0.01959     host node2                         
+ 1   hdd 0.00980         osd.1      up  1.00000 1.00000 
+ 4   hdd 0.00980         osd.4      up  1.00000 1.00000 
+-7       0.01959     host node3                         
+ 2   hdd 0.00980         osd.2      up  1.00000 1.00000 
+ 5   hdd 0.00980         osd.5      up  1.00000 1.00000 
+```
+- 可以看到只有第二列CLASS，只有hdd类型。
+
+通过查看crush class，确实只有hdd类型
+```
+# ceph osd crush class ls
+[
+    "hdd"
+]
+```
+
+2.2、删除osd.0，osd.1，osd.2的class：
+```
+# for i in 0 1 2;do ceph osd crush rm-device-class osd.$i;done
+done removing class of osd(s): 0
+done removing class of osd(s): 1
+done removing class of osd(s): 2
+```
+
+再次通过命令ceph osd tree查看osd.0，osd.1，osd.2的class
+```
+# ceph osd tree
+ID CLASS WEIGHT  TYPE NAME      STATUS REWEIGHT PRI-AFF 
+-1       0.05878 root default                           
+-3       0.01959     host node1                         
+ 0       0.00980         osd.0      up  1.00000 1.00000 
+ 3   hdd 0.00980         osd.3      up  1.00000 1.00000 
+-5       0.01959     host node2                         
+ 1       0.00980         osd.1      up  1.00000 1.00000 
+ 4   hdd 0.00980         osd.4      up  1.00000 1.00000 
+-7       0.01959     host node3                         
+ 2       0.00980         osd.2      up  1.00000 1.00000 
+ 5   hdd 0.00980         osd.5      up  1.00000 1.00000 
+```
+- 可以发现osd.0，osd.1，osd.2的class为空
+
+2.3、设置osd.0，osd.1，osd.2的class为ssd：
+```
+# for i in 0 1 2;do ceph osd crush set-device-class ssd osd.$i;done
+set osd(s) 0 to class 'ssd'
+set osd(s) 1 to class 'ssd'
+set osd(s) 2 to class 'ssd'
+```
+
+再次通过命令ceph osd tree查看osd.0，osd.1，osd.2的class
+```
+# ceph osd tree
+ID CLASS WEIGHT  TYPE NAME      STATUS REWEIGHT PRI-AFF 
+-1       0.05878 root default                           
+-3       0.01959     host node1                         
+ 3   hdd 0.00980         osd.3      up  1.00000 1.00000 
+ 0   ssd 0.00980         osd.0      up  1.00000 1.00000 
+-5       0.01959     host node2                         
+ 4   hdd 0.00980         osd.4      up  1.00000 1.00000 
+ 1   ssd 0.00980         osd.1      up  1.00000 1.00000 
+-7       0.01959     host node3                         
+ 5   hdd 0.00980         osd.5      up  1.00000 1.00000 
+ 2   ssd 0.00980         osd.2      up  1.00000 1.00000 
+```
+- 可以看到osd.0，osd.1，osd.2的class变为ssd
+
+再查看一下crush class：
+```
+# ceph osd crush class ls
+[
+    "hdd",
+    "ssd"
+]
+```
+- 可以看到class中多出了一个名为ssd的class
+
+2.4、创建一个优先使用ssd设备的crush rule
+
+创建了一个rule的名字为：rule-ssd，在root名为default下的rule
+```
+# ceph osd crush rule create-replicated rule-ssd default  host ssd 
+```
+
+查看集群的rule
+```
+# ceph osd crush rule ls
+replicated_rule
+rule-ssd
+```
+- 可以看到多出了一个名为rule-ssd的rule
+
+通过下面的命令下载集群crushmap查看有哪些变化：
+```
+# ceph osd getcrushmap -o crushmap
+20
+
+# crushtool -d crushmap -o crushmap
+
+# cat crushmap
+# begin crush map
+tunable choose_local_tries 0
+tunable choose_local_fallback_tries 0
+tunable choose_total_tries 50
+tunable chooseleaf_descend_once 1
+tunable chooseleaf_vary_r 1
+tunable chooseleaf_stable 1
+tunable straw_calc_version 1
+tunable allowed_bucket_algs 54
+ 
+# devices
+device 0 osd.0 class ssd
+device 1 osd.1 class ssd
+device 2 osd.2 class ssd
+device 3 osd.3 class hdd
+device 4 osd.4 class hdd
+device 5 osd.5 class hdd
+ 
+# types
+type 0 osd
+type 1 host
+type 2 chassis
+type 3 rack
+type 4 row
+type 5 pdu
+type 6 pod
+type 7 room
+type 8 datacenter
+type 9 region
+type 10 root
+     
+# buckets
+host node1 {
+        id -3           # do not change unnecessarily
+        id -4 class hdd         # do not change unnecessarily
+        id -9 class ssd         # do not change unnecessarily
+        # weight 0.020
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.0 weight 0.010
+        item osd.3 weight 0.010
+}
+host node2 {
+        id -5           # do not change unnecessarily
+        id -6 class hdd         # do not change unnecessarily
+        id -10 class ssd                # do not change unnecessarily
+        # weight 0.020
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.1 weight 0.010
+        item osd.4 weight 0.010
+}
+host node3 {
+        id -7           # do not change unnecessarily
+        id -8 class hdd         # do not change unnecessarily
+        id -11 class ssd                # do not change unnecessarily
+        # weight 0.020
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.2 weight 0.010
+        item osd.5 weight 0.010
+}
+root default {
+        id -1           # do not change unnecessarily
+        id -2 class hdd         # do not change unnecessarily
+        id -12 class ssd                # do not change unnecessarily
+        # weight 0.059
+        alg straw2
+        hash 0  # rjenkins1
+        item node1 weight 0.020
+        item node2 weight 0.020
+        item node3 weight 0.020
+}
+ 
+# rules
+rule replicated_rule {
+        id 0
+        type replicated
+        min_size 1
+        max_size 10
+        step take default
+        step chooseleaf firstn 0 type host
+        step emit
+}
+rule rule-ssd {
+        id 1
+        type replicated
+        min_size 1
+        max_size 10
+        step take default class ssd
+        step chooseleaf firstn 0 type host
+        step emit
+}
+ 
+# end crush map
+```
+- 可以看到在root default下多了一行： id -12 class ssd。在rules下，多了一个rule rule-ssd其id为1
+
+5，创建一个使用该rule-ssd规则的存储池：
+```
+# ceph osd pool create ssdpool 64 64 rule-ssd
+pool 'ssdpool' created
+```
+
+查看ssdpool的信息可以看到使用的crush_rule 为1，也就是rule-ssd
+```
+# ceph osd pool ls detail
+pool 1 'ssdpool' replicated size 3 min_size 2 crush_rule 1 object_hash rjenkins pg_num 64 pgp_num 64 last_change 39 flags hashpspool stripe_width 0
+```
+
+6，创建对象测试ssdpool
+
+创建一个对象test并放到ssdpool中
+```
+# rados -p ssdpool ls
+# echo "hahah" >test.txt
+# rados -p ssdpool put test test.txt 
+# rados -p ssdpool ls
+test
+```
+
+查看该对象的osd组
+```
+# ceph osd map ssdpool test
+osdmap e46 pool 'ssdpool' (1) object 'test' -> pg 1.40e8aab5 (1.35) -> up ([1,2,0], p1) acting ([1,2,0], p1)
+```
+可以看到该对象的osd组使用的都是ssd磁盘，至此验证成功。可以看出crush class相当于一个辨别磁盘类型的标签。
+
+
+
+# 八、完整版crush map示例
 ```
 # begin crush map
 tunable choose_local_tries 0
