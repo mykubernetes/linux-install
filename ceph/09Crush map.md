@@ -300,6 +300,7 @@ ceph osd crush move node1-ssd root=ssd
 ceph osd crush move node2-ssd root=ssd
 ceph osd crush move node3-ssd root=ssd
 ```
+- 如果设备被move移动，默认就没有了，可以使用`ceph osd crush link`
 
 4、bucket填充数据，将osd 012移至root ssd
 ```
