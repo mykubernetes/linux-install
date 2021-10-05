@@ -9,7 +9,7 @@
 | 书 | https://www.kancloud.cn/willseecloud/ceph/1788233 |
 | 书 | https://www.bookstack.cn/read/zxj_ceph/deploy |
 | 如何计算 Ceph 读写性能 | https://blog.ucloud.cn/archives/3434?tdsourcetag=s_pcqq_aiomsg |
-
+| 博客 | https://www.cnblogs.com/zphj1987/category/1816548.html?page=1 |
 # Ceph核心概念
 ## RADOS
 >全称Reliable Autonomic Distributed Object Store，即可靠的、自动化的、分布式对象存储系统。RADOS是Ceph集群的精华，用户实现数据分配、Failover等集群操作。
