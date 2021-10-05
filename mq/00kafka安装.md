@@ -296,7 +296,7 @@ group.initial.rebalance.delay.ms=0
 
 1、创建topic  
 ```
-# ./kafka-topics.sh --zookeeper node001:2181 --create --topic test --partitions 20 --replication-factor 3
+# ./kafka-topics.sh --zookeeper node001:2181 --create --topic test --partitions 20 --replication-factor 3 --config max.message.bytes=1048576 --config segment.bytes=10485760
 ```
 - --zookeeper 指定zookeeper的地址，如果zookeeper是集群，可以指定多个zookeeper，也可以只指定一个可用的zookeeper服务地址
 - --create 创建命令
@@ -375,26 +375,43 @@ GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG  
 test-group1     test-ken-io     0          10              10              0               -               -            
 ```
 
-5、增加partitions分区数
+5、修改topics
 ```
 # kafka-topics.sh --zookeeper node001:2181 --alter --topic test --partitions 40
 WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
 Adding partitions succeeded!
 ```
+- partitions的一个使用场景就是对数据进行分区，添加分区数并不会改变已有数据的分区，因此这可能会影响到一些依赖于分区的consumer。因为通常使用hash(key)%number_of_partitions算法来决定数据存放到哪个分区，但是kafka并不会尝试对已存在的数据重新做分区映射。
 
-修改主题
+1）添加configs
 ```
-# kafka-topics.sh --alter --zookeeper localhost:2181 --topic test --config flush.messages=1
-# kafka-topics.sh --alter --zookeeper localhost:2181 --topic test --delete-config flush.messages
+# bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --add-config x=y
+# bin/kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name my_topic_name --alter --add-config x=y
 ```
 
-6、删除topic
+2) 移除config
+```
+# bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --delete-config x
+# bin/kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name my_topic_name --alter --delete-config x
+```
+
+3) 修改topic
+```
+# kafka-topics.sh --zookeeper localhost:2181 --create --topic test --partitions 2 --replication-factor 1
+# kafka-topics.sh --zookeeper localhost:2181 --alter --topic test --config max.message.bytes=1048576
+# kafka-topics.sh --zookeeper localhost:2181 --describe --topic test
+# kafka-topics.sh --zookeeper localhost:2181 --alter --topic test --config segment.bytes=10485760
+# kafka-topics.sh --zookeeper localhost:2181 --alter --delete-config max.message.bytes --topic test
+```
+
+4）删除topic
 ```
 # kafka-topics.sh --zookeeper node001:2181 --delete --topic test
 Topic test is marked for deletion.
 Note: This will have no impact if delete.topic.enable is not set to true.
 ```  
 - 需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
+
 
 分区副本的分配
 - 见官方文档：http://kafka.apache.org/documentation/#topicconfigs
@@ -545,13 +562,7 @@ pv              page_visits        2   20       20         0      none
 - Owner：表示消费者
 
 
-12、增加、删除配置项
-```
-# bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --add-config x=y
-# bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --delete-config x
-```
-
-13、常用创建topic参数
+12、常用创建topic参数
 ```
 bin/kafka-topics.sh --create \
 --zookeeper $zookeeper_address \
