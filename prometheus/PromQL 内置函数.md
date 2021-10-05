@@ -2,46 +2,48 @@ PromQL 内置函数
 ===
 Prometheus 提供了其它大量的内置函数，可以对时序数据进行丰富的处理。某些函数有默认的参数，例如：`year(v=vector(time()) instant-vector)`。其中参数 v 是一个瞬时向量，如果不提供该参数，将使用默认值`vector(time())`。instant-vector 表示参数类型。
 
-abs()
-absent()
-ceil()
-changes()
-clamp_max()
-clamp_min()
+```
+abs()                 #绝对值
+absent()              #取布尔值
+ceil()                #向上取整
+changes()             #显示变更次数
+clamp_max()           #当大于最大值时，则为最大值
+clamp_min()           #当小于最小值时，则为最小值
 day_of_month()
 day_of_week()
 days_in_month()
-delta()
+delta()               #计算区间向量里最大最小的差值
 deriv()
 exp()
-floor()
+floor()               #向下取整
 histogram_quantile()
 holt_winters()
 hour()
 idelta()
-increase()
-irate()
-label_join()
-label_replace()
+increase()            #计算区间向量里最后一个值和第一个值的差值
+irate()               #计算区间向量内最新和最后的瞬时向量的增长率
+label_join()          #新增标签
+label_replace()       #替换标签
 ln()
 log2()
 log10()
 minute()
 month()
-predict_linear()
-rate()
+predict_linear()      #基于一段时间内的增长值来预测多久后会溢出
+rate()                #计算区间向量里的平均增长率
 resets()
-round()
+round()               #四舍五入取整
 scalar()
-sort()
-sort_desc()
+sort()                #升序排序
+sort_desc()           #降序排序
 sqrt()
 time()
 timestamp()
 vector()
 year()
 <aggregation>_over_time()
-
+```
+  
 # abs()
 
 `abs(v instant-vector)` 返回输入向量的所有样本的绝对值。
