@@ -333,13 +333,25 @@ test
 
 5、从topic消费消息
 ```
-# bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --topic test
-# bin/kafka-console-consumer.sh --bootstrap-server node001:9092 --from-beginning --topic test
+# 实时消费
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test
 
-# 创建hncscwc消费者组, 并从2号分区 偏移量为1的位置开始消费 2条消息
-# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --group hncscwc --partition 2 --offset 1 --max-messages 2
+# 从头开始消费
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic test
+
+# 从尾部开始消费
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --offset latest
+
+# 指定分区消费
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --offset latest --partition 1
+
+# 指定消费消息的个数
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --offset latest --partition 1 --max-messages 30
+
+# 创建hncscwc消费者组, 并从2号分区 偏移量为999的位置开始消费 2条消息
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --group hncscwc --partition 2 --offset 999 --max-messages 2
 ```
-- --from-beginning 读取主题中所有的数据
+- --from-beginning 读取主题中所有的数据，从头开始消费
 - --partition 从指定的分区消费消息
 - --offset 从指定的偏移位置消费消息
 - --group 以指定消费者组的形式消费消息
