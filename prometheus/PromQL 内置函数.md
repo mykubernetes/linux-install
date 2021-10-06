@@ -338,7 +338,7 @@ sort_desc(node_filesystem_free_bytes)
 delta(node_memory_MemAvailable_bytes[2m])
 ```
 
-## 十八 increase()
+## 十八 increase()计算区间向量里最后一个值和第一个值的差值
 ```
 #increase函数获取区间向量中的第⼀个和最后⼀个样本值并返回其增⻓量
 increase(node_memory_MemAvailable_bytes[2m])
