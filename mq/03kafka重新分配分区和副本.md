@@ -205,6 +205,19 @@ Topic: topic0703    Partition: 2  Leader: 2    Replicas: 0,1,2 Isr: 2,0
 
 # 三、kafka对topic leader 进行自动负载均衡
 
+
+## 1、指定Topic指定分区用重新PREFERRED：优先副本策略 进行Leader重选举
+```
+# bin/kafka-leader-election.sh --bootstrap-server localhost:9092 --topic test_create_topic4 --election-type PREFERRED --partition 0
+```
+
+## 2、所有Topic所有分区用重新PREFERRED：优先副本策略 进行Leader重选举
+```
+# bin/kafka-leader-election.sh --bootstrap-server localhost:9092 --election-type preferred  --all
+```
+
+##  3、设置配置文件批量指定topic和分区进行Leader重选举
+
 在创建一个topic时，kafka尽量将partition均分在所有的brokers上，并且将replicas也j均分在不同的broker上。
 
 每个partitiion的所有replicas叫做”assigned replicas”，”assigned replicas”中的第一个replicas叫”preferred replica”，刚创建的topic一般”preferred replica”是leader。leader replica负责所有的读写。
@@ -213,7 +226,7 @@ Topic: topic0703    Partition: 2  Leader: 2    Replicas: 0,1,2 Isr: 2,0
 
 1、查看topic详情
 ```
-./kafka-topics.sh --zookeeper 127.0.0.1:2181 --describe  --topic logdata-es
+./kafka-topics.sh --bootstrap-server localhost:9092 --describe  --topic logdata-es
 
 Topic:logdata-es        PartitionCount:6        ReplicationFactor:2     Configs:
         Topic: logdata-es       Partition: 0    Leader: 2       Replicas: 3,2   Isr: 2,3
@@ -242,7 +255,7 @@ vim logdata-es-autu.json
 
 3、执行
 ```
-./kafka-preferred-replica-election.sh --zookeeper 127.0.0.1:2181 --path-to-json-file logdata-es-autu.json 
+./kafka-preferred-replica-election.sh --bootstrap-server localhost:9092 --path-to-json-file logdata-es-autu.json 
 
 Successfully started preferred replica election for partitions Set([logdata-es,3], [logdata-es,2], [logdata-es,1], [logdata-es,5], [logdata-es,0], [logdata-es,4])
 ```
