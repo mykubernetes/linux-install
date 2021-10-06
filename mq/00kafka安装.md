@@ -373,13 +373,26 @@ Adding partitions succeeded!
 # bin/kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name my_topic_name --alter --add-config x=y
 ```
 
-2) 移除config
+2）移除config
 ```
 # bin/kafka-configs.sh --zookeeper node001:2181 --entity-type topics --entity-name my_topic_name --alter --delete-config x
 # bin/kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name my_topic_name --alter --delete-config x
 ```
 
-3) 修改topic
+3）查询config
+```
+# bin/kafka-configs.sh --describe --bootstrap-server localhost:9092 --topic my_topic_name
+或者
+# bin/kafka-configs.sh --describe --bootstrap-server localhost:9092 --entity-type topics --entity-name my_topic_name
+```
+
+4）查询kafka版本信息
+```
+# bin/kafka-configs.sh --describe --bootstrap-server localhost:9092 --version
+```
+
+
+5）修改topic
 ```
 # kafka-topics.sh --zookeeper localhost:2181 --create --topic test --partitions 2 --replication-factor 1
 # kafka-topics.sh --zookeeper localhost:2181 --alter --topic test --config max.message.bytes=1048576
@@ -388,7 +401,7 @@ Adding partitions succeeded!
 # kafka-topics.sh --zookeeper localhost:2181 --alter --delete-config max.message.bytes --topic test
 ```
 
-4）删除topic
+7、删除topic
 ```
 # kafka-topics.sh --zookeeper node001:2181 --delete --topic test
 Topic test is marked for deletion.
@@ -396,7 +409,7 @@ Note: This will have no impact if delete.topic.enable is not set to true.
 ```  
 - 需要server.properties中设置delete.topic.enable=true否则只是标记删除或者直接重启。
 
-7、查看topic的分区及副本
+8、查看topic的分区及副本
 ```
 kafka-topics.sh --zookeeper node001:2181 --describe --topic test
 Topic:test  PartitionCount:20  ReplicationFactor:3  Configs:
@@ -426,7 +439,7 @@ Topic: test  Partition: 19     Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
 - Replicas:表示该topic的每个分区在那些borker中保存
 - Isr:表示当前有效的broker, Isr是Replicas的子集
 
-8、查看topic消费到的offset
+9、查看topic消费到的offset
 ```
 # kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list node001:9092 --topic test0 --time -1
 test0:17:0
