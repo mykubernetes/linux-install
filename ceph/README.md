@@ -10,6 +10,17 @@
 | 书 | https://www.bookstack.cn/read/zxj_ceph/deploy |
 | 如何计算 Ceph 读写性能 | https://blog.ucloud.cn/archives/3434?tdsourcetag=s_pcqq_aiomsg |
 | 博客 | https://www.cnblogs.com/zphj1987/category/1816548.html?page=1 |
+
+
+# ceph最小硬件要求
+
+| **HARDWARE**| **OSD** | **MON** | **RADOSGW** | **MDS** |
+|-------------|---------|---------|-------------|----------|
+| **Processor** | 1X AMD64 or intel 64 | 1X AMD64 or intel 64 | 1X AMD64 or intel 64 | 1X AMD64 or intel 64 |
+| **RAM** | 16GB for the host,plus an additional 2GB of RAM per OSD daemon | 1GB per daemon | 1GB per daemon | 1GB per daemon (but depends heavily on configured MDS cachesize)
+| **Disk** | One storage device per OSD daemon separate from the system disk | 10GB per daemon | 5GB per daemon | 1MB per daemon,plus space for log file(varies) |
+| **Network** | 2x Gigabit Ethernet NICs | 2x Gigabit Ethernet NICs | 2x Gigabit Ethernet NICs | 2x Gigabit Ethernet NICs |
+
 # Ceph核心概念
 ## RADOS
 >全称Reliable Autonomic Distributed Object Store，即可靠的、自动化的、分布式对象存储系统。RADOS是Ceph集群的精华，用户实现数据分配、Failover等集群操作。
