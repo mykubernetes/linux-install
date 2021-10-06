@@ -345,6 +345,9 @@ test
 # 指定分区消费
 # bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --offset latest --partition 1
 
+# 指定分区消费--partition 指定起始偏移量消费--offset 
+# bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --partition 0 --offset 100
+
 # 指定消费消息的个数
 # bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --offset latest --partition 1 --max-messages 30
 
@@ -353,7 +356,7 @@ test
 ```
 - --from-beginning 读取主题中所有的数据，从头开始消费
 - --partition 从指定的分区消费消息
-- --offset 从指定的偏移位置消费消息
+- --offset 执行消费的起始offset位置 
 - --group 以指定消费者组的形式消费消息
 - --max-messages 指定消费消息的最大个数
 - --zookeeper 0.9之前的版本使用
