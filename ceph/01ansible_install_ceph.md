@@ -103,14 +103,14 @@ devices:
  - /dev/sdd
 ```
 
-2、非并置方案：将不同的存储设备用于OSD数据和OSD日志。
+2、非并置方案：将数据盘和日志盘分开，用于存储不同设备的OSD数据和OSD日志。
 ```
 group_vars/osds.yml配置示例：
 osd_scenario: "non-collocated"
-devices:
+devices:                        # 日志盘
  - /dev/sdb
  - /dev/sdc
-dedicated_devices:
+dedicated_devices:              # 数据盘
  - /dev/sdd
  - /dev/sde
 ```
