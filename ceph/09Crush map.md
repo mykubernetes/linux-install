@@ -202,7 +202,6 @@ ceph osd crush tree
 ## 4）buckets（存储桶实例）
 
 ```
-# buckets
 host node65 {
         id -3           # do not change unnecessarily
         id -4 class hdd         # do not change unnecessarily
@@ -229,6 +228,57 @@ root default {
         hash 0  # rjenkins1
         item node65 weight 0.195
         item node66 weight 0.195
+}
+host pig-node65 {
+        id -7           # do not change unnecessarily
+        id -11 class hdd                # do not change unnecessarily
+        # weight 2.000
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.0 weight 1.000
+        item osd.2 weight 1.000
+}
+rack pig-rack1 {
+        id -8           # do not change unnecessarily
+        id -12 class hdd                # do not change unnecessarily
+        # weight 2.000
+        alg straw2
+        hash 0  # rjenkins1
+        item pig-node65 weight 2.000
+}
+host pig-node66 {
+        id -15          # do not change unnecessarily
+        id -17 class hdd                # do not change unnecessarily
+        # weight 2.000
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.1 weight 1.000
+        item osd.3 weight 1.000
+}
+rack pig-rack2 {
+        id -16          # do not change unnecessarily
+        id -18 class hdd                # do not change unnecessarily
+        # weight 2.000
+        alg straw2
+        hash 0  # rjenkins1
+        item pig-node66 weight 2.000
+}
+room pig-room {
+        id -9           # do not change unnecessarily
+        id -13 class hdd                # do not change unnecessarily
+        # weight 4.000
+        alg straw2
+        hash 0  # rjenkins1
+        item pig-rack1 weight 2.000
+        item pig-rack2 weight 2.000
+}
+root piglet {
+        id -10          # do not change unnecessarily
+        id -14 class hdd                # do not change unnecessarily
+        # weight 4.000
+        alg straw2
+        hash 0  # rjenkins1
+        item pig-room weight 4.000
 }
 ```
 - bucket-name： 唯一的存储桶名称。
@@ -339,7 +389,6 @@ step chooseleaf firstn 3 type host
 step emit
 ```
 - 这样在选中一个failure_domain type的bucket后，会递归调用一次choose函数来选择一个该bucket下的OSD。
-
 
 ## 纠删规则
 
