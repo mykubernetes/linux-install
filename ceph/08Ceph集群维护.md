@@ -1,5 +1,5 @@
-flag	介绍
----
+# flag	介绍
+
 
 Ceph是一个分布式系统，旨在从数十个OSD扩展到数千个。维护Ceph集群所需的关键之一是管理其OSD。
 
@@ -39,28 +39,27 @@ $ ceph osd unset norecover
 | full | 标记集群已满，将拒绝任何数据写入，但可读 |
 
 
-节流回填和恢复
----
-如果要在生产峰值中添加新的OSD节点，又希望对客户端IO中产生的影响最小，这时就可以借助以下命令限制回填和恢复。
+# 节流回填和恢复
 
-设置`osd_max_backfills = 1`选项以限制回填线程。可以在`ceph.conf [osd]`部分中添加它，也可以使用以下命令动态设置
+在业务高峰期添加新的OSD节点，又希望对客户端IO中产生的影响最小，这时就可以借助以下命令限制回填和恢复。
 ```
-$ ceph tell osd.* injectargs '--osd_max_backfills 1'
-```
-
-设置`osd_recovery_max_active = 1`选项以限制恢复线程。可以在`ceph.conf [osd]`部分中添加它，也可以使用以下命令动态设置
-```
-$ ceph tell osd.* injectargs '--osd_recovery_max_active 1'
+# vim ceph.conf
+[osd]
+osd_max_backfills = 1                   # 限制回填线程
+osd_recovery_max_active = 1             # 限制恢复线程
+osd_recovery_op_priority = 1            # 降低恢复优先
 ```
 
-设置`osd_recovery_op_priority = 1`选项以降低恢复优先
+通过命令动态设置回填速度
 ```
-$ ceph tell osd.* injectargs '--osd_recovery_op_priority 1'
+# ceph tell osd.* injectargs '--osd_max_backfills 1'
+# ceph tell osd.* injectargs '--osd_recovery_max_active 1'
+# ceph tell osd.* injectargs '--osd_recovery_op_priority 1'
 ```
+- 注意回填和恢复完成后调回之前参数
 
+# OSD	和	PG	修复
 
-OSD	和	PG	修复
----
 ```
 # 这将在指定的OSD上执行修复。
 ceph osd repair
