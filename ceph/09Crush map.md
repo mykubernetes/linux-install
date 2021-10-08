@@ -134,6 +134,14 @@ watch ceph -s
 
 # 四、Crush map 介绍
 
+CRUSH Map主要分为以下几个部分
+- Tunables: 可调整的参数列表（仅一部分，非完整列表）
+- Devices: 存储设备列表，列举了集群中所有的OSD
+- Types: 类型定义，一般0为OSD，其它正整数代表host、chassis、rack等
+- Buckets: 容器列表，指明了每个bucket下直接包含的children项及其权重值（非OSD的items统称为bucket）
+- Rules: 规则列表，每个规则定义了一种选取OSD的方式
+
+
 1)tunable（可调参数）
 ```
 # begin crush map                     # 选择存放副本位置时的选择算法策略中的变量配置
