@@ -141,8 +141,7 @@ CRUSH Map主要分为以下几个部分
 - Buckets: 容器列表，指明了每个bucket下直接包含的children项及其权重值（非OSD的items统称为bucket）
 - Rules: 规则列表，每个规则定义了一种选取OSD的方式
 
-
-1)tunable（可调参数）
+## 1)tunable（可调参数）
 ```
 # begin crush map                     # 选择存放副本位置时的选择算法策略中的变量配置
 tunable choose_local_tries 0
@@ -188,7 +187,7 @@ ceph tell mon.\* config set mon_warn_on_legacy_crush_tunables false
 ```  
 - 请注意，这可能会导致一些数据移动。
 
-2）devices（设备）
+## 2）devices（设备）
 - 包含集群中所有 OSD 设备列表。OSD 是与ceph-osd守护程序对应的物理磁盘。要将PG映射到OSD设备，CRUSH需要OSD设备列表。
 ```
 # devices
@@ -225,7 +224,7 @@ type 10 root              # 根
 ceph osd crush tree
 ```
 
-4）buckets（存储桶实例）
+## 4）buckets（存储桶实例）
 
 ```
 # buckets
@@ -269,21 +268,39 @@ root default {
 - hash： 每个桶使用哈希算法。0为默认设置，即 rjenkins1
 - item： 桶可能有一个或多个项目。这些项目可能包含节点桶或叶子
 
-5）rules（规则）
+## 5）rules（规则）
 - CRUSH map 包含CRUSH规则确定池的数据放置。顾名思义，这些是定义池属性和数据存储在池中的方式的规则。它们定义了允许CRUSH在Ceph集群中存储对象的复制和放置策略。默认CRUSH映射包含默认池的规则，即rbd。
 
 ```
-# rules                                # 副本选取规则的设定
-rule replicated_ruleset {              # rule的名称
-ruleset 0                              # rule编号
-type replicated                        # replicated代表适用于副本池，erasure代表适用于EC池
-min_size 1                             # 副本数最小值
-max_size 10                            # 副本数最大值
-step take default                      # 选择一个root bucket，做下一步的输入
-step choose firstn  1 type row         # 选择一个row，同一排
-step choose firstn  3 type cabinet     # 选择三个cabinet, 三副本分别在不同的cabinet
-step choose firstn  1 type osd         # 在上一步输出的三个cabinet中，分别选择一个osd
-step emit                              # 提交
+# rules
+rule replicated_rule {                         # rule的名称
+        id 0                                   # rule ID
+        type replicated                        # replicated代表适用于副本池，erasure代表适用于EC池
+        min_size 1                             # 副本数最小值
+        max_size 10                            # 副本数最大值
+        step take default                      # 选择一个root bucket，做下一步的输入
+        step chooseleaf firstn 0 type host     # 选择host级别到一个osd
+        step emit                              # 提交
+}
+rule pig-rep {
+        id 1
+        type replicated
+        min_size 1
+        max_size 10
+        step take piglet
+        step chooseleaf firstn 0 type rack
+        step emit
+}
+rule my-ec3 {
+        id 2
+        type erasure
+        min_size 3
+        max_size 5
+        step set_chooseleaf_tries 5
+        step set_choose_tries 100
+        step take piglet
+        step chooseleaf indep 0 type rack
+        step emit
 }
 # end crush map
 ```
@@ -302,8 +319,9 @@ step emit                              # 提交
   - <4>: failure domain
     - 指定故障域类型；CRUSH确保同一故障域最多只会被选中一次。
 
-Rule执行流程
+## Rule执行流程
 
+1、osd级别，数据寻址
 ```
 # rule
 step take default
@@ -317,6 +335,7 @@ rep=2, host=ceph0, go deeper -> osd=osd.1, OK
 ```
 - 最后选中了同一个host ceph0下的两个OSD。在实际应用中，通常不会以OSD为故障域，而是使用高级的bucket（如host，rack）等作为故障域
 
+2、host级别数据寻址
 ```
 # rule
 step take default
@@ -329,7 +348,7 @@ rep=2, host=ceph2, OK
 ```
 - 最后只选到了host而没有OSD，那么数据的最终存放位置并没有确定，这个rule的设置不合理。
 
-再增加一步choose
+3、host级别数据寻址到指定osd,再增加一步choose
 ```
 step take default
 step choose firstn 3 type host
@@ -338,7 +357,7 @@ step emit
 ```
 新增的一步会在上述基础上，再以每个选中的host为起点，在host下选择1个OSD。另一个更方便的方案
 
-使用chooseleaf
+4、精简写法同上一样，使用chooseleaf
 ```
 step take default
 step chooseleaf firstn 3 type host
@@ -346,6 +365,54 @@ step emit
 ```
 - 这样在选中一个failure_domain type的bucket后，会递归调用一次choose函数来选择一个该bucket下的OSD。
 
+
+## 纠删规则
+
+1、配置纠删规则
+```
+ceph osd erasure-code-profile set my-ec3 k=3 m=2 ruleset-failure-domain=rack crush-root=piglet
+```
+
+2、查看纠删配置：
+```
+# ceph osd erasure-code-profile get my-ec3
+crush-device-class=
+crush-failure-domain=rack
+crush-root=piglet
+jerasure-per-chunk-alignment=false
+k=3
+m=2
+plugin=jerasure
+technique=reed_sol_van
+w=8
+```
+
+3、创建crush map规则
+```
+# ceph osd crush rule create-erasure {rule_name} {ec-profile}
+# ceph osd crush rule create-erasure my-ec3  my-ec3
+```
+
+4、创建副本池
+```
+# ceph osd pool create {pool-name} {pg-num} [{pgp-num}] [replicated] [crush-ruleset-name]
+
+# ceph osd pool create my-rep-pool 8 8 replicated pig-rep
+pool 4 'my-rep-pool' replicated size 2 min_size 1 crush_rule 1 object_hash rjenkins pg_num 8 pgp_num 8 last_change 41 flags hashpspool stripe_width 0
+```
+
+5、创建纠删池
+```
+# ceph osd pool create {pool-name} {pg-num}  {pgp-num}   erasure  [erasure-code-profile] [rule-name]
+
+# ceph osd pool create test-1 8 8 erasure my-ec3 my-ec3
+pool 7 'test-1' erasure size 5 min_size 4 crush_rule 2 object_hash rjenkins pg_num 8 pgp_num 8 
+```
+
+6、替换其他存储池crush map规则
+```
+ceph osd pool set [pool-name] crush_rule [rule-name]
+```
 
 # 五、命令创建crush rule示例
 
@@ -481,62 +548,6 @@ crush-demo.img
 # ceph osd map ceph-demo crush-demo.img
 osdmap e519 pool 'ceph-demo' (10) object 'crush-demo.img' -> pg 10.d267742c (10.c) -> up ([0,1,2], p0) acting ([0,1,
 ```
-
-纠删规则
-```
-1.配置纠删规则
-
-ceph osd erasure-code-profile set my-ec3 k=3 m=2 ruleset-failure-domain=rack crush-root=piglet
-查看纠删配置：
-
-ceph osd erasure-code-profile get my-ec3
-crush-device-class=
-crush-failure-domain=rack
-crush-root=piglet
-jerasure-per-chunk-alignment=false
-k=3
-m=2
-plugin=jerasure
-technique=reed_sol_van
-w=8
-2.创建crush map规则
-
-ceph osd crush rule create-erasure {rule_name} {ec-profile}
-例子:
-
-ceph osd crush rule create-erasure my-ec3  my-ec3
-# rules
-rule replicated_rule {
-        id 0
-        type replicated
-        min_size 1
-        max_size 10
-        step take default
-        step chooseleaf firstn 0 type host
-        step emit
-}
-rule pig-rep {
-        id 1
-        type replicated
-        min_size 1
-        max_size 10
-        step take piglet
-        step chooseleaf firstn 0 type rack
-        step emit
-}
-rule my-ec3 {
-        id 2
-        type erasure
-        min_size 3
-        max_size 5
-        step set_chooseleaf_tries 5
-        step set_choose_tries 100
-        step take piglet
-        step chooseleaf indep 0 type rack
-        step emit
-}
-```
-
 
 # 六、自定义OSD上创建Ceph池
 
