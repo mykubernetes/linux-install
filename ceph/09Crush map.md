@@ -349,6 +349,25 @@ step emit
 
 # 五、命令创建crush rule示例
 
+### 添加osd的在root下的系统拓扑
+```
+# host级别
+ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} host={hostname}
+
+# rack级别
+ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} rack={rack_name} host={hostname}
+
+# room级别
+ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} room={room_name} rack={rack_name} host={hostname}
+
+
+部署命令：
+ceph osd crush add osd.0 1 root=piglet room=pig-room rack=pig-rack1 host=pig-node65
+ceph osd crush add osd.1 1 root=piglet room=pig-room rack=pig-rack2 host=pig-node66
+ceph osd crush add osd.2 1 root=piglet room=pig-room rack=pig-rack1 host=pig-node65
+ceph osd crush add osd.3 1 root=piglet room=pig-room rack=pig-rack2 host=pig-node66
+```
+
 1、添加root类型的bucket
 ```
 # 创建一个新的桶叫ssd ，级别是root最高级
@@ -590,28 +609,6 @@ osdmap e101 pool 'ssd-pool' (8) object 'dummy_object1' -> pg 8.71968e96 (8.6) ->
 osdmap e101 pool 'sata-pool' (9) object 'dummy_object1' -> pg 9.71968e96 (9.6) -> up ([4,1,7], p4) acting ([4,1,7], p4)
 ```
 - 创建的对象ssd-pool实际上存储在OSD集上 [0，6，3] ，并且创建的对象sata-pool存储在OSD集上 [4，1，7] 此输出是预期的，它验证我们创建的池使用我们请求的正确OSD集。这种类型的配置在生产设置中非常有用，您可以在其中创建仅基于SSD的快速池，以及基于机械磁盘的中/慢性池。
-
-
-### 添加osd的在root下的系统拓扑
-```
-# host级别
-ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} host={hostname}
-
-# rack级别
-ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} rack={rack_name} host={hostname}
-
-# room级别
-ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} room={room_name} rack={rack_name} host={hostname}
-
-
-部署命令：
-ceph osd crush add osd.0 1 root=piglet room=pig-room rack=pig-rack1 host=pig-node65
-ceph osd crush add osd.1 1 root=piglet room=pig-room rack=pig-rack2 host=pig-node66
-ceph osd crush add osd.2 1 root=piglet room=pig-room rack=pig-rack1 host=pig-node65
-ceph osd crush add osd.3 1 root=piglet room=pig-room rack=pig-rack2 host=pig-node66
-```
-
-
 
 # 七、ceph Luminous新功能之crush class
 	
