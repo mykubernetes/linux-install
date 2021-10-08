@@ -73,7 +73,7 @@ ec_8_3_00000000-fast_host
 # ceph osd pool set .rgw.root crush_rule rep_0000000-fast_host
 ```
 
-# 二、生成环境存储池迁移
+# 二、生产环境存储池迁移
 ```
 # 暂时关闭数据迁移
 ceph osd set norecover
