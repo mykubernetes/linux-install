@@ -35,6 +35,8 @@ $ ceph osd unset norecover
 | norecover | 防止数据发生恢复操作。 |
 | noscrub | 防止集群清洗操作，在高负载、recovery,	backfilling,rebalancing等期间，为了保证集群性能，可以和	nodeep-scrub	一起设置。 |
 | nodeep-scrub | 防止集群进行深度清洗操作。因为会阻塞读写操作，影响性能。一般不要长时间设置该值，否则，一旦取消该值，则会由大量的pg进行深度清洗。 |
+| pause | 设置该标志位，则集群停止读写，但不影响osd自检 |
+| full | 标记集群已满，将拒绝任何数据写入，但可读 |
 
 
 节流回填和恢复
