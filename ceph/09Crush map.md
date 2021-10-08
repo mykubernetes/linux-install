@@ -109,7 +109,7 @@ watch ceph -s
 
 # 四、Crush map 介绍
 
-CRUSH Map主要分为以下几个部分
+crush map 由5部分组成
 - Tunables: 可调整的参数列表（仅一部分，非完整列表）
 - Devices: 存储设备列表，列举了集群中所有的OSD
 - Types: 类型定义，一般0为OSD，其它正整数代表host、chassis、rack等
@@ -118,18 +118,46 @@ CRUSH Map主要分为以下几个部分
 
 ## 1)tunable（可调参数）
 ```
-# begin crush map                     # 选择存放副本位置时的选择算法策略中的变量配置
-tunable choose_local_tries 0
-tunable choose_local_fallback_tries 0
-tunable choose_total_tries 50
-tunable chooseleaf_descend_once 1
-tunable chooseleaf_vary_r 1
-tunable chooseleaf_stable 1
-tunable straw_calc_version 1
+# begin crush map                        # 选择存放副本位置时的选择算法策略中的变量配置
+tunable choose_local_tries 0             # 已废弃，为做向后兼容应保持为 0
+tunable choose_local_fallback_tries 0    # 已废弃，为做向后兼容应保持为 0
+tunable choose_total_tries 50            # 可调，选择bucket的最大尝试次数，缺省值为50，已被验证是比较合理的值,如果50还无法选择出期待的bucket，可以适当调整这个参数
+tunable chooseleaf_descend_once 1        # 已废弃，为做向后兼容应保持 1
+tunable chooseleaf_vary_r 1              # 这个参数是为了fix一些bug而存在，应该保持为1
+tunable chooseleaf_stable 1              # 这个参数的实现也是为了避免一些不必要的pg迁移，应该保持为1
+tunable straw_calc_version 1             # straw 算法的版本，为了向后兼容这个值应该保持为 1
 tunable allowed_bucket_algs 54
 ```
 
-从版本v0.74开始，如果当前CRUSH可调参数不包含default配置文件中的所有最佳值，Ceph将发出运行状况警告。要使此警告消失，您有两种选择：  
+### 1.1) `allowed_bucket_algs`参数 ，crush 的bucket选择算法总共有下面5种
+```
+enum crush_algorithm {
+    CRUSH_BUCKET_UNIFORM = 1    # uniform
+    CRUSH_BUCKET_LIST = 2       # list
+    CRUSH_BUCKET_TREE = 3       # tree
+    CRUSH_BUCKET_STRAW = 4      # straw
+    CRUSH_BUCKET_STRAW2 = 5     # straw2
+}
+```
+
+allowed_bucket_algs 计算方法为
+```
+1 << CRUSH_BUCKET_* : 1 左移 CRUSH_BUCKET_* 位数代表这个算法可用， 
+再将所有得到的结果，做二进制数的或运算，得到allowed_bucket_algs 值
+```
+
+上面crush文件中 allowed_bucket_algs = 54 的计算过程如下，这是默认的参数
+```
+allowed_bucket_algs = (1 << CRUSH_BUCKET_UNIFORM) |             # 1 左移 1位 
+                      (1 << CRUSH_BUCKET_LIST) |                # 1 左移 2位
+                      (1 << CRUSH_BUCKET_STRAW) |               # 1 左移 4位
+                      (1 << CRUSH_BUCKET_STRAW2))               # 1 左移 5位
+    
+allowed_bucket_algs = 00000010 | 00000100 | 00010000 | 00100000 = 00110110 = 54
+```
+> 从这里也可以看出，默认情况下是不会允许 CRUSH_BUCKET_TREE 算法，因为在L这个版本禁用了tree算法。
+
+### 1.2)从版本v0.74开始，如果当前CRUSH可调参数不包含default配置文件中的所有最佳值，Ceph将发出运行状况警告。要使此警告消失，您有两种选择：  
 
 方法一：切换为最优版  
 ```
@@ -154,7 +182,7 @@ ceph tell mon.\* config set mon_warn_on_legacy_crush_tunables false
 - jewel：宝石版本支持的值
 - optimal：当前版本Ceph的最佳（即最佳）值
 - default：默认为default。这些值取决于当前版本的Ceph，是硬编码的，通常是最佳值和传统值的混合。这些值通常与optimal之前LTS版本的配置文件相匹配，或者通常与我们通常除了更多用户拥有最新客户端的最新版本匹配。
-
+ 
 设置  
 ```
 # ceph osd crush tunables {PROFILE}
@@ -206,8 +234,8 @@ host node65 {
         id -3           # do not change unnecessarily
         id -4 class hdd         # do not change unnecessarily
         # weight 0.195
-        alg straw2
-        hash 0  # rjenkins1
+        alg straw2                               # 指定bucket选择的时候使用的crush算法
+        hash 0  # rjenkins1                      # 指定hash的算法
         item osd.0 weight 0.098
         item osd.2 weight 0.098
 }
@@ -327,6 +355,19 @@ rule my-ec3 {
         step chooseleaf indep 0 type rack
         step emit
 }
+rule ssd_primary {
+        ruleset 1
+        type replicated
+        min_size 1
+        max_size 10
+        step take rep_ssd                        # 首先从rep_ssd 入口 
+        step chooseleaf firstn 1 type host       # 选择一个ssd host并找到一个osd作为主osd
+        step emit                                # 结束第一次查找
+        step take rep_hdd                        # 从rep_hdd 入口欧
+        step chooseleaf firstn -1 type host      # 选择两个HDD host并各找到一个osd作为2个副本osd
+        step emit                                # 结束
+}
+
 # end crush map
 ```
 - step choose firstn  1 type row 可以分解为: `step <1> <2> <3> type <4>`
