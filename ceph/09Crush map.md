@@ -229,20 +229,34 @@ ceph osd crush tree
 
 ```
 # buckets
-host c720102 {
-id -3 # do not change unnecessarily                 # 唯一名称,表示为负整数的唯一ID
-id -4 class hdd # do not change unnecessarily
-# weight 0.117                                      # 权重,相对于其项目总容量的权重
-alg straw2                                          # 存储区算法,（straw默认情况下 straw2）
-hash 0 # rjenkins1                                  # 哈希,（默认为 0，CRUSH哈希rjenkins1）
-item osd.0 weight 0.039
-item osd.3 weight 0.039
-item osd.6 weight 0.039
+host node65 {
+        id -3           # do not change unnecessarily
+        id -4 class hdd         # do not change unnecessarily
+        # weight 0.195
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.0 weight 0.098
+        item osd.2 weight 0.098
 }
-...
+host node66 {
+        id -5           # do not change unnecessarily
+        id -6 class hdd         # do not change unnecessarily
+        # weight 0.195
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.1 weight 0.098
+        item osd.3 weight 0.098
+}
+root default {
+        id -1           # do not change unnecessarily
+        id -2 class hdd         # do not change unnecessarily
+        # weight 0.391
+        alg straw2
+        hash 0  # rjenkins1
+        item node65 weight 0.195
+        item node66 weight 0.195
+}
 ```
-参数详解：
-- bucket-type： 桶类型，我们必须在CRUSH层次结构中指定OSD的位置。
 - bucket-name： 唯一的存储桶名称。
 - id： 唯一ID,使用负整数表示。
 - weight： Ceph在群集磁盘上均匀地写入数据，这有助于提高性能并改善数据分发。这会强制所有磁盘都参与群集，并确保所有群集磁盘的使用均等，而不管其容量如何。为此，Ceph使用加权机制。CRUSH为每个OSD分配权重。OSD的权重越高，它的物理存储容量就越大。权重是设备容量之间的相对差异。我们建议使用1.00作为1 TB存储设备的相对重量。类似地，0.5的重量代表大约500GB，而3.00的重量代表大约3TB。
@@ -576,6 +590,26 @@ osdmap e101 pool 'ssd-pool' (8) object 'dummy_object1' -> pg 8.71968e96 (8.6) ->
 osdmap e101 pool 'sata-pool' (9) object 'dummy_object1' -> pg 9.71968e96 (9.6) -> up ([4,1,7], p4) acting ([4,1,7], p4)
 ```
 - 创建的对象ssd-pool实际上存储在OSD集上 [0，6，3] ，并且创建的对象sata-pool存储在OSD集上 [4，1，7] 此输出是预期的，它验证我们创建的池使用我们请求的正确OSD集。这种类型的配置在生产设置中非常有用，您可以在其中创建仅基于SSD的快速池，以及基于机械磁盘的中/慢性池。
+
+
+### 添加osd的在root下的系统拓扑
+```
+# host级别
+ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} host={hostname}
+
+# rack级别
+ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} rack={rack_name} host={hostname}
+
+# room级别
+ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} room={room_name} rack={rack_name} host={hostname}
+
+
+部署命令：
+ceph osd crush add osd.0 1 root=piglet room=pig-room rack=pig-rack1 host=pig-node65
+ceph osd crush add osd.1 1 root=piglet room=pig-room rack=pig-rack2 host=pig-node66
+ceph osd crush add osd.2 1 root=piglet room=pig-room rack=pig-rack1 host=pig-node65
+ceph osd crush add osd.3 1 root=piglet room=pig-room rack=pig-rack2 host=pig-node66
+```
 
 
 
