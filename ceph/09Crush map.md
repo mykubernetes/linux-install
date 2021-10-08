@@ -227,20 +227,14 @@ ceph osd crush tree
 
 4）buckets（存储桶实例）
 
-定义存储桶后您必须为主机声明存储桶实例。存储桶实例需要以下字段
-- 存储桶类型
-- 唯一名称（字符串）：表示为负整数的唯一ID
-- 权重：相对于其项目总容量的权重
-- 存储区算法：（straw默认情况下 straw2）
-- 哈希：（默认为 0，CRUSH哈希rjenkins1）
 ```
 # buckets
 host c720102 {
-id -3 # do not change unnecessarily
+id -3 # do not change unnecessarily                 # 唯一名称,表示为负整数的唯一ID
 id -4 class hdd # do not change unnecessarily
-# weight 0.117
-alg straw2
-hash 0 # rjenkins1
+# weight 0.117                                      # 权重,相对于其项目总容量的权重
+alg straw2                                          # 存储区算法,（straw默认情况下 straw2）
+hash 0 # rjenkins1                                  # 哈希,（默认为 0，CRUSH哈希rjenkins1）
 item osd.0 weight 0.039
 item osd.3 weight 0.039
 item osd.6 weight 0.039
