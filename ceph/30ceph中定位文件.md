@@ -1,5 +1,7 @@
 我们知道,将一个文件存到ceph里之后，ceph会将该文件条带化为若干个小的object，然后使用cursh算法，将每一个object复制若干份（根据pool size 来定）分别存储到不同的osd上。 本文会介绍，如何通过命令找到一个文件真正被存在哪里了。
 
+https://www.dovefi.com/post/rgw%E6%95%B0%E6%8D%AE%E6%98%AF%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8%E5%9C%A8ceph%E4%B8%AD%E7%9A%84_2-%E5%AE%9E%E8%B7%B5%E9%83%A8%E5%88%86/
+
 # 1. 查找文件存放的物理位置
 
 ## 1) 列出当前系统下所有bucket信息
