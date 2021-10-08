@@ -361,11 +361,21 @@ ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} rack={rack_nam
 ceph osd crush add osd.{osd_id} {osd weight} root={root_rulename} room={room_name} rack={rack_name} host={hostname}
 
 
-部署命令：
+# 部署命令
 ceph osd crush add osd.0 1 root=piglet room=pig-room rack=pig-rack1 host=pig-node65
 ceph osd crush add osd.1 1 root=piglet room=pig-room rack=pig-rack2 host=pig-node66
 ceph osd crush add osd.2 1 root=piglet room=pig-room rack=pig-rack1 host=pig-node65
 ceph osd crush add osd.3 1 root=piglet room=pig-room rack=pig-rack2 host=pig-node66
+
+# 副本规则
+# rack级别
+ceph osd crush rule create-simple {rule_name} root rack
+
+# room级别
+ceph osd crush rule create-simple {rule_name} root room
+
+# host级别
+ceph osd crush rule create-simple {rule_name} root host
 ```
 
 1、添加root类型的bucket
@@ -470,6 +480,61 @@ crush-demo.img
 
 # ceph osd map ceph-demo crush-demo.img
 osdmap e519 pool 'ceph-demo' (10) object 'crush-demo.img' -> pg 10.d267742c (10.c) -> up ([0,1,2], p0) acting ([0,1,
+```
+
+纠删规则
+```
+1.配置纠删规则
+
+ceph osd erasure-code-profile set my-ec3 k=3 m=2 ruleset-failure-domain=rack crush-root=piglet
+查看纠删配置：
+
+ceph osd erasure-code-profile get my-ec3
+crush-device-class=
+crush-failure-domain=rack
+crush-root=piglet
+jerasure-per-chunk-alignment=false
+k=3
+m=2
+plugin=jerasure
+technique=reed_sol_van
+w=8
+2.创建crush map规则
+
+ceph osd crush rule create-erasure {rule_name} {ec-profile}
+例子:
+
+ceph osd crush rule create-erasure my-ec3  my-ec3
+# rules
+rule replicated_rule {
+        id 0
+        type replicated
+        min_size 1
+        max_size 10
+        step take default
+        step chooseleaf firstn 0 type host
+        step emit
+}
+rule pig-rep {
+        id 1
+        type replicated
+        min_size 1
+        max_size 10
+        step take piglet
+        step chooseleaf firstn 0 type rack
+        step emit
+}
+rule my-ec3 {
+        id 2
+        type erasure
+        min_size 3
+        max_size 5
+        step set_chooseleaf_tries 5
+        step set_choose_tries 100
+        step take piglet
+        step chooseleaf indep 0 type rack
+        step emit
+}
 ```
 
 
