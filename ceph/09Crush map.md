@@ -263,11 +263,12 @@ item osd.6 weight 0.039
 
 5）rules（规则）
 - CRUSH map 包含CRUSH规则确定池的数据放置。顾名思义，这些是定义池属性和数据存储在池中的方式的规则。它们定义了允许CRUSH在Ceph集群中存储对象的复制和放置策略。默认CRUSH映射包含默认池的规则，即rbd。
+
 ```
 # rules                                # 副本选取规则的设定
-rule replicated_ruleset {
-ruleset 0                              # ruleset的编号id
-type replicated                        # 类型:repliated或者erasure code
+rule replicated_ruleset {              # rule的名称
+ruleset 0                              # rule编号
+type replicated                        # replicated代表适用于副本池，erasure代表适用于EC池
 min_size 1                             # 副本数最小值
 max_size 10                            # 副本数最大值
 step take default                      # 选择一个root bucket，做下一步的输入
@@ -277,16 +278,20 @@ step choose firstn  1 type osd         # 在上一步输出的三个cabinet中�
 step emit                              # 提交
 }
 # end crush map
-```  
-规则参数
-- id： 整数值
-- type： 字符串值; 它是复制或擦除编码的池类型。
-- min_size： 整数值; 如果池的副本数少于此数，则CRUSH将不会选择此规则。
-- max_size： 整数值; 如果池的副本数量多于此数字，则CRUSH将不会选择此规则。
-- step take： 这需要一个存储桶名称并开始在树中迭代。
-- step choose firstn `<num>` type `<bucket-type>`： 为一个桶类型，选择存储数，
-- step emit： 这首先输出当前值并清空堆栈。这通常在规则的末尾使用.
-
+```
+- step choose firstn  1 type row 可以分解为: `step <1> <2> <3> type <4>`
+  - <1>: choose/chooseleaf
+    - choose表示选择结果类型为故障域（由<4>指定）
+    - chooseleaf表示在确定故障域后，还必须选出该域下面的OSD节点（即leaf）
+  - <2>: firstn/indep
+    - firstn: 适用于副本池，选择结果中rep（replica，指一份副本或者EC中的一个分块，下同）位置无明显意义
+    - indep: 适用于EC池，选择结果中rep位置不可随意变动
+  - <3>: num_reps 这个整数值指定需要选择的rep数目，可以是正值负值或0。
+    - 正整数值即代表要选择的副本数，非常直观
+    - 0表示的是与实际逻辑池的size相等；也就是说，如果2副本池用了这个rule，0就代表了2；如果3副本池用了此rule，0就相当于3
+    - 负整数值代表与实际逻辑池size的差值；如果3副本池使用此rule将该值设为了-1，那边该策略只会选择出2个reps
+  - <4>: failure domain
+    - 指定故障域类型；CRUSH确保同一故障域最多只会被选中一次。
 
 # 五、命令创建crush rule示例
 
