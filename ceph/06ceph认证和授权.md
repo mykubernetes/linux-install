@@ -40,19 +40,24 @@ osd 'allow rwx' or osd 'allow class-read, allow rwx pool=rbd'
 mds 'allow'
 ```  
 
-参数的具体解释：  
-- allow： 仅适合 MDS
-- r： 读取访问权限，这是监视器读取CRUSH映射所必需的。
-- w： 对对象的写访问权限。
-- x： 这使用户能够调用类方法，包括读取和写入，以及auth在监视器上执行操作的权限。
-- class-read： 这是x的一个子集，允许用户调用类读取方法。
-- class-write： 这是x允许用户调用类写方法的子集。
-- *： 这为用户提供特定池的完全权限（r，w和x）以及执行管理命令。
-- profile（配置） osd： 这允许用户以OSD的形式连接到其他OSD或监视器。用于OSD心跳流量和状态报告。
-- profile mds： 这允许用户作为MDS连接到其他MDS。
-- profile bootstrap-osd： 这允许用户引导OSD。例如，ceph-deploy和ceph-disk工具使用的客户端。bootstrap-osduser，有权添加密钥和引导OSD。
-- profile bootstrap-mds： 这允许用户引导元数据服务器。例如，该ceph-deploy工具使用
-- client.bootstrap-mds用户添加密钥并引导元数据服务器。
+Ceph常用权限说明
+
+| 参数 | 描述 |
+|-----|------|
+| allow | 仅适合 MDS |
+| r | 读取访问权限，这是监视器读取CRUSH映射所必需的。 |
+| w | 对对象的写访问权限。 |
+| x | 这使用户能够调用类方法，包括读取和写入，以及auth在监视器上执行操作的权限。 |
+| class-read | 这是x的一个子集，允许用户调用类读取方法。 |
+| class-write | 这是x允许用户调用类写方法的子集。 |
+| * | 这为用户提供特定池的完全权限（r，w和x）以及执行管理命令。 |
+| profile rbd | 授权管理rbd权限 |
+| profile osd | 这允许用户以OSD的形式连接到其他OSD或监视器。用于OSD心跳流量和状态报告。 |
+| profile mds | 这允许用户作为MDS连接到其他MDS。 |
+| monitor profile bootstrap-osd | 允许用户引导0SD。比如ceph-deploy和ceph-disk工具都使用client.bootstrap-osd用户，该用户有权给0SD添加密钥和启动加载程序 |
+| profile bootstrap-osd | 这允许用户引导OSD。例如，ceph-deploy和ceph-disk工具使用的客户端。bootstrap-osduser，有权添加密钥和引导OSD。 |
+| profile bootstrap-mds | 这允许用户引导元数据服务器。例如，该ceph-deploy工具使用 |
+| client.bootstrap-mds | 用户添加密钥并引导元数据服务器。 |
 
 1、列出集群中的用户  
 ```
