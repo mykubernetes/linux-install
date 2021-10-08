@@ -297,28 +297,44 @@ step emit                              # 提交
 
 1、添加root类型的bucket
 ```
+# 创建一个新的桶叫ssd ，级别是root最高级
 ceph osd crush add-bucket ssd root
 ```
 
 2、添加host类型的bucket
 ```
+# 创建一个新的桶叫node1-ssd ，级别是主机host
 ceph osd crush add-bucket node1-ssd host
+
+# 创建一个新的桶叫node2-ssd ，级别是主机host
 ceph osd crush add-bucket node2-ssd host
+
+# 创建一个新的桶叫node3-ssd ，级别是主机host
 ceph osd crush add-bucket node3-ssd host
 ```
 
 3、将host bucket加入到ssd bucket中
 ```
+# 将node1-ssd归入ssd
 ceph osd crush move node1-ssd root=ssd
+
+# 将node2-ssd归入ssd
 ceph osd crush move node2-ssd root=ssd
+
+# 将node3-ssd归入ssd
 ceph osd crush move node3-ssd root=ssd
 ```
 - 如果设备被move移动，默认就没有了，可以使用`ceph osd crush link`
 
 4、bucket填充数据，将osd 012移至root ssd
 ```
+# 将osd.0 移动到主机host=node1-ssd root=ssd 中
 ceph osd crush move osd.0 host=node1-ssd root=ssd
+
+# 将osd.2 移动到主机host=node2-ssd root=ssd 中
 ceph osd crush move osd.1 host=node2-ssd root=ssd
+
+# 将osd.3 移动到主机host=node3-ssd root=ssd 中
 ceph osd crush move osd.2 host=node3-ssd root=ssd
 ```
 
@@ -356,8 +372,10 @@ ID  CLASS WEIGHT  TYPE NAME          STATUS REWEIGHT PRI-AFF
 
 7、创建规则
 ```
+# 创建crush rule，rule名称是ssd-demo，root=ssd，tpye=host，mode=ssd
 ceph osd crush rule create-replicated ssd-demo ssd host ssd
 
+# 查看crush规则
 # ceph osd crush rule ls
 replicated_rule
 ssd-demo
@@ -367,8 +385,10 @@ ssd-demo
 
 8、修改存储池crush rule
 ```
-ceph osd pool set ceph-demo crush_rule ssd-demo
+# 修改ceph-demo存储池规则为ssd-demo
+# ceph osd pool set ceph-demo crush_rule ssd-demo
 
+# 查看存储池ceph-demo规则
 # ceph osd pool get ceph-demo crush_rule
 crush_rule: ssd-demo
 
