@@ -294,6 +294,51 @@ step emit                              # 提交
   - <4>: failure domain
     - 指定故障域类型；CRUSH确保同一故障域最多只会被选中一次。
 
+Rule执行流程
+
+```
+# rule
+step take default
+step choose firstn 3 type osd
+step emit
+
+# choose flow
+rep=0, host=ceph0, go deeper -> osd=osd.0, OK
+rep=1, host=ceph1, go deeper -> osd=osd.2, OK
+rep=2, host=ceph0, go deeper -> osd=osd.1, OK
+```
+- 最后选中了同一个host ceph0下的两个OSD。在实际应用中，通常不会以OSD为故障域，而是使用高级的bucket（如host，rack）等作为故障域
+
+```
+# rule
+step take default
+step choose firstn 3 type host
+step emit
+# choose flow
+rep=0, host=ceph0, OK
+rep=1, host=ceph1, OK
+rep=2, host=ceph2, OK
+```
+- 最后只选到了host而没有OSD，那么数据的最终存放位置并没有确定，这个rule的设置不合理。
+
+再增加一步choose
+```
+step take default
+step choose firstn 3 type host
+step choose firstn 1 type osd
+step emit
+```
+新增的一步会在上述基础上，再以每个选中的host为起点，在host下选择1个OSD。另一个更方便的方案
+
+使用chooseleaf
+```
+step take default
+step chooseleaf firstn 3 type host
+step emit
+```
+- 这样在选中一个failure_domain type的bucket后，会递归调用一次choose函数来选择一个该bucket下的OSD。
+
+
 # 五、命令创建crush rule示例
 
 1、添加root类型的bucket
