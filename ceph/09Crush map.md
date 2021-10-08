@@ -5,35 +5,11 @@ http://docs.ceph.org.cn/rados/operations/crush-map/
 1、查看每个pool的详细信息，可以查看每个pool使用的crush_rule规则
 ```
 # ceph osd pool ls detail
-pool 1 '.rgw.root' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 8 pgp_num 8 last_change 977 flags hashpspool stripe_width 0 application rgw
-pool 2 '00000000-default.rgw.buckets.index' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 256 pgp_num 256 last_change 885 flags hashpspool stripe_width 0 application rgw
-pool 3 'default.rgw.meta' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 4 pgp_num 4 last_change 886 flags hashpspool stripe_width 0 application rgw
-pool 4 'default.rgw.control' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 4 pgp_num 4 last_change 887 flags hashpspool stripe_width 0 application rgw
-pool 5 '00000000-default.rgw.buckets.non-ec' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 16 pgp_num 16 last_change 888 flags hashpspool stripe_width 0 application rgw
-pool 6 'default.rgw.log' replicated size 3 min_size 2 crush_rule 15 object_hash rjenkins pg_num 4 pgp_num 4 last_change 890 flags hashpspool stripe_width 0 application rgw
-pool 7 '00000000-default.rgw.buckets.data' replicated size 3 min_size 2 crush_rule 7 object_hash rjenkins pg_num 4096 pgp_num 4096 last_change 1241 flags hashpspool stripe_width 0 expected_num_objects 819200000 application rgw
 ```
 
 2、查看存储池有哪些规则
 ```
 # ceph osd crush rule ls
-replicated_rule
-rep_00000000-default_datacenter
-ec_8_3_00000000-default_datacenter
-rep_00000000-default_room
-ec_8_3_00000000-default_room
-rep_00000000-default_rack
-ec_8_3_00000000-default_rack
-rep_00000000-default_host
-ec_8_3_00000000-default_host
-crep_00000000-fast_datacenter
-ec_8_3_00000000-fast_datacenter
-rep_00000000-fast_room
-cec_8_3_00000000-fast_room
-rep_00000000-fast_rack
-ec_8_3_00000000-fast_rack
-rep_00000000-fast_host
-ec_8_3_00000000-fast_host
 ```
 
 3、查看存储池有哪些规则的详细信息
@@ -70,7 +46,6 @@ ec_8_3_00000000-fast_host
 4、这是存储池使用哪条规则
 ```
 # 语法ceph osd pool set {{pool_name}} crush_rule {{crush_rule_name}}
-# ceph osd pool set .rgw.root crush_rule rep_0000000-fast_host
 ```
 
 # 二、生产环境存储池迁移
@@ -1227,7 +1202,7 @@ root default {
 	alg straw2
 	hash 0	# rjenkins1
 }
-host 00000000-default-172.16.0.1 {
+host default-172.16.0.1 {
 	id -3		# do not change unnecessarily
 	id -7 class hdd		# do not change unnecessarily
 	id -23 class ssd		# do not change unnecessarily
@@ -1245,16 +1220,16 @@ host 00000000-default-172.16.0.1 {
 	item osd.32 weight 10.656
 	item osd.35 weight 10.205
 }
-rack 00000000-default-rack.1D02 {
+rack default-rack.1D02 {
 	id -4		# do not change unnecessarily
 	id -8 class hdd		# do not change unnecessarily
 	id -24 class ssd		# do not change unnecessarily
 	# weight 108.934
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-172.16.0.1 weight 108.934
+	item default-172.16.0.1 weight 108.934
 }
-host 00000000-default-172.16.1.1 {
+host default-172.16.1.1 {
 	id -11		# do not change unnecessarily
 	id -13 class hdd		# do not change unnecessarily
 	id -25 class ssd		# do not change unnecessarily
@@ -1272,16 +1247,16 @@ host 00000000-default-172.16.1.1 {
 	item osd.31 weight 10.986
 	item osd.36 weight 10.409
 }
-rack 00000000-default-rack.1D01 {
+rack default-rack.1D01 {
 	id -12		# do not change unnecessarily
 	id -14 class hdd		# do not change unnecessarily
 	id -26 class ssd		# do not change unnecessarily
 	# weight 110.164
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-172.16.1.1 weight 110.164
+	item default-172.16.1.1 weight 110.164
 }
-host 00000000-default-172.16.0.2 {
+host default-172.16.0.2 {
 	id -15		# do not change unnecessarily
 	id -17 class hdd		# do not change unnecessarily
 	id -27 class ssd		# do not change unnecessarily
@@ -1299,16 +1274,16 @@ host 00000000-default-172.16.0.2 {
 	item osd.33 weight 11.115
 	item osd.37 weight 10.791
 }
-rack 00000000-default-rack.1D03 {
+rack default-rack.1D03 {
 	id -16		# do not change unnecessarily
 	id -18 class hdd		# do not change unnecessarily
 	id -28 class ssd		# do not change unnecessarily
 	# weight 108.928
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-172.16.0.2 weight 108.928
+	item default-172.16.0.2 weight 108.928
 }
-host 00000000-default-172.16.0.3 {
+host default-172.16.0.3 {
 	id -19		# do not change unnecessarily
 	id -21 class hdd		# do not change unnecessarily
 	id -29 class ssd		# do not change unnecessarily
@@ -1326,37 +1301,37 @@ host 00000000-default-172.16.0.3 {
 	item osd.38 weight 11.555
 	item osd.42 weight 11.403
 }
-rack 00000000-default-rack.1D04 {
+rack default-rack.1D04 {
 	id -20		# do not change unnecessarily
 	id -22 class hdd		# do not change unnecessarily
 	id -30 class ssd		# do not change unnecessarily
 	# weight 108.592
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-172.16.0.3 weight 108.592
+	item default-172.16.0.3 weight 108.592
 }
-datacenter 00000000-default-datacenter.lhlt8f {
+datacenter default-datacenter.lhlt8f {
 	id -5		# do not change unnecessarily
 	id -9 class hdd		# do not change unnecessarily
 	id -31 class ssd		# do not change unnecessarily
 	# weight 436.618
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-rack.1D02 weight 108.934
-	item 00000000-default-rack.1D01 weight 110.164
-	item 00000000-default-rack.1D03 weight 108.928
-	item 00000000-default-rack.1D04 weight 108.592
+	item default-rack.1D02 weight 108.934
+	item default-rack.1D01 weight 110.164
+	item default-rack.1D03 weight 108.928
+	item default-rack.1D04 weight 108.592
 }
-root 00000000-default {
+root default {
 	id -6		# do not change unnecessarily
 	id -10 class hdd		# do not change unnecessarily
 	id -32 class ssd		# do not change unnecessarily
 	# weight 436.618
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-default-datacenter.lhlt8f weight 436.618
+	item default-datacenter.lhlt8f weight 436.618
 }
-host 00000000-fast-172.16.1.1 {
+host fast-172.16.1.1 {
 	id -34		# do not change unnecessarily
 	id -38 class hdd		# do not change unnecessarily
 	id -42 class ssd		# do not change unnecessarily
@@ -1365,16 +1340,16 @@ host 00000000-fast-172.16.1.1 {
 	hash 0	# rjenkins1
 	item osd.40 weight 5.822
 }
-rack 00000000-fast-rack.1D01 {
+rack fast-rack.1D01 {
 	id -35		# do not change unnecessarily
 	id -39 class hdd		# do not change unnecessarily
 	id -43 class ssd		# do not change unnecessarily
 	# weight 5.822
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-172.16.1.1 weight 5.822
+	item fast-172.16.1.1 weight 5.822
 }
-host 00000000-fast-172.16.0.1 {
+host fast-172.16.0.1 {
 	id -46		# do not change unnecessarily
 	id -48 class hdd		# do not change unnecessarily
 	id -50 class ssd		# do not change unnecessarily
@@ -1383,16 +1358,16 @@ host 00000000-fast-172.16.0.1 {
 	hash 0	# rjenkins1
 	item osd.39 weight 5.822
 }
-rack 00000000-fast-rack.1D02 {
+rack fast-rack.1D02 {
 	id -47		# do not change unnecessarily
 	id -49 class hdd		# do not change unnecessarily
 	id -51 class ssd		# do not change unnecessarily
 	# weight 5.822
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-172.16.0.1 weight 5.822
+	item fast-172.16.0.1 weight 5.822
 }
-host 00000000-fast-172.16.0.2 {
+host fast-172.16.0.2 {
 	id -52		# do not change unnecessarily
 	id -54 class hdd		# do not change unnecessarily
 	id -56 class ssd		# do not change unnecessarily
@@ -1401,16 +1376,16 @@ host 00000000-fast-172.16.0.2 {
 	hash 0	# rjenkins1
 	item osd.41 weight 5.822
 }
-rack 00000000-fast-rack.1D03 {
+rack fast-rack.1D03 {
 	id -53		# do not change unnecessarily
 	id -55 class hdd		# do not change unnecessarily
 	id -57 class ssd		# do not change unnecessarily
 	# weight 5.822
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-172.16.0.2 weight 5.822
+	item fast-172.16.0.2 weight 5.822
 }
-host 00000000-fast-172.16.0.3 {
+host fast-172.16.0.3 {
 	id -58		# do not change unnecessarily
 	id -60 class hdd		# do not change unnecessarily
 	id -62 class ssd		# do not change unnecessarily
@@ -1419,35 +1394,35 @@ host 00000000-fast-172.16.0.3 {
 	hash 0	# rjenkins1
 	item osd.43 weight 5.822
 }
-rack 00000000-fast-rack.1D04 {
+rack fast-rack.1D04 {
 	id -59		# do not change unnecessarily
 	id -61 class hdd		# do not change unnecessarily
 	id -63 class ssd		# do not change unnecessarily
 	# weight 5.822
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-172.16.0.3 weight 5.822
+	item fast-172.16.0.3 weight 5.822
 }
-datacenter 00000000-fast-datacenter.lhlt8f {
+datacenter fast-datacenter.lhlt8f {
 	id -36		# do not change unnecessarily
 	id -40 class hdd		# do not change unnecessarily
 	id -44 class ssd		# do not change unnecessarily
 	# weight 23.288
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-rack.1D01 weight 5.822
-	item 00000000-fast-rack.1D02 weight 5.822
-	item 00000000-fast-rack.1D03 weight 5.822
-	item 00000000-fast-rack.1D04 weight 5.822
+	item fast-rack.1D01 weight 5.822
+	item fast-rack.1D02 weight 5.822
+	item fast-rack.1D03 weight 5.822
+	item fast-rack.1D04 weight 5.822
 }
-root 00000000-fast {
+root fast {
 	id -37		# do not change unnecessarily
 	id -41 class hdd		# do not change unnecessarily
 	id -45 class ssd		# do not change unnecessarily
 	# weight 23.288
 	alg straw2
 	hash 0	# rjenkins1
-	item 00000000-fast-datacenter.lhlt8f weight 23.288
+	item fast-datacenter.lhlt8f weight 23.288
 }
 
 # rules
@@ -1460,163 +1435,163 @@ rule replicated_rule {
 	step chooseleaf firstn 0 type host
 	step emit
 }
-rule cos_rep_00000000-default_datacenter {
+rule rep-default_datacenter {
 	id 1
 	type replicated
 	min_size 1
 	max_size 10
-	step take 00000000-default
+	step take default
 	step chooseleaf firstn 0 type datacenter
 	step emit
 }
-rule cos_ec_8_3_00000000-default_datacenter {
+rule ec_8_3-default_datacenter {
 	id 2
 	type erasure
 	min_size 3
 	max_size 11
 	step set_chooseleaf_tries 5
 	step set_choose_tries 100
-	step take 00000000-default
+	step take default
 	step chooseleaf indep 0 type datacenter
 	step emit
 }
-rule cos_rep_00000000-default_room {
+rule rep-default_room {
 	id 3
 	type replicated
 	min_size 1
 	max_size 10
-	step take 00000000-default
+	step take default
 	step chooseleaf firstn 0 type room
 	step emit
 }
-rule cos_ec_8_3_00000000-default_room {
+rule ec_8_3-default_room {
 	id 4
 	type erasure
 	min_size 3
 	max_size 11
 	step set_chooseleaf_tries 5
 	step set_choose_tries 100
-	step take 00000000-default
+	step take default
 	step chooseleaf indep 0 type room
 	step emit
 }
-rule cos_rep_00000000-default_rack {
+rule rep-default_rack {
 	id 5
 	type replicated
 	min_size 1
 	max_size 10
-	step take 00000000-default
+	step take default
 	step chooseleaf firstn 0 type rack
 	step emit
 }
-rule cos_ec_8_3_00000000-default_rack {
+rule ec_8_3-default_rack {
 	id 6
 	type erasure
 	min_size 3
 	max_size 11
 	step set_chooseleaf_tries 5
 	step set_choose_tries 100
-	step take 00000000-default
+	step take default
 	step chooseleaf indep 0 type rack
 	step emit
 }
-rule cos_rep_00000000-default_host {
+rule rep-default_host {
 	id 7
 	type replicated
 	min_size 1
 	max_size 10
-	step take 00000000-default
+	step take default
 	step chooseleaf firstn 0 type host
 	step emit
 }
-rule cos_ec_8_3_00000000-default_host {
+rule ec_8_3-default_host {
 	id 8
 	type erasure
 	min_size 3
 	max_size 11
 	step set_chooseleaf_tries 5
 	step set_choose_tries 100
-	step take 00000000-default
+	step take default
 	step chooseleaf indep 0 type host
 	step emit
 }
-rule cos_rep_00000000-fast_datacenter {
+rule rep-fast_datacenter {
 	id 9
 	type replicated
 	min_size 1
 	max_size 10
-	step take 00000000-fast
+	step take fast
 	step chooseleaf firstn 0 type datacenter
 	step emit
 }
-rule cos_ec_8_3_00000000-fast_datacenter {
+rule ec_8_3-fast_datacenter {
 	id 10
 	type erasure
 	min_size 3
 	max_size 11
 	step set_chooseleaf_tries 5
 	step set_choose_tries 100
-	step take 00000000-fast
+	step take fast
 	step chooseleaf indep 0 type datacenter
 	step emit
 }
-rule cos_rep_00000000-fast_room {
+rule rep-fast_room {
 	id 11
 	type replicated
 	min_size 1
 	max_size 10
-	step take 00000000-fast
+	step take fast
 	step chooseleaf firstn 0 type room
 	step emit
 }
-rule cos_ec_8_3_00000000-fast_room {
+rule ec_8_3-fast_room {
 	id 12
 	type erasure
 	min_size 3
 	max_size 11
 	step set_chooseleaf_tries 5
 	step set_choose_tries 100
-	step take 00000000-fast
+	step take fast
 	step chooseleaf indep 0 type room
 	step emit
 }
-rule cos_rep_00000000-fast_rack {
+rule rep-fast_rack {
 	id 13
 	type replicated
 	min_size 1
 	max_size 10
-	step take 00000000-fast
+	step take fast
 	step chooseleaf firstn 0 type rack
 	step emit
 }
-rule cos_ec_8_3_00000000-fast_rack {
+rule ec_8_3-fast_rack {
 	id 14
 	type erasure
 	min_size 3
 	max_size 11
 	step set_chooseleaf_tries 5
 	step set_choose_tries 100
-	step take 00000000-fast
+	step take fast
 	step chooseleaf indep 0 type rack
 	step emit
 }
-rule cos_rep_00000000-fast_host {
+rule rep-fast_host {
 	id 15
 	type replicated
 	min_size 1
 	max_size 10
-	step take 00000000-fast
+	step take fast
 	step chooseleaf firstn 0 type host
 	step emit
 }
-rule cos_ec_8_3_00000000-fast_host {
+rule ec_8_3-fast_host {
 	id 16
 	type erasure
 	min_size 3
 	max_size 11
 	step set_chooseleaf_tries 5
 	step set_choose_tries 100
-	step take 00000000-fast
+	step take fast
 	step chooseleaf indep 0 type host
 	step emit
 }
