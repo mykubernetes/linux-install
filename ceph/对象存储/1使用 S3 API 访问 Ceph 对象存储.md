@@ -54,11 +54,15 @@ Default Region: US
 S3 Endpoint: s3.amazonaws.com
 DNS-style bucket+hostname:port template for accessing a bucket: %(bucket)s.s3.amazonaws.com
 Encryption password:
+# 保持默认
 Path to GPG program: /usr/bin/gpg
+# 是否开启HTTPS
 Use HTTPS protocol: False                                 #根据提示输入False或者no
+# 这里不用写，因为没有代理
 HTTP Proxy server name:
 HTTP Proxy server port: 0
 Test access with supplied credentials? [Y/n] n            #输入n
+# 保存设置
 Save settings? [y/N] y                                    #输入y
 Configuration saved to '/root/.s3cfg'
 ```  
@@ -88,6 +92,9 @@ host_bucket = %(bucket).node01:7480       #bucket地址
 # s3cmd ls s3://bucket
 ERROR: Bucket 'bucket' does not exist
 ERROR: S3 error: 404 (NoSuchBucket)
+
+# s3cmd ls -v
+# s3cmd ls --recursive (或者 -r)   # 列出所有文件
 ```
 
 2. Make bucket
