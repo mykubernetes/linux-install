@@ -88,67 +88,110 @@ rgw_frontends = civetweb port=9900
 # sudo systemctl restart ceph-radosgw@rgw.node02.service
 ```
 
-5、创建池  
+
+# 启用 SSL
+
+- 生成签名证书并配置 radosgw 启用 SSL
+
+1、自签名证书
 ```
-# cat ./pool
-.rgw
-.rgw.root
-.rgw.control
-.rgw.gc
-.rgw.buckets
-.rgw.buckets.index
-.rgw.buckets.extra
-.log
-.intent-log
-.usage
-.users
-.users.email
-.users.swift
-.users.uid
-
-
-
-# cat ./create_pool.sh
-#!/bin/bash
-
-PG_NUM=30
-PGP_NUM=30
-SIZE=3
-
-for i in `cat ./pool`
-        do
-        ceph osd pool create $i $PG_NUM
-        ceph osd pool set $i size $SIZE
-        done
-
-for i in `cat ./pool`
-        do
-        ceph osd pool set $i pgp_num $PGP_NUM
-        done
-
-
-
-
-
-# chmod +x create_pool.sh
-# ./create_pool.sh
-```  
-6、测试是否能够访问ceph 集群  
-```
-sudo cp /var/lib/ceph/radosgw/ceph-rgw.node01/keyring ./
-ceph -s -k keyring --name client.rgw.node01
+#mgr2节点
+# mkdir /etc/ceph/certs
+# cd /etc/ceph/certs/
+# sudo openssl genrsa -out civetweb.key 2048
+# sudo openssl req -new -x509 -key civetweb.key -out civetweb.crt -subj "/CN=rgw.magedu.net"
+# cat civetweb.key civetweb.crt > civetweb.pem
+# ls
+civetweb.crt  civetweb.key  civetweb.pem
 ```
 
-7、删除池（如果操作错误，需要删除时，才执行这步，否则请略过）  
+2、SSL配置
 ```
-# vi /etc/ceph/ceph.conf
-...
-[mon]
-mon_allow_pool_delete = true
-...
+# mgr节点
+# cat /etc/ceph/ceph.conf 
+[global]
+fsid = 635d9577-7341-4085-90ff-cb584029a1ea
+public_network = 10.0.0.0/24
+cluster_network = 192.168.133.0/24
+mon_initial_members = ceph-mon1
+mon_host = 10.0.0.101
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
 
-# systemctl restart ceph-mon.target
+mon clock drift allowed = 2 
+mon clock drift warn backoff = 30 
 
-# ceph osd pool delete poolname poolname --yes-i-really-really-mean-it
-```  
+[mds.ceph-mgr2] 
+#mds_standby_for_fscid = mycephfs 
+mds_standby_for_name = ceph-mgr1 
+mds_standby_replay = true 
+
+[mds.ceph-mon3] 
+mds_standby_for_name = ceph-mon2 
+mds_standby_replay = true
+
+[client.rgw.ceph-mgr1]
+rgw_host = ceph-mgr1 
+rgw_frontends = civetweb port=9900
+
+[client.rgw.ceph-mgr2] 
+rgw_host = ceph-mgr2
+rgw_frontends = civetweb port=9900
+
+[client.rgw.ceph-mgr2] 
+rgw_host = ceph-mgr2 
+rgw_frontends = "civetweb port=9900+9443s ssl_certificate=/etc/ceph/certs/civetweb.pem"          # 添加证书
+
+#重启服务
+# systemctl restart ceph-radosgw@rgw.ceph-mgr2.service
+```
+
+3、mgr节点验证9443端口
+```
+# ss -tln
+State         Recv-Q       Send-Q           Local Address:Port              Peer Address:Port               
+LISTEN        0            128                  127.0.0.1:6010                   0.0.0.0:*                 
+LISTEN        0            128                    0.0.0.0:9443                   0.0.0.0:*                 
+LISTEN        0            128                    0.0.0.0:9900                   0.0.0.0:*                 
+LISTEN        0            128                 10.0.0.105:6800                   0.0.0.0:*                 
+LISTEN        0            128                 10.0.0.105:6801                   0.0.0.0:*                 
+LISTEN        0            128              127.0.0.53%lo:53                     0.0.0.0:*                 
+LISTEN        0            128                    0.0.0.0:22                     0.0.0.0:*                 
+LISTEN        0            128                  127.0.0.1:43447                  0.0.0.0:*                 
+LISTEN        0            128                      [::1]:6010                      [::]:*                 
+LISTEN        0            128                       [::]:22                        [::]:*  
+```
+
+4、浏览器验证
+https://10.0.0.105:9443
+
+# 优化配置
+```
+# mgr节点
+# 创建日志目录
+# sudo mkdir /var/log/radosgw
+# sudo chown -R ceph:ceph /var/log/radosgw
+
+# 修改配置
+# cat /etc/ceph/ceph.conf 
+[client.rgw.ceph-mgr2] 
+rgw_host = ceph-mgr2 
+rgw_frontends = "civetweb port=9900+9443s ssl_certificate=/etc/ceph/certs/civetweb.pem error_log_file=/var/log/radosgw/civetweb.error.log access_log_file=/var/log/radosgw/civetweb.access.log request_timeout_ms=30000 num_threads=200"
+
+# 重启服务
+# sudo systemctl restart ceph-radosgw@rgw.ceph-mgr2.service
+
+# 访问测试
+# curl -k https://10.0.0.105:9443
+# curl -k https://10.0.0.105:9443
+
+# 验证日志
+# tail /var/log/radosgw/civetweb.access.log 
+10.0.0.105 - - [31/Aug/2021:14:44:47 +0800] "GET / HTTP/1.1" 200 414 - curl/7.58.0
+10.0.0.105 - - [31/Aug/2021:14:44:48 +0800] "GET / HTTP/1.1" 200 414 - curl/7.58.0
+10.0.0.105 - - [31/Aug/2021:14:44:50 +0800] "GET / HTTP/1.1" 200 414 - curl/7.58.0
+
+注:mgr1做一样的操作
+```
 
