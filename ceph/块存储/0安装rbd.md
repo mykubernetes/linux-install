@@ -423,6 +423,137 @@ rbd-data1              10   32   23 MiB       32   69 MiB   0.03     76 GiB
 # mount -a
 ```
 
+# 客户端使用普通账户挂载并使用 RBD
+
+1、创建普通账户并授权 (资源有限，使用了之前的虚拟机，可以新建一台client来做实验)
+```
+# 创建普通账户
+# ceph auth add client.shijie mon 'allow r' osd 'allow rwx pool=rbd-data1'
+added key for client.shijie
+
+# 验证用户信息
+# ceph auth get client.shijie
+[client.shijie]
+    key = AQCAaCphzIAHMxAAddWTSYWGP6+lQuJV2OW/mQ==
+    caps mon = "allow r"
+    caps osd = "allow rwx pool=rbd-data1"
+exported keyring for client.shijie
+
+# 创建 keyring 文件
+# ceph-authtool --create-keyring ceph.client.shijie.keyring
+creating ceph.client.shijie.keyring
+
+# 导出用户 keyring
+# ceph auth get client.shijie -o ceph.client.shijie.keyring
+exported keyring for client.shijie
+```
+
+2、同步普通用户认证文件
+```
+# scp ceph.conf ceph.client.admin.keyring root@10.0.0.200:/etc/ceph/
+```
+
+3、在客户端验证权限
+```
+# ll /etc/ceph/
+total 20
+drwxr-xr-x  2 root root 4096 Aug 28 09:56 ./
+drwxr-xr-x 81 root root 4096 Aug 28 09:51 ../
+-rw-r--r--  1 root root  125 Aug 28 09:47 ceph.client.shijie.keyring
+-rw-r--r--  1 root root  261 Aug 20 10:11 ceph.conf
+-rw-r--r--  1 root root   92 Jun  7 07:39 rbdmap
+
+# 默认使用 admin 账户
+# ceph --user shijie -s
+```
+
+4、映射 rbd
+```
+# 映射 rbd
+# rbd --user shijie -p rbd-data1 map data-img2
+/dev/rbd2
+
+# 验证rbd
+# fdisk -l /dev/rbd0
+Disk /dev/rbd0: 3 GiB, 3221225472 bytes, 6291456 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 4194304 bytes / 4194304 bytes
+```
+
+5、格式化并使用 rbd 镜像
+```
+# mkfs.ext4 /dev/rbd2
+mke2fs 1.44.1 (24-Mar-2018)
+/dev/rbd2 contains a xfs file system
+Proceed anyway? (y,N) y
+Discarding device blocks: done                            
+Creating filesystem with 1310720 4k blocks and 327680 inodes
+Filesystem UUID: fb498e3f-e8cb-40dd-b10d-1e91e0bfbbed
+Superblock backups stored on blocks: 
+    32768, 98304, 163840, 229376, 294912, 819200, 884736
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (16384 blocks): done
+Writing superblocks and filesystem accounting information: done 
+
+# mkdir /data2
+# mount /dev/rbd2 /data2/
+# cp /var/log/messages /data2/
+
+# ll /data2
+total 24
+drwxr-xr-x  3 root root  4096 Aug 28 10:00 ./
+drwxr-xr-x 25 root root  4096 Aug 28 10:01 ../
+drwx------  2 root root 16384 Aug 28 10:00 lost+found/
+
+# df -TH
+Filesystem     Type      Size  Used Avail Use% Mounted on
+udev           devtmpfs  1.1G     0  1.1G   0% /dev
+tmpfs          tmpfs     207M  7.0M  200M   4% /run
+/dev/sda1      ext4       22G  3.0G   17G  15% /
+tmpfs          tmpfs     1.1G     0  1.1G   0% /dev/shm
+tmpfs          tmpfs     5.3M     0  5.3M   0% /run/lock
+tmpfs          tmpfs     1.1G     0  1.1G   0% /sys/fs/cgroup
+/dev/rbd0      xfs       3.3G   39M  3.2G   2% /data
+/dev/rbd1      xfs       5.4G   42M  5.4G   1% /data1
+tmpfs          tmpfs     207M     0  207M   0% /run/user/1000
+/dev/rbd2      ext4      5.3G   21M  5.0G   1% /data2
+
+#管理端验证镜像状态
+# rbd ls -p rbd-data1 -l
+NAME       SIZE   PARENT  FMT  PROT  LOCK
+data-img1  3 GiB            2        excl
+data-img2  5 GiB            2
+```
+
+6、验证 ceph 内核模块
+
+- 挂载 rbd 之后系统内核会自动加载 libceph.ko 模块
+```
+# lsmod|grep ceph
+libceph               315392  1 rbd
+libcrc32c              16384  2 xfs,libceph
+
+# modinfo libceph
+filename:       /lib/modules/4.15.0-112-generic/kernel/net/ceph/libceph.ko
+license:        GPL
+description:    Ceph core library
+author:         Patience Warnick <patience@newdream.net>
+author:         Yehuda Sadeh <yehuda@hq.newdream.net>
+author:         Sage Weil <sage@newdream.net>
+srcversion:     899059C79545E4ADF47A464
+depends:        libcrc32c
+retpoline:      Y
+intree:         Y
+name:           libceph
+vermagic:       4.15.0-112-generic SMP mod_unload 
+signat:         PKCS#7
+signer:         
+sig_key:        
+sig_hashalgo:   md4
+```
 
 
 七、调整Ceph RBD块大小
