@@ -182,3 +182,128 @@ exported keyring for client.test
 ```
 # ceph auth del client.rbd
 ```
+
+
+## 秘钥环管理
+
+- ceph 的秘钥环是一个保存了 secrets、keys、certificates 并且能够让客户端通认证访问 ceph的 keyring file(集合文件)，一个 keyring file 可以保存一个或者多个认证信息，每一个 key 都有一个实体名称加权限，类型为：
+```
+{client、mon、mds、osd}.name
+```
+
+1、通过秘钥环文件备份与恢复用户
+使用 ceph auth add 等命令添加的用户还需要额外使用 ceph-authtool 命令为其创建用户秘钥环文件
+```
+创建 keyring 文件命令格式：
+ceph-authtool --create-keyring FILE
+```
+
+2、导出用户认证信息至 keyring 文件
+- 将用户信息导出至 keyring 文件，对用户信息进行备份。
+```
+#deploy节点
+#创建用户
+# ceph auth get-or-create client.user1 mon 'allow r' osd 'allow * pool=mypool'
+[client.user1]
+    key = AQB6WiphsylPERAALnVZ0wMPapQ0lb3ehDdrVA==
+
+#验证用户
+# ceph auth get client.user1
+[client.user1]
+    key = AQB6WiphsylPERAALnVZ0wMPapQ0lb3ehDdrVA==
+    caps mon = "allow r"
+    caps osd = "allow * pool=mypool"
+exported keyring for client.user1
+
+#创建keyring 文件
+# ceph-authtool --create-keyring ceph.client.user1.keyring
+creating ceph.client.user1.keyring
+
+#验证 keyring 文件
+# cat ceph.client.user1.keyring
+# file ceph.client.user1.keyring
+ceph.client.user1.keyring: empty #空文件
+
+#导出 keyring 至指定文件
+# ceph auth get client.user1 -o ceph.client.user1.keyring
+exported keyring for client.user1
+
+#验证指定用户的 keyring 文件
+# cat ceph.client.user1.keyring
+[client.user1]
+    key = AQB6WiphsylPERAALnVZ0wMPapQ0lb3ehDdrVA==
+    caps mon = "allow r"
+    caps osd = "allow * pool=mypool"
+```
+
+3、从 keyring 文件恢复用户认证信息
+- 可以使用 ceph auth import -i 指定 keyring 文件并导入到 ceph，起到用户备份和恢复的作用
+```
+#验证用户
+# cat ceph.client.user1.keyring
+[client.user1]
+    key = AQB6WiphsylPERAALnVZ0wMPapQ0lb3ehDdrVA==
+    caps mon = "allow r"
+    caps osd = "allow * pool=mypool"
+
+#模拟误删用户
+# ceph auth del client.user1
+updated
+
+#验证用户
+# ceph auth get client.user1
+Error ENOENT: failed to find client.user1 in keyring
+
+#导入用户 keyring
+# ceph auth import -i ceph.client.user1.keyring
+imported keyring
+
+#验证用户
+# ceph auth get client.user1
+[client.user1]
+    key = AQB6WiphsylPERAALnVZ0wMPapQ0lb3ehDdrVA==
+    caps mon = "allow r"
+    caps osd = "allow * pool=mypool"
+exported keyring for client.user1
+```
+
+
+4、秘钥环文件多用户
+- 一个 keyring 文件中可以包含多个不同用户的认证文件
+
+将多用户导出至秘钥环
+```
+#创建空的keyring 文件
+# ceph-authtool --create-keyring ceph.client.user.keyring
+creating ceph.client.user.keyring
+
+#把指定的 admin 用户的 keyring 文件内容导入到 user 用户的 keyring 文件
+# ceph-authtool ./ceph.client.user.keyring --import-keyring ./ceph.client.admin.keyring
+importing contents of ./ceph.client.admin.keyring into ./ceph.client.user.keyring
+
+#验证 keyring 文件
+# ceph-authtool -l ./ceph.client.user.keyring
+[client.admin]
+    key = AQD55h9h5ICUJBAAfk/2gBzkwU+G8bfqY023Yg==
+    caps mds = "allow *"
+    caps mgr = "allow *"
+    caps mon = "allow *"
+    caps osd = "allow *"
+
+#再导入一个其他用户的 keyring
+# ceph-authtool ./ceph.client.user.keyring --import-keyring ./ceph.client.user1.keyring
+importing contents of ./ceph.client.user1.keyring into ./ceph.client.user.keyring
+
+#验证 keyring 文件是否包含多个用户的认证信息
+# ceph-authtool -l ./ceph.client.user.keyring
+[client.admin]
+    key = AQD55h9h5ICUJBAAfk/2gBzkwU+G8bfqY023Yg==
+    caps mds = "allow *"
+    caps mgr = "allow *"
+    caps mon = "allow *"
+    caps osd = "allow *"
+[client.user1]
+    key = AQB6WiphsylPERAALnVZ0wMPapQ0lb3ehDdrVA==
+    caps mon = "allow r"
+    caps osd = "allow * pool=mypool"
+```
