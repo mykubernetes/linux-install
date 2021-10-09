@@ -161,7 +161,7 @@ rbd image 'rbd1':
 | fast-diff | 16 | 快照平支持(snapshot flatten support) |
 | deep-flatten | 32 | 在client-node1上使用krbd(内核rbd)客户机进行快速diff计算(需要对象映射)，我们将无法在CentOS内核3.10上映射块设备映像，因为该内核不支持对象映射(object-map)、深平(deep-flatten)和快速diff(fast-diff)(在内核4.9中引入了支持)。 |
 
-1、映射到客户端，应该会报错  
+映射到客户端，应该会报错  
 ```
 # rbd map --image rbd1 --name client.rbd
 
@@ -176,6 +176,79 @@ rbd create data-img1 --size 3G --pool rbd-data1 --image-format 2 --image-feature
 # rbd_default_features = 1
 ```
 
+# 六、实验
+
+1、创建镜像
+```
+#创建2个镜像
+# rbd create data-img1 --size 3G --pool rbd-data1 --image-format 2 --image-feature layering
+# rbd create data-img2 --size 5G --pool rbd-data1 --image-format 2 --image-feature layering
+
+# 验证镜像
+# rbd ls --pool rbd-data1
+data-img1
+data-img2
+
+# 查看镜像信息
+# rbd ls --pool rbd-data1 -l
+NAME       SIZE   PARENT  FMT  PROT  LOCK
+data-img1  3 GiB            2            
+data-img2  5 GiB            2 
+```
+
+2、查看镜像详细信息
+```
+#查看data-img2的详细信息
+# rbd --image data-img2 --pool rbd-data1 info
+rbd image 'data-img2':
+    size 5 GiB in 1280 objects
+    order 22 (4 MiB objects)
+    snapshot_count: 0
+    id: 12468e5b9a04b
+    block_name_prefix: rbd_data.12468e5b9a04b
+    format: 2
+    features: layering
+    op_features: 
+    flags: 
+    create_timestamp: Sun Aug 29 00:08:51 2021
+    access_timestamp: Sun Aug 29 00:08:51 2021
+    modify_timestamp: Sun Aug 29 00:08:51 2021
+
+#查看data-img1的详细信息
+# rbd --image data-img1 --pool rbd-data1 info
+rbd image 'data-img1':
+    size 3 GiB in 768 objects
+    order 22 (4 MiB objects)
+    snapshot_count: 0
+    id: 1245f7ae95595
+    block_name_prefix: rbd_data.1245f7ae95595
+    format: 2
+    features: layering
+    op_features: 
+    flags: 
+    create_timestamp: Sun Aug 29 00:08:41 2021
+    access_timestamp: Sun Aug 29 00:08:41 2021
+    modify_timestamp: Sun Aug 29 00:08:41 2021
+```
+
+3、以json格式显示镜像信息
+```
+# rbd ls --pool rbd-data1 -l --format json --pretty-format
+[
+    {
+        "image": "data-img1",
+        "id": "1245f7ae95595",
+        "size": 3221225472,
+        "format": 2
+    },
+    {
+        "image": "data-img2",
+        "id": "12468e5b9a04b",
+        "size": 5368709120,
+        "format": 2
+    }
+]
+```
 
 镜像特性的启用
 ```
