@@ -124,20 +124,23 @@ Self-signed certificate created
 ```
 
 
-# 开启Object Gateway管理功能
-- 默认object  Gateway功能没有开启
+# Dashboard中启用RGW
+
 ```
 1、创建rgw用户
-# radosgw-admin user info --uid=user01
+# radosgw-admin user create --uid=rgw --display-name=rgw --system
 
-2、提供Dashboard证书
+2、记下输出的access_key 和 secret_key的值，之前没有记下也可以通过以下命令查看(可选)
+# radosgw-admin user info --uid=rgw
+
+3、为Dashboard设置access_key 和 secret_key。
 # ceph dashboard set-rgw-api-access-key $access_key
 # ceph dashboard set-rgw-api-secret-key $secret_key
 
-3、配置rgw主机名和端口
+4、配置rgw主机名和端口
 # ceph dashboard set-rgw-api-host 10.0.0.104
 
-4、刷新web页面
+5、刷新web页面
 ```
 
 https://blog.51cto.com/renlixing/2487852
