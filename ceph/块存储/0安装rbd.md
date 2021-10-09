@@ -132,9 +132,9 @@ enabled application 'rbd' on pool 'rbd-data1'
 
 查看创建的块设备  
 ```
-# rbd ls --name client.rbd
-# rbd ls -p rbd --name client.rbd
-# rbd list --name client.rbd
+# rbd ls --name client.rbd  或 # rbd list --name client.rbd
+# rbd ls -p rbd-data1 --name client.rbd
+# rbd ls --pool rbd-data1 -l
 # rbd --image rbd1 info --name client.rbd
 ```  
 
@@ -153,8 +153,6 @@ rbd image 'rbd1':
 - order: order 22 (4096 kB objects)，指定RBD在OSD中存储时的block size，block size的计算公式是1<<order(单位是bytes)，在本例中order=22，所有block         size是1<<22bytes，也就是4096KBytes。order的默认值是22，RBD在OSD中默认的对象大小是4MBytes
 - format: rbd image的格式，format1已经过期了。现在默认都是format2，被librbd和kernel3.11后面的版本支持
 - block_name_prefix: 表示这个image在pool中的名称前缀，可以通过rados -p pool-frank6866 ls | grep rbd_data.1ad6e2ae8944a命令查看这个rbd image在rados中的所有object。但是要注意的是，刚创建的image，如果里面没有数据，不会在rados中创建object，只有写入数据时才会有。size字段中的objects数量表示的是最大的objects数量
-
-
 
 
 五、客户端映射块设备
@@ -187,7 +185,7 @@ rbd image 'rbd1':
 
 2）创建RBD镜像时，只启用 分层特性。
 ```
-# rbd create rbd2 --size 10240 --image-feature layering --name client.rbd
+rbd create data-img1 --size 3G --pool rbd-data1 --image-format 2 --image-feature layering --name client.rbd
 ```
 
 3）ceph 配置文件中禁用
