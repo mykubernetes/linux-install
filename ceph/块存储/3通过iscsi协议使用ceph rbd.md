@@ -80,11 +80,11 @@ Login to [iface: default, target: iqn.2014-04.rbdstore.example.com:iscsi, portal
 ```
 root@cetune1:~# lsblk 
 NAME                  MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
-sda                     8:0    0    10G  0 disk 
-vda                   253:0    0    24G  0 disk 
+sda                      8:0    0    10G  0 disk 
+vda                    253:0    0    24G  0 disk 
 ?..vda1                253:1    0   190M  0 part /boot
 ?..vda2                253:2    0     1K  0 part 
 ?..vda5                253:5    0  23.8G  0 part 
-  ?..linux-swap (dm-0) 252:0    0   3.8G  0 lvm  [SWAP]
-  ?..linux-root (dm-1) 252:1    0    20G  0 lvm  /
+?..linux-swap (dm-0)   252:0    0   3.8G  0 lvm  [SWAP]
+?..linux-root (dm-1)   252:1    0    20G  0 lvm  /
 ```
