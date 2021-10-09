@@ -1,23 +1,4 @@
-# 安装rbd客户端工具
-
-
-## RBD介绍
-> RBD即RADOS Block Device的简称，RBD块存储是最稳定且最常用的存储类型。RBD块设备类似磁盘可以被挂载。 RBD块设备具有快照、多副本、克隆和一致性等特性，数据以条带化的方式存储在Ceph集群的多个OSD中。如下是对Ceph RBD的理解。
-- RBD 就是 Ceph 里的块设备，一个 4T 的块设备的功能和一个 4T 的 SATA 类似，挂载的 RBD 就可以当磁盘用；
-- resizable：这个块可大可小；
-- data striped：这个块在Ceph里面是被切割成若干小块来保存，不然 1PB 的块怎么存的下；
-- thin-provisioned：精简置备，1TB 的集群是能创建无数 1PB 的块的。其实就是块的大小和在 Ceph 中实际占用大小是没有关系的，刚创建出来的块是不占空间，今后用多大空间，才会在 Ceph 中占用多大空间。举例：你有一个 32G 的 U盘，存了一个2G的电影，那么 RBD 大小就类似于 32G，而 2G 就相当于在 Ceph 中占用的空间  ；
-
->块存储本质就是将裸磁盘或类似裸磁盘(lvm)设备映射给主机使用，主机可以对其进行格式化并存储和读取数据，块设备读取速度快但是不支持共享。
->>ceph可以通过内核模块和librbd库提供块设备支持。客户端可以通过内核模块挂在rbd使用，客户端使用rbd块设备就像使用普通硬盘一样，可以对其就行格式化然后使用；客户应用也可以通过librbd使用ceph块，典型的是云平台的块存储服务（如下图），云平台可以使用rbd作为云的存储后端提供镜像存储、volume块或者客户的系统引导盘等。
-
-使用场景：
-- 云平台（OpenStack做为云的存储后端提供镜像存储）
-- K8s容器
-- map成块设备直接使用
-- ISCIS，安装Ceph客户端
-
-## RBD常用命令
+# RBD常用命令
 | 命令 | 功能 |
 | ------ | ------ |
 | rbd create --szie n [pool-name/]image-name | 创建RBD |
@@ -250,14 +231,14 @@ rbd image 'data-img1':
 ]
 ```
 
-镜像特性的启用
+4、镜像特性的启用
 ```
 # rbd feature enable exclusive-lock --pool rbd-data1 --image data-img1
 # rbd feature enable object-map --pool rbd-data1 --image data-img1
 # rbd feature enable fast-diff --pool rbd-data1 --image data-img1
 ```
 
-验证镜像特性
+5、验证镜像特性
 ```
 # rbd --image data-img1 --pool rbd-data1 info
 rbd image 'data-img1':
@@ -275,7 +256,7 @@ rbd image 'data-img1':
     modify_timestamp: Sun Aug 29 00:08:41 2021
 ```
 
-镜像特性的禁用
+6、镜像特性的禁用
 ```
 # rbd feature disable fast-diff --pool rbd-data1 --image data-img1
 # rbd --image data-img1 --pool rbd-data1 info
@@ -294,49 +275,138 @@ rbd image 'data-img1':
     modify_timestamp: Sun Aug 29 00:08:41 2021
 ```
 
-3、映射到本地
+7、客户端映射镜像到本地
 ``` 
-# rbd map --image rbd1 --name client.rbd 
+# rbd -p rbd-data1 map data-img1
 /dev/rbd0
+# rbd -p rbd-data1 map data-img2
+/dev/rbd1
 ```  
-或者
-```
-# rbd map rbd1 --pool rbd --name client.rbd
-```
 
-4、查看系统中已经映射到本地的块
+8、查看系统中已经映射到本地的块
 ``` 
 # rbd showmapped --name client.rbd
 id pool image snap device    
-0  rbd  rbd1  -    /dev/rbd0
+0  rbd  data-img1  -    /dev/rbd0
+0  rbd  data-img2  -    /dev/rbd1
 ```
 
-5、取消映射
+9、客户端验证镜像
+```
+# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda      8:0    0   20G  0 disk 
+└─sda1   8:1    0   20G  0 part /
+sr0     11:0    1 1024M  0 rom  
+rbd0   252:0    0    3G  0 disk 
+rbd1   252:16   0    5G  0 disk
+```
+
+10、客户端格式化磁盘并挂载使用
+```
+#客户端格式化 rbd
+# mkfs.xfs /dev/rbd0
+meta-data=/dev/rbd0              isize=512    agcount=9, agsize=97280 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=0, rmapbt=0, reflink=0
+data     =                       bsize=4096   blocks=786432, imaxpct=25
+         =                       sunit=1024   swidth=1024 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=8 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+# mkfs.xfs /dev/rbd1
+meta-data=/dev/rbd1              isize=512    agcount=9, agsize=162816 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=0, rmapbt=0, reflink=0
+data     =                       bsize=4096   blocks=1310720, imaxpct=25
+         =                       sunit=1024   swidth=1024 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=8 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+# 挂载
+# mkdir /data /data1 -p
+# mount /dev/rbd0 /data
+# mount /dev/rbd1 /data1
+
+# df -TH
+Filesystem     Type      Size  Used Avail Use% Mounted on
+udev           devtmpfs  1.1G     0  1.1G   0% /dev
+tmpfs          tmpfs     207M  7.0M  200M   4% /run
+/dev/sda1      ext4       22G  3.0G   17G  15% /
+tmpfs          tmpfs     1.1G     0  1.1G   0% /dev/shm
+tmpfs          tmpfs     5.3M     0  5.3M   0% /run/lock
+tmpfs          tmpfs     1.1G     0  1.1G   0% /sys/fs/cgroup
+tmpfs          tmpfs     207M     0  207M   0% /run/user/1000
+/dev/rbd0      xfs       3.3G   38M  3.2G   2% /data
+/dev/rbd1      xfs       5.4G   41M  5.4G   1% /data1
+```
+
+11、客户端验证写入数据
+```
+# sudo cp /var/log/syslog /data
+# sudo cp /var/log/syslog /data1
+# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            964M     0  964M   0% /dev
+tmpfs           198M  6.7M  191M   4% /run
+/dev/sda1        20G  2.8G   16G  15% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+tmpfs           986M     0  986M   0% /sys/fs/cgroup
+tmpfs           198M     0  198M   0% /run/user/1000
+/dev/rbd0       3.0G   38M  3.0G   2% /data
+/dev/rbd1       5.0G   40M  5.0G   1% /data1
+```
+
+12、验证 rbd 数据
+```
+# ll /data
+total 1160
+drwxr-xr-x  2 root root      20 Aug 28 09:42 ./
+drwxr-xr-x 24 root root    4096 Aug 28 09:38 ../
+-rw-r-----  1 root root 1181490 Aug 28 09:42 syslog
+
+# ll /data1
+total 1160
+drwxr-xr-x  2 root root      20 Aug 28 09:43 ./
+drwxr-xr-x 24 root root    4096 Aug 28 09:38 ../
+-rw-r-----  1 root root 1181490 Aug 28 09:43 syslog
+```
+
+13、服务器端查看存储池空间
+```
+# ceph df 
+--- RAW STORAGE ---
+CLASS     SIZE    AVAIL     USED  RAW USED  %RAW USED
+hdd    240 GiB  239 GiB  861 MiB   861 MiB       0.35
+TOTAL  240 GiB  239 GiB  861 MiB   861 MiB       0.35
+ 
+--- POOLS ---
+POOL                   ID  PGS   STORED  OBJECTS     USED  %USED  MAX AVAIL
+device_health_metrics   1    1      0 B        0      0 B      0     76 GiB
+mypool                  2   32      0 B        0      0 B      0     76 GiB
+myrbd1                  3   64   12 MiB       18   35 MiB   0.02     76 GiB
+.rgw.root               4   32  1.3 KiB        4   48 KiB      0     76 GiB
+default.rgw.log         5   32  3.6 KiB      209  408 KiB      0     76 GiB
+default.rgw.control     6   32      0 B        8      0 B      0     76 GiB
+default.rgw.meta        7    8      0 B        0      0 B      0     76 GiB
+cephfs-metadata         8   32   56 KiB       22  254 KiB      0     76 GiB
+cephfs-data             9   64  121 MiB       31  363 MiB   0.16     76 GiB
+rbd-data1              10   32   23 MiB       32   69 MiB   0.03     76 GiB
+```
+
+14、取消映射
 ```
 # rbd unmap /dev/rbd0
 或者
 # rbd unmap rbd/rbd1
 ```
 
-```
-rbd remove rbd/rbd1
-```
-
-6、创建文件系统，并挂载
-```
-# fdisk -l /dev/rbd0
-# mkfs.xfs /dev/rbd0
-# mkdir /mnt/ceph-disk1
-# mount /dev/rbd0 /mnt/ceph-disk1
-# df -h /mnt/ceph-disk1
-```  
-
-7、写入数据测试
-```
-# dd if=/dev/zero of=/mnt/ceph-disk1/file1 count=100 bs=1M
-```
-
-8、设置自动挂载
+15、设置自动挂载
 ```
 # 1、开机自动映射到本地
 # vim /etc/ceph/rbdmap
@@ -354,67 +424,6 @@ rbd remove rbd/rbd1
 ```
 
 
-9、做成服务，开机自动挂载(此步不需要，已经过时)
-
-1)做成服务
-```
-# cat /usr/local/bin/rbd-mount
-
-#!/bin/bash
-
-# Pool name where block device image is stored
-export poolname=rbd
- 
-# Disk image name
-export rbdimage=rbd1
- 
-# Mounted Directory
-export mountpoint=/mnt/ceph-disk1
- 
-# Image mount/unmount and pool are passed from the systemd service as arguments
-# Are we are mounting or unmounting
-if [ "$1" == "m" ]; then
-   modprobe rbd
-   rbd feature disable $rbdimage object-map fast-diff deep-flatten
-   rbd map $rbdimage --id rbd --keyring /etc/ceph/ceph.client.rbd.keyring
-   mkdir -p $mountpoint
-   mount /dev/rbd/$poolname/$rbdimage $mountpoint
-fi
-if [ "$1" == "u" ]; then
-   umount $mountpoint
-   rbd unmap /dev/rbd/$poolname/$rbdimage
-fi
-
-添加执行权限
-# chmod +x /usr/local/bin/rbd-mount
-```  
-
-2)开机自动挂载
-```
-# cat /etc/systemd/system/rbd-mount.service 
-[Unit]
-Description=RADOS block device mapping for $rbdimage in pool $poolname"
-Conflicts=shutdown.target
-Wants=network-online.target
-After=NetworkManager-wait-online.service
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-ExecStart=/usr/local/bin/rbd-mount m
-ExecStop=/usr/local/bin/rbd-mount u
-[Install]
-WantedBy=multi-user.target
-
-
-# systemctl daemon-reload
-# systemctl enable rbd-mount.service
-```  
-
-重启测试  
-```
-# reboot -f
-# df -h
-```  
 
 七、调整Ceph RBD块大小
 ---
