@@ -106,6 +106,8 @@ exported keyring for client.yanyan
 
 > 客户端挂载有两种方式，一是内核空间一是用户空间，内核空间挂载需要内核支持 ceph 模块，用户空间挂载需要安装 ceph-fuse
 
+http://docs.ceph.org.cn/man/8/mount.ceph/#mount-ceph-ceph  
+
 1、客户端验证权限
 ```
 # ceph --user yanyan -s
@@ -155,6 +157,7 @@ tmpfs                                              198M     0  198M   0% /run/us
 # tail /etc/ceph/yanyan.key
 AQAhMCth/3d/HxAA7sMakmCr5tOFj8l2vmmaRA==
 # umount /data/
+# 指定多个mon地址
 # mount -t ceph 10.0.0.101:6789,10.0.0.102:6789,10.0.0.103:6789:/ /data -o name=yanyan,secret=AQAhMCth/3d/HxAA7sMakmCr5tOFj8l2vmmaRA==
 # df -h
 Filesystem                                         Size  Used Avail Use% Mounted on
@@ -182,7 +185,7 @@ Inodes: Total: 56         Free: -1
 4、开机挂载
 ```
 # cat /etc/fstab 
-10.0.0.101:6789,10.0.0.102:6789,10.0.0.103:6789:/ /data ceph defaults,name=yanyan,secretfile=/etc/ceph/yanyan.key,_netdev 0 0
+10.0.0.101:6789,10.0.0.102:6789,10.0.0.103:6789:/ /data ceph defaults,name=yanyan,secretfile=/etc/ceph/yanyan.key,_netdev,noatime 0 0
 
 # mount -a
 ```
@@ -190,7 +193,6 @@ Inodes: Total: 56         Free: -1
 5、客户端模块
 - 客户端内核加载 ceph.ko 模块挂载 cephfs 文件系统
 ```
-#client节点
 # lsmod|grep ceph
 ceph                  376832  1
 libceph               315392  1 ceph
@@ -200,45 +202,10 @@ fscache                65536  1 ceph
 # madinfo ceph
 ```
 
-1、通过内核驱动挂载Ceph FS  
-mount挂载ceph选项参考  
-http://docs.ceph.org.cn/man/8/mount.ceph/#mount-ceph-ceph  
-1)创建挂载目录  
-``` # mkdir /mnt/cephfs ```  
-2)挂载  
-
-手动输入key挂载  
-```
-# ceph auth get-key client.cephfs        #在ceph fs服务器上执行，获取key
-AQCpdblcDYdhGBAATHHTR0Fd7cwZ0hFmz1VjtQ==
-# mount -t ceph node01:6789:/ /mnt/cephfs -o name=cephfs,secret=AQCpdblcDYdhGBAATHHTR0Fd7cwZ0hFmz1VjtQ==      # -o name=cephfs的name为创建key的时候client.cephfs的cephfs名
 
 
-$ umount /mnt/cephfs //使用多个mon挂载
-$ mount -t ceph node01,node02,node03:/ /mnt/cephfs -o name=cephfs,secret=AQCpdblcDYdhGBAATHHTR0Fd7cwZ0hFmz1VjtQ==
-```
+# 通过FUSE客户端挂载  
 
-通过指定key文件挂载  
-```
-# echo AQCpdblcDYdhGBAATHHTR0Fd7cwZ0hFmz1VjtQ== > /etc/ceph/cephfskey        #把 key保存起来
-# mount -t ceph node02:6789:/ /mnt/cephfs -o name=cephfs,secretfile=/etc/ceph/cephfskey   #name为认证用户名
-```  
-
-启动挂载  
-```
-# echo "node02:6789:/ /mnt/cephfs ceph name=cephfs,secretfile=/etc/ceph/cephfskey,_netdev,noatime 0 0" >> /etc/fstab
-```  
-
-3)、校验  
-```
-umount /mnt/cephfs
-mount /mnt/cephfs
-dd if=/dev/zero of=/mnt/cephfs/file1 bs=1M count=1024
-```  
-
-
-通过FUSE客户端挂载  
----
 1)安装软件包  
 ```
 [ceph]
