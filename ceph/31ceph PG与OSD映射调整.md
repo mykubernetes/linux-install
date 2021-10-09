@@ -110,6 +110,7 @@ ID  CLASS  WEIGHT   REWEIGHT  SIZE     RAW USE  DATA     OMAP     META     AVAIL
 ```
 
 > 需要注意的是，这个参数不会持久化，当该osd out时，reweight的值为0， 当该osd重新up时，该值会恢复到1，而不会保持之前修改过的值。
+
 > 当`reweight`改变时，weight的值并不会变化。它影响PG到OSD的映射关系。`Reweight`参数的目的，由于ceph的CRUSH算法随机分配，是概率统计意义上的数据均衡，当小规模集群pg数量相对较少时，会产生一些不均匀的情况，通过调整`reweight`参数，达到数据均衡。
 
 
