@@ -65,9 +65,141 @@ ceph auth get-or-create client.cephfs mon 'allow r' mds 'allow r, allow rw path=
 scp ceph.client.cephfs.keyring node04:/etc/ceph/
 ```  
 
-客户端挂载
---------
-在linux中挂载有两种方式Kernel Driver和Fuse  
+创建客户端账户
+```
+#创建用户
+# ceph auth add client.yanyan mon 'allow r' mds 'allow rw' osd 'allow rwx pool=cephfs-data'
+added key for client.yanyan
+
+#验证账户
+# ceph auth get client.yanyan
+[client.yanyan]
+    key = AQAhMCth/3d/HxAA7sMakmCr5tOFj8l2vmmaRA==
+    caps mds = "allow rw"
+    caps mon = "allow r"
+    caps osd = "allow rwx pool=cephfs-data"
+exported keyring for client.yanyan
+
+#创建keyring 文件
+# ceph auth get client.yanyan -o ceph.client.yanyan.keyring
+exported keyring for client.yanyan
+
+#创建 key 文件
+# ceph auth print-key client.yanyan > yanyan.key
+
+#验证用户的 keyring 文件
+# cat ceph.client.yanyan.keyring
+[client.yanyan]
+    key = AQAhMCth/3d/HxAA7sMakmCr5tOFj8l2vmmaRA==
+    caps mds = "allow rw"
+    caps mon = "allow r"
+    caps osd = "allow rwx pool=cephfs-data"
+
+
+#同步客户端认证文件
+# scp ceph.conf ceph.client.yanyan.keyring yanyan.key root@10.0.0.200:/etc/ceph/
+```
+
+
+
+# 客户端挂载
+
+> 客户端挂载有两种方式，一是内核空间一是用户空间，内核空间挂载需要内核支持 ceph 模块，用户空间挂载需要安装 ceph-fuse
+
+1、客户端验证权限
+```
+# ceph --user yanyan -s
+  cluster:
+    id:     635d9577-7341-4085-90ff-cb584029a1ea
+    health: HEALTH_OK
+ 
+  services:
+    mon: 3 daemons, quorum ceph-mon1,ceph-mon2,ceph-mon3 (age 55m)
+    mgr: ceph-mgr2(active, since 54m), standbys: ceph-mgr1
+    mds: 1/1 daemons up
+    osd: 12 osds: 12 up (since 54m), 12 in (since 39h)
+    rgw: 1 daemon active (1 hosts, 1 zones)
+ 
+  data:
+    volumes: 1/1 healthy
+    pools:   10 pools, 329 pgs
+    objects: 328 objects, 213 MiB
+    usage:   895 MiB used, 239 GiB / 240 GiB avail
+    pgs:     329 active+clean
+```
+
+2、客户端通过 key 文件挂载
+```
+# mount -t ceph 10.0.0.101:6789,10.0.0.102:6789,10.0.0.103:6789:/ /data -o name=yanyan,secretfile=/etc/ceph/yanyan.key
+# df -h
+Filesystem                                         Size  Used Avail Use% Mounted on
+udev                                               964M     0  964M   0% /dev
+tmpfs                                              198M  6.6M  191M   4% /run
+/dev/sda1                                           20G  2.8G   16G  16% /
+tmpfs                                              986M     0  986M   0% /dev/shm
+tmpfs                                              5.0M     0  5.0M   0% /run/lock
+tmpfs                                              986M     0  986M   0% /sys/fs/cgroup
+tmpfs                                              198M     0  198M   0% /run/user/1000
+10.0.0.101:6789,10.0.0.102:6789,10.0.0.103:6789:/   76G  120M   76G   1% /data
+
+#验证写入数据
+# cp /var/log/syslog /data/
+# dd if=/dev/zero of=/data/testfile bs=1M count=100
+100+0 records in
+100+0 records out
+104857600 bytes (105 MB, 100 MiB) copied, 0.0415206 s, 2.5 GB/s
+```
+
+3、客户端通过 key 挂载
+```
+# tail /etc/ceph/yanyan.key
+AQAhMCth/3d/HxAA7sMakmCr5tOFj8l2vmmaRA==
+# umount /data/
+# mount -t ceph 10.0.0.101:6789,10.0.0.102:6789,10.0.0.103:6789:/ /data -o name=yanyan,secret=AQAhMCth/3d/HxAA7sMakmCr5tOFj8l2vmmaRA==
+# df -h
+Filesystem                                         Size  Used Avail Use% Mounted on
+udev                                               964M     0  964M   0% /dev
+tmpfs                                              198M  6.6M  191M   4% /run
+/dev/sda1                                           20G  2.8G   16G  16% /
+tmpfs                                              986M     0  986M   0% /dev/shm
+tmpfs                                              5.0M     0  5.0M   0% /run/lock
+tmpfs                                              986M     0  986M   0% /sys/fs/cgroup
+tmpfs                                              198M     0  198M   0% /run/user/1000
+10.0.0.101:6789,10.0.0.102:6789,10.0.0.103:6789:/   76G  220M   76G   1% /data
+
+#测试写入数据
+# cp /var/log/syslog /data/
+
+#查看挂载点状态
+# stat -f /data/
+  File: "/data/"
+    ID: 2f5ea2f36fe16833 Namelen: 255     Type: ceph
+Block size: 4194304    Fundamental block size: 4194304
+Blocks: Total: 19319      Free: 19264      Available: 19264
+Inodes: Total: 56         Free: -1
+```
+
+4、开机挂载
+```
+# cat /etc/fstab 
+10.0.0.101:6789,10.0.0.102:6789,10.0.0.103:6789:/ /data ceph defaults,name=yanyan,secretfile=/etc/ceph/yanyan.key,_netdev 0 0
+
+# mount -a
+```
+
+5、客户端模块
+- 客户端内核加载 ceph.ko 模块挂载 cephfs 文件系统
+```
+#client节点
+# lsmod|grep ceph
+ceph                  376832  1
+libceph               315392  1 ceph
+libcrc32c              16384  1 libceph
+fscache                65536  1 ceph
+
+# madinfo ceph
+```
+
 1、通过内核驱动挂载Ceph FS  
 mount挂载ceph选项参考  
 http://docs.ceph.org.cn/man/8/mount.ceph/#mount-ceph-ceph  
