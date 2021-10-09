@@ -625,9 +625,8 @@ rbd info --image rbd1 -n client.rbd
 xfs_growfs -d /mnt/ceph-disk1
 ```  
 
+# 八、回收站
 
-八、回收站
----
 ```
 # 查看镜像状态
 # rbd status --pool rbd-data1 --image data-img2
@@ -648,12 +647,11 @@ xfs_growfs -d /mnt/ceph-disk1
 # 验证镜像
 # rbd ls --pool rbd-data1 -l
 NAME       SIZE   PARENT  FMT  PROT  LOCK
-data-img2  8 GiB            2  
-
+data-img2  8 GiB            2
 ```
 
-九、创建快照
----
+# 九、创建快照
+
 | 命令 | 描述 |
 |------|-----|
 | rbd feature enable rbd/test layering | 启动快照 |
@@ -671,82 +669,88 @@ data-img2  8 GiB            2
 
 1、创建一个测试文件到挂载目录
 ```
-# echo "Hello cephtest,This is snapshot test" > /opt/ceph/ceph-snapshot-file
+# echo "Hello cephtest,This is snapshot test" > /data2/ceph-snapshot-file
 ```
 
 2、创建快照
-语法：`rbd snap create <pool name>/<image name>@<snap name>`
 ```
-# rbd snap create rbd/rbd1@snapshot1 -n client.rbd
-```
+# 创建快照
+# rbd snap create --pool rbd-data1 --image data-img2 --snap img2-snap-12468e5b9a04b
+Creating snap: 100% complete...done.
 
-3、显示 image 的快照
-语法：`rbd snap ls <pool name>/<image name>`
-```
-# rbd snap ls rbd/rbd1 -n client.rbd
+# 验证快照
+# rbd snap list --pool rbd-data1 --image data-img2
+SNAPID  NAME                     SIZE   PROTECTED  TIMESTAMP               
+     4  img2-snap-12468e5b9a04b  8 GiB             Sun Aug 29 01:41:32 2021
+
+# 或者
+# rbd snap create rbd-data1/data-img2@img2-snap-12468e5b9a04b
+# rbd snap ls rbd-data1/data-img2
 # rbd ls -l
+
+# 查看快照详细信息
+# rbd info rbd-data1/data-img2
 ```
 
-4、查看快照详细信息
+# 十、删除数据并还原快照
 ```
-# rbd info rbd1@snapshot1
-```
-
-5、设置与修改快照数量限制
-```
-# rbd snap limit set --pool rbd-data1 --image data-img2 --limit 30
-```
-
-6、清除快照数量限制
-```
-# rbd snap limit clear --pool rbd-data1 --image data-img2
-```
+# 删除文件
+rm -rf /data2/*
 
 
-十、恢复快照测试
----
+# 卸载 rbd
+# umount /data2 
+# rbd unmap /dev/rbd2
 
-1、删除文件
-```
-rm -rf /opt/ceph/*
-```  
+#回滚快照
+# rbd snap rollback --pool rbd-data1 --image data-img2 --snap img2-snap-12468e5b9a04b
+或者
+# rbd snap rollback  rbd-data1/data-img2@img2-snap-12468e5b9a04b --name client.rbd
 
-2、恢复快照  
-语法：`rbd snap rollback <pool-name>/<image-name>@<snap-name>`
-```
-# umount /opt/ceph-disk1 # 卸载文件系统
-# rbd snap rollback rbd/rbd1@snapshot1 --name client.rbd # 回滚快照
-```  
 
-3、验证回滚  
-```
-# mount /dev/rbd0 /opt/ceph-disk1 # 重新挂载
-# cat /opt/ceph/ceph-snapshot-file
+# 验证回滚
+# rbd --user shijie -p rbd-data1 map data-img2
+# mount /dev/rbd0 /data2/
+
+# cat /data2/ceph-snapshot-file
 Hello cephtest,This is snapshot test
-```  
+``` 
 
-十一、重命名快照  
----
-1、重命名  
+# 重命名快照  
+
 语法： `rbd snap rename <pool-name>/<image-name>@<original-snapshot-name> <pool-name>/<image-name>@<new-snapshot-name>`
 ```
 # rbd snap rename rbd/rbd1@snapshot1 rbd/rbd1@snapshot1_new -n client.rbd
 ```
  
-十二、删除快照  
----  
-1、删除  
-语法：`rbd snap rm <pool-name>/<image-name>@<snap-name>`
+# 删除快照  
+
 ```
-# rbd snap rm rbd/rbd1@snapshot1_new --name client.rbd
+# rbd snap remove --pool rbd-data1 --image data-img2 --snap img2-snap-12468e5b9a04b
 Removing snap: 100% complete...done.
+
+# rbd snap rm rbd-data1/data-img2@img2-snap-12468e5b9a04b
+Removing snap: 100% complete...done.
+
+#验证快照是否删除
+# rbd snap list --pool rbd-data1 --image data-img2
 ```
 
-删除多个快照,使用 purge  
----
-语法：`rbd snap purge <pool-name>/<image-name>`
+# 清除所有快照
+
 ```
-# rbd snap purge rbd/rbd1 --name client.rbd
+# rbd snap purge --pool rbd-data1 --image data-img2
+或者
+# rbd snap purge  rbd-data1/data-img2
+```
+
+# 快照数量限制
+```
+设置与修改快照数量限制
+# rbd snap limit set --pool rbd-data1 --image data-img2 --limit 30
+
+清除快照数量限制
+# rbd snap limit clear --pool rbd-data1 --image data-img2
 ```
 
 
