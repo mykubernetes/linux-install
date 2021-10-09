@@ -629,17 +629,27 @@ xfs_growfs -d /mnt/ceph-disk1
 八、回收站
 ---
 ```
-# 将rbd镜像移动到回收站
-rbd trash mv rbd/rbd1
+# 查看镜像状态
+# rbd status --pool rbd-data1 --image data-img2
 
-# 从回收站中删除RBD镜像
-rbd trash rm rbd/rbd1
+# 将进行移动到回收站
+# rbd trash move --pool rbd-data1 --image data-img2
 
-# 从回收站中恢复RBD镜像
-rbd trash restore 393f643c9869
+# 查看回收站的镜像
+# rbd trash list --pool rbd-data1
+12468e5b9a04b data-img2
 
-# 列出回收站中所有RBD镜像
-rbd trash ls
+# 从回收站删除镜像,如果镜像不再使用，可以直接使用 trash remove 将其从回收站删除
+# rbd trash remove --pool rbd-data1 --image data-img2
+
+# 还原镜像
+# rbd trash restore --pool rbd-data1 --image data-img2 --image-id 12468e5b9a04b
+
+# 验证镜像
+# rbd ls --pool rbd-data1 -l
+NAME       SIZE   PARENT  FMT  PROT  LOCK
+data-img2  8 GiB            2  
+
 ```
 
 九、创建快照
