@@ -258,3 +258,191 @@ mon_host = node01,node02,node03
 none /mnt/cephfs fuse.ceph ceph.id=cephfs,_netdev,defaults 0 0
 ```  
 注：因为 keyring文件包含了用户名，前提是，必须要有ceph.conf文件，指明 mon地址。
+
+# ceph mds 高可用
+
+- Ceph mds(etadata service)作为 ceph 的访问入口，需要实现高性能及数据备份，假设启动 4个 MDS 进程，设置 2 个 Rank。这时候有 2 个 MDS 进程会分配给两个 Rank，还剩下 2 个 MDS进程分别作为另外个的备份。
+
+1、 当前 mds 服务器状态
+```
+# ceph mds stat
+mycephfs:1 {0=ceph-mgr1=up:active}
+```
+
+2、添加 MDS 服务器
+```
+#mds 服务器安装 ceph-mds 服务
+# sudo yum install ceph-mds -y
+
+#添加 mds 服务器
+# ceph-deploy mds create ceph-mon2
+# ceph-deploy mds create ceph-mon3
+# ceph-deploy mds create ceph-mon4
+
+#验证 mds 服务器当前状态
+# ceph mds stat
+mycephfs:1 {0=ceph-mgr1=up:active} 3 up:standby
+```
+
+3、验证 ceph 集群当前状态
+
+- 当前处于激活状态的 mds 服务器有一台，处于备份状态的 mds 服务器有三台
+```
+# ceph fs status
+mycephfs - 1 clients
+========
+RANK  STATE      MDS        ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  ceph-mgr1  Reqs:    0 /s    13     16     12      2   
+      POOL         TYPE     USED  AVAIL  
+cephfs-metadata  metadata   379k  75.2G  
+  cephfs-data      data     663M  75.2G  
+STANDBY MDS  
+ ceph-mon2   
+ ceph-mgr2   
+ ceph-mon3   
+MDS version: ceph version 16.2.5 (0883bdea7337b95e4b611c768c0279868462204a) pacific (stable)
+```
+
+4、当前的文件系统状态
+```
+# ceph fs get mycephfs
+Filesystem 'mycephfs' (1)
+fs_name    mycephfs
+epoch    37
+flags    12
+created    2021-08-27T11:06:31.193582+0800
+modified    2021-08-29T14:48:37.814878+0800
+tableserver    0
+root    0
+session_timeout    60
+session_autoclose    300
+max_file_size    1099511627776
+required_client_features    {}
+last_failure    0
+last_failure_osd_epoch    551
+compat    compat={},rocompat={},incompat={1=base v0.20,2=client writeable ranges,3=default file layouts on dirs,4=dir inode in separate object,5=mds uses versioned encoding,6=dirfrag is stored in omap,8=no anchor table,9=file layout v2,10=snaprealm v2}
+max_mds    1
+in    0
+up    {0=84172}
+failed    
+damaged    
+stopped    
+data_pools    [9]
+metadata_pool    8
+inline_data    disabled
+balancer    
+standby_count_wanted    1
+[mds.ceph-mgr1{0:84172} state up:active seq 7 addr [v2:10.0.0.104:6800/3031657167,v1:10.0.0.104:6801/3031657167]]
+```
+
+5、设置处于激活状态 mds 的数量
+
+- 目前有四个 mds 服务器，但是有一个主三个备，可以优化一下部署架构，设置为为两主两备
+```
+# 设置同时活跃的主 mds 最大值为 2
+# ceph fs set mycephfs max_mds 2             
+
+# ceph fs status
+mycephfs - 1 clients
+========
+RANK  STATE      MDS        ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  ceph-mgr1  Reqs:    0 /s    13     16     12      2   
+ 1    active  ceph-mon3  Reqs:    0 /s    10     13     11      0   
+      POOL         TYPE     USED  AVAIL  
+cephfs-metadata  metadata   451k  75.2G  
+  cephfs-data      data     663M  75.2G  
+STANDBY MDS  
+ ceph-mon2   
+ ceph-mgr2   
+MDS version: ceph version 16.2.5 (0883bdea7337b95e4b611c768c0279868462204a) pacific (stable)
+```
+
+6、MDS 高可用优化
+- 目前的状态是 ceph-mgr1 和 ceph-mon2 分别是 active 状态，ceph-mon3 和 ceph-mgr2 分别处于 standby 状态，现在可以将 ceph-mgr2 设置为 ceph-mgr1 的 standby，将 ceph-mon3 设置为 ceph-mon2 的 standby，以实现每个主都有一个固定备份角色的结构，
+```
+# cat ceph.conf
+[global]
+fsid = 635d9577-7341-4085-90ff-cb584029a1ea
+public_network = 10.0.0.0/24
+cluster_network = 192.168.133.0/24
+mon_initial_members = ceph-mon1
+mon_host = 10.0.0.101
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
+
+mon clock drift allowed = 2 
+mon clock drift warn backoff = 30 
+
+[mds.ceph-mgr2] 
+#mds_standby_for_fscid = mycephfs 
+mds_standby_for_name = ceph-mgr1 
+mds_standby_replay = true 
+
+[mds.ceph-mon3] 
+mds_standby_for_name = ceph-mon2 
+mds_standby_replay = true
+```
+
+7、分发配置文件并重启 mds 服务
+```
+#分发配置文件保证各 mds 服务重启有效
+# ceph-deploy --overwrite-conf config push ceph-mon3
+# ceph-deploy --overwrite-conf config push ceph-mon2
+# ceph-deploy --overwrite-conf config push ceph-mgr1
+# ceph-deploy --overwrite-conf config push ceph-mgr2
+
+# sudo systemctl restart ceph-mds@ceph-mon2.service
+# sudo systemctl restart ceph-mds@ceph-mon3.service
+# sudo systemctl restart ceph-mds@ceph-mgr1.service
+# sudo systemctl restart ceph-mds@ceph-mgr2.service
+```
+
+8、ceph 集群 mds 高可用状态
+```
+# ceph fs status
+mycephfs - 1 clients
+========
+RANK  STATE      MDS        ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  ceph-mgr2  Reqs:    0 /s    13     16     12      1   
+ 1    active  ceph-mon2  Reqs:    0 /s    10     13     11      0   
+      POOL         TYPE     USED  AVAIL  
+cephfs-metadata  metadata   451k  75.2G  
+  cephfs-data      data     663M  75.2G  
+STANDBY MDS  
+ ceph-mon3   
+ ceph-mgr1   
+MDS version: ceph version 16.2.5 (0883bdea7337b95e4b611c768c0279868462204a) pacific (stable)
+
+
+# 查看 active 和 standby 对应关系
+# ceph fs get mycephfs
+Filesystem 'mycephfs' (1)
+fs_name    mycephfs
+epoch    67
+flags    12
+created    2021-08-27T11:06:31.193582+0800
+modified    2021-08-29T16:34:16.305266+0800
+tableserver    0
+root    0
+session_timeout    60
+session_autoclose    300
+max_file_size    1099511627776
+required_client_features    {}
+last_failure    0
+last_failure_osd_epoch    557
+compat    compat={},rocompat={},incompat={1=base v0.20,2=client writeable ranges,3=default file layouts on dirs,4=dir inode in separate object,5=mds uses versioned encoding,6=dirfrag is stored in omap,8=no anchor table,9=file layout v2,10=snaprealm v2}
+max_mds    2
+in    0,1
+up    {0=84753,1=84331}
+failed    
+damaged    
+stopped    
+data_pools    [9]
+metadata_pool    8
+inline_data    disabled
+balancer    
+standby_count_wanted    1
+[mds.ceph-mgr2{0:84753} state up:active seq 7 addr [v2:10.0.0.105:6802/2338760756,v1:10.0.0.105:6803/2338760756]]
+[mds.ceph-mon2{1:84331} state up:active seq 14 addr [v2:10.0.0.102:6800/3841027813,v1:10.0.0.102:6801/3841027813]]
+```
