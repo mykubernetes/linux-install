@@ -1,31 +1,64 @@
-cephfs
-======
-服务器端部署
-----------
+# cephfs
+
+## 服务器端部署
+
 1、部署 cephfs  
-``` # ceph-deploy mds create node01 node02 node03 ```  
+```
+# ceph-deploy mds create node01 node02 node03
+```
 注意：查看输出，应该能看到执行了哪些命令，以及生成的keyring  
 
-mds需要创建两个pool一个存储数据，一个存储元数据  
+2、使用 CephFS 之前需要事先于集群中创建一个文件系统，并为其分别指定元数据和数据相关的存储池
 ```
-# ceph osd pool create cephfs_data 64
-# ceph osd pool create cephfs_metadata 64
-```  
+# ceph osd pool create cephfs-metadata 32 32
+# ceph osd pool create cephfs-data 64 64
+# ceph -s
+  cluster:
+    id:     635d9577-7341-4085-90ff-cb584029a1ea
+    health: HEALTH_OK
+ 
+  services:
+    mon: 3 daemons, quorum ceph-mon1,ceph-mon2,ceph-mon3 (age 7m)
+    mgr: ceph-mgr2(active, since 6m), standbys: ceph-mgr1
+    mds: 1/1 daemons up
+    osd: 12 osds: 12 up (since 6m), 12 in (since 39h)
+    rgw: 1 daemon active (1 hosts, 1 zones)
+ 
+  data:
+    volumes: 1/1 healthy
+    pools:   10 pools, 329 pgs
+    objects: 328 objects, 213 MiB
+    usage:   894 MiB used, 239 GiB / 240 GiB avail
+    pgs:     329 active+clean
+```
 
-创建一个cephfs  
-语法：ceph fs new <fs_name> <metadata> <data>
+3、创建 cephFS 并验证
 ```
-# ceph fs new cephfs cephfs_metadata cephfs_data
+# ceph fs new mycephfs cephfs-metadata cephfs-data
+# ceph fs ls
+name: mycephfs, metadata pool: cephfs-metadata, data pools: [cephfs-data ]
+
+# ceph fs status mycephfs
+mycephfs - 0 clients
+========
+RANK  STATE      MDS        ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  ceph-mgr1  Reqs:    0 /s    12     15     12      0   
+      POOL         TYPE     USED  AVAIL  
+cephfs-metadata  metadata   247k  75.5G  
+  cephfs-data      data     362M  75.5G  
+MDS version: ceph version 16.2.5 (0883bdea7337b95e4b611c768c0279868462204a) pacific (stable)
 ```
 
-查看创建的cephfs  
+4、验证 cepfFS 服务状态 
 ```
 # ceph mds stat
+mycephfs:1 {0=ceph-mgr1=up:active}
+
 # ceph osd pool ls
 # ceph fs ls
 ```  
 
-2、创建用户并赋予权限  
+5、创建用户并赋予权限  
 ```
 ceph auth get-or-create client.cephfs mon 'allow r' mds 'allow r, allow rw path=/' osd 'allow rw pool=cephfs_data' -o ceph.client.cephfs.keyring
 拷贝到客户端
