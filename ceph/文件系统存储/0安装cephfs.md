@@ -4,7 +4,7 @@
 
 1、部署 cephfs  
 ```
-# ceph-deploy mds create node01 node02 node03
+# ceph-deploy mds create node01
 ```
 注意：查看输出，应该能看到执行了哪些命令，以及生成的keyring  
 
