@@ -58,30 +58,127 @@ Ceph常用权限说明
 | profile bootstrap-mds | 这允许用户引导元数据服务器。例如，该ceph-deploy工具使用 |
 | client.bootstrap-mds | 用户添加密钥并引导元数据服务器。 |
 
-1、列出集群中的用户  
+
+1、列出集群中的用户 
 ```
-# ceph auth list
+# ceph auth ls
 ```
 
-2、查看特定用户  
+2、 # 列出指定用户信息
 ```
+# ceph auth get osd.10
+[osd.10]
+    key = AQDNBilhkPDRKRAABW8mMaGrYMwYHVVVjtOU0g==
+    caps mgr = "allow profile osd"
+    caps mon = "allow profile osd"
+    caps osd = "allow *"
+exported keyring for osd.10
+                                  
 # ceph auth get client.admin
+[client.admin]
+    key = AQD55h9h5ICUJBAAfk/2gBzkwU+G8bfqY023Yg==
+    caps mds = "allow *"
+    caps mgr = "allow *"
+    caps mon = "allow *"
+    caps osd = "allow *"
+exported keyring for client.admin
 ```
 
-3、创建用户  
+3、结合使用-o 文件名选项和 ceph auth list 将输出保存到某个文件。
 ```
+# ceph auth list -o 123.key
+```
+
+4、添加用户
+
+- 添加用户的规范方法：它会创建用户、生成密钥，并添加所有指定的能力
+```
+#添加认证 key
+# ceph auth add client.tom mon 'allow r' osd 'allow rwx pool=mypool'
+0added key for client.tom
+
+#验证key
+# ceph auth get client.tom
+[client.tom]
+    key = AQBvVipheB/5DhAAaABVJGZbBlneBJUNoWfowg==
+    caps mon = "allow r"
+    caps osd = "allow rwx pool=mypool"
+exported keyring for client.tom
+```
+
+5、ceph auth get-or-create
+
+- ceph auth get-or-create 此命令是创建用户较为常见的方式之一，它会返回包含用户名和密钥的密钥文，如果该用户已存在，此命令只以密钥文件格式返回用户名和密钥，还可以使用 -o 指定文件名选项将输出保存到某个文件
+```
+# 创建用户
+# ceph auth get-or-create client.test mon 'allow r' osd 'allow rwx pool=mypool'
+[client.test]
+    key = AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
+
+# 验证用户
+# ceph auth get client.test
+[client.test]
+    key = AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
+    caps mon = "allow r"
+    caps osd = "allow rwx pool=mypool"
+exported keyring for client.test
+
+# 再次创建用户
+# ceph auth get-or-create client.test mon 'allow r' osd 'allow rwx pool=mypool'
+[client.test]
+    key = AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
+
+# 保存文件
 # ceph auth get-or-create client.rbd | tee /etc/ceph/ceph.client.rbd.keyring      #ceph集群名.client.rbd用户名.keyring格式保存
 ```
 
-4、删除用户
+6、ceph auth get-or-create-key
+- 此命令是创建用户并仅返回用户密钥，对于只需要密钥的客户端（例如 libvirt），此命令非常有用。如果该用户已存在，此命令只返回密钥。您可以使用 -o 文件名选项将输出保存到某个文件。
+- 创建客户端用户时，可以创建不具有能力的用户。不具有能力的用户可以进行身份验证，但不能执行其他操作，此类客户端无法从监视器检索集群地图，但是，如果希望稍后再添加能力，可以使用 ceph auth caps 命令创建一个不具有能力的用户。
+
+典型的用户至少对 Ceph monitor 具有读取功能，并对 Ceph OSD 具有读取和写入功能。此外，用户的 OSD 权限通常限制为只能访问特定的存储池
+```
+# 用户有 key 就显示没有就创建
+# ceph auth get-or-create-key client.test mon 'allow r' osd 'allow rwx pool=mypool'
+AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
+```
+
+7、ceph auth print-key
+```
+# 获取单个指定用户的key
+# ceph auth print-key client.test
+AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==test
+```
+
+8、修改用户能力
+
+- 使用 ceph auth caps 命令可以指定用户以及更改该用户的能力，设置新能力会完全覆盖当前的能力，因此要加上之前的用户已经拥有的能和新的能力，如果看当前能力，可以运行 cephauth get USERTYPE.USERID
+```
+# 查看用户当前权限
+# ceph auth get client.test
+[client.test]
+    key = AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
+    caps mon = "allow r"
+    caps osd = "allow rwx pool=mypool"
+exported keyring for client.test
+
+# 修改权限
+# ceph auth caps client.test mon 'allow r' osd 'allow rw pool=mypool'
+updated caps for client.test
+
+# 验证权限
+# ceph auth get client.test
+[client.test]
+    key = AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
+    caps mon = "allow r"
+    caps osd = "allow rw pool=mypool"
+exported keyring for client.test
+
+# 写入到文件
+# ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd' | tee /etc/ceph/ceph.client.rbd.keyring
+```
+
+9、删除用户
 ```
 # ceph auth del client.rbd
 ```
-
-5、修改用户添加功能  
-```
-# ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd' | tee /etc/ceph/ceph.client.rbd.keyring
-# ceph auth get client.rbd
-```  
-
-
