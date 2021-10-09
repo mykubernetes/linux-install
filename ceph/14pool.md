@@ -7,6 +7,23 @@
 pool 'pool-frank6866' created
 ```
 
+
+## 删除pool
+```
+# 编辑配置文件可以删除存储池
+# vim /etc/ceph/ceph.conf
+...
+[mon]
+mon_allow_pool_delete = true
+...
+
+# 重启服务
+# systemctl restart ceph-mon.target
+
+# 删除pool
+# ceph osd pool delete poolname poolname --yes-i-really-really-mean-it
+```
+
 ## 列出所有pool
 ```
 # ceph osd pool ls
