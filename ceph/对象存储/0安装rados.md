@@ -5,7 +5,7 @@
 
 2、部署  
 ```
-# ceph-deploy rgw create node01 node02 node03     # 指定要部署radsgw到的哪些服务器
+# ceph-deploy rgw create node01 node02    # 指定要部署radsgw到的哪些服务器
 ```
 
 ```
@@ -19,7 +19,7 @@
     mgr: ceph-mgr2(active, since 20h), standbys: ceph-mgr1
     mds: 2/2 daemons up, 2 standby
     osd: 12 osds: 12 up (since 2h), 12 in (since 2d)
-    rgw: 3 daemons active (3 hosts, 1 zones) 
+    rgw: 2 daemons active (2 hosts, 1 zones) 
  
   data:
     volumes: 1/1 healthy
@@ -47,23 +47,45 @@ ceph        608      1  0 06:43 ?        00:00:27 /usr/bin/radosgw -f --cluster 
 ```
 - 浏览器访问： http://192.168.20.176:7480  
 
-4、可配置80端口（不用修改）  
+4、自定义端口
+
+- radosgw 服务器（node01、node02）的配置文件要和deploy服务器的一致，可以ceph-deploy 服务器修改然后统一推送，或者单独修改每个 radosgw 服务器的配置为同一配置  
 ```
-# vim ceph.conf       # mycluster/ceph.conf
-追加
-[client.rgw.node01]
-rgw_frontends = "civetweb port=80"
+# cat ceph.conf 
+[global]
+fsid = 635d9577-7341-4085-90ff-cb584029a1ea
+public_network = 10.0.0.0/24
+cluster_network = 192.168.133.0/24
+mon_initial_members = ceph-mon1
+mon_host = 10.0.0.101
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
 
-[client.rgw.node02]
-rgw_frontends = "civetweb port=80"
+mon clock drift allowed = 2 
+mon clock drift warn backoff = 30 
 
-[client.rgw.node03]
-rgw_frontends = "civetweb port=80"
+[mds.ceph-mgr2] 
+#mds_standby_for_fscid = mycephfs 
+mds_standby_for_name = ceph-mgr1 
+mds_standby_replay = true 
 
-# ceph-deploy --overwrite-conf config push node01 node02 node03
+[mds.ceph-mon3] 
+mds_standby_for_name = ceph-mon2 
+mds_standby_replay = true
+
+[client.rgw.ceph-mgr1]
+rgw_host = node01 
+rgw_frontends = civetweb port=9900         #修改端口号
+
+[client.rgw.ceph-mgr2] 
+rgw_host = node02
+rgw_frontends = civetweb port=9900
+
+# 将配置文件推送到rgw节点并重启服务
+# ceph-deploy --overwrite-conf config push node01 node02
 # sudo systemctl restart ceph-radosgw@rgw.node01.service
 # sudo systemctl restart ceph-radosgw@rgw.node02.service
-# sudo systemctl restart ceph-radosgw@rgw.node03.service
 ```
 
 5、创建池  
