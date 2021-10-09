@@ -92,7 +92,6 @@ priority=1
 # ceph -s --name client.rbd
 ```  
 
-
 # 三、服务器端配置存储池
 
 默认创建块设备，会直接创建在rbd 池中，但使用 deploy 安装后，该rbd池并没有创建。  
@@ -266,7 +265,7 @@ rbd remove rbd/rbd1
 
 8、设置自动挂载
 ```
-#1、开机自动映射到本地
+# 1、开机自动映射到本地
 # vim /etc/ceph/rbdmap
   rbd/rbd1  id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
 
@@ -275,7 +274,7 @@ rbd remove rbd/rbd1
 # systemctl status rbdmap.service
 
 
-#2、开机自动挂载
+# 2、开机自动挂载
 # vim /etc/fstab
  /dev/rbd/rbd/rbd1 /mnt/ceph-test001 xfs defaults,noatime,_netdev 0 0
 # mount -a
