@@ -89,7 +89,12 @@ exported keyring for client.admin
 # ceph auth list -o 123.key
 ```
 
-4、添加用户
+4、将osd.1的用户秘钥导出到aaa中
+```
+ceph auth export osd.1 -o aaa.key
+```
+
+5、添加用户
 
 - 添加用户的规范方法：它会创建用户、生成密钥，并添加所有指定的能力
 ```
@@ -106,7 +111,7 @@ exported keyring for client.admin
 exported keyring for client.tom
 ```
 
-5、ceph auth get-or-create
+6、ceph auth get-or-create
 
 - ceph auth get-or-create 此命令是创建用户较为常见的方式之一，它会返回包含用户名和密钥的密钥文，如果该用户已存在，此命令只以密钥文件格式返回用户名和密钥，还可以使用 -o 指定文件名选项将输出保存到某个文件
 ```
@@ -132,7 +137,7 @@ exported keyring for client.test
 # ceph auth get-or-create client.rbd | tee /etc/ceph/ceph.client.rbd.keyring      #ceph集群名.client.rbd用户名.keyring格式保存
 ```
 
-6、ceph auth get-or-create-key
+7、ceph auth get-or-create-key
 - 此命令是创建用户并仅返回用户密钥，对于只需要密钥的客户端（例如 libvirt），此命令非常有用。如果该用户已存在，此命令只返回密钥。您可以使用 -o 文件名选项将输出保存到某个文件。
 - 创建客户端用户时，可以创建不具有能力的用户。不具有能力的用户可以进行身份验证，但不能执行其他操作，此类客户端无法从监视器检索集群地图，但是，如果希望稍后再添加能力，可以使用 ceph auth caps 命令创建一个不具有能力的用户。
 
@@ -143,14 +148,14 @@ exported keyring for client.test
 AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
 ```
 
-7、ceph auth print-key
+8、ceph auth print-key
 ```
 # 获取单个指定用户的key
 # ceph auth print-key client.test
 AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==test
 ```
 
-8、修改用户能力
+9、修改用户能力
 
 - 使用 ceph auth caps 命令可以指定用户以及更改该用户的能力，设置新能力会完全覆盖当前的能力，因此要加上之前的用户已经拥有的能和新的能力，如果看当前能力，可以运行 cephauth get USERTYPE.USERID
 ```
@@ -178,7 +183,7 @@ exported keyring for client.test
 # ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd' | tee /etc/ceph/ceph.client.rbd.keyring
 ```
 
-9、删除用户
+10、删除用户
 ```
 # ceph auth del client.rbd
 ```
