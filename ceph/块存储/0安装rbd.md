@@ -382,7 +382,18 @@ rbd trash ls
 ```
 # rbd info rbd1@snapshot1
 ```
-    
+
+5、设置与修改快照数量限制
+```
+# rbd snap limit set --pool rbd-data1 --image data-img2 --limit 30
+```
+
+6、清除快照数量限制
+```
+# rbd snap limit clear --pool rbd-data1 --image data-img2
+```
+
+
 十、恢复快照测试
 ---
 
