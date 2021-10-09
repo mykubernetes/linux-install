@@ -102,7 +102,7 @@ priority=1
 1、在服务器端创建池和块  
 ```
 # ceph osd lspools              # 查看集群存储池
-# ceph osd pool create rbd 512  # 50 为place group数量(pg)
+# ceph osd pool create rbd-data1 512  # 50 为place group数量(pg)
 ```  
 确定 pg_num 取值是强制性的，因为不能自动计算。下面是几个常用的值：  
 • 少于 5 个 OSD 时可把 pg_num 设置为 128  
@@ -110,6 +110,16 @@ priority=1
 • OSD 数量在 10 到 50 个时，可把 pg_num 设置为 4096  
 • OSD 数量大于 50 时，你得理解权衡方法、以及如何自己计算pg_num 取值  
 
+2、在存储池启用 rbd
+```
+# ceph osd pool application enable rbd-data1 rbd
+enabled application 'rbd' on pool 'rbd-data1'
+```
+
+3、初始化RBD
+```
+# rbd pool init -p rbd-data1
+```
 
 四、客户端申请image
 -------------
@@ -117,18 +127,7 @@ priority=1
 创建一个10G大小的块设备
 ```
 创建块设备rbd1为块名 --size默认以M为单位 --pool 池名
-# rbd create rbd1 --size 10240 --pool rbd --name client.rbd
-```
-
-在存储池启用 rbd
-```
-# ceph osd pool application enable rbd-data1 rbd
-enabled application 'rbd' on pool 'rbd-data1'
-```
-
-初始化RBD
-```
-# rbd pool init -p rbd-data1
+# rbd create rbd1 --size 10240 --pool rbd-data1 --name client.rbd
 ```
 
 查看创建的块设备  
