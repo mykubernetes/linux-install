@@ -86,7 +86,7 @@ LISTEN         0              128                    [::1]:6010                 
 Username and password updated
 
 # 或者直接创建一个dashboard登录用户名密码
-# ceph dashboard ac-user-create guest 1q2w3e4r administrator 
+# ceph dashboard ac-user-create admin 123456 administrator 
 ```
 
 5、dashboard 访问验证
@@ -112,9 +112,9 @@ Self-signed certificate created
     "dashboard": "http://10.0.0.104:9009/"
 }
 
-# mgr节点
-# 重启 mgr 服务
-# sudo systemctl restart ceph-mgr@ceph-mgr1
+# 使用配置生效
+# ceph mgr module disable dashboard
+# ceph mgr module enable dashboard
 
 # 再次验证dashboard 状态
 # ceph mgr services
@@ -122,7 +122,6 @@ Self-signed certificate created
     "dashboard": "https://10.0.0.104:9009/"
 }
 ```
-
 
 
 # 开启Object Gateway管理功能
