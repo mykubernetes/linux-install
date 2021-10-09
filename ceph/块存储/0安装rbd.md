@@ -402,8 +402,6 @@ rbd-data1              10   32   23 MiB       32   69 MiB   0.03     76 GiB
 14、取消映射
 ```
 # rbd unmap /dev/rbd0
-或者
-# rbd unmap rbd/rbd1
 ```
 
 15、设置自动挂载
@@ -555,6 +553,62 @@ sig_key:
 sig_hashalgo:   md4
 ```
 
+7、rbd 镜像空间拉伸
+```
+#当前 rbd 镜像空间大小
+# rbd ls -p rbd-data1 -l
+NAME       SIZE   PARENT  FMT  PROT  LOCK
+data-img1  3 GiB            2        excl
+data-img2  5 GiB            2            
+
+#拉伸 rbd 镜像空间
+# rbd resize --pool rbd-data1 --image data-img2 --size 8G
+Resizing image: 100% complete...done.
+
+# rbd resize --pool rbd-data1 --image data-img1 --size 6G
+Resizing image: 100% complete...done.
+
+#验证rgb信息
+# rbd ls -p rbd-data1 -l
+NAME       SIZE   PARENT  FMT  PROT  LOCK
+data-img1  6 GiB            2            
+data-img2  8 GiB            2 
+```
+
+8、客户端验证镜像空间
+```
+# fdisk -l /dev/rbd2
+Disk /dev/rbd2: 8 GiB, 8589934592 bytes, 16777216 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 4194304 bytes / 4194304 bytes
+```
+
+9、开机自动挂载
+```
+# cat /etc/fstab 
+rbd --user shijie -p rbd-data1 map data-img2 mount /dev/rbd2 /data2/
+# chmod a+x /etc/fstab 
+# reboot
+
+#查看映射
+# rbd showmapped
+id pool image snap device 
+0 rbd-data1 data-img2 - /dev/rbd2
+```
+
+10、卸载 rbd 镜像
+```
+# umount /data2
+# umount /data2 rbd --user shijie -p rbd-data1 unmap data-img2
+```
+
+11、删除 rbd 镜像
+- 删除存储池 rbd -data1 中的 data-img1 镜像
+```
+# rbd rm --pool rbd-data1 --image data-img1
+Removing image: 100% complete...done.
+```
 
 七、调整Ceph RBD块大小
 ---
