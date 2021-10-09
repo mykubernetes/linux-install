@@ -118,7 +118,19 @@ priority=1
 ```
 创建块设备rbd1为块名 --size默认以M为单位 --pool 池名
 # rbd create rbd1 --size 10240 --pool rbd --name client.rbd
-```  
+```
+
+在存储池启用 rbd
+```
+# ceph osd pool application enable rbd-data1 rbd
+enabled application 'rbd' on pool 'rbd-data1'
+```
+
+初始化RBD
+```
+# rbd pool init -p rbd-data1
+```
+
 查看创建的块设备  
 ```
 # rbd ls --name client.rbd
