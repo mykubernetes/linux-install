@@ -1,7 +1,7 @@
-安装rbd客户端工具
-===============
+# 安装rbd客户端工具
 
-# RBD介绍
+
+## RBD介绍
 > RBD即RADOS Block Device的简称，RBD块存储是最稳定且最常用的存储类型。RBD块设备类似磁盘可以被挂载。 RBD块设备具有快照、多副本、克隆和一致性等特性，数据以条带化的方式存储在Ceph集群的多个OSD中。如下是对Ceph RBD的理解。
 - RBD 就是 Ceph 里的块设备，一个 4T 的块设备的功能和一个 4T 的 SATA 类似，挂载的 RBD 就可以当磁盘用；
 - resizable：这个块可大可小；
@@ -17,7 +17,7 @@
 - map成块设备直接使用
 - ISCIS，安装Ceph客户端
 
-# RBD常用命令
+## RBD常用命令
 | 命令 | 功能 |
 | ------ | ------ |
 | rbd create --szie n [pool-name/]image-name | 创建RBD |
@@ -39,11 +39,8 @@
 | rbd unmap | 取消映射 |
 | rbd remove  | 删除块设备 |
 
+# 一、服务器端配置认证
 
-
-
-一、服务器端配置认证
------------
 1、在服务器端创建 ceph 块客户端用户名和认证密钥
 ```
 # ceph auth get-or-create client.rbd mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=rbd' |tee ./ceph.client.rbd.keyring
@@ -56,8 +53,8 @@
 ```  
 
 
-二、客户端安装客户端工具
------------
+# 二、客户端安装客户端工具
+
 1、客户端检查是否符合块设备环境要求
 ```
 # uname -r
@@ -96,8 +93,8 @@ priority=1
 ```  
 
 
-三、服务器端配置存储池
-------------------
+# 三、服务器端配置存储池
+
 默认创建块设备，会直接创建在rbd 池中，但使用 deploy 安装后，该rbd池并没有创建。  
 1、在服务器端创建池和块  
 ```
@@ -121,8 +118,8 @@ enabled application 'rbd' on pool 'rbd-data1'
 # rbd pool init -p rbd-data1
 ```
 
-四、客户端申请image
--------------
+# 四、客户端申请image
+
 1、客户端创建 块设备  
 创建一个10G大小的块设备
 ```
@@ -154,48 +151,75 @@ rbd image 'rbd1':
 - format: rbd image的格式，format1已经过期了。现在默认都是format2，被librbd和kernel3.11后面的版本支持
 - block_name_prefix: 表示这个image在pool中的名称前缀，可以通过rados -p pool-frank6866 ls | grep rbd_data.1ad6e2ae8944a命令查看这个rbd image在rados中的所有object。但是要注意的是，刚创建的image，如果里面没有数据，不会在rados中创建object，只有写入数据时才会有。size字段中的objects数量表示的是最大的objects数量
 
+# 五、客户端映射块设备
 
-五、客户端映射块设备
-------------
-
-| 属性 | BIT位 |
-|-----|-------|
-| layering | 1 |
+| 属性 | BIT位 | 描述 |
+|-----|-------|------|
+| layering | 1 | 分层支持 |
 | striping | 2 |
-| exclusive-lock | 4 |
-| object-map | 8 |
-| fast-diff | 16 |
-| deep-flatten | 32 |
-
+| exclusive-lock | 4 | 排它锁定支持对 |
+| object-map | 8 | 对象映射支持(需要排它锁定(exclusive-lock)) |
+| fast-diff | 16 | 快照平支持(snapshot flatten support) |
+| deep-flatten | 32 | 在client-node1上使用krbd(内核rbd)客户机进行快速diff计算(需要对象映射)，我们将无法在CentOS内核3.10上映射块设备映像，因为该内核不支持对象映射(object-map)、深平(deep-flatten)和快速diff(fast-diff)(在内核4.9中引入了支持)。 |
 
 1、映射到客户端，应该会报错  
 ```
 # rbd map --image rbd1 --name client.rbd
-```
-• layering: 分层支持  
-• exclusive-lock: 排它锁定支持对  
-• object-map: 对象映射支持(需要排它锁定(exclusive-lock))  
-• deep-flatten: 快照平支持(snapshot flatten support)  
-• fast-diff: 在client-node1上使用krbd(内核rbd)客户机进行快速diff计算(需要对象映射)，我们将无法在CentOS内核3.10上映射块设备映像，因为该内核不支持对象映射(object-map)、深平(deep-flatten)和快速diff(fast-diff)(在内核4.9中引入了支持)。为了解决这个问题，我们将禁用不支持的特性，有几个选项可以做到这一点:  
 
-1）动态禁用
-```
+# 以下是解决办法
+# 需要手动，动态禁用features
 # rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd
-```
 
-2）创建RBD镜像时，只启用 分层特性。
-```
+# 或者在创建RBD镜像时，只启用分层特性。
 rbd create data-img1 --size 3G --pool rbd-data1 --image-format 2 --image-feature layering --name client.rbd
-```
 
-3）ceph 配置文件中禁用
-```
+# ceph.conf 配置文件中禁用
 # rbd_default_features = 1
 ```
 
-2、动态禁用
+
+镜像特性的启用
 ```
-# rbd feature disable rbd1 exclusive-lock object-map deep-flatten fast-diff --name client.rbd
+# rbd feature enable exclusive-lock --pool rbd-data1 --image data-img1
+# rbd feature enable object-map --pool rbd-data1 --image data-img1
+# rbd feature enable fast-diff --pool rbd-data1 --image data-img1
+```
+
+验证镜像特性
+```
+# rbd --image data-img1 --pool rbd-data1 info
+rbd image 'data-img1':
+    size 3 GiB in 768 objects
+    order 22 (4 MiB objects)
+    snapshot_count: 0
+    id: 1245f7ae95595
+    block_name_prefix: rbd_data.1245f7ae95595
+    format: 2
+    features: layering, exclusive-lock, object-map, fast-diff
+    op_features: 
+    flags: object map invalid, fast diff invalid
+    create_timestamp: Sun Aug 29 00:08:41 2021
+    access_timestamp: Sun Aug 29 00:08:41 2021
+    modify_timestamp: Sun Aug 29 00:08:41 2021
+```
+
+镜像特性的禁用
+```
+# rbd feature disable fast-diff --pool rbd-data1 --image data-img1
+# rbd --image data-img1 --pool rbd-data1 info
+rbd image 'data-img1':
+    size 3 GiB in 768 objects
+    order 22 (4 MiB objects)
+    snapshot_count: 0
+    id: 1245f7ae95595
+    block_name_prefix: rbd_data.1245f7ae95595
+    format: 2
+    features: layering, exclusive-lock                   #少了一个fast-diff 特性
+    op_features: 
+    flags: 
+    create_timestamp: Sun Aug 29 00:08:41 2021
+    access_timestamp: Sun Aug 29 00:08:41 2021
+    modify_timestamp: Sun Aug 29 00:08:41 2021
 ```
 
 3、映射到本地
