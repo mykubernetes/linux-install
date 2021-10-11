@@ -96,8 +96,171 @@ rbd cache max dirty object = 2                            #默认值0 #最大的
 rbd cache target dirty = 235544320                        #默认值16777216 #开始执行回写过程的脏数据大小，不能超过 rbd_cache_max_dirty
 ```
 
+# 资源池管理模块
+```
+$osd_reuse = 0;                             # 控制是否可以复用osd创建资源池。0、不支持复用，1、支持复用
+$system_free_memory_limit = 60;             # 系统剩余内存水线,单位：%
+$osd_memory_limit = 2097152;                # osd内存使用水线，单位：KB
+$blu_cache_other_limit = 419430400;         # bluestore_cache_other使用水线,单位：byte
+```
 
+# bluestore相关
+```
+bluestore_block_size                        # 设置块大小，以分区建立osd时需要修改
+bluestore_cache_size                        # 单个bluestore实例，配置cache大小
+bluestore_block_wal_size = 10737418240      # bluestore wal大小
+bluestore_block_db_size = 10737418240       # bluestore db大小
+bluestore_cache_trim_interval               # bluestore trim周期
+bluestore_cache_trim_max_skip_pinned        # 最大trim值
+bluestore_prefer_deferred_size_hdd          # 控制io落wal分区io大小
+```
 
+# osd rocksdb相关
+```
+rocksdb_cache_shard_bits                    # 重庆现场修改为4后，导致磁盘读很大
+```
+
+# osd相关
+```
+osd_failsafe_full_ratio = 0.98              # 超过此限制op直接被抛弃
+osd_recovery_max_chunk                      # 设置恢复过程中最大的块设备
+osd_op_history_slow_op_size = 100           # slow op保存的历史记录数量
+osd_op_history_slow_op_threshold = 1        # 当一个op超过多长时间，则记录上报
+osd_peering_wq_threads=20                   # 设置peer线程数量
+osd_peering_wq_batch_size=10                # 设置peer队列长度
+osd_crush_update_on_start = false           # 默认不创建host
+osd_heartbeat_use_min_delay_socket = true
+osd_heartbeat_interval = 5
+osd_heartbeat_grace = 17
+osd_client_message_size_cap                 # OSD messenge大小
+mon_osd_max_split_count                     # 最大增加的pg数量，如果想一次扩增很多pg，可用该方法
+```
+
+# osd性能
+```
+osd max write size                          # OSD一次可写入的最大值(MB)
+osd client message size cap                 # 客户端允许在内存中的最大数据(bytes)
+osd deep scrub stride                       # 在Deep Scrub时候允许读取的字节数(bytes)
+osd op threads                              # OSD进程操作的线程数
+osd disk threads                            # OSD密集型操作例如恢复和Scrubbing时的线程
+osd map cache size                          # 保留OSD Map的缓存(MB)
+osd map cache bl size                       # OSD进程在内存中的OSD Map缓存(MB)
+osd mount options xfs                       # Ceph OSD xfs Mount选项
+```
+
+# osd recovery
+```
+osd recovery op priority                    # 恢复操作优先级，取值1-63，值越高占用资源越高
+osd recovery max active                     # 同一时间内活跃的恢复请求数
+osd max backfills                           # 一个OSD允许的最大backfills数
+
+如下为生产环境限制回复速率配置：
+osd_recovery_priority=3
+osd_recovery_op_priority=2
+osd_recovery_max_active=2                   # 同一时间内活跃的恢复请求数
+osd_recovery_max_single_start=1
+osd_recovery_sleep=0.1                      # 实际测试，该项最有效
+```
+
+# mon相关
+```
+mon_election_timeout                        # 设置mon选举超时时间
+mon_osd_max_split_count                     # 每个osd最大pg数限制
+mon_osd_backfillfull_ratio = 0.95           # 大于此数值时，拒绝pg通过Backfill的方式迁入或者继续迁出本OSD
+mon_osd_full_ratio = 0.96                   # 集群停止接受客户端的请求
+mon_osd_nearfull_ratio = 0.94               # 产生告警
+mon_osd_max_split_count                     # 每个osd上最大的pg数量
+mon_osd_full_ratio                          # 集群上的任意一个OSD空间使用率大于等于此数值时，集群将被标记为full，此时集群将停止接受来自客户端的写入请求
+mon_osd_nearfull_ratio                      # 集群中的任一OSD空间使用率大于等于此数值时，集群将被标记为NearFull，此时集群将产生告警，并提示所有已经处于NearFull状态的OSD
+osd_backfill_full_ratio                     # OSD空间使用率大于等于此数值时，拒绝PG通过Backfill方式迁出或者继续迁入本OSD
+osd_failsafe_full_ratio                     # PG执行包含写操作的op时，防止所在的OSD磁盘空间被100%写满的最后一道屏障，超过此限制时，op将直接被丢弃
+mon_data_avail_crit                         # 系统卡使用量低于此值时，mon 挂掉
+client_mount_timeout                        # ceph命令hand住时间控制，默认300 S
+```
+
+# paxos相关：
+```
+paxos_min                                   # paxos消息上一次trim和当前值最小差距
+paxos_service_trim_max                      # Paxos_service维护的15个消息类型每次trim的最数值
+paxos_service_trim_min                      # axos_service维护的15个消息类型每次trim的最小值，如果没有到达改值，则不发生trim
+paxos_trim_max                              # Paxos消息发送trim时，trim的最大值
+paxos_trim_min                              # 和paxos_min共同决定，本次应该不应该发送trim
+
+通过阅读代码分析，源码里面触发compaction的地方一共有下面五处
+1、当mon_compact_on_trim为false时，mon直接不触发compact，compact全权由rocksdb自身机制触发
+2、first_committed >= get_version() - paxos_min时，翻译一下就是如果当前版本增长量没有超过paxos_min
+3、first_committed >= get_first_committed() + paxos_trim_max);翻译一下就是第一次committed值加上paxos_trim_max仍然等于first_committed时，只有当paxos_trim_max为0才有可能
+4、get_version() - get_first_committed() <= paxos_min + paxos_trim_min时，即当前版本差异小于paxos_min+paxos_trim_min之和时
+5、to_remove < paxos_service_trim_min时
+需要注意的是2、3、4限制的是消息头为paxos的数据，5限制的是消息头为auth 、health、 logm、mdsmap、mgr  、mgr_command_descs、 mgr_metadata、mgrstat、monitor、monitor_store  monmap 、osdmap、osd_metadata、osd_pg_creating、pgmap的数据，任何一个数据达到上述限制值都会触发compact
+当前设置下：
+1、paxos数据版本差距为paxos_min+ paxos_trim_min = 5000+2500=7500时，paxos消息会触发compact
+2、auth 、health、 logm、mdsmap、mgr  、mgr_command_descs、 mgr_metadata、mgrstat monitor、monitor_store         monmap  、osdmap、osd_metadata、osd_pg_creating、pgmap任意一个消息版本超过paxos_service_trim_min = 7500时触发compact
+```
+
+# 网络相关：
+```
+public_network={public-network/netmask}      # 负责确保ceph服务端和客户端在同一网络或者子网
+cluster_network={cluster-network/netmask}    # 定义一个集群的网络，osd会用这个网络进行心跳控制，对象复制和恢复通信，如果没有配置该网络，Ceph默认会使用public_network用做此网络的作用
+max open files                               # 如果设置了该选项， Ceph会设置系统的max open fds
+```
+
+# Bluefs相关
+```
+bluefs_alloc_size                            # 最小进度大小，默认为1M
+bluefs_max_prefetch                          # 预读时的最大字节数，默认为1MB，主要用在顺序读场景
+//日志文件
+bluefs_min_log_runway                        # bluefs日志文件的可用空间小于此值时，新分配空间。默认为1MB
+bluefs_max_log_runway                        # bluefs日志文件的单次分配大小，默认为4MB
+bluefs_log_compact_min_ratio                 # 通过当前日志文件大小和预估的日志文件的大小的比率控制compact，默认为5
+bluefs_log_compact_min_size                  # 通过日志文件大小控制compact，小于此值不做compact。默认为16MB
+bluefs_compact_log_sync                      # 日志文件compact的方式，有sync和async两种，默认为false，即采用async方式
+bluefs_min_flush_size                        # 因为写文件内容是写到内存中的，当文件内容超过此值就刷新到磁盘。默认为512kb
+bluefs_buffered_io                           # bluefs调用BlockDevice的read/write时的参数，默认为false，即采用fd_direct
+bluefs_sync_write                            # 是否采用synchronous写。默认为false，即采用aio_write。这时候在flush block
+device的时候，需要等待aio完成。参见函数_flush_bdev_safely
+bluefs_allocator                             # bluefs分配磁盘空间的分配器，默认为stupid，即基于extent的方式。
+bluefs_preextend_wal_files                   # 是否预先更新rocksdb wal文件的大小。默认为false
+```
+
+# libaio相关参数
+```
+bdev_aio                    # 默认为true。不能修改，现在只支持aio方式操作磁盘
+bdev_aio_poll_ms            # libaio API io_getevents的超时时间，默认为250
+bdev_aio_max_queue_depth    # libaio API io_setup的最大队列深度, 默认为1024
+bdev_aio_reap_max           # libaio API io_getevents每次请求返回的最大条目数
+bdev_block_size             # 磁盘块大小，默认4096字节
+```
+
+# nvme相关参数
+```
+bdev_nvme_unbind_from_kernel
+bdev_nvme_retry_count
+```
+
+# rbd相关
+```
+[client.admin] 
+rbd_cache = true                   # RBD缓存
+rbd_cache_max_dirty 891289600      # 缓存为write-back时允许的最大dirty字节数(bytes)，如果为0，使用write-through
+rbd_cache_max_dirty_age 10         # 在被刷新到存储盘前dirty数据存在缓存的时间(seconds)
+rbd_cache_size 1073741824          # RBD缓存大小(bytes)
+rbd_cache_target_dirty 754974720
+```
+
+# pg相关
+```
+# 控制pg收敛速度
+osd_peering_wq_threads   = 2 
+osd_peering_wq_batch_size = 20
+```
+
+# rados相关
+```
+# rados层到osd 与mon的超时检测
+rados_mon_op_timeout = 10
+rados_osd_op_timeout = 10 
+```
 
 ```
 [global]
