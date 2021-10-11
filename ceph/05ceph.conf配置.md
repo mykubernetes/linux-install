@@ -95,3 +95,37 @@ rbd cache max dirty object = 2                            #默认值0 #最大的
                                                           #每个chunk对象抽象为一个Object；librbd中以Object为单位来管理缓存，增大该值可以提升性能
 rbd cache target dirty = 235544320                        #默认值16777216 #开始执行回写过程的脏数据大小，不能超过 rbd_cache_max_dirty
 ```
+
+
+
+
+```
+[global]
+fsid = 1235bE62-8ae1-difg-893a-892a675757c6
+mon_initial_members = ceph-node01,ceph-node02,ceph-node03
+mon_host = 192.168.170.11,192.168.170.12,192.168.170.13
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
+public_network = 192.168.170.0/22                           #管理网络
+cluster_network = 192.168.180.0/22                          #集群网络
+mon_pg_warn_max_per_osd = 1000                              #每个osd上pg数量警告值，这个可以根据具体规划来设定
+osd_pool_default_size = 3                                   #默认副本数为3
+osd_pool_default_min_size = 2                               #最小副本数为2，也就是只能坏一个
+mon_osd_full_ratio = .85                                    #存储使用率达到85%将不再提供数据存储
+mon_osd_nearfull_ratio = .70                                #存储使用率达到70%集群将会warn状态
+osd_deep_scrub_randomize_ratio = 0.01                       #随机深度清洗概率,值越大，随机深度清洗概率越高,太高会影响业务
+
+[osd]
+osd_max_write_size = 1024                                   #默认90M，一次写操作最小值
+osd_recovery_op_priority = 1                                #默认为10, 1-63 osd修复操作的优先级, 。值越小，优先级越低
+osd_recovery_max_active = 1                                 #限定每个osd上同时有多少个pg可以同时进行recover
+osd_recovery_max_single_start = 1                           #和osd_recovery_max_active一起使用，要理解其含义。假设我们配置osd_recovery_max_single_start为1，osd_recovery_max_active为3，那么，这意味着OSD在某个时刻会为一个PG启动一个恢复操作，而且最多可以有三个恢复操作同时处于活动状态。
+osd_recovery_max_chunk = 1048576                            #默认为8388608, 设置恢复数据块的大小，以防网络阻塞
+osd_recovery_threads = 1                                    #恢复数据所需的线程数
+osd_max_backfills = 1                                       #集群故障后,最大backfill数为1，太大会影响业务
+osd_scrub_begin_hour = 22                                   #清洗开始时间为晚上22点
+osd_scrub_end_hour = 7                                      #清洗结束时间为早上7点
+osd_recovery_sleep = 0                                      #默认为0，recovery的时间间隔，会影响recovery时常，如果recovery导致业务不正常，可以调大该值，增加时间间隔
+osd_crush_update_on_start = false                           #新加的osd会up/in,但并不会更新crushmap，prepare+active期间不会导致数据迁移
+```
