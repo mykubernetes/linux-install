@@ -84,3 +84,27 @@ ceph osd set-full-ratio 0.8
 
 
 mon_osd_nearfull_ration 参数是一个根据保守的限值。超出这个限值时，集群会进入 HEALTH_WARN状态。 这是为了在达到全满比率之前，提醒需要添加OSD到集群或者修复问题。默认情况下，设置为集群中可用空间的0.85（85%）。
+
+
+
+# 关闭顺序
+```
+# 关闭服务前设置 noout 
+关闭存储客户端停止读写数据 
+如果使用了 RGW，关闭 RGW
+关闭 cephfs 元数据服务 
+关闭 ceph OSD 
+关闭 ceph manager 
+关闭 ceph monitor
+```
+
+# 启动顺序
+```
+启动 ceph monitor
+启动 ceph manager
+启动 ceph OSD
+关闭 cephfs 元数据服务
+启动 RGW
+启动存储客户端
+# 启动服务后取消 noout-->ceph osd unset noout
+```
