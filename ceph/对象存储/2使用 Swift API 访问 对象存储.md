@@ -48,4 +48,7 @@ default.conf
 # swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC list
 first-bucket
 second-bucket
+
+查看容器状态
+# swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC stat
 ```  
