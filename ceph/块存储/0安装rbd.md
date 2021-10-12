@@ -133,14 +133,15 @@ rbd image 'rbd1':
 
 # 五、客户端映射块设备
 
-| 属性 | BIT位 | 描述 |
-|-----|-------|------|
-| layering | 1 | 分层支持 |
-| striping | 2 |
-| exclusive-lock | 4 | 排它锁定支持对 |
-| object-map | 8 | 对象映射支持(需要排它锁定(exclusive-lock)) |
-| fast-diff | 16 | 快照平支持(snapshot flatten support) |
-| deep-flatten | 32 | 在client-node1上使用krbd(内核rbd)客户机进行快速diff计算(需要对象映射)，我们将无法在CentOS内核3.10上映射块设备映像，因为该内核不支持对象映射(object-map)、深平(deep-flatten)和快速diff(fast-diff)(在内核4.9中引入了支持)。 |
+| 特点 | 描述信息 | i |d号
+| layering | 是否支持克隆 | 1 |
+| striping | 是否支持数据对象间的数据条带化，提升性能只支持librbd的客户端使用(内核态) | 2 |
+| exclusive-lock | 是否支持分布式排他锁机制以限制同时仅能有一个客户端访问当前 image | 4 |
+| object-map | 是否支持object位图，主要用于加速导入、导出及已用容量统计等操 作，依赖于exclusive-lock特性 | 8 |
+| fast-diff | 是否支持快照间的快速比较操作，依赖于object-map特性 | 16 |
+| deep-flatten | 是否支持克隆分离时解除在克隆image时创建的快照与其父image之间的关联关系 | 32 |
+| journaling | 是否支持日志IO，即是否支持记录image的修改操作至日志对象；依赖于exclusive-lock特性 | 64 |
+| data-pool | 是否支持将image的数据对象存储于纠删码存储池，主要用于将image的元数据与数据放置于不同的存储池 | 128 |
 
 映射到客户端，应该会报错  
 ```
