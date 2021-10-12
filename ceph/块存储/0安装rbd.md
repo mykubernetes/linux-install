@@ -61,8 +61,6 @@ rbd_default_features = 69
 # dmesg |tail
 ```
 
-
-
 # RBD常用命令
 | 命令 | 功能 |
 | ------ | ------ |
@@ -809,6 +807,15 @@ Removing snap: 100% complete...done.
 # rbd snap limit clear --pool rbd-data1 --image data-img2
 ```
 
+8、快照保护
+```
+# 保护快照
+# rbd snap protect rbd-data1/data-img2@img2-snap-12468e5b9a04b
+
+取消保护快照
+# rbd snap unprotect rbd-data1/data-img2@img2-snap-12468e5b9a04b
+```
+- 保护的快照只能可读无法进行操作除非取消才能操作
 
 十、克隆
 ---
@@ -932,15 +939,52 @@ rbd2
 # ll /opt/ceph-disk2/
 ```  
 
-导出导入RBD镜像
----
-    
-1、导出RBD镜像
+# RBD的镜像导入和导出
+
+- ceph存储可以利用快照做数据恢复，但是快照依赖于底层的存储系统没有被破坏,可以利用rbd的导入导出功能将快照导出备份,RBD导出功能可以基于快照实现增量导出 
+
+
+## 导出
+
+常见的几种导出方式
+- 1.导出从创建rbd到第一次快照2.导出从创建rbd到第二次快照
+- 3.导出从第一次快照到第二次快照的差异
+- 4.导出第二次快照到当前状态的差异
+- 5.导出完整的
+
 ```
-# rbd export image02 /tmp/image02
+# 创建快照
+rbd snap create testimage@v1
+rbd snap create testimage@v2
+
+# 导出创建image到快照v1时间点的差异数据
+rbd export-diff rbd/testimage@v1 testimage_v1
+
+# 导出创建image到快照v2时间点的差异数据
+rbd export-diff rbd/testimage@v2 testimage_v2
+
+# 导出v1快照时间点到v2快照时间点的差异数据
+rbd export-diff  rbd/testimage@v2 --from-snap v1 testimage_v1_v2
+
+# 导出创建image到当前时间点的差异数据
+rbd export rbd/testimage testimage_now
 ```
 
-2、导出RBD镜像
+## 导入
+
+常见导入方式
+- 1.导入完整的rbd
+- 2.导入从创建rbd到第一次快照，导入第一次快照到第二次快照，导入第二次快照到当前状态
+- 3.导入第二次快照，导入第二次快照到当前状态的差异
+
 ```
-# rbd import /tmp/image02 rbd/image02 --image-format 2 
+# 随便创建一个image，名称大小都不限制（恢复时会覆盖大小信息）
+rbd create testbacknew --size 1
+
+# 恢复到v2时间点,直接基于v2的时间点快照做恢复
+rbd import-diff testimage_v2 rbd/testbacknew
+
+# 基于v1的时间点数据，增量v1_v2的数据
+rbd import-diff testimage_v1 rbd/testbacknew
+rbd import-diff testimage_v1_v2 rbd/testbacknew
 ```
