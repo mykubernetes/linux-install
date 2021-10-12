@@ -1,3 +1,68 @@
+# 启用RBD的特性
+- ceph为rbd提供了一些功能增强，但是都是需要内核的支持以下大多数参数内核3.0都不支持，若需要则升级高版本的内核
+- 默认情况下如有配置文件或者命令行创建rbd的时候不指定feature则会默认开启很多特性，如果客户端内核版本低则会导致无法挂载盘，这个时候就需要去指定具体的rbd关闭不支持的特性
+- 当RBD启用了一些内核不支持的功能，需要关闭之后才能正常映射可通过rbd feature enable/disable来开启或禁用功能
+- rbd feature enable rbd/test object-map
+
+## rbd的特性
+
+| 特点 | 描述信息 | id号 |
+|-----|---------|-------|
+| layering | 是否支持克隆 | 1 |
+| striping | 是否支持数据对象间的数据条带化，提升性能只支持librbd的客户端使用(内核态) | 2 |
+| exclusive-lock | 是否支持分布式排他锁机制以限制同时仅能有一个客户端访问当前 image | 4 |
+| object-map | 是否支持object位图，主要用于加速导入、导出及已用容量统计等操 作，依赖于exclusive-lock特性 | 8 |
+| fast-diff | 是否支持快照间的快速比较操作，依赖于object-map特性 | 16 |
+| deep-flatten | 是否支持克隆分离时解除在克隆image时创建的快照与其父image之间的关联关系 | 32 |
+| journaling | 是否支持日志IO，即是否支持记录image的修改操作至日志对象；依赖于exclusive-lock特性 | 64 |
+| data-pool | 是否支持将image的数据对象存储于纠删码存储池，主要用于将image的元数据与数据放置于不同的存储池 | 128 |
+
+## 配置文件中设置
+```
+#在配置文件中正确的feature配置方法
+vim /etc/ceph/ceph.conf
+
+#这个值等于以上的ID号之和，如果你想开启(layering+striping)那值就=3(表示开启这两个)
+#生产环境推荐开启的是=69
+[client]
+rbd_default_features = 69
+```
+
+## 命令行界面的操作
+```
+# 命令模型
+# rbd create [poolname/iamgename] --size 大小 --image-format <1|2> --image-feature <xxx> --stripe-unit=1M --stripe-count=4
+
+# 具体例子
+# rbd create rbd/dataname --size 1G --image-format 2 --image-feature layering,exclusive,journaling
+```
+- --size: 指定块设备大小
+- --image-format: 指定块存储设备类型，默认为2，1已经废弃（1和2在底层的存储实现上不同）
+- --stripe-unit: 块存储中object大小，不得小于4k，不得大于32M，默认为4M
+- --stripe-count: 并发写入的对象个数
+- --image-feature: 指定的rbd块设备开启的特性
+
+
+
+## 关闭feature
+
+- 要注意关闭feature必须一个个的关闭，部分特性有关联性必先关闭前一个才能关闭后一个具体看报错信息判断
+```
+#查看当前拥有的块设备名称[-id idname]中的代表用户，如果是管理员权限则忽略
+# rbd ls [-id idname]
+
+# 查看具体的feature信息
+# rbd info rbd/rbdname [-id idname]
+
+# 关闭具体的特性
+# rbd [-id idname] feature disable rbd/rbdname [特性名称]
+
+# 查看你具体报错信息
+# dmesg |tail
+```
+
+
+
 # RBD常用命令
 | 命令 | 功能 |
 | ------ | ------ |
@@ -133,15 +198,6 @@ rbd image 'rbd1':
 
 # 五、客户端映射块设备
 
-| 特点 | 描述信息 | i |d号
-| layering | 是否支持克隆 | 1 |
-| striping | 是否支持数据对象间的数据条带化，提升性能只支持librbd的客户端使用(内核态) | 2 |
-| exclusive-lock | 是否支持分布式排他锁机制以限制同时仅能有一个客户端访问当前 image | 4 |
-| object-map | 是否支持object位图，主要用于加速导入、导出及已用容量统计等操 作，依赖于exclusive-lock特性 | 8 |
-| fast-diff | 是否支持快照间的快速比较操作，依赖于object-map特性 | 16 |
-| deep-flatten | 是否支持克隆分离时解除在克隆image时创建的快照与其父image之间的关联关系 | 32 |
-| journaling | 是否支持日志IO，即是否支持记录image的修改操作至日志对象；依赖于exclusive-lock特性 | 64 |
-| data-pool | 是否支持将image的数据对象存储于纠删码存储池，主要用于将image的元数据与数据放置于不同的存储池 | 128 |
 
 映射到客户端，应该会报错  
 ```
