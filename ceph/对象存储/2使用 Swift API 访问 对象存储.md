@@ -37,6 +37,13 @@ default.conf
 创建bucket
 # swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC post second-bucket
 
+上传文件或目录
+# swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC upload second-bucket /etc/passwd
+# swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC upload second-bucket /etc/
+
+下载bucket中的文件
+# swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC download second-bucket /etc/passwd
+
 列出所有bucket
 # swift -A http://node01:7480/auth/1.0 -U radosgw:swift -K 9c13SH3hJ2Uf06GVixFIF52fjMBm33qvQ5e00dOC list
 first-bucket
