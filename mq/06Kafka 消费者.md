@@ -55,6 +55,7 @@ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --f
 消费者A：
 ```
 bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning --group a
+```
 
 消费者B：
 ```
