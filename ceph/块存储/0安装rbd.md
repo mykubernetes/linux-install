@@ -749,7 +749,7 @@ SNAPID  NAME                     SIZE   PROTECTED  TIMESTAMP
 # rbd info rbd-data1/data-img2
 ```
 
-# 十、删除数据并还原快照
+3、删除数据并还原快照
 ```
 # 删除文件
 rm -rf /data2/*
@@ -773,14 +773,14 @@ rm -rf /data2/*
 Hello cephtest,This is snapshot test
 ``` 
 
-# 重命名快照  
+4、重命名快照  
 
 语法： `rbd snap rename <pool-name>/<image-name>@<original-snapshot-name> <pool-name>/<image-name>@<new-snapshot-name>`
 ```
 # rbd snap rename rbd/rbd1@snapshot1 rbd/rbd1@snapshot1_new -n client.rbd
 ```
  
-# 删除快照  
+5、删除快照  
 
 ```
 # rbd snap remove --pool rbd-data1 --image data-img2 --snap img2-snap-12468e5b9a04b
@@ -793,15 +793,14 @@ Removing snap: 100% complete...done.
 # rbd snap list --pool rbd-data1 --image data-img2
 ```
 
-# 清除所有快照
-
+6、清除所有快照
 ```
 # rbd snap purge --pool rbd-data1 --image data-img2
 或者
 # rbd snap purge  rbd-data1/data-img2
 ```
 
-# 快照数量限制
+7、快照数量限制
 ```
 设置与修改快照数量限制
 # rbd snap limit set --pool rbd-data1 --image data-img2 --limit 30
@@ -811,7 +810,7 @@ Removing snap: 100% complete...done.
 ```
 
 
-十三、克隆
+十、克隆
 ---
 
 | 命令 | 描述 |
