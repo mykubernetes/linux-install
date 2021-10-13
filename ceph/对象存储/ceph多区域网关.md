@@ -98,13 +98,33 @@ RGW在所有zone group集合之间同步元数据和数据操作。元数据操�
 ## 2.2 创建realm
 ```
 # radosgw-admin realm create --rgw-realm hubei  --default
-
-
+{
+    "id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba",
+    "name": "hebei",
+    "current_period": "55fafff6-9c4c-4d54-8801-ad48861221a1",
+    "epoch": 1
+}
 ```
 
 ## 2.3 创建zonegroup
+```
 # radosgw-admin zonegroup create --rgw-realm hubei --rgw-zonegroup  fancheng --default  --master
+{
+    "id": "c3e67678-07df-45cc-a6d7-f714d63fad9b",
+    "name": "fancheng",
+    "api_name": "fancheng",
+    "is_master": "true",
+    "endpoints": [],
+    "hostnames": [],
+    "hostnames_s3website": [],
+    "master_zone": [],
+    "zones": [],
+    "placement_tragets": [],
+    "default_placement": "",
+    "realm_id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba"
+}
 
+```
 
 
 ## 2.4 修改名
