@@ -123,7 +123,6 @@ RGW在所有zone group集合之间同步元数据和数据操作。元数据操�
     "default_placement": "",
     "realm_id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba"
 }
-
 ```
 
 
@@ -132,20 +131,44 @@ RGW在所有zone group集合之间同步元数据和数据操作。元数据操�
 # radosgw-admin zonegroup rename  --rgw-realm hubei --rgw-zonegroup fancheng --zonegroup-new-name xiangyang
 
 # radosgw-admin zonegroup  get --rgw-zonegroup xiangyang
+{
+    "id": "c3e67678-07df-45cc-a6d7-f714d63fad9b",
+    "name": "xiangyang",
+    "api_name": "fancheng",
+    "is_master": "true",
+    "endpoints": [],
+    "hostnames": [],
+    "hostnames_s3website": [],
+    "master_zone": [],
+    "zones": [],
+    "placement_tragets": [],
+    "default_placement": "",
+    "realm_id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba"
+}
 ```
-
 
 ## 2.5 删除一个zonegroup
 ```
 # radosgw-admin realm remove --rgw-realm hubei --rgw-zonegroup xiangyang
 
 # radosgw-admin zonegroup list
-
-
+{
+    "default_info": "c3e67678-07df-45cc-a6d7-f714d63fad9b",
+    "zonegroups": [
+        "xiangyang",
+        "default"
+    ]
+}
 
 # radosgw-admin zonegroup delete --rgw-zonegroup xiangyang
 
 # radosgw-admin zonegroup list
+{
+    "default_info": "",
+    "zonegroups": [
+        "default"
+    ]
+}
 ```
 
 
@@ -331,10 +354,14 @@ RGW在所有zone group集合之间同步元数据和数据操作。元数据操�
 ## 2.10 查看用户
 ```
 # radosgw-admin user list
-
-
+[
+    "syncuser"
+]
 
 # radosgw-admin user list --rgw-zonegroup default --rgw-zone default
+[
+    "joy"
+]
 ```
 
 
@@ -416,22 +443,36 @@ RGW在所有zone group集合之间同步元数据和数据操作。元数据操�
 
 
 # ceph osd pool ls
+rbd
+rbdmirror
+.rgw.root
+defautl.rgw.control
+defautl.rgw.meta
+defautl.rgw.log
+defautl.rgw.buckets.index
+defautl.rgw.buckets.data
+fancheng.rgw.control
+fancheng.rgw.meta
+fancheng.rgw.log
 ```
 
- ## 2.12 更新配置文件并重启
+## 2.12 更新配置文件并重启
 ```
 # vim /etc/ceph/backup.conf 
-
+[client.rgw.chph5]
+host = ceph5
+keyring = /etc/ceph/backup.client.rgw.ceph5.keyring
+rgw_frontends = civetweb port=80 num_threads=100
+log = /var/log/ceph/$cluster.$name.log
+rgw_dns_name = ceph5.lab.example.com
+rgw_zone = fancheng
 
 
 # systemctl restart ceph-radosgw@rgw.ceph5
-```
 
-为当前zone创建用户
-```
+
+# 为当前zone创建用户
 # radosgw-admin user create --uid joy --display-name "Joy Ning" --subuser joy:swift
-
-
 {
     "user_id": "joy",
     "display_name": "Joy Ning",
@@ -551,10 +592,22 @@ etc/ceph/ceph.client.rbd.keyring
 出现元数据和数据的池
 ```
 # ceph osd pool ls
-
-
+rbd
+rbdmirror
+.rgw.root
+defautl.rgw.control
+defautl.rgw.meta
+defautl.rgw.log
+defautl.rgw.buckets.index
+defautl.rgw.buckets.data
+fancheng.rgw.control
+fancheng.rgw.meta
+fancheng.rgw.log
+fancheng.rgw.buckets.index
+fancheng.rgw.buckets.data
 
 # rados -p fancheng.rgw.buckets.data ls --cluster backup
+b337a562-5921-46fc-aad2-e70e99454e5f.4282.1_etc/ceph/ceph.client.rbd.keyring
 ```
 
 
@@ -575,12 +628,14 @@ etc/ceph/ceph.client.rbd.keyring
 }
 
 # radosgw-admin realm list
-
-
+{
+    "default-info": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba",
+    "realms": [
+        "hebei",
+    ]
+}
 
 # radosgw-admin zonegroup get --rgw-realm hubei
-
-
 {
     "id": "5acbb712-0f7f-4108-8d93-ea75a19e33b3",
     "name": "xiangyang",
@@ -620,13 +675,121 @@ etc/ceph/ceph.client.rbd.keyring
 ## 4.2 拉取period
 ```
 # radosgw-admin period pull --url  http://ceph5.lab.example.com --access-key 4YGLC3480T3Z5ZRY3UHG  --secret UuHLN9nlTofwez8Nz0RVJ60Vl6v6zGVJtjLP04pB
-period
+2019-03-26 11:47:05.406374 7f3dc85c7c40  1 found existing latest_epoch 1 >= given epoch 1, returning r=-17
+{
+    "id": "1c6ccdef-ca02-44b5-b212-ba68acbd6aad",
+    "epoch": 1,
+    "predecessor_uuid": "55fafff6-9c4c-4d54-8801-ad48861221a1",
+    "sync_status": [],
+    "period_map": {
+        "id": "1c6ccdef-ca02-44b5-b212-ba68acbd6aad",
+        "zonegroups": [
+            {
+                "id": "5acbb712-0f7f-4108-8d93-ea75a19e33b3",
+                "name": "xiangyang",
+                "api_name": "xiangyang",
+                "is_master": "true",
+                "endpoints": [],
+                "hostnames": [],
+                "hostnames_s3website": [],
+                "master_zone": "b337a562-5921-46fc-aad2-e70e99454e5f",
+                "zones": [
+                    {
+                        "id": "b337a562-5921-46fc-aad2-e70e99454e5f",
+                        "name": "fancheng",
+                        "endpoints": [
+                            "http://ceph5.lab.example.com"
+                        ],
+                        "log_meta": "false",
+                        "log_data": "false",
+                        "bucket_index_max_shards": 0,
+                        "read_only": "false",
+                        "tier_type": "",
+                        "sync_from_all": "true",
+                        "sync_from": []
+                    }
+                ],
+                "placement_targets": [
+                    {
+                        "name": "default-placement",
+                        "tags": []
+                    }
+                ],
+                "default_placement": "default-placement",
+                "realm_id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba"
+            }
+        ],
+        "short_zone_ids": [
+            {
+                "key": "b337a562-5921-46fc-aad2-e70e99454e5f",
+                "val": 557238113
+            }
+        ]
+    },
+    "master_zonegroup": "5acbb712-0f7f-4108-8d93-ea75a19e33b3",
+    "master_zone": "b337a562-5921-46fc-aad2-e70e99454e5f",
+    "period_config": {
+        "bucket_quota": {
+            "enabled": false,
+            "check_on_raw": false,
+            "max_size": -1,
+            "max_size_kb": 0,
+            "max_objects": -1
+        },
+        "user_quota": {
+            "enabled": false,
+            "check_on_raw": false,
+            "max_size": -1,
+            "max_size_kb": 0,
+            "max_objects": -1
+        }
+    },
+    "realm_id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba",
+    "realm_name": "hubei",
+    "realm_epoch": 2
+}
 ```
 
 ## 4.3 创建Secondary Zone
 ```
 # radosgw-admin zone create --rgw-zonegroup  xiangyang --rgw-zone  xiantao  --endpoints http://ceph2.lab.example.com  --default --access-key 4YGLC3480T3Z5ZRY3UHG  --secret UuHLN9nlTofwez8Nz0RVJ60Vl6v6zGVJtjLP04pB
-zone-new
+2019-03-26 11:49:47.924379 7f7d2758cc40  0 failed reading obj info from .rgw.root:zone_info.b337a562-5921-46fc-aad2-e70e99454e5f: (2) No such file or directory
+2019-03-26 11:49:47.924419 7f7d2758cc40  0 WARNING: could not read zone params for zone id=b337a562-5921-46fc-aad2-e70e99454e5f name=fancheng
+{
+    "id": "b012d15d-a83c-4553-9ec3-09bf45d4a67b",
+    "name": "xiantao",
+    "domain_root": "xiantao.rgw.meta:root",
+    "control_pool": "xiantao.rgw.control",
+    "gc_pool": "xiantao.rgw.log:gc",
+    "lc_pool": "xiantao.rgw.log:lc",
+    "log_pool": "xiantao.rgw.log",
+    "intent_log_pool": "xiantao.rgw.log:intent",
+    "usage_log_pool": "xiantao.rgw.log:usage",
+    "reshard_pool": "xiantao.rgw.log:reshard",
+    "user_keys_pool": "xiantao.rgw.meta:users.keys",
+    "user_email_pool": "xiantao.rgw.meta:users.email",
+    "user_swift_pool": "xiantao.rgw.meta:users.swift",
+    "user_uid_pool": "xiantao.rgw.meta:users.uid",
+    "system_key": {
+        "access_key": "4YGLC3480T3Z5ZRY3UHG",
+        "secret_key": "UuHLN9nlTofwez8Nz0RVJ60Vl6v6zGVJtjLP04pB"
+    },
+    "placement_pools": [
+        {
+            "key": "default-placement",
+            "val": {
+                "index_pool": "xiantao.rgw.buckets.index",
+                "data_pool": "xiantao.rgw.buckets.data",
+                "data_extra_pool": "xiantao.rgw.buckets.non-ec",
+                "index_type": 0,
+                "compression": ""
+            }
+        }
+    ],
+    "metadata_heap": "",
+    "tier_config": [],
+    "realm_id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba"
+}
 
 # radosgw-admin zonegroup get --rgw-realm  hubei --rgw-zonegroup
 parse error setting 'rgw_zonegroup' to '' (Option --rgw-zonegroup requires an argument.)
@@ -721,11 +884,89 @@ parse error setting 'rgw_zonegroup' to '' (Option --rgw-zonegroup requires an ar
 ## 4.4 更新period
 ```
 #  radosgw-admin period update --commit
-View Code
+{
+    "id": "1c6ccdef-ca02-44b5-b212-ba68acbd6aad",
+    "epoch": 2,
+    "predecessor_uuid": "55fafff6-9c4c-4d54-8801-ad48861221a1",
+    "sync_status": [],
+    "period_map": {
+        "id": "1c6ccdef-ca02-44b5-b212-ba68acbd6aad",
+        "zonegroups": [
+            {
+                "id": "5acbb712-0f7f-4108-8d93-ea75a19e33b3",
+                "name": "xiangyang",
+                "api_name": "xiangyang",
+                "is_master": "true",
+                "endpoints": [],
+                "hostnames": [],
+                "hostnames_s3website": [],
+                "master_zone": "b337a562-5921-46fc-aad2-e70e99454e5f",
+                "zones": [
+                    {
+                        "id": "b337a562-5921-46fc-aad2-e70e99454e5f",
+                        "name": "fancheng",
+                        "endpoints": [
+                            "http://ceph5.lab.example.com"
+                        ],
+                        "log_meta": "false",
+                        "log_data": "false",
+                        "bucket_index_max_shards": 0,
+                        "read_only": "false",
+                        "tier_type": "",
+                        "sync_from_all": "true",
+                        "sync_from": []
+                    }
+                ],
+                "placement_targets": [
+                    {
+                        "name": "default-placement",
+                        "tags": []
+                    }
+                ],
+                "default_placement": "default-placement",
+                "realm_id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba"
+            }
+        ],
+        "short_zone_ids": [
+            {
+                "key": "b337a562-5921-46fc-aad2-e70e99454e5f",
+                "val": 557238113
+            }
+        ]
+    },
+    "master_zonegroup": "5acbb712-0f7f-4108-8d93-ea75a19e33b3",
+    "master_zone": "b337a562-5921-46fc-aad2-e70e99454e5f",
+    "period_config": {
+        "bucket_quota": {
+            "enabled": false,
+            "check_on_raw": false,
+            "max_size": -1,
+            "max_size_kb": 0,
+            "max_objects": -1
+        },
+        "user_quota": {
+            "enabled": false,
+            "check_on_raw": false,
+            "max_size": -1,
+            "max_size_kb": 0,
+            "max_objects": -1
+        }
+    },
+    "realm_id": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba",
+    "realm_name": "hubei",
+    "realm_epoch": 2
+}
 
 # ceph auth get-or-create client.rgw.ceph2  mon 'allow rwx' osd 'allow rwx' -o /etc/ceph/ceph.client.radosgw.keyring --cluster ceph
 
 # ceph osd pool ls
+testpool
+rbd
+rbdmirror
+.rgw.root
+default.rgw.control
+default.rgw.meta
+default.rgw.log
 ```
 发现没有成功，重新拉取一遍
 
@@ -737,6 +978,10 @@ View Code
 # radosgw-admin zone delete --rgw-zone xiantao
 
 # radosgw-admin realm list
+{
+    "default_info": "",
+    "realms": []
+}
 ```
 
 
