@@ -1133,26 +1133,41 @@ xiantao.rgw.log
 ## 5.1 查看
 ```
 # swift -A http://ceph5.lab.example.com/auth/v1.0 -U joy:swift -K ofbO1nZ1vqUHQwdNuyUd6zLLYhlbiDxMCILfbJoL list 
-
+testswift
  
 # swift -A http://ceph5.lab.example.com/auth/v1.0 -U joy:swift -K ofbO1nZ1vqUHQwdNuyUd6zLLYhlbiDxMCILfbJoL list testswift
-
+etc/ceph/ceph.client.rbd.keyring
 ```
 
 ## 5.2 ceph5把default的zone添加到一个realm
 ```
 #  radosgw-admin realm list
-
- 
+{
+    "default_info": "d4668fc2-ceed-4eb2-a5e7-a70c2aa7deba",
+    "realms": [
+        "hubei"
+    ]
+}
 
 # radosgw-admin zonegroup list
-
+{
+    "default_info": "5acbb712-0f7f-4108-8b93-ea75a19e33b3",
+    "zonegroups": [
+        "xiangyang",
+        "default"
+    ]
+}
 ```
 
 ## 5.3 为default创建一个新的zonegroup
 ```
 # radosgw-admin realm create --rgw-realm realmnew
-
+{
+    "id": "de918d45-d763-416d-af0a-0350b1339ca1",
+    "name": "realmnew",
+    "current_period": "0daf85ed-732b-4f0f-8f58-a3f8efle996e"，
+    "epoch": 1
+}
 ```
 
 ## 5.4 修改default的realm，设置为master
@@ -1417,4 +1432,5 @@ rgw_zonegroup = default
 # systemctl restart ceph-radosgw@rgw.ceph5
 
 # ps -ef|grep rados
+ceph      19622      1  5 13:53 ?        00:00:00 /user/bin/radosgw -f --cluster backup --name client.rgw.ceph5 --setuser ceph --setgroup ceph
 ```
