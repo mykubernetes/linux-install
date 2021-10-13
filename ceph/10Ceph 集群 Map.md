@@ -954,3 +954,169 @@ Standby daemons:
     }
 }
 ```
+
+# 二、 管理monitor map
+
+## .1 多Momitor的同步机制
+
+在生产环境建议最少三节点monitor，以确保cluster map的高可用性和冗余性
+
+monitor使用paxos算法作为集群状态上达成一致的机制。paxos是一种分布式一致性算法。每当monitor修改map时，它会通过paxos发送更新到其他monitor。Ceph只有在大多数monitor就更新达成一致时提交map的新版本
+
+cluster map的更新操作需要Paxos确认，但是读操作不经由Paxos，而是直接访问本地的kv存储
+
+## 2.2 Monitor的选举机制
+
+多个monitor之间需要建立仲裁并选择出一个leader，其他节点则作为工作节点（peon）
+
+在选举完成并确定leader之后，leader将从所有其他monitor请求最新的map epoc，以确保leader具有集群的最新视图
+
+要维护monitor集群的正常工作，必须有超过半数的节点正常
+
+## 2.3 Monitor租期
+
+在Monitor建立仲裁后，leader开始分发短期的租约到所有的monitors。让它们能够分发cluster map到OSD和client
+
+Monitor租约默认每3s续期一次
+
+当peon monitor没有确认它收到租约时，leader假定该monitor异常，它会召集新的选举以建立仲裁
+
+如果peon monitor的租约到期后没有收到leader的续期，它会假定leader异常，并会召集新的选举
+
+## 2.4 管理monitor map
+
+将monitor map导出为一个二进制文件
+```
+# ceph mon getmap -o ./monmap
+got monmap epoch 1
+```
+
+打印导出的二进制文件的内容
+```
+# monmaptool --print  ./monmap
+
+monmaptool: monmap file ./monmap
+epoch 1
+fsid 35a91e48-8244-4e96-a7ee-980ab989d20d
+last_changed 2019-03-16 12:39:14.839999
+created 2019-03-16 12:39:14.839999
+0: 172.25.250.11:6789/0 mon.ceph2
+1: 172.25.250.12:6789/0 mon.ceph3
+2: 172.25.250.13:6789/0 mon.ceph4
+```
+
+
+修改二进制文件，从monmap删除某个monitor
+```
+# monmaptool ./monmap  --rm ceph2
+monmaptool: monmap file ./monmap
+monmaptool: removing ceph2
+monmaptool: writing epoch 1 to ./monmap (2 monitors)
+
+
+# monmaptool --print ./monmap
+monmaptool: monmap file ./monmap
+epoch 1
+fsid 35a91e48-8244-4e96-a7ee-980ab989d20d
+last_changed 2019-03-16 12:39:14.839999
+created 2019-03-16 12:39:14.839999
+0: 172.25.250.12:6789/0 mon.ceph3
+1: 172.25.250.13:6789/0 mon.ceph4
+
+
+# ceph mon dump
+dumped monmap epoch 1
+epoch 1
+fsid 35a91e48-8244-4e96-a7ee-980ab989d20d
+last_changed 2019-03-16 12:39:14.839999
+created 2019-03-16 12:39:14.839999
+0: 172.25.250.11:6789/0 mon.ceph2
+1: 172.25.250.12:6789/0 mon.ceph3
+2: 172.25.250.13:6789/0 mon.ceph4
+```
+
+修改二进制文件，往monmap中添加一个monitor
+```
+# monmaptool ./monmap --add ceph2 172.25.254.11:6789
+monmaptool: monmap file ./monmap
+monmaptool: writing epoch 1 to ./monmap (3 monitors)
+[root@ceph2 ~]# monmaptool --print ./monmap 
+monmaptool: monmap file ./monmap
+epoch 1
+fsid 35a91e48-8244-4e96-a7ee-980ab989d20d
+last_changed 2019-03-16 12:39:14.839999
+created 2019-03-16 12:39:14.839999
+0: 172.25.250.12:6789/0 mon.ceph3
+1: 172.25.250.13:6789/0 mon.ceph4
+2: 172.25.254.11:6789/0 mon.ceph2
+```
+
+导入一个二进制文件，在导入之前，需要先停止monitor
+```
+ceph-mon -i <id> --inject-monmap ./monmap
+```
+    
+# 三、 管理osd map
+
+## 3.1 OSD map生命周期
+
+每当OSD加入或离开集群时，Ceph都会更新OSD map
+
+OSD不使用leader来管理OSD map，它们会在自身之间传播map。OSD会利用OSD map epoch标记它们交换的每一条信息，当OSD检测到自己已落后时，它会使用其对等OSD执行map更新
+
+在大型集群中OSD map更新会非常频繁，节点会执行递增map更新
+
+Ceph也会利用epoch来标记OSD和client之间的消息。当client连接到OSD时OSD会检查epoch。如果发现epoch不匹配，则OSD会以正确的epoch响应，以便客户端可以更新其OSD map
+
+OSD定期向monitor报告自己的状态，OSD之间会交换心跳，以便检测对等点的故障，并报告给monitor
+
+leader monitor发现OSD故障时，它会更新map，递增epoch，并使用Paxos更新协议来通知其他monitor，同时撤销租约，并发布新的租约，以使monitor以分发最新的OSD map
+
+## 3.2 管理 osd map
+```
+#  ceph osd getmap -o ./osdmap
+got osdmap epoch 281
+
+# osdmaptool --print ./osdmap
+osdmaptool: osdmap file './osdmap'
+epoch 281
+fsid 35a91e48-8244-4e96-a7ee-980ab989d20d
+created 2019-03-16 12:39:22.552356
+modified 2019-03-26 22:32:15.354383
+flags sortbitwise,recovery_deletes,purged_snapdirs
+crush_version 43
+full_ratio 0.95
+backfillfull_ratio 0.9
+nearfull_ratio 0.85
+require_min_compat_client jewel
+min_compat_client jewel
+require_osd_release luminous
+pool 1 'testpool' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 128 pgp_num 128 last_change 190 flags hashpspool stripe_width 0 application rbd
+    snap 1 'testpool-snap-20190316' 2019-03-16 22:27:34.150433
+    snap 2 'testpool-snap-2' 2019-03-16 22:31:15.430823
+pool 5 'rbd' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 64 pgp_num 64 last_change 191 flags hashpspool stripe_width 0 application rbd
+    removed_snaps [1~13]
+pool 6 'rbdmirror' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 32 pgp_num 32 last_change 192 flags hashpspool stripe_width 0 application rbd
+    removed_snaps [1~7]
+pool 7 '.rgw.root' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_num 8 last_change 176 flags hashpspool stripe_width 0 application rgw
+pool 8 'default.rgw.control' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_num 8 last_change 178 flags hashpspool stripe_width 0 application rgw
+pool 9 'default.rgw.meta' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_num 8 last_change 180 flags hashpspool stripe_width 0 application rgw
+pool 10 'default.rgw.log' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_num 8 last_change 182 flags hashpspool stripe_width 0 application rgw
+pool 11 'xiantao.rgw.control' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_num 8 last_change 194 owner 18446744073709551615 flags hashpspool stripe_width 0 application rgw
+pool 12 'xiantao.rgw.meta' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_num 8 last_change 196 owner 18446744073709551615 flags hashpspool stripe_width 0 application rgw
+pool 13 'xiantao.rgw.log' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 8 pgp_num 8 last_change 198 owner 18446744073709551615 flags hashpspool stripe_width 0 application rgw
+pool 14 'cephfs_metadata' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 64 pgp_num 64 last_change 214 flags hashpspool stripe_width 0 application cephfs
+pool 15 'cephfs_data' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 128 pgp_num 128 last_change 214 flags hashpspool stripe_width 0 application cephfs
+pool 16 'test' replicated size 3 min_size 2 crush_rule 3 object_hash rjenkins pg_num 32 pgp_num 32 last_change 280 flags hashpspool stripe_width 0 application rbd
+pool 17 'ssdpool' replicated size 3 min_size 2 crush_rule 4 object_hash rjenkins pg_num 32 pgp_num 32 last_change 281 flags hashpspool stripe_width 0 application rbd
+max_osd 9
+osd.0 up   in  weight 1 up_from 54 up_thru 264 down_at 53 last_clean_interval [7,51) 172.25.250.11:6800/185671 172.25.250.11:6801/185671 172.25.250.11:6802/185671 172.25.250.11:6803/185671 exists,up 745dce53-1c63-4c50-b434-d441038dafe4
+osd.1 up   in  weight 1 up_from 187 up_thru 258 down_at 184 last_clean_interval [54,186) 172.25.250.13:6809/60269 172.25.250.13:6807/1060269 172.25.250.13:6803/1060269 172.25.250.13:6813/1060269 exists,up a7562276-6dfd-4803-b248-a7cbdb64ebec
+osd.2 up   in  weight 1 up_from 258 up_thru 264 down_at 257 last_clean_interval [54,257) 172.25.250.12:6804/59201 172.25.250.12:6810/8059201 172.25.250.12:6811/8059201 172.25.250.12:6815/8059201 exists,up bbef1a00-3a31-48a0-a065-3a16b9edc3b1
+osd.3 up   in  weight 1 up_from 54 up_thru 272 down_at 53 last_clean_interval [13,51) 172.25.250.11:6804/185668 172.25.250.11:6805/185668 172.25.250.11:6806/185668 172.25.250.11:6807/185668 exists,up e934a4fb-7125-4e85-895c-f66cc5534ceb
+osd.4 up   in  weight 1 up_from 187 up_thru 267 down_at 184 last_clean_interval [54,186) 172.25.250.13:6805/60272 172.25.250.13:6802/1060272 172.25.250.13:6810/1060272 172.25.250.13:6811/1060272 exists,up e2c33bb3-02d2-4cce-85e8-25c419351673
+osd.5 up   in  weight 1 up_from 261 up_thru 275 down_at 257 last_clean_interval [54,258) 172.25.250.12:6808/59198 172.25.250.12:6806/8059198 172.25.250.12:6807/8059198 172.25.250.12:6814/8059198 exists,up d299e33c-0c24-4cd9-a37a-a6fcd420a529
+osd.6 up   in  weight 1 up_from 54 up_thru 273 down_at 52 last_clean_interval [21,51) 172.25.250.11:6808/185841 172.25.250.11:6809/185841 172.25.250.11:6810/185841 172.25.250.11:6811/185841 exists,up debe7f4e-656b-48e2-a0b2-bdd8613afcc4
+osd.7 up   in  weight 1 up_from 187 up_thru 266 down_at 184 last_clean_interval [54,186) 172.25.250.13:6801/60271 172.25.250.13:6806/1060271 172.25.250.13:6808/1060271 172.25.250.13:6812/1060271 exists,up 8c403679-7530-48d0-812b-72050ad43aae
+osd.8 up   in  weight 1 up_from 151 up_thru 265 down_at 145 last_clean_interval [54,150) 172.25.250.12:6800/59200 172.25.250.12:6801/7059200 172.25.250.12:6802/7059200 172.25.250.12:6805/7059200 exists,up bb73edf8-ca97-40c3-a727-d5fde1a9d1d9
+```
