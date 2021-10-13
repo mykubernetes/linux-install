@@ -96,7 +96,19 @@ rbd cache max dirty object = 2                            #默认值0 #最大的
 rbd cache target dirty = 235544320                        #默认值16777216 #开始执行回写过程的脏数据大小，不能超过 rbd_cache_max_dirty
 ```
 
-
+rgw常用的配置项
+```
+/etc/ceph/ceph.conf
+#也可以全部写在rgw_frontends=""中空格分割开
+[client.rgw.servera]
+rgw_frontends="civetweb port=80"
+#生产环境中指向负载均衡器的域名后缀
+rgw_dns_name=servera
+log_file=/var/log/ceph/servera.rgw.log
+access_log_file=/var/log/ceph/civetweb.access.log
+error_log_file=/var/log/ceph/civetweb.error.log
+num_threads=100
+```
 
 # 限制pool配置更改
 ```
