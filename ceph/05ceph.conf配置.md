@@ -96,6 +96,75 @@ rbd cache max dirty object = 2                            #默认值0 #最大的
 rbd cache target dirty = 235544320                        #默认值16777216 #开始执行回写过程的脏数据大小，不能超过 rbd_cache_max_dirty
 ```
 
+
+
+# 限制pool配置更改
+```
+#禁止池被删除
+osd_pool_default_flag_nodelete
+
+#禁止池的pg_num和pgp_num被修改
+osd_pool_default_flag_nopgchange
+
+#禁止修改池的size和min_size
+osd_pool_default_flag_nosizechange
+```
+
+# OSD状态参数
+```
+# osd之间传递心跳的间隔时间
+osd_heartbeat_interval
+
+# 一个osd多久没心跳，就会被集群认为它down了
+osd_heartbeat_grace
+
+# 确定一个osd状态为down的最少报告来源osd数
+mon_osd_min_down_reporters
+
+# 一个OSD必须重复报告一个osd状态为down的次数
+mon_osd_min_down_reports
+
+# 当osd停止响应多长时间，将其标记为down和out
+mon_osd_down_out_interval
+
+# monitor宣布失败osd为down前的等待时间
+mon_osd_report_timeout
+
+# 一个新的osd加入集群时，等待多长时间，开始向monitor报告
+osd_mon_report_interval_min
+
+# monitor允许osd报告的最大间隔，超时就认为它down了
+osd_mon_report_interval_max
+
+# osd向monitor报告心跳的时间
+osd_mon_heartbeat_interval
+```
+
+# 清理调优参数
+```
+osd_scrub_begin_hour =                    #取值范围0-24
+osd_scrub_end_hour = end_hbegin_hour our  #取值范围0-24
+osd_scrub_load_threshold                  #当系统负载低于多少的时候可以清理，默认为0.5
+osd_scrub_min_interval                    #多久清理一次，默认是一天一次（前提是系统负载低于上一个参数的设定）
+osd_scrub_interval_randomize_ratio        #在清理的时候，随机延迟的值，默认是0.5
+osd_scrub_max_interval                    #清理的最大间隔时间，默认是一周（如果一周内没清理过，这次就必须清理，不管负载是多少）
+osd_scrub_priority                        #清理的优先级，默认是5
+osd_deep_scrub_interal                    #深度清理的时间间隔，默认是一周
+osd_scrub_sleep                           #当有磁盘读取时，则暂停清理，增加此值可减缓清理的速度以降低对客户端的影响，默认为0,范围0-1
+```
+
+# 管理回填和恢复操作的配置项
+```
+#用于限制每个osd上用于回填的并发操作数，默认为1
+osd_max_backfills
+
+#用于限制每个osd上用于恢复的并发操作数，默认为3
+osd_recovery_max_active
+
+#恢复操作的优先级，默认为3
+osd_recovery_op_priority
+```
+
 # 资源池管理模块
 ```
 $osd_reuse = 0;                             # 控制是否可以复用osd创建资源池。0、不支持复用，1、支持复用
