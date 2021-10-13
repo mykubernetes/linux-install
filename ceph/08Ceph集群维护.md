@@ -74,13 +74,13 @@ ceph pg scrub
 ceph deep-scrub 
 ```
 
-# 集群空间限制
+# 集群空间限制(OSD容量)
 
 - 当集群容量达到mon_osd_nearfull_ratio的值时，集群会进入HEALTH_WARN状态。这是为了在达到full_ratio之前，提醒添加OSD。默认设置为0.85，即85%
 - 当集群容量达到mon_osd_full_ratio的值时，集群将停止写入，但允许读取。集群会进入到HEALTH_ERR状态。默认为0.95，即95%。这是为了防止当一个或多个OSD故障时仍留有余地能重平衡数据
 
 ```
-# 设置方法：
+# 设置方法
 ceph osd set-full-ratio 0.95
 ceph osd set-nearfull-ratio 0.85
 ceph osd dump
