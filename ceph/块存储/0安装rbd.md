@@ -178,6 +178,16 @@ enabled application 'rbd' on pool 'rbd-data1'
 # rbd --image rbd1 info --name client.rbd
 ```  
 
+| 命令 | 描述 |
+|------|------|
+| size M GiB in N objects | image空间大小为M，共分割至N个对象（分割的数量由条带大小决定） |
+| order 22 (4 MiB objects) | 块大小（条带）的标识序号，有效范围为12-25，分别对应着4K-32M之间的大小 |
+| id | 当前image的标识符 |
+| block_name_prefix | 当前image相关的object的名称前缀 |
+| format | image的格式，其中的”2″表示”v2″ |
+| features | 当前image启用的功能特性，其值是一个以逗号分隔的字符串列表，例如layering、 exclusive-lock等 |
+| op_features | 可选的功能特性 |
+
 查看块设备的详细信息  
 ```
 # rbd info rbd/rbd1
