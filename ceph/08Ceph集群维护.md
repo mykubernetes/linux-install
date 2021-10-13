@@ -175,6 +175,67 @@ test
 ```
 
 
+# pool相关配置文件
+
+| 配置 | 描述 |
+|-----|------|
+| osd_pool_default_flag_nodelete | 禁止池被删除 |
+| osd_pool_default_flag_nopgchange | 禁止池的pg_num和pgp_num被修改 |
+| osd_pool_default_flag_nosizechang | 禁止修改池的size和min_size |
+
+```
+# ceph daemon osd.0  config show|grep osd_pool_default_flag
+"osd_pool_default_flag_hashpspool": "true",
+"osd_pool_default_flag_nodelete": "false",
+"osd_pool_default_flag_nopgchange": "false",
+"osd_pool_default_flag_nosizechange": "false",
+"osd_pool_default_flags": "0",
+
+# ceph tell osd.* injectargs --osd_pool_default_flag_nodelete true
+
+# ceph daemon osd.0 config show|grep osd_pool_default_flag
+"osd_pool_default_flag_hashpspool": "true",
+"osd_pool_default_flag_nodelete": "true",
+"osd_pool_default_flag_nopgchange": "false",
+"osd_pool_default_flag_nosizechange": "false",
+"osd_pool_default_flags": "0",
+
+# 删除资源池
+# ceph osd pool delete ssdpool  ssdpool yes-i-really-really-mean-it
+Error EPERM: WARNING: this will *PERMANENTLY DESTROY* all data stored in pool ssdpool.  If you are *ABSOLUTELY CERTAIN* that is what you want, pass the pool name *twice*, followed by --yes-i-really-really-mean-it.   #不能删除
+
+修改osd_pool_default_flag_nodelete为false
+# ceph tell osd.* injectargs --osd_pool_default_flag_nodelete false
+
+# ceph daemon osd.0 config show|grep osd_pool_default_flag
+"osd_pool_default_flag_hashpspool": "true",
+"osd_pool_default_flag_nodelete": "true",                   #依然显示为ture
+"osd_pool_default_flag_nopgchange": "false",
+"osd_pool_default_flag_nosizechange": "false",
+"osd_pool_default_flags": "0"
+
+
+# 使用配置文件修改
+
+# 在ceph1的配置文件上修改osd_pool_default_flag_nodelete false
+
+# 推送配置到ceph集群节点
+# ansible all -m copy -a 'src=/etc/ceph/ceph.conf dest=/etc/ceph/ceph.conf owner=ceph group=ceph mode=0644'
+# ansible mons -m shell -a ' systemctl restart ceph-mon.target'
+# ansible mons -m shell -a ' systemctl restart ceph-osd.target'
+
+# 查看配置
+# ceph daemon osd.0 config show|grep osd_pool_default_flag
+"osd_pool_default_flag_hashpspool": "true",
+"osd_pool_default_flag_nodelete": "false",
+"osd_pool_default_flag_nopgchange": "false",
+"osd_pool_default_flag_nosizechange": "false",
+"osd_pool_default_flags": "0",
+
+# 删除ssdpool
+# ceph osd pool delete ssdpool ssdpool --yes-i-really-really-mean-it
+```
+
 
 # 节流回填和恢复
 
