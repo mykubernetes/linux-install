@@ -47,7 +47,7 @@ ceph        608      1  0 06:43 ?        00:00:27 /usr/bin/radosgw -f --cluster 
 ```
 - 浏览器访问： http://192.168.20.176:7480  
 
-4、自定义端口
+5、自定义端口
 
 - radosgw 服务器（node01、node02）的配置文件要和deploy服务器的一致，可以ceph-deploy 服务器修改然后统一推送，或者单独修改每个 radosgw 服务器的配置为同一配置  
 ```
@@ -374,4 +374,45 @@ test@ceph-deploy:~$ s3cmd rm s3://test/pdf/test.pdf
 delete: 's3://test/pdf/test.pdf'
 
 # s3cmd ls s3://test/pdf/test.pdf
+```
+
+9、修改信息
+```
+# radosgw-admin user modify --uid user1 --display-name 'joy Ningrui'  --max_buckets 2000
+{
+    "user_id": "user1",
+    "display_name": "joy Ningrui",
+    "email": "",
+    "suspended": 0,
+    "max_buckets": 2000,
+    "subusers": [],
+    "keys": [
+        {
+            "user": "user1",
+            "access_key": "6LO8046SQ3DVGVKS84LX",
+            "secret_key": "iiVFHXC6qc4iTnKVcKDVJaOLeIpl39EbQ2OwueRV"
+        }
+    ],
+```
+
+10、 禁用user1用户
+```
+# radosgw-admin user suspend --uid user1
+"user_id": "user1",
+"email": "",
+"suspended": 1,                    #禁用
+"max_buckets": 2000,
+"auid": 0,
+"subusers": [],
+```
+
+11、启用
+```
+# radosgw-admin user enable --uid user1
+"user_id": "user1",
+"email": "",
+"suspended": 0,                    #启用
+"max_buckets": 2000,
+"auid": 0,
+"subusers": [],
 ```
