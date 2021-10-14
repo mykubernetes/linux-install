@@ -98,7 +98,7 @@ ceph auth export osd.1 -o aaa.key
 
 - 添加用户的规范方法：它会创建用户、生成密钥，并添加所有指定的能力
 ```
-#添加认证 key
+#当用户不存在，则创建用户并授权；当用户存在，当权限不变，则不进行任何输出；当用户存在，不支持修改权限
 # ceph auth add client.tom mon 'allow r' osd 'allow rwx pool=mypool'
 0added key for client.tom
 
@@ -112,11 +112,8 @@ exported keyring for client.tom
 ```
 
 6、ceph auth get-or-create
-
-- ceph auth get-or-create 此命令是创建用户较为常见的方式之一，它会返回包含用户名和密钥的密钥文，如果该用户已存在，此命令只以密钥文件格式返回用户名和密钥，还可以使用 -o 指定文件名选项将输出保存到某个文件
 ```
-# 创建用户
-#当用户不存在，则创建用户并授权；当用户存在，当权限不变，则不进行任何输出；当用户存在，不支持修改权限
+# 创建用户,当用户不存在，则创建用户并授权；当用户存在，当权限不变，则不进行任何输出；当用户存在，不支持修改权限
 # ceph auth get-or-create client.test mon 'allow r' osd 'allow rwx pool=mypool'
 [client.test]
     key = AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
