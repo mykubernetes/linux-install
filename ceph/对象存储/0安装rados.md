@@ -602,3 +602,124 @@ user1
     "summary": []
 }
 ```
+
+18、查看bucket
+```
+# radosgw-admin bucket list
+"test"
+
+
+# radosgw-admin bucket stats --bucket=test
+{
+    "bucket": "test",
+    "zonegroup": "e80133e1-a513-44f5-ba90-e25b6c987b26",
+    "placement_rule": "default-placement",
+    "explicit_placement": {
+        "data_pool": "",
+        "data_extra_pool": "",
+        "index_pool": ""
+    },
+    "id": "1b85c5b1-19d2-48a1-bb45-3ac75895aeed.4235.1",
+    "marker": "1b85c5b1-19d2-48a1-bb45-3ac75895aeed.4235.1",
+    "index_type": "Normal",
+    "owner": "joy",
+    "ver": "0#3",
+    "master_ver": "0#0",
+    "mtime": "2019-03-19 22:02:50.726716",
+    "max_marker": "0#",
+    "usage": {
+        "rgw.main": {
+            "size": 6,
+            "size_actual": 4096,
+            "size_utilized": 6,
+            "size_kb": 1,
+            "size_kb_actual": 4,
+            "size_kb_utilized": 1,
+            "num_objects": 1
+        }
+    },
+    "bucket_quota": {
+        "enabled": false,
+        "check_on_raw": false,
+        "max_size": -1,
+        "max_size_kb": 0,
+        "max_objects": -1
+    }
+}
+
+
+# radosgw-admin bucket check --bucket=test
+[]
+```
+
+19、删除bucket
+```
+# radosgw-admin bucket rm --bucket=test
+```
+
+20、上传，下载
+```
+# s3cmd put --acl-public  /etc/ceph/ceph.conf  s3://test/ceph
+upload: '/etc/ceph/ceph.conf' -> 's3://test/ceph'  [1 of 1]
+ 589 of 589   100% in    0s    20.96 kB/s  done
+Public URL of the object is: http://test.ceph5/ceph
+
+
+# curl http://test.ceph5.lab.example.com/ceph
+# Please do not change this file directly since it is managed by Ansible and will be overwritten
+
+[global]
+fsid = 35a91e48-8244-4e96-a7ee-980ab989d20d
+
+
+
+mon initial members = ceph2,ceph3,ceph4
+mon host = 172.25.250.11,172.25.250.12,172.25.250.13
+
+public network = 172.25.250.0/24
+cluster network = 172.25.250.0/24
+
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
+
+[osd]
+osd mkfs type = xfs
+osd mkfs options xfs = -f -i size=2048
+osd mount options xfs = noatime,largeio,inode64,swalloc
+osd journal size = 5120
+
+[mon]
+
+
+# s3cmd get s3://test/demoobject ./demoobject
+download: 's3://test/demoobject' -> './demoobject' [1 of 1]
+6 of 6 100% in 0s 1346.20 B/s done
+
+
+# cat ./demoobject
+11111
+```
+
+21、 查看底层数据
+```
+# ceph osd pool ls
+rbd
+rbdmirror
+.rgw.root
+default.rgw.control
+default.rgw.meta
+default.rgw.log
+default.rgw.buckets.index
+default.rgw.buckets.data
+
+#  rados -p  default.rgw.buckets.index ls --cluster backup
+.dir.1b85c5b1-19d2-48a1-bb45-3ac75895aeed.4235.1
+
+#  rados -p  default.rgw.buckets.data ls
+error opening pool default.rgw.buckets.data: (2) No such file or directory
+
+#  rados -p  default.rgw.buckets.data ls --cluster backup
+1b85c5b1-19d2-48a1-bb45-3ac75895aeed.4235.1_demoobject
+1b85c5b1-19d2-48a1-bb45-3ac75895aeed.4235.1_ceph
+```
