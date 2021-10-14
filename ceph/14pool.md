@@ -1,10 +1,76 @@
-# pool管理
-介绍pool管理相关的命令
+# 一、部分概念
+池是ceph存储集群的逻辑分区，用于存储对象
 
-## 创建pool
+对象存储到池中时，使用CRUSH规则将该对象分配到池中的一个PG，PG根据池的配置和CRUSH算法自动映射一组OSD池中PG数量对性能有重要影响。通常而言，池应当配置为每个OSD包含的100-200个归置组
+
+创建池时。ceph会检查每个OSD的PG数量是否会超过200.如果超过，ceph不会创建这个池。ceph3.0安装时不创建存储池。
+
+
+# 二、存储池（复制池）
+
+## 2.1 创建复制池
+
+| 参数 | 描述 |
+|------|------|
+| pool-name | 存储池的名称 |
+| pg-num | 存储池的pg总数 |
+| pgp-num | 存储池的pg的有效数，通常与pg相等 |
+| replicated | 指定为复制池，即使不指定，默认也是创建复制池 |
+| crush-ruleset-name | 用于这个池的crush规则的名字，默认为osd_pool_default_crush_replicated_ruleset |
+| expected-num-objects | 池中预期的对象数量。如果事先知道这个值，ceph可于创建池时在OSD的文件系统上准备文件夹结构。否则，ceph会在运行时重组目录结构，因为对象数量会有所增加。这种重组一会带来延迟影响 |
+
 ```
-# ceph osd pool create pool-frank6866 128
-pool 'pool-frank6866' created
+ceph osd pool create <pool-name> <pg-num> [pgp-num] [replicated] [crush-ruleset-name] [expected-num-objects]
+```
+
+```
+# 创建pool
+ ceph osd pool create testpool 128
+pool 'testpool' created
+
+# 没有写的参数即使用默认值
+# ceph -s
+    pools:   1 pools, 128 pgs
+    objects: 0 objects,  0 bytes
+
+
+# 查询集群有哪些pool
+# ceph osd pool ls
+testpool
+# ceph osd lspools 
+
+# ceph df
+GLOBAL:
+    SIZE       AVAIL      RAW USED     %RAW USED 
+    134G        133G          968M          0.70 
+POOLS:
+    NAME                                    ID     USED        %USED     MAX AVAIL     OBJECTS 
+    testpool                                1         0            0        43421M           0 
+```
+- 注：创建了池后，无法减少PG的数量，只能增加
+
+如果创建池时不指定副本数量，则默认为3，可通过osd_pool_default_size参数修改，还可以通过如下命令修改：`ceph osd pool set pool-name size  number-of-replicas osd_pool_default_min_size`参数可用于设置最对象可用的最小副本数，默认为2
+
+查看pool属性
+```
+# ceph osd pool get testpool all
+size: 3
+min_size: 2
+crash_replay_interval: 0
+pg_num: 128
+pgp_num: 128
+crush_rule: replicated_rule
+hashpspool: true
+nodelete: false
+nopgchange: false
+nosizechange: false
+write_fadvise_dontneed: false
+noscrub: false
+nodeep-scrub: false
+use_gmt_hitset: 1
+auid: 0
+fast_read: 0
+expected_num_objects: 0
 ```
 
 
@@ -24,12 +90,7 @@ mon_allow_pool_delete = true
 # ceph osd pool delete poolname poolname --yes-i-really-really-mean-it
 ```
 
-## 列出所有pool
-```
-# ceph osd pool ls
-rbd
-pool-frank6866
-```
+
 
 也可以查看pool的详细信息:  
 
