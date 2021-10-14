@@ -351,6 +351,17 @@ DIR   s3://test/pdf/
 # 查看文件信息
 # s3cmd ls s3://test/pdf/
 2021-08-31 08:25   4809229   s3://test/pdf/test.pdf
+
+
+# 上传文件，并访问
+# echo 11111 >/tmp/demoobject
+# s3cmd put --acl-public /tmp/demoobject s3://test/demoobject
+
+# vim /etc/hosts
+172.25.250.14  ceph5    ceph5.lab.example.com servere  test.ceph5.lab.example.com
+
+# curl http://test.ceph5.lab.example.com/demoobject
+11111
 ```
 
 7、验证下载文件
