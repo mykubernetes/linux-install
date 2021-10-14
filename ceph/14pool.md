@@ -73,53 +73,39 @@ fast_read: 0
 expected_num_objects: 0
 ```
 
+## 2.2 为池启用ceph应用
 
-## 删除pool
+- 创建池后，必须显式指定能够使用它的ceph应用类型：（ceph块设备 ceph对象网关 ceph文件系统）
+- 如果不显示指定类型，集群将显示HEALTH_WARN状态（使用ceph health detail命令查看）
+
+1、指定池为块设备
 ```
-# 编辑配置文件可以删除存储池
-# vim /etc/ceph/ceph.conf
-...
-[mon]
-mon_allow_pool_delete = true
-...
+# ceph osd pool application enable testpool rbd
+enabled application 'rbd' on pool 'testpool'
 
-# 重启服务
-# systemctl restart ceph-mon.target
-
-# 删除pool
-# ceph osd pool delete poolname poolname --yes-i-really-really-mean-it
-```
-
-
-
-也可以查看pool的详细信息:  
-
-```
 # ceph osd pool ls detail
-pool 0 'rbd' replicated size 3 min_size 2 crush_ruleset 0 object_hash rjenkins pg_num 64 pgp_num 64 last_change 1 flags hashpspool stripe_width 0
-pool 1 'pool-frank6866' replicated size 3 min_size 2 crush_ruleset 0 object_hash rjenkins pg_num 128 pgp_num 128 last_change 37 flags hashpspool stripe_width 0
+pool 1 'testpool' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 128 pgp_num 128 last_change 33 flags hashpspool stripe_width 0 application rbd
 ```
-* replicated size: 副本数
-* min_size: 最小的副本数
-* pg_num: pg数量	
+- replicated size: 副本数
+- min_size: 最小的副本数
+- crush_rule： crush规则的id
+- pg_num: pg数量
+- pgp_num: pgp数量
+- application: 存储池类型
 
-## 查看某个pool的pg个数
-查看名为pool-frank6866的pool中pg的个数
-
+## 2.3、查看某个pool的pg个数
 ```
-# ceph osd pool get pool-frank6866 pg_num
+# ceph osd pool get testpool pg_num
 pg_num: 128
 ```
 
-## 修改pool中对象的副本数
-将pool-frank6866的副本数设置为5
-
+## 2.4、修改pool中对象的副本数
 ```
-# ceph osd pool set pool-frank6866 size 5
+# ceph osd pool set testpool size 5
 set pool 1 size to 5
 ```
 
-## 查看所有pool的状态
+## 2.5、查看所有pool的状态
 ```
 # ceph osd pool stats
 pool rbd id 0
@@ -128,53 +114,74 @@ pool rbd id 0
 pool volumes id 369
   client io 0 B/s rd, 264 kB/s wr, 44 op/s rd, 55 op/s wr
 
-pool images id 370
-  nothing is going on
-
-pool vms id 371
+pool testpool id 1
   nothing is going on
 ```
-* pool后面是pool的名称，比如rbd、volumes等，id后面是pool的id。
-* io表示的是客户端使用这个pool的io情况，B/s rd表示读的速率，kB/s wr表示写速度；op/s rd表示读的iops，op/s wr表示写的iops
+- pool后面是pool的名称，比如rbd、volumes等，id后面是pool的id。
+- io表示的是客户端使用这个pool的io情况，B/s rd表示读的速率，kB/s wr表示写速度；op/s rd表示读的iops，op/s wr表示写的iops
 
-## 获取pool的配额信息
-
+## 2.6、查看单个pool的状态
 ```
-# ceph osd pool get-quota volumes
-quotas for pool 'volumes':
+# ceph osd pool stats testpool
+pool testpool id 1
+  nothing is going on
+```
+
+## 2.7、获取pool的配额信息
+```
+# ceph osd pool get-quota testpool
+quotas for pool 'testpool':
   max objects: N/A
   max bytes  : N/A
 ```
-* max objects: 最大对象数，默认为N/A，表示不限制
-* max bytes: 最大空间，默认为N/A，表示不限制
+- max objects: 最大对象数，默认为N/A，表示不限制
+- max bytes: 最大空间，默认为N/A，表示不限制
+
+## 2.8、设置配额
+```
+# ceph osd pool set-quota testpool max_bytes 1048576
+set-quota max_bytes = 1048576 for pool testpool
+
+# ceph osd pool set-quota testpool max_bytes 0
+set-quota max_bytes = 0 for pool testpool
+```
+
+## 2.9、池的重命名
+```
+# ceph osd pool rename testpool mytestpool
+pool 'testpool' renamed to 'mytestpool'
+
+# ceph osd pool ls
+mytestpool
+```
+
+#  数据处理
 
 ## 往pool中上传对象
 ```
 # dd if=/dev/zero of=data.img bs=1M count=32
-# rados -p pool-frank6866 put object-data data.img
+# rados -p testpool put object-data data.img
 ```
 
 ## 列出pool中的对象
-
 ```
-# rados -p pool-frank6866 ls
+# rados -p testpool ls
 object-data
 ```
 
 ```
-# ceph osd map pool-frank6866 object-data
-osdmap e42 pool 'pool-frank6866' (1) object 'object-data' -> pg 1.c9cf1b74 (1.74) -> up ([2,0,1], p2) acting ([2,0,1], p2)
+# ceph osd map testpool object-data
+osdmap e42 pool 'testpool' (1) object 'object-data' -> pg 1.c9cf1b74 (1.74) -> up ([2,0,1], p2) acting ([2,0,1], p2)
 ```
-* osdmap e42: 表示osdmap的版本是42
-* pool 'pool-frank6866': 表示pool的名称是pool-frank6866
-* (1): 表示pool的id是1
-* object 'object-data': 表示对象名是object-data
-* pg 1.c9cf1b74 (1.74): 表示对象所属pg的id是1.74,c9cf1b74表示的是对象的id
-* up ([2,0,1], p2): 这里副本数设置的是3,up表示该对象所在的osd的id
+- osdmap e42: 表示osdmap的版本是42
+- pool 'pool-frank6866': 表示pool的名称是pool-frank6866
+- (1): 表示pool的id是1
+- object 'object-data': 表示对象名是object-data
+- pg 1.c9cf1b74 (1.74): 表示对象所属pg的id是1.74,c9cf1b74表示的是对象的id
+- up ([2,0,1], p2): 这里副本数设置的是3,up表示该对象所在的osd的id
 
 
-
-查找id为2的osd所在的主机
+## 查找id为2的osd所在的主机
 ```
 # ceph osd find 2
 {
@@ -187,22 +194,21 @@ osdmap e42 pool 'pool-frank6866' (1) object 'object-data' -> pg 1.c9cf1b74 (1.74
 }
 ```
 
-
-登录osd所在主机上查看挂载的目录信息:
+## 登录osd所在主机上查看挂载的目录信息:
 ```
 # df -lTh /var/lib/ceph/osd/ceph-2
 Filesystem     Type  Size  Used Avail Use% Mounted on
 /dev/sdb1      xfs    45G   68M   45G   1% /var/lib/ceph/osd/ceph-2
 ```
 
-根据pg id查看该pg存放数据的地方:
+## 根据pg id查看该pg存放数据的地方:
 ```
 # ls -al /var/lib/ceph/osd/ceph-2/current | grep 1.74
 drwxr-xr-x   2 ceph ceph    67 Jun  3 17:20 1.74_head
 drwxr-xr-x   2 ceph ceph     6 Jun  3 16:53 1.74_TEMP
 ```
 
-查看pg所在目录的结构:
+## 查看pg所在目录的结构:
 ```
 # tree /var/lib/ceph/osd/ceph-2/current/1.74_head/
 /var/lib/ceph/osd/ceph-2/current/1.74_head/
@@ -324,4 +330,22 @@ erasure_code_profile: hdd-3-2
 ceph osd pool ls
 ceph osd pool ls detail
 ceph osd pool stats ceph125-erasure
+```
+
+
+
+## 删除pool
+```
+# 编辑配置文件可以删除存储池
+# vim /etc/ceph/ceph.conf
+...
+[mon]
+mon_allow_pool_delete = true
+...
+
+# 重启服务
+# systemctl restart ceph-mon.target
+
+# 删除pool
+# ceph osd pool delete poolname poolname --yes-i-really-really-mean-it
 ```
