@@ -157,18 +157,23 @@ mytestpool
 
 #  数据处理
 
-## 往pool中上传对象
+## 1、往pool中上传对象
 ```
-# dd if=/dev/zero of=data.img bs=1M count=32
-# rados -p testpool put object-data data.img
+# rados -p testpool put object-data /root/anaconda-ks.cfg 
 ```
 
-## 列出pool中的对象
+## 2、列出pool中的对象
 ```
 # rados -p testpool ls
 object-data
 ```
 
+## 3、查看数据内容，只能下载后查看
+```
+rados -p testpool get test /root/111
+```
+
+## 4、查看osd map信息
 ```
 # ceph osd map testpool object-data
 osdmap e42 pool 'testpool' (1) object 'object-data' -> pg 1.c9cf1b74 (1.74) -> up ([2,0,1], p2) acting ([2,0,1], p2)
@@ -181,7 +186,7 @@ osdmap e42 pool 'testpool' (1) object 'object-data' -> pg 1.c9cf1b74 (1.74) -> u
 - up ([2,0,1], p2): 这里副本数设置的是3,up表示该对象所在的osd的id
 
 
-## 查找id为2的osd所在的主机
+## 4.1、查找id为2的osd所在的主机
 ```
 # ceph osd find 2
 {
@@ -194,21 +199,21 @@ osdmap e42 pool 'testpool' (1) object 'object-data' -> pg 1.c9cf1b74 (1.74) -> u
 }
 ```
 
-## 登录osd所在主机上查看挂载的目录信息:
+## 4.2、登录osd所在主机上查看挂载的目录信息:
 ```
 # df -lTh /var/lib/ceph/osd/ceph-2
 Filesystem     Type  Size  Used Avail Use% Mounted on
 /dev/sdb1      xfs    45G   68M   45G   1% /var/lib/ceph/osd/ceph-2
 ```
 
-## 根据pg id查看该pg存放数据的地方:
+## 4.3、根据pg id查看该pg存放数据的地方:
 ```
 # ls -al /var/lib/ceph/osd/ceph-2/current | grep 1.74
 drwxr-xr-x   2 ceph ceph    67 Jun  3 17:20 1.74_head
 drwxr-xr-x   2 ceph ceph     6 Jun  3 16:53 1.74_TEMP
 ```
 
-## 查看pg所在目录的结构:
+## 4.4、查看pg所在目录的结构:
 ```
 # tree /var/lib/ceph/osd/ceph-2/current/1.74_head/
 /var/lib/ceph/osd/ceph-2/current/1.74_head/
@@ -216,19 +221,87 @@ drwxr-xr-x   2 ceph ceph     6 Jun  3 16:53 1.74_TEMP
 └── object-data__head_C9CF1B74__1
 ```
 
+# 池的快照
 
-纠删码池概述
----
+## 1、创建池快照
+```
+#  ceph osd pool mksnap testpool  testpool-snap-20190316
+created pool testpool snap testpool-snap-20190316
+
+#  rados lssnap -p testpool
+1    testpool-snap-20190316    2019.03.16 22:27:34
+1 snaps
+```
+
+## 2、再上传一个数据
+```
+# rados -p testpool put test2 /root/anaconda-ks.cfg
+# rados -p testpool ls
+test2
+test
+```
+- 使用快照的场景：（防止误删除，防止误修改，防止新增错误文件）
+
+## 3、ceph针对文件回退
+```
+# ceph osd pool mksnap testpool testpool-snap-2
+created pool testpool snap testpool-snap-2
+
+# rados lssnap -p  testpool
+1    testpool-snap-20190316    2019.03.16 22:27:34
+2    testpool-snap-2    2019.03.16 22:31:15
+2 snaps
+```
+
+## 4、文件删除并恢复
+```
+# rados -p testpool rm test
+
+# rados -p testpool get test /root/333
+error getting testpool/test: (2) No such file or directory
+
+# rados -p testpool -s testpool-snap-2 get test /root/444
+selected snap 2 'testpool-snap-2'
+
+# ll /root/444                                    #可以直接从444恢复test文件
+-rw-r--r-- 1 root root 7317 Mar 16 22:34 /root/444
+
+# 从快照中还原
+# rados -p testpool rollback test testpool-snap-2
+rolled back pool testpool to snapshot testpool-snap-2
+
+# rados -p testpool get test /root/555
+
+# diff /root/444 /root/555    #对比文件没有区别，还原成功 
+```
+
+## 配置池属性
+```
+#  ceph osd pool get testpool min_size
+min_size: 2
+
+# ceph osd pool set testpool min_size 1
+set pool 1 min_size to 1
+
+#  ceph osd pool get testpool min_size
+min_size: 1
+
+# ceph osd pool set testpool min_size 2
+set pool 1 min_size to 2
+
+#  ceph osd pool get testpool min_size
+min_size: 2
+```
+
+# 三、存储池（纠删码池）
+
 纠删码池使用擦除纠删码而不是复制来保护对象数据。当将一个对象存储在纠删码池中时，该对象被划分为许多数据块，这些数据块存储在单独的OSDs中。此外，还根据数据块计算了大量的纠删码块，并将其存储在不同的osd中。如果包含块的OSD失败，可以使用纠删码块来重构对象的数据。
 
 纠删码池与复制池不同，它不依赖于存储每个对象的多个完整副本。
 
 每个对象的数据被分成k个数据块,计算了m个编码块大小与数据块大小相同的纠删码块,对象存储在总共k + m 个OSDS上。
 
-
 提示：纠删码池比复制池需要更少的存储空间来获得类似级别的数据保护。可以降低存储集群的成本和大小。然而，计算纠删码块会增加CPU和内存开销，从而降低纠删码池的性能。此外，在Red Hat Ceph Storage 3中，需要部分对象写的操作不支持擦除编码池。目前纠删码池的使用限制在执行完整对象写入和追加的应用程序中，比如Ceph对象网关。即Red Hat Ceph存储目前只支持通过Ceph对象网关访问的纠删码池。
-
-
 
 | 参数 | 含义 | 
 |-----|-----|
@@ -243,14 +316,13 @@ drwxr-xr-x   2 ceph ceph     6 Jun  3 16:53 1.74_TEMP
 | technique | technique为每个插件都提供了一组实现不同算法的不同技术。对于Jerasure插件，默认的技术是reed_sol_van。其他包括:reed_sol_r6_op、cauchy_orig、cauchy_good、liberation、blaum_roth和liber8tion。 |
 
 
-
-1、列出现有的 erasure-code-profile 规则
+1、列出现有的纠删码策略
 ```
 # ceph osd erasure-code-profile ls
 default
 ```
 	
-2、查看指定erasure-code-profile 规则的详细内容：
+2、查看指定纠删码策略的详细内容
 ```
 # ceph osd erasure-code-profile get default
 k=2
@@ -258,17 +330,16 @@ m=1
 plugin=jerasure
 technique=reed_sol_van
 ```
-	
-3、自定义erasure-code-profile ， 创建一个只用hdd的 erasure-code-profile, 故障转移域为osd级别
+
+3、创建一个纠删码策略
 ```
 # ceph osd erasure-code-profile set hdd-3-2 k=3 m=2 crush-device-class=hdd crush-failure-domain=osd
 ```
-- crush-device-class（设备分类）
-- crush-failure-domain（故障域）
+- crush-device-class: 设备分类
+- crush-failure-domain: 故障域
 
-4、创建一个纠删码池名字为ceph125-erasure 的池 使用ceph125策略
-
-命令：`ceph osd pool create pool-name pg-num [pgp-num] erasure [erasure-code-profile] \[crush-ruleset-name] [expected-num-objects]`
+4、创建一个纠删码池
+- 命令：`ceph osd pool create pool-name pg-num [pgp-num] erasure [erasure-code-profile] [crush-ruleset-name] [expected-num-objects]`
 ```
 ceph osd pool create hdd-3-2-erasure 128 128 erasure hdd-3-2
 ```
@@ -279,6 +350,17 @@ ceph osd pool create hdd-3-2-erasure 128 128 erasure hdd-3-2
 - erasure-code-profile：指定是要使用的配置文件。可以使用ceph osd erasure-code-profile创建新的配置文件，配置文件定义要使用的k和m值以及erasure插件。
 - crush-ruleset-name是：用于此池的CRUSH名称。如果没有设置，Ceph将使用erasure-code-profile文件中定义。
 
+```
+# ceph osd pool ls
+testpool
+hdd-3-2-erasure
+
+# ceph osd pool ls detail
+pool 1 'testpool' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins pg_num 128 pgp_num 128 last_change 42 flags hashpspool stripe_width 0 application rbd
+    snap 1 'testpool-snap-20190316' 2019-03-16 22:27:34.150433
+    snap 2 'testpool-snap-2' 2019-03-16 22:31:15.430823
+pool 2 'hdd-3-2-erasure' erasure size 5 min_size 4 crush_rule 1 object_hash rjenkins pg_num 128 pgp_num 128 last_change 46 flags hashpspool stripe_width 12288
+```
 
 5、查看hdd-3-2纠删码策略
 ```
@@ -332,7 +414,22 @@ ceph osd pool ls detail
 ceph osd pool stats ceph125-erasure
 ```
 
+查看纠删码池状态
+```
+# ceph osd dump |grep -i EC-pool
+pool 2 'EC-pool' erasure size 5 min_size 4 crush_rule 1 object_hash rjenkins pg_num 64 pgp_num 64 last_change 46 flags hashpspool stripe_width 12288
+```
 
+添加数据到纠删码池
+```
+# rados -p EC-pool ls
+# rados -p EC-pool put object1 hello.txt
+```
+
+查看数据状态
+```
+# ceph osd map EC-pool object1
+```
 
 ## 删除pool
 ```
