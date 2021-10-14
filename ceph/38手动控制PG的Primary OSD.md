@@ -131,7 +131,7 @@ dumped all
 56
 ```
 
-# 6、修改权重
+## 6、修改权重
 ```
 #  ceph pg dump|grep 'active+clean'|egrep "\[4,"|wc -l
 dumped all
