@@ -417,15 +417,177 @@ delete: 's3://test/pdf/test.pdf'
 "subusers": [],
 ```
 
-列出用户
+12、列出用户
 ```
 # radosgw-admin user list
 user1
 ```
  
 
- 删除用户
+13、删除用户
 ```
 # radosgw-admin user rm --uid joy
 # radosgw-admin user list
+```
+
+14、创建用户并添加一个key
+```
+#  radosgw-admin user create --uid joy --display-name 'Joy Ning'
+{
+    "user_id": "joy",
+    "display_name": "Joy Ning",
+    "email": "",
+    "suspended": 0,
+    "max_buckets": 1000,
+    "auid": 0,
+    "subusers": [],
+    "keys": [
+        {
+            "user": "joy",
+            "access_key": "5XCV68WUQJFFJPVM3UHK",
+            "secret_key": "xhaA2YB1CA3xH54xLbmwPcglqjDyuFez36F8XGuG"
+        }
+    ],
+    "swift_keys": [],
+    "caps": [],
+    "op_mask": "read, write, delete",
+    "default_placement": "",
+    "placement_tags": [],
+    "bucket_quota": {
+        "enabled": false,
+        "check_on_raw": false,
+        "max_size": -1,
+        "max_size_kb": 0,
+        "max_objects": -1
+    },
+    "user_quota": {
+        "enabled": false,
+        "check_on_raw": false,
+        "max_size": -1,
+        "max_size_kb": 0,
+        "max_objects": -1
+    },
+    "temp_url_keys": [],
+    "type": "rgw"
+}
+
+
+# radosgw-admin key create --uid joy --display-name 'Joy Ning' --key-type=s3  --gen-access-key --gen-secret
+    "keys": [
+        {
+            "user": "joy",
+            "access_key": "5XCV68WUQJFFJPVM3UHK",
+            "secret_key": "xhaA2YB1CA3xH54xLbmwPcglqjDyuFez36F8XGuG"
+        },
+        {
+            "user": "joy",
+            "access_key": "HPT1SBAXCXW46ZACKPY0",
+            "secret_key": "KPqC0NUOAJEOSiKkZRrCB19iyqPyeyaBY7utCRO8"
+        }
+    ],
+```
+
+15、删除key
+```
+# radosgw-admin key rm --uid joy --display-name 'Joy Ning' --key-type=s3 --access-key HPT1SBAXCXW46ZACKPY0
+    "keys": [
+        {
+            "user": "joy",
+            "access_key": "5XCV68WUQJFFJPVM3UHK",
+            "secret_key": "xhaA2YB1CA3xH54xLbmwPcglqjDyuFez36F8XGuG"
+        },
+```
+
+16、设置配额
+
+16.1)基于用户的配额
+```
+# radosgw-admin quota set --quota-scope=user --uid=joy --max-size 1
+
+# radosgw-admin user info --uid joy
+"user_quota": {
+    "enabled": false,
+    "check_on_raw": false,
+    "max_size": 1024,
+    "max_size_kb": 1,
+    "max_objects": -1
+},
+"temp_url_keys": [],
+"type": "rgw"
+``` 
+
+开启配额
+```
+# radosgw-admin quota enable --quota-scope=user --uid joy
+
+# radosgw-admin user info --uid joy
+"user_quota": {
+    "enabled": true,
+    "check_on_raw": false,
+    "max_size": 1024,
+    "max_size_kb": 1,
+    "max_objects": -1
+},
+"temp_url_keys": [],
+"type": "rgw"
+```
+
+16.2)基于bucket的配额
+```
+# radosgw-admin quota set --quota-scope=bucket --uid=joy --max-size 1
+
+# radosgw-admin quota enable --quota-scope=bucket --uid=joy
+
+# radosgw-admin user info --uid joy
+"bucket_quota": {
+    "enabled": true,
+    "check_on_raw": false,
+    "max_size": 1024,
+    "max_size_kb": 1,
+    "max_objects": -1
+},
+```
+- 如果两个都进行配置，则那个先到，使用哪一个
+
+
+
+16.3)关闭配额
+```
+# 可以disable
+# radosgw-admin quota disable  --quota-scope=bucket --uid=joy
+
+# 也可以参数设为-1
+# radosgw-admin quota set --quota-scope=user --uid joy --max-size -1
+
+# radosgw-admin user info --uid joy
+"bucket_quota": {
+    "enabled": false,
+    "check_on_raw": false,
+    "max_size": 1024,
+    "max_size_kb": 1,
+    "max_objects": -1
+},
+"user_quota": {
+    "enabled": true,
+    "check_on_raw": false,
+    "max_size": -1,
+    "max_size_kb": 1,
+    "max_objects": -1
+},
+```
+
+17、统计数据
+```
+# 统计所有
+# radosgw-admin usage show --uid joy
+{
+    "entries": [],
+    "summary": []
+}
+
+# radosgw-admin usage show --uid joy --start-date 2019-03-19 21:00:00 --end-date 2019-03-19 22:00:00
+{
+    "entries": [],
+    "summary": []
+}
 ```
