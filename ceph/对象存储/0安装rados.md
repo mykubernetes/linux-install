@@ -416,3 +416,16 @@ delete: 's3://test/pdf/test.pdf'
 "auid": 0,
 "subusers": [],
 ```
+
+列出用户
+```
+# radosgw-admin user list
+user1
+```
+ 
+
+ 删除用户
+```
+# radosgw-admin user rm --uid joy
+# radosgw-admin user list
+```
