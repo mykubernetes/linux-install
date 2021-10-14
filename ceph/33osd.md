@@ -1,3 +1,24 @@
+# osd状态
+       
+- 运行状态有：up，in，out，down
+
+- 正常状态的OSD为up且in
+
+- 当OSD故障时，守护进程offline，在5分钟内，集群仍会将其标记为up和in，这是为了防止网络抖动
+
+- 如果5分钟内仍未恢复，则会标记为down和out。此时该OSD上的PG开始迁移。这个5分钟的时间间隔可以通过mon_osd_down_out_interval配置项修改
+
+- 当故障的OSD重新上线以后，会触发新的数据再平衡
+
+- 当集群有noout标志位时，则osd下线不会导致数据重平衡
+
+- OSD每隔6s会互相验证状态。并每隔120s向mon报告一次状态。
+
+- 容量状态：nearfull，full
+
+
+
+
 # osd管理
 对于每个osd，ceph都会启动一个进程，如下:  
 
