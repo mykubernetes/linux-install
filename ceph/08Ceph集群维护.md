@@ -279,11 +279,33 @@ ceph deep-scrub
 
 ```
 # 设置方法
-ceph osd set-full-ratio 0.95
-ceph osd set-nearfull-ratio 0.85
-ceph osd dump
+# ceph osd set-full-ratio 0.95
+# ceph osd set-nearfull-ratio 0.85
+
+# ceph osd dump
+crush_version 43
+full_ratio 0.95
+backfillfull_ratio 0.9
+nearfull_ratio 0.85
 ```
 
+动态修复方式
+```
+# ceph daemon osd.0 config show|grep full_ratio
+"mon_osd_backfillfull_ratio": "0.900000",
+"mon_osd_full_ratio": "0.950000",
+"mon_osd_nearfull_ratio": "0.850000",
+"osd_failsafe_full_ratio": "0.970000",
+"osd_pool_default_cache_target_full_ratio": "0.800000",
+
+# ceph tell osd.* injectargs --mon_osd_full_ratio 0.85
+# ceph daemon osd.0 config show|grep full_ratio
+"mon_osd_backfillfull_ratio": "0.900000",
+"mon_osd_full_ratio": "0.850000",
+"mon_osd_nearfull_ratio": "0.850000",
+"osd_failsafe_full_ratio": "0.970000",
+"osd_pool_default_cache_target_full_ratio": "0.800000",
+```
 
 # 关闭顺序
 ```
