@@ -136,7 +136,7 @@ exported keyring for client.test
     key = AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
 
 # 保存文件
-# ceph auth get-or-create client.rbd | tee /etc/ceph/ceph.client.rbd.keyring      #ceph集群名.client.rbd用户名.keyring格式保存
+# ceph auth get-or-create client.rbd -o /etc/ceph/ceph.client.rbd.keyring      #ceph集群名.client.rbd用户名.keyring格式保存
 ```
 
 7、ceph auth get-or-create-key
@@ -182,7 +182,7 @@ updated caps for client.test
 exported keyring for client.test
 
 # 写入到文件
-# ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd' | tee /etc/ceph/ceph.client.rbd.keyring
+# ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd' -o /etc/ceph/ceph.client.rbd.keyring
 ```
 
 10、删除用户
