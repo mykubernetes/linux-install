@@ -146,7 +146,7 @@ set pool 1 pgp_num to 128
     pools:   1 pools, 128 pgs
     objects: 8 objects, 12418 kB
     usage:   1005 MB used, 133 GB / 134 GB avail
-    pgs:     24.219% pgs not active       #pg状态，数据在重平衡（状态信息代表的意义，请参考https://www.cnblogs.com/zyxnhr/p/10616497.html第三部分内容）
+    pgs:     24.219% pgs not active                       # pg状态，数据在重平衡
              97 active+clean
              20 activating
              9  peering
@@ -182,22 +182,7 @@ set pool 1 pgp_num to 128
 # ceph -s
   cluster:
     id:     04b66834-1126-4870-9f32-d9121f1baccd
-    health: HEALTH_OK
-  services:
-    mon: 3 daemons, quorum serverc,serverd,servere
-    mgr: servere(active), standbys: serverd, serverc
-    osd: 9 osds: 9 up, 9 in
-  data:
-    pools:   1 pools, 128 pgs
-    objects: 8 objects, 12418 kB
-    usage:   1050 MB used, 133 GB / 134 GB avail
-    pgs:     128 active+clean
-  io:
-    recovery: 1023 kB/s, 0 keys/s, 0 objects/s
-[root@serverc ~]# ceph -s
-  cluster:
-    id:     04b66834-1126-4870-9f32-d9121f1baccd
-    health: HEALTH_OK             #数据平衡完毕，集群状态恢复正常
+    health: HEALTH_OK                                  #数据平衡完毕，集群状态恢复正常
   services:
     mon: 3 daemons, quorum serverc,serverd,servere
     mgr: servere(active), standbys: serverd, serverc
