@@ -204,22 +204,21 @@ POOLS:
     cephfs_data         2           0B         0       6.48GiB           0 
     cephfs_metadata     3      6.24KiB         0       6.48GiB          21
 ```
-GLOBAL区域表示整体的空间使用情况:
 
-- SIZE: 表示集群中所有OSD总空间大小
-- AVAIL: 表示可以使用的空间大小
-- RAW USED: 表示已用空间大小
-- %RAW USED: 表示已用空间百分比
+输出的 **GLOBAL** 段展示了数据所占用集群存储空间的概要。
 
-POOLS区域表示某个pool的空间使用情况
+- **SIZE：** 集群的总容量。
+- **AVAIL：** 集群的可用空间总量。
+- **RAW USED：** 已用存储空间总量。
+- **% RAW USED：** 已用存储空间比率。用此值对比 `full ratio` 和 `near full ratio` 来确保不会用尽集群空间。
 
-- NAME: pool名称
-- ID: pool id
-- USED: 已用空间大小
-- %USED: 已用空间百分比
-- MAX AVAIL: 最大可用空间大小
-- OBJECTS: 这个pool中对象的个数
+输出的 **POOLS** 段展示了存储池列表及各存储池的大致使用率。本段没有反映出副本、克隆和快照的占用情况。例如，如果你把 1MB 的数据存储为对象，理论使用率将是 1MB ，但考虑到副本数、克隆数、和快照数，实际使用量可能是 2MB 或更多。
 
+- **NAME:** 存储池名字。
+- **ID:** 存储池唯一标识符。
+- **USED:** 大概数据量，单位为 KB 、MB 或 GB ；
+- **%USED：** 各存储池的大概使用率。
+- **Objects：** 各存储池内的大概对象数。
 注意: pool里面的已有空间是业务上的空间,也就是一个副本的空间;将业务上空间乘以副本数,和RAW USED是相等的。RAW USED是集群物理上已近使用的空间。
 ```
 # ceph osd df
