@@ -307,6 +307,13 @@ nearfull_ratio 0.85
 "osd_pool_default_cache_target_full_ratio": "0.800000",
 ```
 
+# 物理机关机维护
+```
+ceph osd set noout  
+ceph osd set nobackfill  
+ceph osd set norecover
+```
+
 # 关闭顺序
 ```
 # 关闭服务前设置 noout 
