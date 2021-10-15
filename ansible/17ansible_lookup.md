@@ -92,7 +92,6 @@ query函数可以简写的`q`
       msg: "{{ q('file','./hosts') }}"
 ```
 
-
 ## 3、pipe
 
 使用pipe lookup可以直接调用外部命令，并将命令执行的结果打印到标准输出，作为ansible变量。下面的例子通过pipe调用date指令拿到一个以时间数字组成的字串，获取的是服务端命令
@@ -225,4 +224,19 @@ dnstxt lookup用于获取指定域名的TXT记录。需要在主控端安装pyth
 ```
 - name: lookup TXT record
   debug: msg="{{ lookup('dnstxt', "aliyun.com") }}"
+```
+
+## 10、first_found插件可以获取列表中第一个找到的文件
+
+按照列表顺序在ansible主机中查找
+```
+- hosts: all
+  remote_user: root
+  tasks:
+  - debug:
+      msg: "{{ lookup('first_found',looklist) }}"
+  vars:
+    looklist:
+      - /opt/lookup/test
+      - /tmp
 ```
