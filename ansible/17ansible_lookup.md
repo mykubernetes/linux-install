@@ -216,11 +216,11 @@ password lookup会随机生成一个密码，并将这个密码写入到参数�
 - name: create deploy mysql user
   mysql_user: name=bob password={{ lookup('password', 'bob-password,txt')}} priv=*.*:ALL state=present
 ```
+
 ## 9、dnstxt
 
 dnstxt lookup用于获取指定域名的TXT记录。需要在主控端安装python-dns。
 
-使用方法如下
 ```
 - name: lookup TXT record
   debug: msg="{{ lookup('dnstxt', "aliyun.com") }}"
@@ -239,4 +239,74 @@ dnstxt lookup用于获取指定域名的TXT记录。需要在主控端安装pyth
     looklist:
       - /opt/lookup/test
       - /tmp
+```
+
+当使用with_first_found时，可以在列表的最后添加- skip: true
+
+表示如果列表中的所有文件都没有找到，则跳过当前任务,不会报错
+
+当不确定有文件能够被匹配到时，推荐这种方式
+```
+- hosts: all
+  remote_user: root
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_first_found:
+      - /testdir1
+      - /tmp/staging
+      - skip: true
+```
+
+## 11、dig插件可以获取指定域名的IP地址
+- 此插件依赖dnspython库,可使用pip安装pip install dnspython
+- 如果域名使用了CDN，可能返回多个地址
+```
+- hosts: all
+  remote_user: root
+  tasks:
+  - debug:
+      msg: "{{ lookup('dig','www.baidu.com',wantlist=true) }}"
+```
+
+##  12、ini插件可以在ansible主机中的ini文件中查找对应key的值
+
+1、如下示例表示从test.ini文件中的testA段落中查找testa1对应的值
+```
+# vim /testdir/test.ini
+[testA]
+testa1=Andy
+testa2=Armand
+
+[testB]
+testb1=Ben
+```
+
+```
+  - debug:
+      msg: "{{ lookup('ini','testa1 section=testA file=/testdir/test.ini') }}"
+```
+2、当未找到对应key时，默认返回空字符串，如果想要指定返回值，可以使用default选项,如下
+```
+msg: "{{ lookup('ini','test666 section=testA file=/testdir/test.ini default=notfound') }}"
+```
+
+3、可以使用正则表达式匹配对应的键名，需要设置re=true，表示开启正则支持,如下
+```
+#msg: "{{ lookup('ini','testa[12] section=testA file=/testdir/test.ini re=true') }}"
+```
+
+4、ini插件除了可以从ini类型的文件中查找对应key，也可以从properties类型的文件中查找key
+
+#默认在操作的文件类型为ini，可以使用type指定properties类型，如下例所示
+```
+# vim /testdir/pplication.properties
+http.port=8080
+redis.no=0
+imageCode = 1,2,3
+```
+
+```
+  - debug:
+      msg: "{{ lookup('ini','http.port type=properties file=/testdir/application.properties') }}"
 ```
