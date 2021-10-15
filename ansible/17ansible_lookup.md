@@ -10,7 +10,7 @@ ansible支持一套从不同数据源获取数据的lookup，包括file, passwor
 
 ## 2、file
 
-使用file lookup可以从文本文件中获取数据，并在这些数据传递给ansible变量，在task或者jinja2模板中进行引用。下面是一个从文本文件中获取ssh公钥并复制到远程主机的示例：
+1、使用file lookup可以从文本文件中获取数据，并在这些数据传递给ansible变量，在task或者jinja2模板中进行引用。下面是一个从文本文件中获取ssh公钥并复制到远程主机的示例
 ```
 # vim lookup_files_ex.yml
 
@@ -31,7 +31,7 @@ ok: [demo2.example.com] => {
 }
 ```
 
-可以把这个获取的值，使用set_fact变量
+2、可以把这个获取的值，使用set_fact变量
 ```
 - hosts: node01
   tasks:
@@ -47,7 +47,49 @@ ok: [demo2.example.com] => {
       aaa: "{{ lookup('file','./hosts') }}"
   - debug:
       msg: "{{ aaa }}"
+```
 
+3、如果想要获取多个文件中的内容，则可以传入多个文件路径。
+```
+- hosts: all
+  remote_user: root
+  tasks:
+  - set_fact: aaa={{ lookup('file','./hosts','./hosts1',wantlist=true) }}
+  - debug:
+      msg: "{{ aaa }}"
+```
+- 将每个文件的内容当做列表中的一个独立的字符串进行显示，使用`wantlist=true`参数
+
+
+4、通过query函数调用lookup插件时默认行为是返回一个列表
+```
+- hosts: all
+  remote_user: root
+  tasks:
+  - set_fact: aaa={{ lookup('file','./hosts','./hosts1',wantlist=true) }}
+  - debug:
+      msg: "{{ query('file','./hosts') }}"
+```
+
+query函数可以简写的`q`
+```
+- hosts: all
+  remote_user: root
+  tasks:
+  - set_fact: aaa={{ lookup('file','./hosts','./hosts1',wantlist=true) }}
+  - debug:
+      msg: "{{ q('file','./hosts') }}"
+```
+
+5、使用errors关键字控制lookup插件出错时的处理机制，如果我想要在lookup插件执行出错时忽略错误，则可以将errors的值设置为ignore
+```
+- hosts: all
+  remote_user: root
+  tasks:
+  - set_fact:
+      aaa: "{{ lookup('file','./hosts','./hosts1',errors='ignore') }}"
+  - debug:
+      msg: "{{ q('file','./hosts') }}"
 ```
 
 
