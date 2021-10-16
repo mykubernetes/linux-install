@@ -21,6 +21,13 @@
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
 - with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 
+with_list与 with_items一样，也是用于循环列表。区别是，如果列表的值也是列表，with_iems会将第一层嵌套的列表拉平，而with_list会将值作为一个整体返回。with_flatten会将所有列表全部拉平
+
+[[1,2,[3,4]],[5,6],7,8]   
+- with_item------->[1,2,[3,4],5,6,7,8]    拉平第一层
+- with_list--------->[[1,2,[3,4]],[5,6],7,8]   整体返回
+- with_flatten----->[1,2,3,4,5,6,7,8]     全部拉平
+
 
 # with_items
 
