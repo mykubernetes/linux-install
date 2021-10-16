@@ -12,7 +12,7 @@
 | [with_sequence](#with_sequence) | 按照顺序生成数字序列，`start=1 end=5 stride=1`，其中start=1表示从1开始，end=5表示到5结束， stride=1表示步长为1 |
 | [with_random_choice](#with_random_choice) | 可以从列表的多个值中随机返回一个值 |
 | [with_file](#with_file) | 循环获取文件的内容 | 
-| with_nested | 嵌套循环,`ith_nested`与`with_cartesian`的效果一致，可以无差别使用他们 |
+| [with_nested](#with_nested) | 嵌套循环,`ith_nested`与`with_cartesian`的效果一致，可以无差别使用他们 |
 | [with_dict](#with_dict) | 循环字典 |
 | [with_fileglob](#with_fileglob) | 循环指定目录中的所有文件 |
 | [with_lines](#with_lines) | 指令后跟一个命令，ansible会遍历命令的输出 |
@@ -1288,14 +1288,6 @@ drwxr-xr-x 2 root root 4096 Jul 19 16:05 testdir
 ```
 # ansible-playbook -i host test1.yml 
 
-PLAY [node001] **************************************************************************************************************************
-
-TASK [Gathering Facts] ******************************************************************************************************************
-Sunday 12 September 2021  09:47:33 -0400 (0:00:00.060)       0:00:00.060 ****** 
-ok: [192.168.101.69]
-
-TASK [command line] *********************************************************************************************************************
-Sunday 12 September 2021  09:47:33 -0400 (0:00:00.800)       0:00:00.861 ****** 
 ok: [192.168.101.69] => (item=127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4) => {
     "msg": "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 is a line from /etc/hosts"
 }
@@ -1317,16 +1309,94 @@ ok: [192.168.101.69] => (item=192.168.101.69 192.168.101.69 node01 node01) => {
 ok: [192.168.101.69] => (item=192.168.101.80 192.168.101.80) => {
     "msg": "192.168.101.80 192.168.101.80 is a line from /etc/hosts"
 }
+```
 
-PLAY RECAP ******************************************************************************************************************************
-192.168.101.69             : ok=2    changed=0    unreachable=0    failed=0   
+# with_nested
 
-Sunday 12 September 2021  09:47:34 -0400 (0:00:00.136)       0:00:00.998 ****** 
-=============================================================================== 
-Gathering Facts ------------------------------------------------------------------------------------------------------------------ 0.80s
-command line --------------------------------------------------------------------------------------------------------------------- 0.14s
+## 十四、with_nested
+
+- 嵌套循环，相当于像个for
 
 ```
+# vim with_items.yml
+
+- hosts: demo2.example.com
+  gather_facts: no 
+  tasks:
+    - debug: msg="name is {{ item[0] }}  vaule is {{ item[1] }} num is {{ item[2] }}"
+      with_nested:
+        - ['alice','bob']
+        - ['a','b','c']
+        - ['1','2','3']
+
+```
+- item[0]是循环的第一个列表的值["alice","bob"] item[1]是第二个列表的值;以上的执行输出如下:
+
+```
+# ansible-playbook with_items.yml
+
+ok: [demo2.example.com] => (item=[u'alice', u'a', u'1']) => {
+    "msg": "name is alice  vaule is a num is 1"
+}
+ok: [demo2.example.com] => (item=[u'alice', u'a', u'2']) => {
+    "msg": "name is alice  vaule is a num is 2"
+}
+ok: [demo2.example.com] => (item=[u'alice', u'a', u'3']) => {
+    "msg": "name is alice  vaule is a num is 3"
+}
+ok: [demo2.example.com] => (item=[u'alice', u'b', u'1']) => {
+    "msg": "name is alice  vaule is b num is 1"
+}
+ok: [demo2.example.com] => (item=[u'alice', u'b', u'2']) => {
+    "msg": "name is alice  vaule is b num is 2"
+}
+ok: [demo2.example.com] => (item=[u'alice', u'b', u'3']) => {
+    "msg": "name is alice  vaule is b num is 3"
+}
+ok: [demo2.example.com] => (item=[u'alice', u'c', u'1']) => {
+    "msg": "name is alice  vaule is c num is 1"
+}
+ok: [demo2.example.com] => (item=[u'alice', u'c', u'2']) => {
+    "msg": "name is alice  vaule is c num is 2"
+}
+ok: [demo2.example.com] => (item=[u'alice', u'c', u'3']) => {
+    "msg": "name is alice  vaule is c num is 3"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'a', u'1']) => {
+    "msg": "name is bob  vaule is a num is 1"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'a', u'2']) => {
+    "msg": "name is bob  vaule is a num is 2"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'a', u'3']) => {
+    "msg": "name is bob  vaule is a num is 3"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'b', u'1']) => {
+    "msg": "name is bob  vaule is b num is 1"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'b', u'2']) => {
+    "msg": "name is bob  vaule is b num is 2"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'b', u'3']) => {
+    "msg": "name is bob  vaule is b num is 3"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'c', u'1']) => {
+    "msg": "name is bob  vaule is c num is 1"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'c', u'2']) => {
+    "msg": "name is bob  vaule is c num is 2"
+}
+ok: [demo2.example.com] => (item=[u'bob', u'c', u'3']) => {
+    "msg": "name is bob  vaule is c num is 3"
+}
+```
+- with_cartesian功能完全一样
+
+
+
+
+
+
 
 
 
