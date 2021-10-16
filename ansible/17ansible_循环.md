@@ -441,8 +441,6 @@ ok: [node01] => (item=[u'd', 4]) => {
 }
 ```
 
-
-
 # with_cartesian
 
 ## 五、with_cartesian 循环
@@ -450,7 +448,7 @@ ok: [node01] => (item=[u'd', 4]) => {
 ### 1）第一个小列表中的每个元素与第二个小列表中的每个元素都”两两组合在了一起”
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -462,80 +460,48 @@ ok: [node01] => (item=[u'd', 4]) => {
 ```
 
 ```
-TASK [debug] ***********************************
-ok: [test70] => (item=[u'a', u'test1']) => {
-    "changed": false,
-    "item": [
-        "a",
-        "test1"
-    ],
+ok: [node01] => (item=[u'a', u'test1']) => {
     "msg": [
-        "a",
+        "a", 
         "test1"
     ]
 }
-ok: [test70] => (item=[u'a', u'test2']) => {
-    "changed": false,
-    "item": [
-        "a",
-        "test2"
-    ],
+ok: [node01] => (item=[u'a', u'test2']) => {
     "msg": [
-        "a",
+        "a", 
         "test2"
     ]
 }
-ok: [test70] => (item=[u'b', u'test1']) => {
-    "changed": false,
-    "item": [
-        "b",
-        "test1"
-    ],
+ok: [node01] => (item=[u'b', u'test1']) => {
     "msg": [
-        "b",
+        "b", 
         "test1"
     ]
 }
-ok: [test70] => (item=[u'b', u'test2']) => {
-    "changed": false,
-    "item": [
-        "b",
-        "test2"
-    ],
+ok: [node01] => (item=[u'b', u'test2']) => {
     "msg": [
-        "b",
+        "b", 
         "test2"
     ]
 }
-ok: [test70] => (item=[u'c', u'test1']) => {
-    "changed": false,
-    "item": [
-        "c",
-        "test1"
-    ],
+ok: [node01] => (item=[u'c', u'test1']) => {
     "msg": [
-        "c",
+        "c", 
         "test1"
     ]
 }
-ok: [test70] => (item=[u'c', u'test2']) => {
-    "changed": false,
-    "item": [
-        "c",
-        "test2"
-    ],
+ok: [node01] => (item=[u'c', u'test2']) => {
     "msg": [
-        "c",
+        "c", 
         "test2"
     ]
 }
 ```
-
 
 ### 2）在目标主机的测试目录中创建a、b、c三个目录，这三个目录都有相同的子目录，它们都有test1和test2两个子目录
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -551,10 +517,10 @@ ok: [test70] => (item=[u'c', u'test2']) => {
 
 ## 六、with_indexed_items循环
 
-### 1)with_indexed_items 在循环的时候会添加索引索引
+### 1)with_indexed_items 在循环处理列表时，为列表的每一项添加索引
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -567,37 +533,21 @@ ok: [test70] => (item=[u'c', u'test2']) => {
 ```
 
 ```
-TASK [debug] **********************************
-ok: [test70] => (item=(0, u'test1')) => {
-    "changed": false,
-    "item": [
-        0,
-        "test1"
-    ],
+ok: [node01] => (item=[0, u'test1']) => {
     "msg": [
-        0,
+        0, 
         "test1"
     ]
 }
-ok: [test70] => (item=(1, u'test2')) => {
-    "changed": false,
-    "item": [
-        1,
-        "test2"
-    ],
+ok: [node01] => (item=[1, u'test2']) => {
     "msg": [
-        1,
+        1, 
         "test2"
     ]
 }
-ok: [test70] => (item=(2, u'test3')) => {
-    "changed": false,
-    "item": [
-        2,
-        "test3"
-    ],
+ok: [node01] => (item=[2, u'test3']) => {
     "msg": [
-        2,
+        2, 
         "test3"
     ]
 }
@@ -607,7 +557,7 @@ ok: [test70] => (item=(2, u'test3')) => {
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -619,11 +569,23 @@ ok: [test70] => (item=(2, u'test3')) => {
     - test3
 ```
 
+```
+ok: [node01] => (item=[0, u'test1']) => {
+    "msg": "index is : 0 , value is test1"
+}
+ok: [node01] => (item=[1, u'test2']) => {
+    "msg": "index is : 1 , value is test2"
+}
+ok: [node01] => (item=[2, u'test3']) => {
+    "msg": "index is : 2 , value is test3"
+}
+```
+
 ### 3)多层嵌套列表显示索引编号
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -636,70 +598,34 @@ ok: [test70] => (item=(2, u'test3')) => {
 ```
 
 ```
-TASK [debug] *****************************
-ok: [test70] => (item=(0, u'test1')) => {
-    "changed": false,
-    "item": [
-        0,
-        "test1"
-    ],
+ok: [node01] => (item=[0, u'test1']) => {
     "msg": "index is : 0 , value is test1"
 }
-ok: [test70] => (item=(1, u'test2')) => {
-    "changed": false,
-    "item": [
-        1,
-        "test2"
-    ],
+ok: [node01] => (item=[1, u'test2']) => {
     "msg": "index is : 1 , value is test2"
 }
-ok: [test70] => (item=(2, u'test3')) => {
-    "changed": false,
-    "item": [
-        2,
-        "test3"
-    ],
+ok: [node01] => (item=[2, u'test3']) => {
     "msg": "index is : 2 , value is test3"
 }
-ok: [test70] => (item=(3, u'test4')) => {
-    "changed": false,
-    "item": [
-        3,
-        "test4"
-    ],
+ok: [node01] => (item=[3, u'test4']) => {
     "msg": "index is : 3 , value is test4"
 }
-ok: [test70] => (item=(4, u'test5')) => {
-    "changed": false,
-    "item": [
-        4,
-        "test5"
-    ],
+ok: [node01] => (item=[4, u'test5']) => {
     "msg": "index is : 4 , value is test5"
 }
-ok: [test70] => (item=(5, u'test6')) => {
-    "changed": false,
-    "item": [
-        5,
-        "test6"
-    ],
+ok: [node01] => (item=[5, u'test6']) => {
     "msg": "index is : 5 , value is test6"
 }
-ok: [test70] => (item=(6, u'test7')) => {
-    "changed": false,
-    "item": [
-        6,
-        "test7"
-    ],
+ok: [node01] => (item=[6, u'test7']) => {
     "msg": "index is : 6 , value is test7"
 }
 ```
 
-### 4)`with_indexed_items`会将嵌套的两层列表`拉平`，`拉平`后按照顺序为每一项编号,`拉平`效果跟`with_flattened`效果类似.但是，当处理这种嵌套的多层列表时，`with_indexed_items`的拉平效果与`with_flattened`的不完全一致
+### 4) `with_indexed_items`循环嵌套和`with_items`的循环嵌套一样展开一层
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -711,83 +637,47 @@ ok: [test70] => (item=(6, u'test7')) => {
     - [ test6 ]
 ```
 
-
 ```
-TASK [debug] ********************************
-ok: [test70] => (item=(0, u'test1')) => {
-    "changed": false,
-    "item": [
-        0,
-        "test1"
-    ],
-    "msg": [
-        0,
-        "test1"
-    ]
+ok: [node01] => (item=[0, u'test1']) => {
+    "msg": "index is : 0 , value is test1"
 }
-ok: [test70] => (item=(1, u'test2')) => {
-    "changed": false,
-    "item": [
-        1,
-        "test2"
-    ],
-    "msg": [
-        1,
-        "test2"
-    ]
+ok: [node01] => (item=[1, u'test2']) => {
+    "msg": "index is : 1 , value is test2"
 }
-ok: [test70] => (item=(2, u'test3')) => {
-    "changed": false,
-    "item": [
-        2,
-        "test3"
-    ],
-    "msg": [
-        2,
-        "test3"
-    ]
+ok: [node01] => (item=[2, u'test3']) => {
+    "msg": "index is : 2 , value is test3"
 }
-ok: [test70] => (item=(3, [u'test4', u'test5'])) => {
-    "changed": false,
-    "item": [
-        3,
-        [
-            "test4",
-            "test5"
-        ]
-    ],
-    "msg": [
-        3,
-        [
-            "test4",
-            "test5"
-        ]
-    ]
+ok: [node01] => (item=[3, [u'test4', u'test5']]) => {
+    "msg": "index is : 3 , value is [u'test4', u'test5']"
 }
-ok: [test70] => (item=(4, u'test6')) => {
-    "changed": false,
-    "item": [
-        4,
-        "test6"
-    ],
-    "msg": [
-        4,
-        "test6"
-    ]
+ok: [node01] => (item=[4, u'test6']) => {
+    "msg": "index is : 4 , value is test6"
+}
+ok: [node01] => (item=[5, u'test7']) => {
+    "msg": "index is : 5 , value is test7"
 }
 ```
-- 当多加了一层嵌套以后，`with_indexed_items`并不像`with_flattened`一样将嵌套的列表`完全拉平`，第二层列表中的项如果仍然是一个列表，`with_indexed_items`则不会拉平这个列表，而是将其当做一个整体进行编号。
 
 
 # with_sequence
 
 ## 七、with_sequence
 
-### 1)设置起始值为1，最大五，步长为1
+| 参数 | 参数说明 |
+|-----|---------|
+| start | 指走起始值 |
+| end | 指定结束值 |
+| stride | 指定步长，即从 start至end，每次增加的值 |
+| count | 生成连续的数字序列，从1开始，到 count的值结束 |
+| format | 格式化输出类似于lnuX命令行中的 printi格式化输出 |
+
+
+
+### 1) 设置起始值为1，最大五，步长为1
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -802,38 +692,27 @@ ok: [test70] => (item=(4, u'test6')) => {
 ```
 
 ```
-TASK [debug] ***************************
-ok: [test70] => (item=1) => {
-    "changed": false,
-    "item": "1",
+ok: [node01] => (item=1) => {
     "msg": "1"
 }
-ok: [test70] => (item=2) => {
-    "changed": false,
-    "item": "2",
+ok: [node01] => (item=2) => {
     "msg": "2"
 }
-ok: [test70] => (item=3) => {
-    "changed": false,
-    "item": "3",
+ok: [node01] => (item=3) => {
     "msg": "3"
 }
-ok: [test70] => (item=4) => {
-    "changed": false,
-    "item": "4",
+ok: [node01] => (item=4) => {
     "msg": "4"
 }
-ok: [test70] => (item=5) => {
-    "changed": false,
-    "item": "5",
+ok: [node01] => (item=5) => {
     "msg": "5"
 }
 ```
 
-### 2)count=5表示数字序列默认从1开始，到5结束，默认步长为1
+### 2) count=5表示数字序列默认从1开始，到5结束，默认步长为1
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -842,11 +721,29 @@ ok: [test70] => (item=5) => {
     with_sequence: count=5
 ```
 
+```
+ok: [node01] => (item=1) => {
+    "msg": "1"
+}
+ok: [node01] => (item=2) => {
+    "msg": "2"
+}
+ok: [node01] => (item=3) => {
+    "msg": "3"
+}
+ok: [node01] => (item=4) => {
+    "msg": "4"
+}
+ok: [node01] => (item=5) => {
+    "msg": "5"
+}
+```
+
 ### 3)不指定stride的值时，stride的值默认为1，但是当end的值小于start的值时，则必须指定stride的值，而且stride的值必须是负数
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -856,20 +753,13 @@ ok: [test70] => (item=5) => {
 ```
 
 ```
-TASK [debug] ***************************
-ok: [test70] => (item=6) => {
-    "changed": false,
-    "item": "6",
+ok: [node01] => (item=6) => {
     "msg": "6"
 }
-ok: [test70] => (item=4) => {
-    "changed": false,
-    "item": "4",
+ok: [node01] => (item=4) => {
     "msg": "4"
 }
-ok: [test70] => (item=2) => {
-    "changed": false,
-    "item": "2",
+ok: [node01] => (item=2) => {
     "msg": "2"
 }
 ```
@@ -878,7 +768,7 @@ ok: [test70] => (item=2) => {
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -895,7 +785,7 @@ ok: [test70] => (item=2) => {
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -905,20 +795,13 @@ ok: [test70] => (item=2) => {
 ```
 
 ```
-TASK [debug] ***************************
-ok: [test70] => (item=number is 2.00) => {
-    "changed": false,
-    "item": "number is 2.00",
+ok: [node01] => (item=number is 2.00) => {
     "msg": "number is 2.00"
 }
-ok: [test70] => (item=number is 4.00) => {
-    "changed": false,
-    "item": "number is 4.00",
+ok: [node01] => (item=number is 4.00) => {
     "msg": "number is 4.00"
 }
-ok: [test70] => (item=number is 6.00) => {
-    "changed": false,
-    "item": "number is 6.00",
+ok: [node01] => (item=number is 6.00) => {
     "msg": "number is 6.00"
 }
 ```
@@ -926,9 +809,11 @@ ok: [test70] => (item=number is 6.00) => {
 # with_random_choice
 
 ## 八、with_random_choice循环
+- 随机挑选一个进行循环
+
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -942,6 +827,12 @@ ok: [test70] => (item=number is 6.00) => {
     - 5
 ```
 
+```
+ok: [node01] => (item=5) => {
+    "msg": 5
+}
+```
+
 # with_dict
 
 ## 九、with_dict字典循环
@@ -949,7 +840,7 @@ ok: [test70] => (item=number is 6.00) => {
 ### 1)使用字典的方式定义了users变量，users中一共有两个用户，alice和bob，从变量的键值对可以看出，alice是女性，bob是男性
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   vars:
@@ -963,26 +854,15 @@ ok: [test70] => (item=number is 6.00) => {
 ```
 
 ```
-TASK [debug] *************************************
-ok: [test70] => (item={'value': u'male', 'key': u'bob'}) => {
-    "changed": false,
-    "item": {
-        "key": "bob",
-        "value": "male"
-    },
+ok: [node01] => (item={'value': u'male', 'key': u'bob'}) => {
     "msg": {
-        "key": "bob",
+        "key": "bob", 
         "value": "male"
     }
 }
-ok: [test70] => (item={'value': u'female', 'key': u'alice'}) => {
-    "changed": false,
-    "item": {
-        "key": "alice",
-        "value": "female"
-    },
+ok: [node01] => (item={'value': u'female', 'key': u'alice'}) => {
     "msg": {
-        "key": "alice",
+        "key": "alice", 
         "value": "female"
     }
 }
@@ -991,7 +871,7 @@ ok: [test70] => (item={'value': u'female', 'key': u'alice'}) => {
 ### 2)字典中的每个键值对被放到了item变量中，而且，键值对中的”键”被放入了”key”关键字中，键值对中的”值”被放入了”value”关键字中
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   vars:
@@ -1005,21 +885,10 @@ ok: [test70] => (item={'value': u'female', 'key': u'alice'}) => {
 ```
 
 ```
-TASK [debug] ************************************************
-ok: [test70] => (item={'value': u'male', 'key': u'bob'}) => {
-    "changed": false,
-    "item": {
-        "key": "bob",
-        "value": "male"
-    },
+ok: [node01] => (item={'value': u'male', 'key': u'bob'}) => {
     "msg": "User name: bob , User's gender: male "
 }
-ok: [test70] => (item={'value': u'female', 'key': u'alice'}) => {
-    "changed": false,
-    "item": {
-        "key": "alice",
-        "value": "female"
-    },
+ok: [node01] => (item={'value': u'female', 'key': u'alice'}) => {
     "msg": "User name: alice , User's gender: female "
 }
 ```
@@ -1028,7 +897,7 @@ ok: [test70] => (item={'value': u'female', 'key': u'alice'}) => {
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   vars:
@@ -1048,41 +917,22 @@ ok: [test70] => (item={'value': u'female', 'key': u'alice'}) => {
 ```
 
 ```
-TASK [debug] *****************************************
-ok: [test70] => (item={'value': {u'gender': u'male', u'name': u'Bob Bananarama', u'telephone': u'987-654-3210'}, 'key': u'bob'}) => {
-    "changed": false,
-    "item": {
-        "key": "bob",
-        "value": {
-            "gender": "male",
-            "name": "Bob Bananarama",
-            "telephone": "987-654-3210"
-        }
-    },
+ok: [node01] => (item={'value': {u'gender': u'male', u'name': u'Bob Bananarama', u'telephone': u'987-654-3210'}, 'key': u'bob'}) => {
     "msg": {
-        "key": "bob",
+        "key": "bob", 
         "value": {
-            "gender": "male",
-            "name": "Bob Bananarama",
+            "gender": "male", 
+            "name": "Bob Bananarama", 
             "telephone": "987-654-3210"
         }
     }
 }
-ok: [test70] => (item={'value': {u'gender': u'female', u'name': u'Alice Appleworth', u'telephone': u'123-456-7890'}, 'key': u'alice'}) => {
-    "changed": false,
-    "item": {
-        "key": "alice",
-        "value": {
-            "gender": "female",
-            "name": "Alice Appleworth",
-            "telephone": "123-456-7890"
-        }
-    },
+ok: [node01] => (item={'value': {u'gender': u'female', u'name': u'Alice Appleworth', u'telephone': u'123-456-7890'}, 'key': u'alice'}) => {
     "msg": {
-        "key": "alice",
+        "key": "alice", 
         "value": {
-            "gender": "female",
-            "name": "Alice Appleworth",
+            "gender": "female", 
+            "name": "Alice Appleworth", 
             "telephone": "123-456-7890"
         }
     }
@@ -1092,7 +942,7 @@ ok: [test70] => (item={'value': {u'gender': u'female', u'name': u'Alice Applewor
 ### 4)将字典遍历到变量中使用
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   vars:
@@ -1111,6 +961,14 @@ ok: [test70] => (item={'value': {u'gender': u'female', u'name': u'Alice Applewor
     with_dict: "{{users}}"
 ```
 
+```
+ok: [node01] => (item={'value': {u'gender': u'male', u'name': u'Bob Bananarama', u'telephone': u'987-654-3210'}, 'key': u'bob'}) => {
+    "msg": "User bob is Bob Bananarama, Gender: male, Tel: 987-654-3210"
+}
+ok: [node01] => (item={'value': {u'gender': u'female', u'name': u'Alice Appleworth', u'telephone': u'123-456-7890'}, 'key': u'alice'}) => {
+    "msg": "User alice is Alice Appleworth, Gender: female, Tel: 123-456-7890"
+}
+```
 
 # with_subelements
 
@@ -1142,55 +1000,30 @@ ok: [test70] => (item={'value': {u'gender': u'female', u'name': u'Alice Applewor
 ```
 
 ```
-TASK [debug] ***********************************************************
-ok: [test70] => (item=({u'gender': u'male', u'name': u'bob'}, u'Skateboard')) => {
-    "changed": false,
-    "item": [
-        {
-            "gender": "male",
-            "name": "bob"
-        },
-        "Skateboard"
-    ],
+ok: [node01] => (item=[{u'gender': u'male', u'name': u'bob'}, u'Skateboard']) => {
     "msg": [
         {
-            "gender": "male",
+            "gender": "male", 
             "name": "bob"
-        },
+        }, 
         "Skateboard"
     ]
 }
-ok: [test70] => (item=({u'gender': u'male', u'name': u'bob'}, u'VideoGame')) => {
-    "changed": false,
-    "item": [
-        {
-            "gender": "male",
-            "name": "bob"
-        },
-        "VideoGame"
-    ],
+ok: [node01] => (item=[{u'gender': u'male', u'name': u'bob'}, u'VideoGame']) => {
     "msg": [
         {
-            "gender": "male",
+            "gender": "male", 
             "name": "bob"
-        },
+        }, 
         "VideoGame"
     ]
 }
-ok: [test70] => (item=({u'gender': u'female', u'name': u'alice'}, u'Music')) => {
-    "changed": false,
-    "item": [
-        {
-            "gender": "female",
-            "name": "alice"
-        },
-        "Music"
-    ],
+ok: [node01] => (item=[{u'gender': u'female', u'name': u'alice'}, u'Music']) => {
     "msg": [
         {
-            "gender": "female",
+            "gender": "female", 
             "name": "alice"
-        },
+        }, 
         "Music"
     ]
 }
@@ -1222,16 +1055,22 @@ ok: [test70] => (item=({u'gender': u'female', u'name': u'alice'}, u'Music')) => 
 ```
 
 ```
-"msg": "bob 's hobby is Skateboard"
-"msg": "bob 's hobby is VideoGame"
-"msg": "alice 's hobby is Music"
+ok: [node01] => (item=[{u'gender': u'male', u'name': u'bob'}, u'Skateboard']) => {
+    "msg": "bob 's hobby is Skateboard"
+}
+ok: [node01] => (item=[{u'gender': u'male', u'name': u'bob'}, u'VideoGame']) => {
+    "msg": "bob 's hobby is VideoGame"
+}
+ok: [node01] => (item=[{u'gender': u'female', u'name': u'alice'}, u'Music']) => {
+    "msg": "alice 's hobby is Music"
+}
 ```
 
 # with_file
 
 ## 十一、with_file循环获取文件内容
 
-### 1)列表中有两个文件路径，分别是”/testdir/testdir/a.log”和”/opt/testfile”，这两个文件都是ansible主机中的文件，通过`with_file`关键字处理了这个列表
+### 1)列表中有两个文件路径，分别是`/testdir/testdir/a.log`和`/opt/testfile`，这两个文件都是ansible主机中的文件，通过`with_file`关键字处理了这个列表
 ```
 ---
 - hosts: test70
@@ -1246,15 +1085,10 @@ ok: [test70] => (item=({u'gender': u'female', u'name': u'alice'}, u'Music')) => 
 ```
 
 ```
-TASK [debug] *******************
-ok: [test70] => (item=aaa) => {
-    "changed": false,
-    "item": "aaa",
+ok: [node01] => (item=aaa) => {
     "msg": "aaa"
 }
-ok: [test70] => (item=test) => {
-    "changed": false,
-    "item": "test",
+ok: [node01] => (item=test) => {
     "msg": "test"
 }
 ```
