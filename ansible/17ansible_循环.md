@@ -363,7 +363,7 @@ ok: [node01] => (item=8) => {
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -375,37 +375,21 @@ ok: [node01] => (item=8) => {
 ```
 
 ```
-TASK [debug] ******************************
-ok: [test70] => (item=[1, u'a']) => {
-    "changed": false,
-    "item": [
-        1,
-        "a"
-    ],
+ok: [node01] => (item=[1, u'a']) => {
     "msg": [
-        1,
+        1, 
         "a"
     ]
 }
-ok: [test70] => (item=[2, u'b']) => {
-    "changed": false,
-    "item": [
-        2,
-        "b"
-    ],
+ok: [node01] => (item=[2, u'b']) => {
     "msg": [
-        2,
+        2, 
         "b"
     ]
 }
-ok: [test70] => (item=[3, u'c']) => {
-    "changed": false,
-    "item": [
-        3,
-        "c"
-    ],
+ok: [node01] => (item=[3, u'c']) => {
     "msg": [
-        3,
+        3, 
         "c"
     ]
 }
@@ -413,6 +397,37 @@ ok: [test70] => (item=[3, u'c']) => {
 - 第一个小列表中的第1个值与第二个小列表中的第1个值合并在一起输出
 - 第一个小列表中的第2个值与第二个小列表中的第2个值合并在一起输出
 - 第一个小列表中的第3个值与第二个小列表中的第3个值合并在一起输出
+
+```
+- hosts: node01
+  gather_facts: no 
+  vars:
+    alpha: [ 'a','b','c','d']
+    numbers: [ 1,2,3,4 ]
+  tasks:
+    - debug: msg="{{ item.0 }} and {{ item.1 }}"
+      with_together:
+         - "{{ alpha }}"
+         - "{{ numbers }}"
+```
+
+```
+# ansible-playbook with_items.yml
+ok: [node01] => (item=[u'a', 1]) => {
+    "msg": "a and 1"
+}
+ok: [node01] => (item=[u'b', 2]) => {
+    "msg": "b and 2"
+}
+ok: [node01] => (item=[u'c', 3]) => {
+    "msg": "c and 3"
+}
+ok: [node01] => (item=[u'd', 4]) => {
+    "msg": "d and 4"
+}
+```
+
+
 
 # with_cartesian
 
