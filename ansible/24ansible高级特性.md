@@ -310,5 +310,42 @@ ok: [node01]
 
 PLAY RECAP ***************************************************************************
 node01                     : ok=2    changed=0    unreachable=0    failed=0   
+```
 
+
+# 九、add_host
+
+- 在playbook执行的过程中，动态的添加主机到指定的主机组中
+
+常用参数：
+- groups：添加主机至指定的组
+- name：要添加的主机名或IP地址
+
+```
+    - name: add a host to group webservers
+      hosts: webservers
+      tasks:
+        - add_host name={{ ip_from_ec2 }} group=webservers foo=42    #添加主机到webservers组中，主机的变量foo的值为42
+```
+
+# 十、group_by
+
+在playbook执行的过程中，动态的创建主机组
+```
+    - name: Create operating system group
+      hosts: all
+      tasks:
+        - group_by: key=os_{{ ansible_distribution }}           # 在playbook中设置一个新的主机组
+
+    - name: Run on CentOS hosts only
+      hosts: os_CentOS
+      tasks:
+        - name: Install Apache
+          yum: name=httpd state=latest
+
+    - name: Run on Ubuntu hosts only
+      hosts: os_Ubuntu
+      tasks:
+        - name: Install Apache
+          apt: pkg=apache2 state=latest
 ```
