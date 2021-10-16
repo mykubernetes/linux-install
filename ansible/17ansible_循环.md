@@ -21,14 +21,6 @@
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
 - with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 
-with_list与 with_items一样，也是用于循环列表。区别是，如果列表的值也是列表，with_iems会将第一层嵌套的列表拉平，而with_list会将值作为一个整体返回。with_flatten会将所有列表全部拉平
-
-[[1,2,[3,4]],[5,6],7,8]   
-- with_item------->[1,2,[3,4],5,6,7,8]    拉平第一层
-- with_list--------->[[1,2,[3,4]],[5,6],7,8]   整体返回
-- with_flatten----->[1,2,3,4,5,6,7,8]     全部拉平
-
-
 # with_items
 
 ## 一、with_items 循环
@@ -109,7 +101,7 @@ ok: [test70] => (item=test71) => {
 方法一
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -124,7 +116,7 @@ ok: [test70] => (item=test71) => {
 方法二
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -138,7 +130,7 @@ ok: [test70] => (item=test71) => {
 第一个条目的test1键对应的值是a，第二个条目的test1键对应的值是c，所以执行上例playbook以后，”a”和”c”会被输出
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -162,7 +154,7 @@ ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   vars:
@@ -181,7 +173,7 @@ ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
 ### 9)每次shell模块执行后的返回值都会放入一个名为`results`的序列中,`results`也是一个返回值，当模块中使用了循环时，模块每次执行的返回值都会追加存放到`results`这个返回值中
 ```
 ---
-- hosts: test70
+- hosts: node01
   gather_facts: no
   tasks:
   - shell: "{{item}}"
@@ -196,7 +188,7 @@ ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
 
 ```
 ---
-- hosts: test70
+- hosts: node01
   gather_facts: no
   tasks:
   - shell: "{{item}}"
@@ -218,8 +210,9 @@ ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
 ## 1）with_list和with_items的区别
 
 ### with_items 会将第一层嵌套的列表拉平
+```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -322,10 +315,9 @@ ok: [node01] => (item=8) => {
 ## 三、with_flattened 循环
 
 - 将列表中的元素全部拉平
-
 ```
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
