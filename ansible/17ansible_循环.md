@@ -217,8 +217,7 @@ ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
 
 ## 1）with_list和with_items的区别
 
-### with_items将小列表`展开拉平`后一并将小列表中的元素循环输出。
-```
+### with_items 会将第一层嵌套的列表拉平
 ---
 - hosts: test70
   remote_user: root
@@ -227,86 +226,80 @@ ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
   - debug:
       msg: "{{item}}"
     with_items:
-    - [ 1, 2, 3 ]
-    - [ a, b ]
+    - [1,2,[3,4]]
+    - [5,6]
+    - 7
+    - 8
 ```
 
 ```
-TASK [debug] ********************************
-ok: [test70] => (item=1) => {
-    "changed": false,
-    "item": 1,
+ok: [node01] => (item=1) => {
     "msg": 1
 }
-ok: [test70] => (item=2) => {
-    "changed": false,
-    "item": 2,
+ok: [node01] => (item=2) => {
     "msg": 2
 }
-ok: [test70] => (item=3) => {
-    "changed": false,
-    "item": 3,
-    "msg": 3
+ok: [node01] => (item=[3, 4]) => {
+    "msg": [
+        3, 
+        4
+    ]
 }
-ok: [test70] => (item=a) => {
-    "changed": false,
-    "item": "a",
-    "msg": "a"
+ok: [node01] => (item=5) => {
+    "msg": 5
 }
-ok: [test70] => (item=b) => {
-    "changed": false,
-    "item": "b",
-    "msg": "b"
+ok: [node01] => (item=6) => {
+    "msg": 6
+}
+ok: [node01] => (item=7) => {
+    "msg": 7
+}
+ok: [node01] => (item=8) => {
+    "msg": 8
 }
 ```
 
-### with_list每个嵌套在大列表中的小列表都被当做一个整体存放在item变量中，最终被debug作为一个小整体输出了
+### with_list 会将值作为一个整体返回
 ```
----
-- hosts: test70
+- hosts: node01
   remote_user: root
-  gather_facts: no
   tasks:
   - debug:
       msg: "{{item}}"
     with_list:
-    - [ 1, 2, 3 ]
-    - [ a, b ]
+    - [1,2,[3,4]]
+    - [5,6]
+    - 7
+    - 8
 ```
 
-
 ```
-TASK [debug] *******************************
-ok: [test70] => (item=[1, 2, 3]) => {
-    "changed": false,
-    "item": [
-        1,
-        2,
-        3
-    ],
+ok: [node01] => (item=[1, 2, [3, 4]]) => {
     "msg": [
-        1,
-        2,
-        3
+        1, 
+        2, 
+        [
+            3, 
+            4
+        ]
     ]
 }
-ok: [test70] => (item=[u'a', u'b']) => {
-    "changed": false,
-    "item": [
-        "a",
-        "b"
-    ],
+ok: [node01] => (item=[5, 6]) => {
     "msg": [
-        "a",
-        "b"
+        5, 
+        6
     ]
 }
+ok: [node01] => (item=7) => {
+    "msg": 7
+}
+ok: [node01] => (item=8) => {
+    "msg": 8
+}
 ```
+- 当处理单层的简单列表时，with_list与with_items没有任何区别
 
-- 当处理单层的简单列表时，with_list与with_items没有任何区别，只有在处理上例中的”嵌套列表”时，才会体现出区别，区别就是，with_items会将嵌套在内的小列表”拉平”，拉平后循环处理所有元素，而with_list则不会”拉平”嵌套的列表，with_list只会循环的处理列表（最外层列表）中的每一项。
-
-
-### 定义嵌套的列表
+### 通过缩进对齐的方式，定义一个嵌套的列表
 ```
     with_list:
     -
@@ -316,10 +309,8 @@ ok: [test70] => (item=[u'a', u'b']) => {
     -
       - a
       - b
-```
 
-### 上述方法通过缩进对齐的方式，定义出了一个嵌套有列表的列表，与如下定义完全相同
-```
+或者
     with_list:
     - [ 1, 2, 3 ]
     - [ a, b ]
@@ -330,7 +321,7 @@ ok: [test70] => (item=[u'a', u'b']) => {
 
 ## 三、with_flattened 循环
 
-- 当处理这种嵌套的列表时，如果想要实现”拉平”的效果，还能使用另外一个关键字，它就是`with_flattened`关键字
+- 将列表中的元素全部拉平
 
 ```
 ---
@@ -341,11 +332,38 @@ ok: [test70] => (item=[u'a', u'b']) => {
   - debug:
       msg: "{{item}}"
     with_flattened:
-    - [ 1, 2, 3 ]
-    - [ a, b ]
+    - [1,2,[3,4]]
+    - [5,6]
+    - 7
+    - 8
 ```
 
-- `with_list`、`with_items`、`with_flattened`之间的区别，在处理简单的单层列表时，他们没有区别，但是当处理嵌套的多层列表时，`with_items`与`with_flattened`会将嵌套列表`拉平展开`，循环的处理每个元素，而with_list只会处理最外层的列表，将最外层的列表中的每一项循环处理。
+```
+ok: [node01] => (item=1) => {
+    "msg": 1
+}
+ok: [node01] => (item=2) => {
+    "msg": 2
+}
+ok: [node01] => (item=3) => {
+    "msg": 3
+}
+ok: [node01] => (item=4) => {
+    "msg": 4
+}
+ok: [node01] => (item=5) => {
+    "msg": 5
+}
+ok: [node01] => (item=6) => {
+    "msg": 6
+}
+ok: [node01] => (item=7) => {
+    "msg": 7
+}
+ok: [node01] => (item=8) => {
+    "msg": 8
+}
+```
 
 # with_together
 
