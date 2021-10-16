@@ -269,3 +269,46 @@ vars_prompt常用选项说明：
 - private: 默认为yes，表示用户输入的值在命令行不可见
 - default：定义默认值，当用户未输入时则使用默认值
 - confirm：如果设置为yes，则会要求用户输入两次，适合输入密码的情况
+
+
+# 八、pause
+
+在playbook执行的过程中暂停一定时间或者提示用户进行某些操作
+
+常用参数：
+- minutes：暂停多少分钟
+- seconds：暂停多少秒
+- prompt：打印一串信息提示用户操作
+
+```
+- hosts: node01
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - name: wait on user input
+    pause: prompt="Warning! Detected slight issue. ENTER to continue CTRL-C a to quit"
+  - name: timed wait
+    pause: seconds=10
+```
+
+```
+# ansible-playbook test.yml 
+
+PLAY [node01] ************************************************************************
+
+TASK [wait on user input] ************************************************************
+Saturday 16 October 2021  11:52:45 -0400 (0:00:00.056)       0:00:00.056 ****** 
+[wait on user input]
+Warning! Detected slight issue. ENTER to continue CTRL-C a to quit:
+ok: [node01]
+
+TASK [timed wait] ********************************************************************
+Saturday 16 October 2021  11:53:09 -0400 (0:00:24.085)       0:00:24.142 ****** 
+Pausing for 10 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [node01]
+
+PLAY RECAP ***************************************************************************
+node01                     : ok=2    changed=0    unreachable=0    failed=0   
+
+```
