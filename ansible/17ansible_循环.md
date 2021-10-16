@@ -21,6 +21,65 @@
 - 旧循环语句（版本在2.5之前仅有的),这些语句使用with_作为前缀,些语法目前仍然兼容，但在未来的某个时间点，会逐步废弃。
 - with_items、with_list、loop迭代,ansible2.5版本之后将with_items、with_list迁移至loop
 
+
+# 定义一个循环列表
+
+方法一
+```
+---
+- hosts: node01
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_items:
+    - 1
+    - 2
+    - 3
+```
+
+方法二
+```
+---
+- hosts: node01
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{item}}"
+    with_items: [ 1, 2, 3 ]
+```
+
+# 通过缩进对齐的方式，定义一个嵌套循环的列表
+```
+- hosts: node01
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_list:
+    -
+      - 1
+      - 2
+      - 3
+    -
+      - a
+      - b
+
+# 或者
+- hosts: node01
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - debug:
+      msg: "{{ item }}"
+    with_list:
+    - [ 1, 2, 3 ]
+    - [ a, b ]
+```
+
 # with_items
 
 ## 一、with_items 循环
@@ -56,7 +115,7 @@ test70 | SUCCESS => {
 }
 ```
 
-### 4)获取到上述返回信息中的第二条信息
+### 4) 获取到上述返回信息中的第二条信息
 ```
 # ansible test70 -m debug -a "msg={{groups.ungrouped[1]}}"
 test70 | SUCCESS => {
@@ -65,7 +124,7 @@ test70 | SUCCESS => {
 }
 ```
 
-### 5)但是通常不能确定返回信息有几条，可能需要循环的处理返回信息中的每一条信息
+### 5) 但是通常不能确定返回信息有几条，可能需要循环的处理返回信息中的每一条信息
 ```
 ---
 - hosts: test70
@@ -96,36 +155,9 @@ ok: [test70] => (item=test71) => {
 }
 ```
 
-### 6)循环使用列表中的值
 
-方法一
-```
----
-- hosts: node01
-  remote_user: root
-  gather_facts: no
-  tasks:
-  - debug:
-      msg: "{{item}}"
-    with_items:
-    - 1
-    - 2
-    - 3
-```
 
-方法二
-```
----
-- hosts: node01
-  remote_user: root
-  gather_facts: no
-  tasks:
-  - debug:
-      msg: "{{item}}"
-    with_items: [ 1, 2, 3 ]
-```
-
-### 7)稍微复杂一点的循环
+### 6) 稍微复杂一点的循环
 
 第一个条目的test1键对应的值是a，第二个条目的test1键对应的值是c，所以执行上例playbook以后，”a”和”c”会被输出
 ```
@@ -150,7 +182,7 @@ ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
 }
 ```
 
-### 8）使用循环创建文件
+### 7）使用循环创建文件
 
 ```
 ---
@@ -170,7 +202,7 @@ ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
     with_items: "{{dirs}}"
 ```
 
-### 9)每次shell模块执行后的返回值都会放入一个名为`results`的序列中,`results`也是一个返回值，当模块中使用了循环时，模块每次执行的返回值都会追加存放到`results`这个返回值中
+### 8) 使用shell模块执行后的返回值都会放入一个名为`results`的序列中,`results`也是一个返回值，当模块中使用了循环时，模块每次执行的返回值都会追加存放到`results`这个返回值中
 ```
 ---
 - hosts: node01
@@ -291,24 +323,6 @@ ok: [node01] => (item=8) => {
 }
 ```
 - 当处理单层的简单列表时，with_list与with_items没有任何区别
-
-### 通过缩进对齐的方式，定义一个嵌套的列表
-```
-    with_list:
-    -
-      - 1
-      - 2
-      - 3
-    -
-      - a
-      - b
-
-或者
-    with_list:
-    - [ 1, 2, 3 ]
-    - [ a, b ]
-```
-
 
 # with_flattened
 
