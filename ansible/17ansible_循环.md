@@ -149,6 +149,15 @@ ok: [test70] => (item=test71) => {
     - { test1: c, test2: d }
 ```
 
+```
+ok: [node01] => (item={u'test1': u'a', u'test2': u'b'}) => {
+    "msg": "a"
+}
+ok: [node01] => (item={u'test1': u'c', u'test2': u'd'}) => {
+    "msg": "c"
+}
+```
+
 ### 8）使用循环创建文件
 
 ```
