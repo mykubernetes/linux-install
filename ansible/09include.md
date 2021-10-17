@@ -37,7 +37,7 @@ include
       state: present
 ```
 
-# 二、在handlers关键字中，也可以使用include，当`test include handlers`被触发时，`include_handler.yml`中的任务将会执行
+2、在handlers关键字中，也可以使用include，当`test include handlers`被触发时，`include_handler.yml`中的任务将会执行
 ```
 # cat test_include.yml
 ---
@@ -64,7 +64,7 @@ include
 ```
 
 
-# 三、ansible还可以在一个playbook中引用另外一个playbook。
+3、ansible还可以在一个playbook中引用另外一个playbook。
 
 ```
 # cat lamp.yml
@@ -81,7 +81,7 @@ include
 - include: lnmp.yml
 ```
 
-# 四、在使用`函数`或者`方法`时，可能会需要传入一些`参数`，以便更加灵活的根据实际情况作出对应的处理
+4、在使用`函数`或者`方法`时，可能会需要传入一些`参数`，以便更加灵活的根据实际情况作出对应的处理
 
 1）在tasks中直接写入变量
 ```
@@ -92,8 +92,8 @@ include
   gather_facts: no
   tasks:
   - include: in.yml
-     test_var1=hello
-     test_var2=test
+      test_var1=hello
+      test_var2=test
  
 # cat in.yml
 - debug:
@@ -114,8 +114,8 @@ include
   tasks:
   - include: in.yml
     vars:
-     test_var1: hello
-     test_var2: test
+      test_var1: hello
+      test_var2: test
 
 # cat in.yml
 - debug:
@@ -134,11 +134,11 @@ include
   tasks:
   - include: in.yml
     vars:
-     users:
-      bob:
-        gender: male
-      lucy:
-        gender: female
+      users:
+        bob:
+          gender: male
+        lucy:
+          gender: female
          
 # cat in.yml
 - debug:
@@ -146,7 +146,7 @@ include
   loop: "{{ users | dict2items }}"
 ```
 
-# 五、在include中也可以使用tags进行打标签
+5、在include中也可以使用tags进行打标签
 ```
 # cat test_include1.yml
 ---
@@ -172,7 +172,7 @@ include
     msg: "task2 in in2.yml"
 ```
 
-# 六、对`include`添加条件判断，还可以对`include`进行循环操作
+6、对`include`添加条件判断，还可以对`include`进行循环操作
 
 ```
 # cat test_include1.yml
@@ -196,7 +196,7 @@ include
     msg: "task2 in in3.yml"
 ```
 
-# 七、可以对`include`进行循环操作
+7、可以对`include`进行循环操作
 
 ```
 # cat A.yml
@@ -262,7 +262,7 @@ PLAY RECAP *************************************************
 test70                     : ok=9    changed=0    unreachable=0    failed=0
 ```
 
-# 八、B.yml中循环调用了debug模块，而在A.yml中，又循环的调用了B.yml，当出现这种”双层循环”的情况时，当出现上述”双层循环”的情况时，内层item的信息为B.yml中的loop列表，而不是A.yml中的loop列表
+8、B.yml中循环调用了debug模块，而在A.yml中，又循环的调用了B.yml，当出现这种”双层循环”的情况时，当出现上述”双层循环”的情况时，内层item的信息为B.yml中的loop列表，而不是A.yml中的loop列表
 ```
 # cat A.yml
 ---
@@ -284,7 +284,7 @@ test70                     : ok=9    changed=0    unreachable=0    failed=0
   - c
 ```
 
-# 九、想要在B文件中获取到A文件中的item信息，使用loop_control选项
+9、想要在B文件中获取到A文件中的item信息，使用loop_control选项
 ```
 # cat A.yml
 ---
