@@ -429,34 +429,62 @@ Topic:test    PartitionCount:3    ReplicationFactor:3    Configs:
 
 测试Kafka集群一共三个节点，test这个Topic, 编号为0的Partition,Leader在broker.id=0这个节点上，副本在broker.id为0 1 2这个三个几点，并且所有副本都存活，并跟broker.id=0这个节点同步
 
-9、查看topic消费到的offset
-```
-# kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list node001:9092 --topic test0 --time -1
-test0:17:0
-test0:8:0
-test0:11:0
-test0:2:0
-test0:5:0
-test0:14:0
-test0:13:0
-test0:4:0
-test0:16:0
-test0:7:0
-test0:10:0
-test0:1:0
-test0:19:0
-test0:18:0
-test0:9:0
-test0:3:0
-test0:12:0
-test0:15:0
-test0:6:0
-test0:0:
+# kafka-run-class.sh查看消费了多少条数据
 
-# 注1 结果格式为： topic名称:partition分区号:分区的offset
-# 注2 --time 为 -1时用来请求分区最新的offset
-#     --time 为 -2时用来请求分区最早有效的offset
+
+1、查看consumer组内消费的offset：
 ```
+./kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper **:2181 --group ** --topic **
+```
+
+2、其中的group可去zookeeper中查看：
+```
+# bin/zkCli.sh
+[zk: localhost:2181(CONNECTED) 2] ls /consumers
+[console-consumer-74653, WordcountConsumerGroup]
+
+注：console-consumer-74653这个组当我在另一个窗口启动消费者 # bin/kafka-console-consumer.sh --zookeeper h71:2181,h72:2181,h73:2181 --topic test --from-beginning时才会有，关闭消费者进程该组会自动消失
+```
+注：我们在使用kafka消费信息的过程中，不同group的consumer是可以消费相同的信息的，group是在创建consumer时指定的，如果group不存在，会自动创建。其实简单点说就是每个group都会在zk中注册，区别就是注册过还是没注册过。每个group内的consumer只能消费在group注册过之后生产的信息。
+
+3、执行结果如下：
+
+- 列出了所有消费者组的所有信息，包括Group(消费者组)、Topic、Pid(分区id)、Offset(当前已消费的条数)、LogSize(总条数)、Lag(未消费的条数)、Owner
+```
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper node01:2181,node02:2181,node03:2181 --group WordcountConsumerGroup --topic test
+或者：
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper=node01:2181,node02:2181,node03:2181 --group=WordcountConsumerGroup --topic=test
+再或者：
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper=h71:2181 --group=WordcountConsumerGroup
+Group           Topic                          Pid Offset          logSize         Lag             Owner
+test-consumer-group test                           0   4               40              36              none
+test-consumer-group test                           1   14              57              43              none
+
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper node01:2181,node02:2181,node03:2181 --group=WordcountConsumerGroup
+Group           Topic                          Pid Offset          logSize         Lag             Owner
+WordcountConsumerGroup test                           0   9               40              31              none
+WordcountConsumerGroup test                           1   21              57              36              none
+
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper node01:2181,node02:2181,node03:2181 --group=console-consumer-42639
+Group           Topic                          Pid Offset          logSize         Lag             Owner
+console-consumer-42639 test                           0   40              40              0               console-consumer-42639_h71-1498000434797-f1c703cf-0
+console-consumer-42639 test                           1   57              57              0               console-consumer-42639_h71-1498000434797-f1c703cf-0
+```
+
+注意：Apache的kafka_2.11-0.11.0.2版本可执行如下命令
+```
+# bin/kafka-consumer-offset-checker.sh --zookeeper 192.166.240.11:2181 --topic weishiDataOGG  --group cb6e251e-b61b-48df-985e-636a54bf8daf
+[2020-04-06 16:40:14,092] WARN WARNING: ConsumerOffsetChecker is deprecated and will be dropped in releases following 0.9.0. Use ConsumerGroupCommand instead. (kafka.tools.ConsumerOffsetChecker$)
+Group           Topic                          Pid Offset          logSize         Lag             Owner
+cb6e251e-b61b-48df-985e-636a54bf8daf weishiDataOGG                  0   42565489        58261852        15696363        none
+
+# bin/kafka-run-class.sh kafka.tools.GetOffsetShell --topic weishiDataOGG --time -1 --broker-list node:9092 --partitions 0
+weishiDataOGG:0:58261852
+```
+- 结果格式为： topic名称:partition分区号:分区的offset
+- --time 为-1时用来请求分区最新的offset
+- --time 为-2时用来请求分区最早有效的offset
+
 
 # 管理consumer group
 
