@@ -118,6 +118,10 @@ ssh 192.168.0.2            #其他机器ip
 - [stat](#stat)
 - [synchronize](#synchronize)
 - [unarchive](#unarchive)
+- [mydql_user](#mysql_user)
+- [mysql_db](#mysql_db)
+- [pam_limits](#pam_limits)
+
 
 ## command
 
@@ -517,13 +521,26 @@ ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
 [回到模块列表](#常用模块)
 
 ## get_url
+
+| 选项参数 | 选项说明 |
+|---------|---------|
+| url | 自定下载文件的URL |
+| dest | 指定下载的目录 |
+| mode | 指定下载后的权限如'0440' |
+| owner | 属主 |
+| group | 属组 |
+| force_basic_auth | 文件名相同直接覆盖（默认）yes、no |
+| checksum | #默认关闭,#md5校验,sha校验 （md5、sha256） |
+
+1、远程连接并下载（串行，速度慢）
 ```
-# ansible 172.16.1.8 -m get_url -a "url=http://lan.znix.top/RDPWrap-v1.6.1.zip dest=/tmp/"
+# ansible 'web_group' -m get_url -a 'url=http://test.driverzeng.com/Nginx_Code/wordpress-4.9.4-zh_CN.tar.gz dest=/root mode=000'
 ```
-- url= 下载文件的地址 dest 下载到哪里
-- timeout 超时时间
-- url_password   密码
-- url_username  用户名
+
+2、校验MD5并下载（小心等于号，阿里云不使用md5sum校验，）
+```
+# ansible 'web_group' -m get_url -a 'url=http://test.driverzeng.com/Nginx_Code/wordpress-4.9.4-zh_CN.tar.gz dest=/root mode=000 checksum= md5:b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c'
+```
 
 [回到模块列表](#常用模块)
 
@@ -1104,3 +1121,134 @@ ansible all -m unarchive -a "src=/tmp/install/zabbix-3.0.4.tar.gz dest=/tmp/ mod
 ```
 
 [回到模块列表](#常用模块)
+
+## mysql_user
+
+- 主控端对被控端mysql服务器 添加删除用户，授权远程用户登录，访问
+
+| 参数 | 描述 |
+|------|------|
+| login_host=“localhost” | 指定本地root用户登录本机mysql |
+| login_password=“123.com” | root用户的登录密码 |
+| login_user=“root” | 为root用户或者mysql用户 |
+| login_port=“3306” | 数据库端口号 |
+| name="" | 指定grant授权用户,建立使用者的名字或是已存在的使用者 |
+| password="" | grant授权用户密码,给新用户设置密码，或者修改密码 |
+| priv="" | 库名.SQL语句权限,GRANT,资料库.资料表:权限1,权限2（要用"） |
+| host="" | 授权远程登录的IP地址，一般为 网段.% 或者直接 % |
+| state=“present” | 创建授权用户 |
+| state=“absent” | 删除授权用户 |
+
+1、ahdoc模式写法创建授权用户，验证模块正确时使用
+```
+# ansible mysql -m mysql_user -a "login_host=% login_password=123.com login_user=root login_port=3306 name=ty_user password=1 priv=".:ALL,GRANT" host='%' state=present"
+```
+
+2、playbook剧本写法创建授权用户，执行自动化部署时使用
+```
+- hosts: mysql_group
+  remote_user: root
+  tasks:
+    - name: grant mysql user
+      mysql_user:
+      	login_host: "localhost"
+      	login_user: "root"
+     	login_password: "123.com"
+     	login_port: "3306"
+      	name: "ty"
+      	password: "123.com"
+      	host: "%"
+      	priv: "*.*:ALL,GRANT"
+      	state: "present"
+```
+
+[回到模块列表](#常用模块)
+
+## mysql_db
+
+- 用于建立、删除、导入和导出数据库
+
+```
+#建立数据库
+  hosts: mysql_group
+  tasks:
+  - name: create a database
+    mysql_db:
+      login_host: "127.0.0.1"
+      login_user: "root"
+      login_password: "mysql@123"
+      login_port: "3306"
+      name: "mezz"
+      encoding: "utf8"
+      state: "present"
+      
+#删除数据库
+  hosts: mysql_group
+  tasks:
+  - name: delete a database
+    mysql_db:
+      login_host: "127.0.0.1"
+      login_user: "root"
+      login_password: "mysql@123"
+      login_port: "3306"
+      name: "mezz"
+      state: "absent"
+      
+#导出数据库
+  hosts: mysql_group
+  tasks:
+  - name: dump a database
+    mysql_db:
+      login_host: "127.0.0.1"
+      login_user: "root"
+      login_password: "mysql@123"
+      login_port: "3306"
+      name: "mezz"
+      target: "/tmp/mezz.gz"
+      state: "dump"
+      
+#导入数据库
+  hosts: mysql_group
+  tasks:
+  - name: import a database
+    mysql_db:
+      login_host: "127.0.0.1"
+      login_user: "root"
+      login_password: "mysql@123"
+      login_port: "3306"
+      name: "mezz"
+      target: "/tmp/mezz.gz"
+      state: "import"
+```
+
+[回到模块列表](#常用模块)
+
+## pam_limits
+
+- 修改文件描述符
+
+```
+#为用户joe添加或修改nofile软限制
+- pam_limits:
+    domain: joe
+    limit_type: soft
+    limit_item: nofile
+    value: 64000
+
+# 为用户smith添加或修改硬限制。保持或设置最大值。
+- pam_limits:
+    domain: smith
+    limit_type: hard
+    limit_item: fsize
+    value: 1000000
+    use_max: yes
+
+#为用户james添加或修改memlock，包括软硬限制和注释。
+- pam_limits:
+    domain: james
+    limit_type: '-'
+    limit_item: memlock
+    value: unlimited
+    comment: unlimited memory lock for james
+```
+
