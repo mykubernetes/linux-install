@@ -17,9 +17,7 @@ start.time, end.time, fetch.size, data.consumed.in.MB, MB.sec, data.consumed.in.
 2017-09-27 01:36:41:066, 2017-09-27 01:36:46:068, 1048576, 0.0000, 0.0000, 0, 0.0000
 ```
 
-
-注意：新版本运行命令和输出结果都有所变化（参考Kafka-2.11-1.1.0版本）
-可参考网址：Kafka压力测试(写入MQ消息压测和消费MQ消息压测）、Kafka压力测试(自带测试脚本)(单机版)、http://muxiulin.cn/archives/435
+新版本运行命令和输出结果都有所变化（参考Kafka-2.11-1.1.0版本）
 ```
 ./kafka-producer-perf-test.sh --topic test_perf --num-records 100000 --record-size 1000  --throughput 2000 --producer-props bootstrap.servers=localhost:9092
 # 输出：
@@ -39,3 +37,7 @@ records sent, 1997.602877 records/sec (1.91 MB/sec), 290.41 ms avg latency, 2344
 start.time, end.time, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec, rebalance.time.ms, fetch.time.ms, fetch.MB.sec, fetch.nMsg.sec
 2018-12-06 05:50:41:276, 2018-12-06 05:50:45:281, 95.3674, 23.8121, 100000, 24968.7890, 78, 3927, 24.2851, 254
 ```
+
+参考：
+- https://blog.csdn.net/laofashi2015/article/details/81111466
+- https://www.cnblogs.com/xiao987334176/p/10075659.html
