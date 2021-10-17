@@ -456,17 +456,17 @@ Topic:test    PartitionCount:3    ReplicationFactor:3    Configs:
 # bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper=node01:2181,node02:2181,node03:2181 --group=WordcountConsumerGroup --topic=test
 再或者：
 # bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper=h71:2181 --group=WordcountConsumerGroup
-Group           Topic                          Pid Offset          logSize         Lag             Owner
+Group               Topic                          Pid Offset          logSize         Lag             Owner
 test-consumer-group test                           0   4               40              36              none
 test-consumer-group test                           1   14              57              43              none
 
 # bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper node01:2181,node02:2181,node03:2181 --group=WordcountConsumerGroup
-Group           Topic                          Pid Offset          logSize         Lag             Owner
+Group                  Topic                          Pid Offset          logSize         Lag             Owner
 WordcountConsumerGroup test                           0   9               40              31              none
 WordcountConsumerGroup test                           1   21              57              36              none
 
 # bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper node01:2181,node02:2181,node03:2181 --group=console-consumer-42639
-Group           Topic                          Pid Offset          logSize         Lag             Owner
+Group                  Topic                          Pid Offset          logSize         Lag             Owner
 console-consumer-42639 test                           0   40              40              0               console-consumer-42639_h71-1498000434797-f1c703cf-0
 console-consumer-42639 test                           1   57              57              0               console-consumer-42639_h71-1498000434797-f1c703cf-0
 ```
