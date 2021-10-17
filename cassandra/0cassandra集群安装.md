@@ -1,6 +1,3 @@
-配置文件  
-http://cassandra.apache.org/doc/latest/configuration/cassandra_config_file.html
-
 一、安装java 8
 ```
 1、解压缩
