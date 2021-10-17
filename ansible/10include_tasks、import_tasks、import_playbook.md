@@ -467,7 +467,7 @@ demo2.example.com          : ok=5    changed=0    unreachable=0    failed=0    s
 ```
 # cat intest6.yml
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -478,7 +478,7 @@ demo2.example.com          : ok=5    changed=0    unreachable=0    failed=0    s
  
 # cat intest7.yml
 ---
-- hosts: test70
+- hosts: node01
   remote_user: root
   gather_facts: no
   tasks:
@@ -486,7 +486,18 @@ demo2.example.com          : ok=5    changed=0    unreachable=0    failed=0    s
       msg: "test task in intest7.yml"
 ```
 
-
+# import_role
+```
+---
+- hosts: test70
+  remote_user: root
+  gather_facts: no
+  tasks:
+  - name: "Prometheus"
+    import_role:                     #导入一个role 名字叫password-manager
+      name: password-manager
+      tasks_from: vault-reader
+```
 
 
 
