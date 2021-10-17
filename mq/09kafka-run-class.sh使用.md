@@ -38,9 +38,10 @@ BROKER INFO
 1 -> www.iteblog.com:9096
 3 -> www.iteblog.com:9097
 6 -> www.iteblog.com:9098
+```
 
 ## 二、Dump Log Segment
-```
+
 - 有时候我们需要验证日志索引是否正确，或者仅仅想从log文件中直接打印消息，我们可以使用kafka.tools.DumpLogSegments类来实现，先来看看它需要的参数：
 
 ```
