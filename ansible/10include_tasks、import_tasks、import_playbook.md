@@ -13,7 +13,7 @@ include & import 区别
 
 # include_tasks
 
-1)使用`include_tasks`关键字代替`include`关键字
+## 1、使用`include_tasks`关键字代替`include`关键字
 ```
 # cat main.yml
 - hosts: demo2.example.com
@@ -54,7 +54,7 @@ include & import 区别
     msg: "task2 in in.yml"
 ```
 
-2)从2.7版本开始，`include_tasks`模块加入了file参数和apply参数
+## 2、从2.7版本开始，`include_tasks`模块加入了file参数和apply参数
 ```
 # cat main.yml
 - hosts: demo2.example.com
@@ -63,6 +63,8 @@ include & import 区别
         msg: "start tasks"
     - include_tasks:
         file: tasks/host.yml
+        apply:
+          tags: H1
     - include_tasks:
         file: tasks/dns.yml
     - include_tasks:
