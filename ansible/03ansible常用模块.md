@@ -100,6 +100,7 @@ ssh 192.168.0.2            #其他机器ip
 - [hostname](#hostname)
 - [selinux](#selinux)
 - [firewalld](#firewalld)
+- [systemd](#systemd)
 - [service](#service)
 - [yum](#yum)
 - [yum_repository](#yum_repository)
@@ -114,7 +115,9 @@ ssh 192.168.0.2            #其他机器ip
 - [cron](#cron)
 - [find](#find)
 - [template](#template)
-
+- [stat](#stat)
+- [synchronize](#synchronize)
+- [unarchive](#unarchive)
 
 ## command
 
@@ -156,6 +159,8 @@ ssh 192.168.0.2            #其他机器ip
 # ansible clsn -m command -a "removes=/etc/hosts date"
 ```
 
+[回到模块列表](#常用模块)
+
 ## shell
 
 1、shell命令常用参数说明
@@ -173,6 +178,8 @@ ssh 192.168.0.2            #其他机器ip
 192.168.101.69 | SUCCESS | rc=0 >>
 fenfa 192.168.101.69 [  OK  ]
 ```
+
+[回到模块列表](#常用模块)
 
 ## script
 
@@ -208,6 +215,8 @@ ansible clsn -m script -a "creates=/opt/testfile /testdir/atest.sh"
 ```
 ansible clsn -m script -a "removes=/opt/testfile /testdir/atest.sh"
 ```
+
+[回到模块列表](#常用模块)
 
 ## user
 
@@ -257,6 +266,8 @@ $6$salt$jkHSO0tOjmLW0S1NFlw5veSIDRAVsiQQMTrkOKy4xdCCLPNIsHhZkIRlzfzIvKyXeGdOfCBo
 # ansible node01  -m user -a 'name=http generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa'
 ```
 
+[回到模块列表](#常用模块)
+
 ## group
 
 1、group模块常用参数说明
@@ -283,17 +294,40 @@ ansible node02 -m group -a "name=http gid=8888 system=yes state=present"
 ansible node02 -m group -a "name=news state=absent"
 ```
 
+[回到模块列表](#常用模块)
+
 ## hostname
 ```
 # ansible 172.16.1.8 -m hostname -a "name=web01"
 ```
 
+[回到模块列表](#常用模块)
+
 ## selinux
+
+| 参数 | 参数说明 |
+|------|--------|
+state | 永久开启，临时开启（默认，禁用）。enforcing、permissive、disabled |
+
 ```
 # ansible 172.16.1.8 -m selinux -a "state=disabled"
 ```
 
+[回到模块列表](#常用模块)
+
 ## firewalld
+
+| 参数 | 参数说明 |
+|------|--------|
+| service | 指定开放或关闭的服务名称（http https） |
+| port | 指定开放或关闭的端口（-） |
+| permanent | 是否添加永久生效(permanent=no即为临时生效) |
+| immediate | 临时生效 |
+| state | 永久开启或者永久关闭enabled、disabled |
+| zone | 指定配置某个区域 |
+| rich_rule | 配置辅规则 |
+| masquerade | 开启地址伪装 |
+| source | 指定来源IP |
 
 1、启动防火墙
 ```
@@ -315,6 +349,51 @@ ansible node02 -m firewalld -a "zone=public service=https permanent=yes state=en
 # ansible node02 -m firewalld -a "zone=public port=8080-8090/tcp permanent=yes immediate=yes state=enabled"
 ```
 
+[回到模块列表](#常用模块)
+
+## systemd
+
+1、systemd模块常用参数说明
+
+| 参数 | 参数说明 |
+|------|--------|
+| state | 服务状态started、stopped、restarted、reloaded |
+| name | 指定服务名称 |
+| enabled | 设置开机自启yes、no |
+| daemon_reload | 读取配置文件，每次修改了文件，最好都运行一次，确保应用了（systemd） |
+| masked | 是否将服务设置为masked状态，被mask的服务是无法启动的(systemd),（yes|no）默认为no |
+
+
+2、远程停止服务
+```
+# ansible 'web_group' -m systemd -a 'name=nginx state=stopped '
+```
+
+3、远程启动服务（并设置开机自启动）
+```
+# ansible 'web_group' -m systemd -a 'name=nginx state=started enabled=yes '
+```
+
+4、设置masked
+```
+# 先将服务停止
+# ansible web -m systemd -a "name=httpd state=stopped"
+
+#设置masked
+# ansible web -m systemd -a "name=httpd masked=yes"
+
+# 服务已无法启动
+# ansible web -m systemd -a "name=httpd state=started"
+
+# 撤销mask
+# ansible web -m systemd -a "name=httpd masked=no"
+
+# 可以启动成功
+# ansible web -m systemd -a "name=httpd state=started"
+```
+
+[回到模块列表](#常用模块)
+
 ## service
 
 1、service模块常用参数说明
@@ -324,6 +403,10 @@ ansible node02 -m firewalld -a "zone=public service=https permanent=yes state=en
 | name | 服务的名称 |
 | state | 服务状态信息为过去时stared/stoped/restarted/reloaded |
 | enabled | 设置开机自启动yes、no |
+| sleep | 如果执行了restarted，在则stop和start之间沉睡几秒钟 |
+| runlevel | 运行级别 |
+| arguments | 给命令行提供一些选项 |
+| pattern | 定义一个模式，如果通过status指令来查看服务的状态时，没有响应，就会通过ps指令在进程中根据该模式进行查找，如果匹配到，则认为该服务依然在运行 |
 
 2、启动Httpd服务
 ```
@@ -349,6 +432,8 @@ ansible web -m service -a "name=httpd state=stopped"
 ```
 ansible web -m service -a "name=httpd state=started enabled=yes"  
 ```
+
+[回到模块列表](#常用模块)
 
 ## yum
 
@@ -387,6 +472,8 @@ ansible web -m yum -a "name=* state=latest exclude=kernel*,foo*"
 ```
 ansible web -m yum -a "name=httpd state=absent"
 ```
+
+[回到模块列表](#常用模块)
 
 ## yum_repository
 
@@ -427,6 +514,8 @@ ansible web -m yum_repository -a 'name=local baseurl=file:///media description="
 ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
 ```
 
+[回到模块列表](#常用模块)
+
 ## get_url
 ```
 # ansible 172.16.1.8 -m get_url -a "url=http://lan.znix.top/RDPWrap-v1.6.1.zip dest=/tmp/"
@@ -435,6 +524,8 @@ ansible web -m yum_repository -a 'file=alibaba name=aliEpel state=absent'
 - timeout 超时时间
 - url_password   密码
 - url_username  用户名
+
+[回到模块列表](#常用模块)
 
 ## copy
 
@@ -479,6 +570,8 @@ ansible clsn -m copy -a "src=./httpd.conf dest=/etc/httpd/conf/httpd.conf owner=
 ```
 ansible node02 -m copy -a "src=/etc/pam.d/ dest=/tmp/"
 ```
+
+[回到模块列表](#常用模块)
 
 ## file
 
@@ -534,6 +627,8 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 ```
 - 注意：重命名和创建多级目录不能同时实现
 
+[回到模块列表](#常用模块)
+
 ## fetch
 
 1、fetch常用参数说明
@@ -555,6 +650,8 @@ ansible clsn -m file -a "path=/var/www/html/ owner=apache group=apache recurse=y
 ```
 # ansible clsn -m fetch -a "dest=/tmp/backup/ src=/etc/hosts flat=yes"
 ```
+
+[回到模块列表](#常用模块)
 
 ## lineinfile
 
@@ -605,12 +702,7 @@ ansible node01 -m lineinfile -a 'path=/testdir/test regexp="^lineinfile" state=a
 ansible node01 -m lineinfile -a 'path=/testdir/test regexp="(H.{4}).*(H.{4})" line="\2" backrefs=yes'
 ```
 
-
-
-
-
-
-
+[回到模块列表](#常用模块)
 
 ## replace
 
@@ -624,7 +716,6 @@ ansible node01 -m lineinfile -a 'path=/testdir/test regexp="(H.{4}).*(H.{4})" li
 | regexp |  必须参数，指定一个python正则表达式，文件中与正则匹配的字符串将会被替换 |
 | replace | 指定最终要替换成的字符串 |
 | backup | 是否在修改文件之前对文件进行备份，最好设置为yes |
-
 
 2、把文件中的所有ASM替换成asm
 ```
@@ -640,6 +731,8 @@ ansible node02 -m replace -a 'path=/testdir/test regexp="ASM" replace=asm backup
 ```
 ansible node01 -m replace -a 'path=/etc/sysconfig/selinux regexp="^SELINUX=.*" replace="SELINUX=disabled"'
 ```
+
+[回到模块列表](#常用模块)
 
 ## blockinfile
 
@@ -727,6 +820,8 @@ ansible node01 -m blockinfile -a 'path=/etc/rc.local marker="#{mark} test" state
 ansible node01 -m blockinfile -a 'path=/etc/test block="test" marker="#{mark} test" create=yes'
 ```
 
+[回到模块列表](#常用模块)
+
 ## mount
 
 1、mount模块常用参数
@@ -770,17 +865,19 @@ ansible node01 -m blockinfile -a 'path=/etc/test block="test" marker="#{mark} te
 # ansible webservers -m mount -a "src=172.16.1.61:/ops path=/opt fstype=nfs opts=defaults state=absent"
 ```
 
+[回到模块列表](#常用模块)
+
 ## cron
 
 1、cron模块常用参数
 
 | 参数 | 参数说明 |
 |------|---------|
-| minute 分 | Minute when the job should run ( 0-59, *, */2, etc ) |
-| hour 时 | Hour when the job should run ( 0-23, *, */2, etc ) |
-| day 日 | Day of the month the job should run ( 1-31, *, */2, etc ) |
-| month 月 | Month of the year the job should run ( 1-12, *, */2, etc ) |
-| weekday 周 | Day of the week that the job should run ( 0-6 for Sunday-Saturday, *, etc ) |
+| minute 分 | Minute when the job should run `( 0-59, *, */2, etc )` |
+| hour 时 | Hour when the job should run `( 0-23, *, */2, etc )` |
+| day 日 | Day of the month the job should run `( 1-31, *, */2, etc )` |
+| month 月 | Month of the year the job should run `( 1-12, *, */2, etc )` |
+| weekday 周 | Day of the week that the job should run `( 0-6 for Sunday-Saturday, *, etc )` |
 | job | 工作 ;要做的事情 |
 | name | 定义定时任务的描述信息 |
 | disabled | 注释定时任务 |
@@ -811,6 +908,8 @@ ansible node01 -m blockinfile -a 'path=/etc/test block="test" marker="#{mark} te
 ```
 # ansible clsn -m cron -a "name=clsn01 job='/bin/sh  /server/scripts/hostname.sh &>/dev/null'  disabled=no"
 ```
+
+[回到模块列表](#常用模块)
 
 ## find
 
@@ -891,6 +990,8 @@ ansible test70 -m find -a "paths=/testdir size=2g recurse=yes"
 ansible test70 -m find -a "paths=/testdir patterns=*.sh get_checksum=yes  hidden=yes recurse=yes"
 ```
 
+[回到模块列表](#常用模块)
+
 ## template
 
 1、template模块常用参数说明
@@ -931,6 +1032,75 @@ bind {{ ansible_enp0s3.ipv4.address }}
 # 3、运行后查看配置文件是否更换
 # cat /etc/redis.conf |grep ^bind
 bind 192.168.1.70
+```
+
+[回到模块列表](#常用模块)
+
+## stat
+- stat模块获取远程文件状态信息，包括atime、ctime、mtime、md5、uid、gid等，和linux的stat命令类似。
+
+1、显示文件的所有信息
+```
+# ansible web -m stat -a "path=/etc/sysctl.conf"
+```
+
+2、显示MD5值
+```
+# ansible web -m stat -a "path=/etc/sysctl.conf get_md5=yes"
+```
+
+[回到模块列表](#常用模块)
+
+## synchronize
+
+功能：基于rsync命令工具同步目录和文件
+
+由于synchronize模块会调用rsync命令，因此首先要记得提前安装好rsync软件包
+
+| 参数 | 描述 |
+|------|------|
+| archive | 归档，相当于同时开启recursive(递归)、links、perms、times、owner、group、-D选项都为yes ，默认该项为开启（#保证源文件和目标文件属性一致） |
+| checksum: | 是否检测sum值，默认关闭 |
+| compress | 是否开启压缩（默认开启） |
+| copy_links | 同步的时候是否复制链接，默认为no ，注意后面还有一个links参数 |
+| links | 同步链接文件 |
+| delete | 删除不存在的文件，delete=yes 使两边的内容一样（即以推送方为主），默认no |
+| dest | 目录路径（绝对路径或者相对路径） |
+| dest_port | 目标主机上的端口 ，默认是22，走的ssh协议 |
+| dirs | 传送目录不进行递归，默认为no，即进行目录递归（#一般不用指定）rsync_opts：通过传递数组来指定其他rsync选项。	`#--exclude=*.txt`#排除 |
+| set_remote_user | 主要用于ansible默认使用的用户与rsync使用的'用户不同的情况 |
+| mode | push(默认)或pull 模块，push模的话，'一般用于从本机向远程主机上传文件，pull 模式用于从远程主机上取文件' |
+| src | 要同步到目的地的源主机上的路径; 路径可以是绝对的或相对的。如果路径使用”/”来结尾，则只复制目录里的内容，如果没有使用”/”来结尾，则包含目录在内的整个内容全部复制  |
+
+1、同步目录（前提是远程服务器上有rsync这个命令）
+```
+ansible 172.25.70.2 -m synchronize -a 'src=some/relative/path dest=/some/absolute/path rsync_path="sudo rsync"'
+```
+
+2、排除(#由于这个是rsync命令的参数，所以必须和rsync_opts一起使用)
+```
+ansible 172.25.70.2 -m synchronize -a 'src=/tmp/helloworld dest=/var/www/helloword rsync_opts=--exclude=.log'
+```
+
+[回到模块列表](#常用模块)
+
+## unarchive
+- 解压缩
+
+| 参数 | 描述 |
+|------|------|
+| copy | 默认为yes，当copy=yes，那么拷贝的文件是从ansible主机复制到远程主机上的，如果设置为copy=no，那么会在远程主机上寻找src源文件 |
+| src | 源路径，可以是ansible主机上的路径，也可以是远程主机上的路径，如果是远程主机上的路径，则需要设置copy=no |
+| dest | 远程主机上的目标路径 |
+
+1、解压ansible管理机上的压缩文件到远程主机
+```
+ansible all -m unarchive -a "src=/tmp/install/zabbix-3.0.4.tar.gz dest=/tmp/ mode=0755 copy=yes"
+```
+
+2、解压远程主机上的文件到目录
+```
+ansible all -m unarchive -a "src=/tmp/install/zabbix-3.0.4.tar.gz dest=/tmp/ mode=0755 copy=no"
 ```
 
 [回到模块列表](#常用模块)
