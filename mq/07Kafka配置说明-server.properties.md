@@ -515,6 +515,6 @@ batch.num.messages=200
 ```
 
 参考：
-http://www.cnblogs.com/rilley/p/5391268.html
-http://blog.csdn.net/hanjibing1990/article/details/50070815
-http://www.cnblogs.com/liangyours/p/4971656.html
+- http://www.cnblogs.com/rilley/p/5391268.html
+- http://blog.csdn.net/hanjibing1990/article/details/50070815
+- http://www.cnblogs.com/liangyours/p/4971656.html
