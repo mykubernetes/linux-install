@@ -314,7 +314,7 @@ bin/kafka-topics.sh --create \
 --replication-factor 3 \
 --partitons 3 \
 --config retention.ms=86400000 \        # topic过期时间，86400000 为一天，单位是毫秒
---config retention.bytes=1073741824 \   #topic过期时间，86400000 为一天，单位是毫秒
+--config retention.bytes=1073741824 \   # topic过期时间，86400000 为一天，单位是毫秒
 --if-not-exists
 ```
 
