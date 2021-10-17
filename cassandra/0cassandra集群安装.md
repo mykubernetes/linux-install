@@ -74,6 +74,37 @@ mv /opt/apache-cassandra-3.11.3    /opt/cassandra
 chown -R cassandra.cassandra /opt/cassandra
 ```
 
+| 目录 | 描述 |
+|-----|------|
+| bin | 这个目录下包含了启动 Cassandra 以及客户端相关操作的可执行文件，包括 query language shell（cqlsh）以及命令行界面（CLI）等客户端。同时还包含运行 nodetool 的相关脚本，操作 SSTables 的工具等等。 |
+| conf | 这个目录下面包含了 Cassandra 的配置文件。必须包含的配置文件包括：assandra.yaml 以及 logback.xml，这两个文件分别是运行 Cassandra 必须包含的配置文件以及日志相关配置文件。同时还包含 Cassandra 网络拓扑配置文件等。 |
+| doc | 这个目录包含 CQL 相关的 html 文档。 |
+| interface | 这个文件夹下面只包含一个名为 cassandra.thrift 的文件。这个文件定义了基于 Thrift 语法的 RPC API，这个 Thrift 主要用于在 Java, C++, PHP, Ruby, Python, Perl, 以及 C# 等语言中创建相关客户端，但是在 CQL 出现之后，Thrift API 在 Cassandra 3.2 版本开始标记为 deprecated，并且会在 Cassandra 4.0 版本删除。 |
+| javadoc | 这个文件夹包含使用 JavaDoc 工具生成的 html 文档。 |
+| lib | 这个目录包含 Cassandra 运行时需要的所有外部库。 |
+| pylib | 这个目录包含 cqlsh 运行时需要使用的 Python 库。 |
+| tools | 这个目录包含用于维护 Cassandra 节点的相关工具。 |
+| NEWS.txt | 这个文件包含当前及之前版本的 release notes 相关信息。 |
+| CHANGES.txt | 这个文件主要包含一些 bug fixes 信息。 |
+
+```
+# ll
+total 528
+drwxr-xr-x 2 iteblog iteblog   4096 Apr  2 21:12 bin
+-rw-r--r-- 1 iteblog iteblog   4832 Feb  3 06:09 CASSANDRA-14092.txt
+-rw-r--r-- 1 iteblog iteblog 366951 Feb  3 06:09 CHANGES.txt
+drwxr-xr-x 3 iteblog iteblog   4096 Apr  2 21:12 conf
+drwxr-xr-x 4 iteblog iteblog   4096 Apr  2 21:12 doc
+drwxr-xr-x 2 iteblog iteblog   4096 Apr  2 21:12 interface
+drwxr-xr-x 3 iteblog iteblog   4096 Apr  2 21:12 javadoc
+drwxr-xr-x 4 iteblog iteblog   4096 Apr  2 21:12 lib
+-rw-r--r-- 1 iteblog iteblog  11609 Feb  3 06:09 LICENSE.txt
+-rw-r--r-- 1 iteblog iteblog 112586 Feb  3 06:09 NEWS.txt
+-rw-r--r-- 1 iteblog iteblog   2811 Feb  3 06:09 NOTICE.txt
+drwxr-xr-x 3 iteblog iteblog   4096 Apr  2 21:12 pylib
+drwxr-xr-x 4 iteblog iteblog   4096 Apr  2 21:12 tools
+```
+
 七、却换到cassandra用户下
 ```
 su - cassandra
