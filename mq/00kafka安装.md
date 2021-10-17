@@ -455,10 +455,10 @@ Topic:test    PartitionCount:3    ReplicationFactor:3    Configs:
 或者：
 # bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper=node01:2181,node02:2181,node03:2181 --group=WordcountConsumerGroup --topic=test
 再或者：
-# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper=h71:2181 --group=WordcountConsumerGroup
-Group               Topic                          Pid Offset          logSize         Lag             Owner
-test-consumer-group test                           0   4               40              36              none
-test-consumer-group test                           1   14              57              43              none
+# bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper=node01:2181 --group=WordcountConsumerGroup
+Group                  Topic                          Pid Offset          logSize         Lag             Owner
+WordcountConsumerGroup test                           0   4               40              36              none
+WordcountConsumerGroup test                           1   14              57              43              none
 
 # bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper node01:2181,node02:2181,node03:2181 --group=WordcountConsumerGroup
 Group                  Topic                          Pid Offset          logSize         Lag             Owner
