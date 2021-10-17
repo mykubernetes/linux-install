@@ -475,7 +475,7 @@ console-consumer-42639 test                           1   57              57    
 ```
 # bin/kafka-consumer-offset-checker.sh --zookeeper 192.166.240.11:2181 --topic weishiDataOGG  --group cb6e251e-b61b-48df-985e-636a54bf8daf
 [2020-04-06 16:40:14,092] WARN WARNING: ConsumerOffsetChecker is deprecated and will be dropped in releases following 0.9.0. Use ConsumerGroupCommand instead. (kafka.tools.ConsumerOffsetChecker$)
-Group           Topic                          Pid Offset          logSize         Lag             Owner
+Group                                Topic                          Pid Offset          logSize         Lag             Owner
 cb6e251e-b61b-48df-985e-636a54bf8daf weishiDataOGG                  0   42565489        58261852        15696363        none
 
 # bin/kafka-run-class.sh kafka.tools.GetOffsetShell --topic weishiDataOGG --time -1 --broker-list node:9092 --partitions 0
