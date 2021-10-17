@@ -152,7 +152,7 @@ Option                                  Description
 
 # 五、Kafka数据迁移工具
 
-这个工具主要有两个：`kafka.tools.KafkaMigrationTool`和`kafka.tools.MirrorMaker`。第一个主要是用于将Kafka 0.7上面的数据迁移到Kafka 0.8（https://cwiki.apache.org/confluence/display/KAFKA/Migrating+from+0.7+to+0.8）；而后者可以同步两个Kafka集群的数据（https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=27846330）。都是从原端消费Messages，然后发布到目标端。
+这个工具主要有两个：`kafka.tools.KafkaMigrationTool`和`kafka.tools.MirrorMaker`。第一个主要是用于将Kafka 0.7上面的数据迁移到Kafka 0.8（`https://cwiki.apache.org/confluence/display/KAFKA/Migrating+from+0.7+to+0.8`）；而后者可以同步两个Kafka集群的数据（`https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=27846330`）。都是从原端消费Messages，然后发布到目标端。
 
 ```
 # bin/kafka-run-class.sh kafka.tools.KafkaMigrationTool --kafka.07.jar kafka-0.7.19.jar --zkclient.01.jar zkclient-0.2.0.jar --num.producers 16 --consumer.config=sourceCluster2Consumer.config --producer.config=targetClusterProducer.config --whitelist=.*
