@@ -414,33 +414,20 @@ Note: This will have no impact if delete.topic.enable is not set to true.
 
 8、查看topic的分区及副本
 ```
-kafka-topics.sh --zookeeper node001:2181 --describe --topic test
-Topic:test  PartitionCount:20  ReplicationFactor:3  Configs:
-Topic: test  Partition: 0      Leader: 3            Replicas: 3,0,2   Isr: 3,0,2
-Topic: test  Partition: 1      Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
-Topic: test  Partition: 2      Leader: 2            Replicas: 2,3,0   Isr: 2,3,0
-Topic: test  Partition: 3      Leader: 3            Replicas: 3,2,0   Isr: 3,2,0
-Topic: test  Partition: 4      Leader: 0            Replicas: 0,3,2   Isr: 0,3,2
-Topic: test  Partition: 5      Leader: 2            Replicas: 2,0,3   Isr: 2,0,3
-Topic: test  Partition: 6      Leader: 3            Replicas: 3,0,2   Isr: 3,0,2
-Topic: test  Partition: 7      Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
-Topic: test  Partition: 8      Leader: 2            Replicas: 2,3,0   Isr: 2,3,0
-Topic: test  Partition: 9      Leader: 3            Replicas: 3,2,0   Isr: 3,2,0
-Topic: test  Partition: 10     Leader: 0            Replicas: 0,3,2   Isr: 0,3,2
-Topic: test  Partition: 11     Leader: 2            Replicas: 2,0,3   Isr: 2,0,3
-Topic: test  Partition: 12     Leader: 3            Replicas: 3,0,2   Isr: 3,0,2
-Topic: test  Partition: 13     Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
-Topic: test  Partition: 14     Leader: 2            Replicas: 2,3,0   Isr: 2,3,0
-Topic: test  Partition: 15     Leader: 3            Replicas: 3,2,0   Isr: 3,2,0
-Topic: test  Partition: 16     Leader: 0            Replicas: 0,3,2   Isr: 0,3,2
-Topic: test  Partition: 17     Leader: 2            Replicas: 2,0,3   Isr: 2,0,3
-Topic: test  Partition: 18     Leader: 3            Replicas: 3,0,2   Isr: 3,0,2
-Topic: test  Partition: 19     Leader: 0            Replicas: 0,2,3   Isr: 0,2,3
+# ./kafka-topics.sh --describe --zookeeper localhost:2181 --topic test
+Topic:test    PartitionCount:3    ReplicationFactor:3    Configs:
+    Topic: test    Partition: 0    Leader: 0    Replicas: 0,1,2    Isr: 0,2,1
+    Topic: test    Partition: 1    Leader: 1    Replicas: 1,2,0    Isr: 1,2,0
+    Topic: test    Partition: 2    Leader: 2    Replicas: 2,0,1    Isr: 2,0,1
 ```
 - 第一行，列出了topic的名称，分区数(PartitionCount),副本数(ReplicationFactor)以及其他的配置(Configs) 
-- Leader:1 表示为做为读写的broker的编号
-- Replicas:表示该topic的每个分区在那些borker中保存
-- Isr:表示当前有效的broker, Isr是Replicas的子集
+- Leader: 是在给出的所有partitons中负责读写的节点，每个节点都有可能成为leader。
+- Replicas: 显示给定partiton所有副本所存储节点的节点列表，不管该节点是否是leader或者是否存活。
+- Isr: 副本都已同步的的节点集合，这个集合中的所有节点都是存活状态，并且跟leader同步。
+
+解释：
+
+测试Kafka集群一共三个节点，test这个Topic, 编号为0的Partition,Leader在broker.id=0这个节点上，副本在broker.id为0 1 2这个三个几点，并且所有副本都存活，并跟broker.id=0这个节点同步
 
 9、查看topic消费到的offset
 ```
