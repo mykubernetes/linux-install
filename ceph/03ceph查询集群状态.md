@@ -224,6 +224,14 @@ Ceph可以声明osd或PG已丢失，这也就意味着数据丢失。
 
 需要说明的是，osd的运行离不开journal，如果journal丢失，则osd停止
 
+查看pg中stuck的状态
+```
+# ceph pg dump_stuck unclean
+# ceph pg dump_stuck inactive
+# ceph pg dump_stuck stale
+```
+
+
 ## 3、管理stuck状态的PG
 ```
 # 检查处于stuck状态的pg
