@@ -18,7 +18,7 @@ https://blog.csdn.net/qq_42883074/category_10860341.html
 | Prometheus 非官方中文手册 | https://github.com/1046102779/prometheus | |
 
 
-
+https://www.cuiliangblog.cn/detail/article/30
 
 
 Metric类型
