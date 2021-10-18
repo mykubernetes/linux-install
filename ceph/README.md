@@ -128,3 +128,7 @@ BlueStore通过直接管理物理HDD或SSD而不使用诸如XFS的中间文件�
   * ceph-mgr还包括一个Prometheus插件。
   * ceph-mgr现在有一个Zabbix插件。使用zabbix_sender，它可以将集群故障事件发送到Zabbix Server主机。这样可以方便地监视Ceph群集的状态，并在发生故障时发送通知。
 
+
+https://www.jianshu.com/p/9d740d025034
+
+https://www.cnblogs.com/kevingrace/p/5569737.html
