@@ -230,6 +230,10 @@ Ceph可以声明osd或PG已丢失，这也就意味着数据丢失。
 # ceph pg dump_stuck inactive
 # ceph pg dump_stuck stale
 ```
+- Inactive （不活跃）归置组不能处理读写，因为它们在等待一个有最新数据的 OSD 复活且进入集群。
+- Unclean （不干净）归置组含有复制数未达到期望数量的对象，它们应该在恢复中。
+- Stale （不新鲜）归置组处于未知状态：存储它们的 OSD 有段时间没向监视器报告了（由 mon_osd_report_timeout 配置）。
+- 可用格式有 plain （默认）和 json 。阀值定义的是，归置组被认为卡住前等待的最小时间（默认 300 秒）
 
 
 ## 3、管理stuck状态的PG
@@ -268,10 +272,23 @@ ceph osd lost osdid --yes-i-really-mean-it
 ```
 
 ```
+#查看PG状态
 # ceph pg stat
 # ceph pg dump -f json-pretty
-# ceph pg <pg_id> query            # 查询特定pg的详细信息
+
+查询一个pg的详细信息
+# ceph pg <pg_id> query
 ```  
+
+```
+# 查看一个PG的map
+# ceph pg map 0.3f
+osdmap e88 pg 0.3f (0.3f) -> up [0,2] acting [0,2]   #其中的[0,2]代表存储在osd.0、osd.2节点，osd.0代表主副本的存储位置
+
+# 显示一个集群中的所有的pg统计
+# ceph pg dump --format plain
+
+```
 
 # pool管理
 
