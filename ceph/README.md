@@ -10,7 +10,7 @@
 | 如何计算 Ceph 读写性能 | https://blog.ucloud.cn/archives/3434?tdsourcetag=s_pcqq_aiomsg |
 | 博客 | https://blog.csdn.net/weixin_43719988 |
 | 博客 | https://www.cnblogs.com/zyxnhr/tag/Ceph/ |
-
+| pglog | https://blog.51cto.com/wendashuai/2493295 |
 
 # ceph最小硬件要求
 
