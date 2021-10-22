@@ -26,9 +26,9 @@ yum install cassandra -y
 cluster_name: 'pte-test'
 num_tokens: 256
 seed_provider:
-- class_name: org.apache.cassandra.locator.SimpleSeedProvider
-parameters:
-- seeds: "172.16.2.693"
+  - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+    parameters:
+    - seeds: "172.16.2.693"
 #listen_address: 172.16.2.693             #由于镜像启动不确定ip地址是什么，因此使用网卡
 
 listen_interface: eth0
