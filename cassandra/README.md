@@ -62,7 +62,104 @@ nodetool常用命令
 
 https://cloud.tencent.com/developer/article/1772888?from=information.detail.Nodetool
 
-http://www.mamicode.com/info-detail-2723557.html
+| 命令参数 | 描述|
+|---------|-----|
+| assassinate | 强制的将某个节点remove掉，但是不会把节点上的数据进行摆放到移除节点后的新环的数据节点上 |
+| bootstrap |  |
+| cleanup | 会触发马上的清理操作，清理的目标主要是不属于这个节点的数据 |
+| clearsnapshot | 清楚本机上的snapshot，如果没有提供keyspace等信息，就清理本机全部的snapshot |
+| compact | 触发major compaction |
+| compactionhistory | 打印compaction的历史 |
+| compactionstats | 打印compaction的状态 |
+| decommission | decommission连接的node, 把节点从环中移除 |
+| describecluster |打印cluster的信息，包括clustername， snitch信息，partitionr信息，schema信息等 |
+| describering | 给出一个keyspace以及对应的token环信息 |
+| disableautocompaction | 关闭minor compaction |
+| disablebackup | 关闭备份 |
+| disablebinary | disable native transport(默认的9042端口服务) |
+| disablegossip | 关闭gossip |
+| disablehandoff | 关闭hinthandoff |
+| disablehintsfordc | 关闭为某dc的hint |
+| disablethrift |关闭thrift服务，默认(9160端口) |
+| drain | drain 掉node，暂停很多操作，比如数据节点的写，counter，view写等操作，flush 表以及disable minor compaction |
+| enableautocompaction | 开启minor compaction |
+| enablebackup | 开启自动incremental backup |
+| enablebinary | 开启native transport |
+| enablegossip | 开启gossip |
+| enablehandoff | 开启hinthandoff |
+| enablehintsfordc | 开启for dc的hint handoff |
+| enablethrift | 开启thrift |
+| failuredetector | 集群的failure 探测的信息 |
+| flush | 强制执行flush操作 |
+| garbagecollect | 清除表中删除的数据 |
+| gcstats | 打印gc信息 |
+| getcompactionthreshold | 获取compact的阈值 |
+| getcompactionthroughput | 获取compact吞吐 |
+| getconcurrentcompactors | 获取系统中的并发compact的数目 |
+| getendpoints | 获取拥有partition key（hash计算前）的节点 |
+| getinterdcstreamthroughput | 集群内部dc stream阈值 |
+| getlogginglevels | log的level |
+| getsstables | 打印key属于的sstable |
+| getstreamthroughput | 系统内部stream阈值 |
+| gettimeout | 超时时间 |
+| gettraceprobability | trace的可能值 |
+| gossipinfo | gossip的信息 |
+| help | 帮助 |
+| info | 集群的信息 |
+| invalidatecountercache | 让counter cache无效 |
+| invalidatekeycache | 让keycache无效 |
+| invalidaterowcache | 让rowcache无效 |
+| join | join 环 |
+| listsnapshots | 列出snapshot |
+| move | 把这个token对应的节点换成别的token相应会移动数据 |
+| netstats | 打印网络信息 |
+| pausehandoff | 暂停hint的传递进程 |
+| proxyhistograms | 打印网络直方图 |
+| rangekeysample | 所有keyspace的抽样key信息 |
+| rebuild | 从别的节点托数据 |
+| rebuild_index | rebuild 本地二级索引 |
+| refresh | 无需重启，直接把本地的sstable进行加载 |
+| refreshsizeestimates | 重建system.size_estimates表，主要是对应节点多少数据 |
+| reloadlocalschema | 从本地重新load schema表 |
+| reloadtriggers | reload trigger 类 |
+| relocatesstables | 搬迁sstable |
+| removenode | 展示当前remove node的状态;force完成阻塞的remove操作；remove 提供的token |
+| repair | 执行副本间数据修复的repair操作 |
+| replaybatchlog | 开始batch log replay以及等待完成 |
+| resetlocalschema | 重置本地的schema |
+| resumehandoff | 恢复hinthandof的传递程序 |
+| ring | 打印集群的ring信息 |
+| scrub | 清理本节点无效的数据 |
+| setcachecapacity | 设置cache的容量 |
+| setcachekeystosave | 设置每个cache的保留容量 |
+| setcompactionthreshold |这只compaction阈值 |
+| setcompactionthroughput | 设置compaction吞吐 |
+| setconcurrentcompactors | 设置compact的并发数 |
+| sethintedhandoffthrottlekb | 设置hint的阈值 |
+| setinterdcstreamthroughput | 设置dc stream的吞吐 |
+| setlogginglevel |设置log的level |
+| setstreamthroughput | 设置stream的阈值 |
+| settimeout | 设置超时 |
+| settraceprobability | 设置执行trace的概率值 |
+| snapshot | 打快照 |
+| status | 集群的状态 |
+| statusbackup | 备份的状态 |
+| statusbinary | native transport的状态 |
+| statusgossip | gossip的状态 |
+| statushandoff | hinthandoff的状态 |
+| statusthrift  | thrift的状态 |
+| stop | 停止compaction |
+| stopdaemon | 停止cassandra deamon |
+| tablehistograms | 表直方图 |
+| tablestats | 表状态 |
+| toppartitions | 抽样并给出某个表的活跃partition |
+| tpstats |打出thread pool的状态 |
+| truncatehints | 给出节点的所有hint 放弃掉 |
+| upgradesstables | 对应的表的sstable执行upgrade(实际上就是读出来，写入新sstable) |
+| verify|验证表的数据checksum |
+| version | cassandra version |
+| viewbuildstatus | viewbuild的状态 |
+
 
 1、列出nodetool所有可用的命令
 ```
