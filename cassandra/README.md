@@ -357,47 +357,112 @@ nodetool compactionstats
 pending tasks: 0
 ```
 
-14、刷新输出
+14、显示集群的gossip信息，下面显示的是一个三节点的集群中，各个节点相关的gossip信息输出：
+```
+nodetool gossipinfo
+/192.168.0.250
+  generation:1578559963
+  heartbeat:289
+  STATUS:18:NORMAL,-1000610182680759021
+  LOAD:273:111238.0
+  SCHEMA:20:ea63e099-37c5-3d7b-9ace-32f4c833653d
+  DC:6:datacenter1
+  RACK:8:rack1
+  RELEASE_VERSION:4:3.11.4
+  RPC_ADDRESS:3:127.0.0.1
+  NET_VERSION:1:11
+  HOST_ID:2:012ed1eb-0dac-4562-9812-415a7b58e6d6
+  RPC_READY:32:true
+  TOKENS:17:<hidden>
+/192.168.0.245
+  generation:1578560055
+  heartbeat:196
+  STATUS:58:NORMAL,-112189776392027338
+  LOAD:153:115665.0
+  SCHEMA:20:ea63e099-37c5-3d7b-9ace-32f4c833653d
+  DC:6:datacenter1
+  RACK:8:rack1
+  RELEASE_VERSION:4:3.11.4
+  RPC_ADDRESS:3:127.0.0.1
+  NET_VERSION:1:11
+  HOST_ID:2:0dbd4aca-7dd4-4833-b3db-c7d9dda0aef9
+  RPC_READY:68:true
+  TOKENS:57:<hidden>
+/192.168.0.246
+  generation:1578559991
+  heartbeat:260
+  STATUS:56:NORMAL,-1045048566066926798
+  LOAD:213:91038.0
+  SCHEMA:18:ea63e099-37c5-3d7b-9ace-32f4c833653d
+  DC:6:datacenter1
+  RACK:8:rack1
+  RELEASE_VERSION:4:3.11.4
+  RPC_ADDRESS:3:127.0.0.1
+  NET_VERSION:1:11
+  HOST_ID:2:3ca695aa-edd2-435c-b9ee-89e143648351
+  RPC_READY:66:true
+  TOKENS:55:<hidden>
+```
+上述信息表示了集群种三个节点对应的相关gossip信息，就第一个节点解释下相关的信息意义:
+- 第一行的ip 192.168.0.250表示的是对应节点进行gossip交互ip信息；
+- generation 表示的每个节点的相关的generation信息，节点的generation是交互信息的一部分，最初是当前时间的秒数（从1970年UTC时间开始到现在）;
+- heartbeat 表示在当前这个generation下面执行了多少次gossip交互，默认的情况下，每隔1s会主动进行一次gossip交互任务，这里看来是经过289秒；
+- 余下都是集群的状态相关的信息：在Cassandra里面都是applicationstate里的VersionedValue，可以参考下面这个图：
+
+我们可以看到的是接下来的模块都是string0:number0:string1,其中string0 的格式就是STATUS、LOAD、SCHEMA等等这些需要的状态字符串，number0是这些状态每个一次变更就加1的version版本号，我们主要介绍是string1的具体意义；但是不是说string0 和number0 不重要。
+- STATUS：表示的是对应的ip节点的状态，有9种状态（3.11.4版本代码），BOOT、BOOT_REPLACE、NORMAL、shutdown、removing、removed、LEAVING、LEFT、MOVING;
+- LOAD: 表示对应节点的节点的磁盘存储容量，单位是byte；
+- SCHEMA: 对应节点上面schema keyspace下面的所有table 按照顺序计算出来的一个md5值转换为的一个UUID；
+- DC: 对应节从属的datacenter；
+- RACK:对应节点从属的rack；
+- RELEASE_VERSION:节点机器的release 软件包的版本号；
+- RPC_ADDRESS: RPC的地址
+- NET_VERSION:这里主要是我们的网络版本号，如果是force使用3.0 的协议版本就是10，否则是11；
+- HOST_ID:节点的hostid，基于对应节点的ip等计算
+- RPC_READY: 如果9042的端口或者9142（ssl）的rpc端口已经准备初始化完成，可以接收响应就是true；
+- TOKENS:本来是对应节点负责的tokens，但是在这里显示的时候是hindden表示。
+
+15、刷新输出
 ```
 nodetool -u cassandra -pw cassandra flush
 ```
 
-15、清理节点上的旧数据，集群扩容后立即清理多余数据，扩容后新节点承担了原理的数据所以旧节点上的数据以及不归该节点管辖
+16、清理节点上的旧数据，集群扩容后立即清理多余数据，扩容后新节点承担了原理的数据所以旧节点上的数据以及不归该节点管辖
 ```
 nodetool -u cassandra -pw cassandra cleanup
 ```
 
-16、修复当前集群的一致性，全量修复，修改大量数据时，失败的概率很大，3.x版本的BUG
+17、修复当前集群的一致性，全量修复，修改大量数据时，失败的概率很大，3.x版本的BUG
 ```
 nodetool -u cassandra -pw cassandra repair --full --trace
 ```
 
-17、扩容时候可能会使⽤用write survey模式启动节点。之后再用该命令将write survey模式下节点加入集群。
+18、扩容时候可能会使⽤用write survey模式启动节点。之后再用该命令将write survey模式下节点加入集群。
 ```
 nodetool join
 ```
 
-18、单节点修复
+19、单节点修复
 ```
 nodetool -u cassandra -pw cassandra repair -pr
 ```
 
-19、重建索引
+20、重建索引
 ```
 nodetool -u cassandra -pw cassandra rebuild_index
 ```
 
-20、移动节点到指定的token,只能用在单个token的节点上，通俗讲就是换一个区间给该节点管理，会移动数据，一般是根据业务，自己设计了分区策略，自己计算token的时候可能会用到，默认每个节点随机256个token出来，用不到这个命令
+21、移动节点到指定的token,只能用在单个token的节点上，通俗讲就是换一个区间给该节点管理，会移动数据，一般是根据业务，自己设计了分区策略，自己计算token的时候可能会用到，默认每个节点随机256个token出来，用不到这个命令
 ```
 nodetool -u cassandra -pw cassandra move <new token>
 ```
 
-21、resetlocalschema 解决节点表Schema不一致问题
+22、resetlocalschema 解决节点表Schema不一致问题
 ```
 nodetool resetlocalschema
 ```
 
-22、重启节点上cassandra
+23、重启节点上cassandra
 ```
 nodetool -u cassandra -pw cassandra disablegossip       #禁用gossip通讯，该节点停止与其他节点的gossip通讯，忽略从其他节点发来的请求
 nodetool -u cassandra -pw cassandra disablebinary       #禁止本地传输（二进制协议）binary CQL protocol
@@ -408,13 +473,13 @@ nodetool -u cassandra -pw cassandra stopdaemon          #停止cassandra进程�
 nodetool -u cassandra -pw cassandra status -r           #查看集群所有节点状态
 ```
 
-23、日志相关操作
+24、日志相关操作
 ```
 nodetool -u cassandra -pw cassandra getlogginglevels               #查看日志级别
 nodetool -u cassandra -pw cassandra setlogginglevel ROOT DEBUG     #设置日志级别为DEBUG
 ```
 
-24、压缩相关操作
+25、压缩相关操作
 ```
 #1、手动触发Major Compaction,用以优化读性能和清理被删除的数据释放空间。
 nodetool -u cassandra -pw cassandra compact --user-defined mc-103-big-Date.db
@@ -448,7 +513,7 @@ nodetool -u cassandra -pw cassandra setstreamthroughput 200           #设置str
 nodetool getstreamthroughput
 ```
 
-25、移除节点
+26、移除节点
 ```
 # 需要在删除的机器上执行，缩容数据会迁移到其他节点，执行后命令会一直开着，节点处于LEAVING状态，直到结束。可以提前中断因为实际过程server端异步执行
 nodetool -u cassandra -pw cassandra decommission                                         #退服节点
@@ -459,7 +524,7 @@ nodetool -u cassandra -pw cassandra removenode 88e16e35-50dd-4ee3-aa1a-f10a8c61a
 nodetool -u cassandra -pw cassandra assassinate node_ip                                  #强制删除节点
 ```
 
-26、快照备份
+27、快照备份
 ```
 #创建快照
 nodetool -u cassandra -pw cassandra snapshot
