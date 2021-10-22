@@ -38,7 +38,7 @@ rpc_interface: eth0
 endpoint_snitch: SimpleSnitch
 
 data_file_directories:
-- /data/cassandra/data                    #由于添加了ssd硬盘，因此指定一个数据目录
+    - /data/cassandra/data                    #由于添加了ssd硬盘，因此指定一个数据目录
 ```
 
 4、启动cassandra
