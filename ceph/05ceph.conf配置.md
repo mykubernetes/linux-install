@@ -373,3 +373,211 @@ osd_scrub_end_hour = 7                                      #清洗结束时间�
 osd_recovery_sleep = 0                                      #默认为0，recovery的时间间隔，会影响recovery时常，如果recovery导致业务不正常，可以调大该值，增加时间间隔
 osd_crush_update_on_start = false                           #新加的osd会up/in,但并不会更新crushmap，prepare+active期间不会导致数据迁移
 ```
+
+
+```
+[global]
+
+    auth_cluster_required = cephx
+    auth_service_required = cephx
+    auth_client_required = cephx
+
+    osd_pool_default_size = 2
+    osd_pool_default_min_size = 2
+
+    filestore_omap_backend = rocksdb
+    filestore_rocksdb_options="compact_on_mount=true,max_background_compactions=8,compaction_readahead_size=2097152,compression=kNoCompression"
+    filestore_op_thread_suicide_timeout=600
+    filestore_op_thread_timeout=180
+    osd_op_num_threads_per_shard=4
+    osd_op_num_shards=6
+    osd_op_num_shards_ssd = 8
+    osd_op_num_threads_per_shard_ssd = 4
+
+    filestore_op_threads=2
+    journal_max_write_entries=1024
+    filestore_queue_max_bytes=536870912
+    # According to RGW test on TSH10, this value along with dir split
+    # results in remarkable performance improvement and Will from TEG
+    # also recommends this value
+    filestore_queue_max_ops=5000
+    filestore_fd_cache_size=256
+
+    bluestore_cache_size = 536870912
+    bluestore_cache_kv_ratio = 0.5
+
+    mon_keyvaluedb = rocksdb
+    mon_rocksdb_options = write_buffer_size=33554432,compression=kNoCompression
+    mon_clock_drift_allowed = 0.5
+    mon_pg_warn_max_object_skew=0
+    mon_osd_down_out_interval=1800
+    mon_osd_down_out_subtree_limit=room
+    mon_max_pg_per_osd=800
+    mon_allow_pool_delete = true
+    mon_compact_on_start = true
+
+    osd_mkfs_type = xfs
+    osd_mount_options_xfs = rw,noatime,inode64,logbsize=256k
+    osd_crush_update_on_start = false
+
+    osd_op_thread_suicide_timeout=300
+    osd_op_thread_timeout=120
+
+    osd_recovery_restrained_begin_hour = 0
+    osd_recovery_restrained_end_hour = 0
+    osd_max_backfills = 1
+    osd_recovery_max_active = 1
+    osd_recovery_sleep = 0
+    
+    # Smaller scan result in more loops of scan but less time for each loop
+    # Thus less time for each loop to lock the PG
+    osd_backfill_scan_min = 4
+    osd_backfill_scan_max = 16
+
+    # Disable merge
+    # HashIndex::must_merge()
+    filestore_merge_threshold = -128
+    # Split when objs under a folder is larger than 128 * 2 * 16 = 4096
+    # HashIndex::must_split()
+    filestore_split_multiple = 2
+
+    rgw_thread_pool_size = 600
+    rgw_multipart_min_part_size = 1048576
+    rgw_override_bucket_index_max_shards = 128
+    rgw_bucket_index_max_aio = 32
+    rgw_gc_max_objs = 1024
+    rgw_op_thread_timeout = 60
+    rgw_obj_stripe_size = 8388608
+    rgw_max_chunk_size = 1048576
+    rgw_content_length_compat = true
+    # rgw_max_put_size = 11811160064
+    rgw_crypt_require_ssl = false
+    rgw_dynamic_resharding = false
+    # Set large enough value to disable concurrent op limit
+    # since we have frequency throttle in csp-nginx
+    rgw_max_concurrent_ops = 8192
+
+    mds_max_file_size = 35184372088832
+    mds_bal_fragment_size_max = 50000000
+     
+    # Default mds cache size : 10G
+    mds_cache_memory_limit = 10737418240
+    
+    # Mitigate peering's impact on Client IO processing
+    osd_peering_wq_batch_size = 1
+    osd_peering_wq_threads = 16
+
+    # Low down the impact of scrub on client io [BEGIN]
+    osd_scrub_chunk_max=5
+    osd_scrub_chunk_min=1
+    osd_scrub_sleep=0.1
+    # Increase this ratio so that scrub job executions will disperse more evenly in time instead of clustering
+    # so that the impact on client IO will be reduced
+    osd_scrub_interval_randomize_ratio=1
+    # If this threshold is too small, the high load system may get no chance for scrub before the deadline.
+    # As a result, the scrub jobs may be delayed until the deadline and burst in a short period,
+    # which may impact the system performance more severely.
+    # So we turn up the threshold to give more chance for scrub to run before the deadline and smooth the impulse.
+    osd_scrub_load_threshold=5
+    osd_scrub_max_interval=2419200
+    osd_scrub_min_interval=1209600
+    osd_deep_scrub_interval=2419200
+    osd_deep_scrub_stride=1048576
+    # Low down the impact of scrub on client io [END]
+
+    # allow explicitly requested repair to be scheduled even on the OSD with ongoing recovery
+    osd_repair_during_recovery = true
+
+    # longer sleep for scrub outside scrub hours
+    osd_scrub_extended_sleep = 10
+
+    # enable auto repair
+    osd_scrub_auto_repair = true
+
+    # During fault test in customer fields, the network may be cut off deliberately and later restored.
+    # The default value of the following 2 options may prohibit the cephfs client from recovering
+    # during the network fluctuation.
+    mds_session_blacklist_on_timeout=false
+    mds_session_autoclose=864000
+
+    mon_health_preluminous_compat_warning = false
+    mon_health_preluminous_compat = true
+    debug_limit = 2/0
+    debug_rgw = 2/0
+
+
+
+    # disable cache autotune before verified with proper parameters
+    bluestore_cache_autotune = false
+
+
+[mon]
+
+
+[osd]
+
+
+[client]
+    keyring = /data/cos/keyring
+
+
+[client.restapi]
+    keyring = /keyring
+
+[mds]
+
+        
+journaler_flusher_enable = true
+
+
+
+[mon.node01]
+    mon_addr = node01:6790
+    # If public_addr is not set while public_network is no empty, then
+    # pick_addresses will pick one ip address and overwrite public_addr with that value
+    # during the first boot of ceph-mon.
+    # Since pick_addresses does not give port, 6789 port will be adopted unexpectedly
+    public_addr = node01:6790
+
+[mon.node02]
+    mon_addr = node02:6791
+    # If public_addr is not set while public_network is no empty, then
+    # pick_addresses will pick one ip address and overwrite public_addr with that value
+    # during the first boot of ceph-mon.
+    # Since pick_addresses does not give port, 6789 port will be adopted unexpectedly
+    public_addr = node02:6791
+
+[mon.node03]
+    mon_addr = node03:6789
+    # If public_addr is not set while public_network is no empty, then
+    # pick_addresses will pick one ip address and overwrite public_addr with that value
+    # during the first boot of ceph-mon.
+    # Since pick_addresses does not give port, 6789 port will be adopted unexpectedly
+    public_addr = node03:6789
+
+
+
+[client.rgw]
+    rgw_frontends = "civetweb port=7480"
+    rgw_host = *
+    rgw_port = 8089
+    rgw_remote_addr_param = HTTP_X_FORWARDED_FOR
+    rgw_s3_auth_use_cam = true
+
+        # In TCE case, rgw_dns_name may be set in global section while cos_dns_name left empty
+    rgw_dns_name=www.baidu.com
+    
+    rgw_cos_delivery_environment = "tce"
+
+
+    # in case that MON need th keyring for management
+    keyring = /data/keyring
+
+[client.rgw.ELASTICSEARCH_SYNC]
+    rgw_frontends = "civetweb port=7481"
+    rgw_host = *
+    rgw_zone = elasticsearch
+
+
+    keyring = /data/keyring
+```
