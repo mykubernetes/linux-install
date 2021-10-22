@@ -95,13 +95,13 @@ Datacenter: dc1
 ===============
 Status=Up/Down
 |/ State=Normal/Leaving/Joining/Moving
---  Address         Load       Tokens Owns (effective)  Host ID                               Rack
-UN  172.20.101.164  173.72 KiB  256    34.2%       dcbbad83-fe7c-4580-ade7-aa763b8d2c40  rack1
-UN  172.20.101.165  50.4 KiB    256    35.0%       cefe8a3b-918f-463b-8c7d-faab0b9351f9  rack1
-UN  172.20.101.166  95.5 KiB    256    34.1%       88e16e35-50dd-4ee3-aa1a-f10a8c61a3eb  rack1
-UN  172.20.101.167  50.4 KiB    256    32.3%       8808aaf7-690c-4f0c-be9b-ce655c1464d4  rack1
-UN  172.20.101.160  194.83 KiB  256    31.5%       57cc39fc-e47b-4c96-b9b0-b004f2b79242  rack1
-UN  172.20.101.157  176.67 KiB  256    33.0%       091ff0dc-415b-48a7-b4ce-e70c84bbfafc  rack1
+--  Address         Load        Tokens Owns (effective)  Host ID                               Rack
+UN  172.20.101.164  173.72 KiB  256    34.2%             dcbbad83-fe7c-4580-ade7-aa763b8d2c40  rack1
+UN  172.20.101.165  50.4 KiB    256    35.0%             cefe8a3b-918f-463b-8c7d-faab0b9351f9  rack1
+UN  172.20.101.166  95.5 KiB    256    34.1%             88e16e35-50dd-4ee3-aa1a-f10a8c61a3eb  rack1
+UN  172.20.101.167  50.4 KiB    256    32.3%             8808aaf7-690c-4f0c-be9b-ce655c1464d4  rack1
+UN  172.20.101.160  194.83 KiB  256    31.5%             57cc39fc-e47b-4c96-b9b0-b004f2b79242  rack1
+UN  172.20.101.157  176.67 KiB  256    33.0%             091ff0dc-415b-48a7-b4ce-e70c84bbfafc  rack1
 ```
 
 5、ring 确定环中节点（包括虚拟节点）状态
