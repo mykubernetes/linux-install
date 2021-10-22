@@ -222,9 +222,13 @@ Address        Rack        Status State   Load            Owns                To
 - Owns：这个ip负责的tokens的范围占整个数据范围的占比多少
 - Token：对应负责的token是哪些
 
-6、describering 查看keyspace 数据分区详细信息，可以用来分析热点，知道热点数据的partition key分布后，可以进一步通过此命令知道数据会由哪些节点负责
+6、打印出给定的keyspace以及与其相关的token ring信息，此处我的token_number设置为2，方便展示信息，如果我们希望想要知道某个keyspace与其相关的token信息，可以通过这个命令获取。
 ```
 nodetool describering <keyspace>
+Schema Version:ea63e099-37c5-3d7b-9ace-32f4c833653d
+TokenRange:
+    TokenRange(start_token:-7410294471124200252, end_token:2438009623152110684, endpoints:[127.0.0.1], rpc_endpoints:[127.0.0.1], endpoint_details:[EndpointDetails(host:127.0.0.1, datacenter:datacenter1, rack:rack1)])
+    TokenRange(start_token:2438009623152110684, end_token:-7410294471124200252, endpoints:[127.0.0.1], rpc_endpoints:[127.0.0.1], endpoint_details:[EndpointDetails(host:127.0.0.1, datacenter:datacenter1, rack:rack1)])
 ```
 
 7、info 查看读Cache命中率，调优性能。如果名利率很低，业务可以通过提升命中率改善读延迟。如果命中率很高，可以尝试增加读cache获取更多收益
