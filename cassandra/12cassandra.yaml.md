@@ -32,16 +32,16 @@ row_cache_size_in_mb: 0
 row_cache_save_period: 0
 counter_cache_size_in_mb:
 counter_cache_save_period: 7200
-saved_caches_directory: /opt/cassandras/saved_caches            #数据缓存文件在磁盘中的存储位置
-commitlog_sync: periodic                     #记录commitlog的方式,periodic每一次有数据更新都将操作commitlog,batch批量记录commitlog,每一段时间内数据的更新将批量一次操作commitlog。
-commitlog_sync_period_in_ms: 1000            #周期记录commitlog时，刷新commitlog文件的时间间隔,在commitlog_sync= periodic时才能设置
+saved_caches_directory: /opt/cassandras/saved_caches           #数据缓存文件在磁盘中的存储位置,保存表和行的缓存
+commitlog_sync: periodic                                       #记录commitlog的方式,periodic每一次有数据更新都将操作commitlog,batch批量记录commitlog,每一段时间内数据的更新将批量一次操作commitlog。
+commitlog_sync_period_in_ms: 1000                              #周期记录commitlog时，刷新commitlog文件的时间间隔,在commitlog_sync= periodic时才能设置
 commitlog_segment_size_in_mb: 32
 seed_provider:
     - class_name: org.apache.cassandra.locator.SimpleSeedProvider
       parameters:
-        - seeds: "192.168.101.74"            #集群种子节点ip
-concurrent_reads: 16
-concurrent_writes: 32
+        - seeds: "192.168.101.74"                             # 集群种子节点ip
+concurrent_reads: 16                                          # 默认32,读取数据的瓶颈是在磁盘上，设置16倍于磁盘数量可以减少操作队列。
+concurrent_writes: 32                                         # 默认32,在Cassandra里写很少出现I/O不稳定，所以并发写取决于CPU的核心数量。推荐8倍于CPU数。
 concurrent_counter_writes: 16
 concurrent_materialized_view_writes: 16
 disk_optimization_strategy: ssd
@@ -64,8 +64,8 @@ rpc_port: 9160                                 #对外提供服务的端口号
 rpc_keepalive: true                            #对外提供服务连接是否一直保持
 rpc_server_type: sync                          #默认: sync,Cassandra提供了三种RPC服务器的选择sync,hsha
 thrift_framed_transport_size_in_mb: 15
-incremental_backups: false
-snapshot_before_compaction: false
+incremental_backups: false                     #默认false，最后一次快照发生时备份更新的数据（增量备份）。当增量备份可用时，Cassandra创建一个到SSTable的的硬链接或者流式存储到本地的备份/子目录。删除这些硬链接是操作员的责任。
+snapshot_before_compaction: false              #默认false，启用或禁用在压缩前执行快照。这个选项在数据格式改变的时候来备份数据是很有用的。注意使用这个选项，因为Cassandra不会自动删除过期的快照。
 auto_snapshot: true                            #默认: true,在清空keyspace或者删除tables之前要拍摄快照
 tombstone_warn_threshold: 10000
 tombstone_failure_threshold: 100000
@@ -74,7 +74,7 @@ column_index_cache_size_in_kb: 2
 batch_size_warn_threshold_in_kb: 5
 batch_size_fail_threshold_in_kb: 50
 concurrent_compactors: 2
-compaction_throughput_mb_per_sec: 32
+compaction_throughput_mb_per_sec: 32                     #限制特定吞吐量下的压缩速率。如果插入数据的速度越快，越应该压缩SSTable减少其数量。推荐16-32倍于写入速度（MB/s）。如果是0表示不限制。
 unlogged_batch_across_partitions_warn_threshold: 10
 compaction_large_partition_warning_threshold_mb: 10000
 sstable_preemptive_open_interval_in_mb: 50
@@ -87,7 +87,7 @@ truncate_request_timeout_in_ms: 300000
 request_timeout_in_ms: 10000
 slow_query_log_timeout_in_ms: 500
 cross_node_timeout: false
-endpoint_snitch: SimpleSnitch
+endpoint_snitch: SimpleSnitch                            #用于设置Cassandra定位节点和路由请求的snitch
 dynamic_snitch_update_interval_in_ms: 100
 dynamic_snitch_reset_interval_in_ms: 600000
 dynamic_snitch_badness_threshold: 0.1
