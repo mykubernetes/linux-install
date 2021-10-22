@@ -171,7 +171,7 @@ nodetool help
 nodetool help command-name
 ```
 
-3、查看集群信息，获取集群名称，检查各节点Schema是否一致
+3、显示集群的基本信息，包括：集群的名字(cassandra.yaml里面配置的)、Snitch类型、是否开启dynamicendpointsnitch、集群partitioner、schmema version，因为我们是通过gossip进行信息同步，可能会存在某些节点一时间与另外节点schema version不一致，可以通过这个命令判断。
 ```
 nodetool -u cassandra -pw cassandra describecluster
 Cluster Information:
