@@ -201,10 +201,26 @@ UN  172.20.101.160  194.83 KiB  256    31.5%             57cc39fc-e47b-4c96-b9b0
 UN  172.20.101.157  176.67 KiB  256    33.0%             091ff0dc-415b-48a7-b4ce-e70c84bbfafc  rack1
 ```
 
-5、ring 确定环中节点（包括虚拟节点）状态
+5、展示集群的token ring环信息，由于我这里的vnode用了默认的256，所以只列部分数据
 ```
 nodetool -u cassandra -pw cassandra ring
+Datacenter: datacenter1
+==========
+Address        Rack        Status State   Load            Owns                Token
+                                                                              9171192753316195244
+192.168.0.245  rack1       Up     Normal  266.49 KiB      64.99%              -9183757132875531958
+192.168.0.250  rack1       Up     Normal  242.16 KiB      70.75%              -9159199665119898622
+192.168.0.250  rack1       Up     Normal  242.16 KiB      70.75%              -9135911702874518408
+192.168.0.250  rack1       Up     Normal  242.16 KiB      70.75%              -9120077450536389482
+192.168.0.246  rack1       Up     Normal  238.16 KiB      64.26%              -9106101311114100850
+192.168.0.246  rack1       Up     Normal  238.16 KiB      64.26%              -9069141338515824351
 ```
+- Datacenter ： 对应的datacenter的名字，这里使用的是默认的；
+- Address、Rack：表示的是对应节点以及从属的rack信息；
+- Status 、State ：对应的节点的状态：Up、Down;Normal、leaving等等；
+- Load：集群的对应节点的load信息，参考上面的gossip info的输出信息；
+- Owns：这个ip负责的tokens的范围占整个数据范围的占比多少
+- Token：对应负责的token是哪些
 
 6、describering 查看keyspace 数据分区详细信息，可以用来分析热点，知道热点数据的partition key分布后，可以进一步通过此命令知道数据会由哪些节点负责
 ```
