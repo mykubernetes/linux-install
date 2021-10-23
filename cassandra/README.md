@@ -160,7 +160,6 @@ https://cloud.tencent.com/developer/article/1772888?from=information.detail.Node
 | version | cassandra version |
 | viewbuildstatus | viewbuild的状态 |
 
-
 1、列出nodetool所有可用的命令
 ```
 nodetool help 
@@ -169,6 +168,17 @@ nodetool help
 2、列出指定command 的帮助内容
 ```
 nodetool help command-name
+```
+
+显示当前Cassandra的版本信息
+```
+nodetool version
+ReleaseVersion: 3.11.11
+```
+
+变比cassandra服务
+```
+nodetool stopdaemon
 ```
 
 3、显示集群的基本信息，包括：集群的名字(cassandra.yaml里面配置的)、Snitch类型、是否开启dynamicendpointsnitch、集群partitioner、schmema version，因为我们是通过gossip进行信息同步，可能会存在某些节点一时间与另外节点schema version不一致，可以通过这个命令判断。
@@ -200,6 +210,7 @@ UN  172.20.101.167  50.4 KiB    256    32.3%             8808aaf7-690c-4f0c-be9b
 UN  172.20.101.160  194.83 KiB  256    31.5%             57cc39fc-e47b-4c96-b9b0-b004f2b79242  rack1
 UN  172.20.101.157  176.67 KiB  256    33.0%             091ff0dc-415b-48a7-b4ce-e70c84bbfafc  rack1
 ```
+- UN正常，DN宕机
 
 5、展示集群的token ring环信息，由于我这里的vnode用了默认的256，所以只列部分数据
 ```
