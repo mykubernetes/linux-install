@@ -521,14 +521,18 @@ nodetool -u cassandra -pw cassandra enableautocompaction
 
 #7、获取compact吞吐
 nodetool -u cassandra -pw cassandra getcompactionthroughput           #打印compaction throughput
+Current compaction throughput: 16 MB/s
 
 #8、设置compact吞吐
-nodetool -u cassandra -pw cassandra setcompactionhroughput 100        #设置compaction throughput，默认100Mb/s
+nodetool -u cassandra -pw cassandra setcompactionthroughput 100        #设置compaction throughput，默认100Mb/s
 
 #9、停止压缩，避免备份数据时sstable compaction 变化
 nodetool -u cassandra -pw cassandra stop --COMPACTION
+```
 
-#10、限制集群所有节点数据迁移流量，集群扩容使用
+集群迁移速度
+```
+限制集群所有节点数据迁移流量，集群扩容使用
 nodetool -u cassandra -pw cassandra setstreamthroughput 200           #设置streaming throughput 默认200Mb/s
 nodetool getstreamthroughput
 ```
