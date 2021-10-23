@@ -296,6 +296,36 @@ DESCRIBE school;
 use school;
 ```
 
+CREATE TABLE 可以附加的部分属性
+```
+CREATE TABLE test_ttl(
+id int PRIMARY KEY,
+value text
+) WITH bloom_filter_fp_chance = 0.01
+AND caching = '{"keys":"ALL", "rows_per_partition":"NONE"}'
+AND comment = ''
+AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
+AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+AND dclocal_read_repair_chance = 0.1
+AND default_time_to_live = 30
+AND gc_grace_seconds = 864000
+AND max_index_interval = 2048
+AND memtable_flush_period_in_ms = 0
+AND min_index_interval = 128
+AND read_repair_chance = 0.0
+AND speculative_retry = '99.0PERCENTILE';
+```
+- comment  对列族的描述信息。
+- bloom_filter_fp_chance 指定bloom_filter算法的容错率，一般写0.01或者0.1。
+- caching 设置缓存方案。
+- compaction 数据压缩策略。
+- compression 数据压缩算法。
+- default_time_to_live 存活时间，默认0（永久存活）。
+- memtable_flush_period_in_ms 内存数据刷新时间间隔。
+- read_repair_chance 0-1之间的数值，与数据的一致性有关。
+
+
+
 6、修改键空间 
 
 > 1）编写完整的修改键空间语句，修改school键空间，把副本因子 从3 改为1
