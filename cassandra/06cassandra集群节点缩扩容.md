@@ -1,5 +1,5 @@
-扩容
----
+# 扩容
+
 ```
 1、 准备一个新节点
 
@@ -44,27 +44,58 @@ nodetool cleanup
 注：清理数据会大量消耗集群性能，对twcs，不必删除，经过一段时间后冗余数据会自动清理；
 ```
 
-正常缩容
----
-```
-1、选择一个要下线的节点实例
-2、选择下线时间，见扩容。
-3、限制集群所有节点数据迁移流量
-nodetool setstreamthroughput 32 (注：32Mb/s = 4MB/s)
-nodetool getstreamthroughput 
-一般，若集群性能好，出流可以设置为70MB/s, 入流可设置8MB/s,  生产迁移过程中可从小到大调整，观察对性能是否有影响，没影响就适当调大。
+# Cassandra下线节点
 
-4、需要删除的机器上执行下线命令
+## 1、选择一个要下线的节点实例
+
+## 2、选择下线时间，见扩容。
+
+## 3、限制集群所有节点数据迁移流量
+```
+# nodetool getstreamthroughput
+Current stream throughput: 200 Mb/s
+
+# nodetool setstreamthroughput 32        # 注：32Mb/s = 4MB/s
+# nodetool getstreamthroughput
+Current stream throughput: 32 Mb/s
+```
+- 一般，若集群性能好，出流可以设置为70MB/s, 入流可设置8MB/s,  生产迁移过程中可从小到大调整，观察对性能是否有影响，没影响就适当调大。
+
+4、需要删除的节点上执行下线命令,关闭当前节点。将数据传输到下一个节点中。
+```
 nodetool decommission
+```
 
 5、监控迁移情况
+```
 nodetool netstats                   # 数据迁移情况
 nodetool compactionstats -H         # SSTABLE压缩情况
-nodetool status                     # 删除节点状态为UL
 ```
 
-强制删除节点
----
+6、查看集群状态
+
+- 删除节点状态为UL，删除完成后消失
+```
+# nodetool status
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address         Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  192.168.101.69  137.38 KiB  256          100.0%            53a8aaf1-f594-4561-9e97-d11e0fd6087c  rack1
+UL  192.168.101.71  244.22 KiB  256          100.0%            8bfb1ae5-99ba-4513-a2ca-8464dbd1fb5b  rack1
+
+# nodetool status
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address         Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  192.168.101.69  147.75 KiB  256          100.0%            53a8aaf1-f594-4561-9e97-d11e0fd6087c  rack1
+```
+
+# 强制删除节点
+
 强制删除节点一般用在节点宕机的情况下使用
 ```
 nodetool removenode hostid    (force)
