@@ -433,47 +433,56 @@ nodetool gossipinfo
 - RPC_READY: 如果9042的端口或者9142（ssl）的rpc端口已经准备初始化完成，可以接收响应就是true；
 - TOKENS:本来是对应节点负责的tokens，但是在这里显示的时候是hindden表示。
 
-15、刷新输出
+
+
+15、把memtable中的数据刷新到sstable，并且当前节点会终止与其他节点的联系。
+> 执行完这条命令需要重启这个节点。一般在Cassandra版本升级的时候才使用这个命令。
+> 如果单纯想把memtable中数据刷新到sstable，可以使用nodetool flush命令。
+```
+nodetool -u cassandra -pw cassandra drain
+```
+
+16、把memtable中的数据刷新到sstable，不需要重启节点。
 ```
 nodetool -u cassandra -pw cassandra flush
 ```
 
-16、清理节点上的旧数据，集群扩容后立即清理多余数据，扩容后新节点承担了原理的数据所以旧节点上的数据以及不归该节点管辖
+17、清理节点上的旧数据，集群扩容后立即清理多余数据，扩容后新节点承担了原理的数据所以旧节点上的数据以及不归该节点管辖
 ```
 nodetool -u cassandra -pw cassandra cleanup
 ```
 
-17、修复当前集群的一致性，全量修复，修改大量数据时，失败的概率很大，3.x版本的BUG
+18、修复当前集群的一致性，全量修复，修改大量数据时，失败的概率很大，3.x版本的BUG
 ```
 nodetool -u cassandra -pw cassandra repair --full --trace
 ```
 
-18、扩容时候可能会使⽤用write survey模式启动节点。之后再用该命令将write survey模式下节点加入集群。
+19、扩容时候可能会使⽤用write survey模式启动节点。之后再用该命令将write survey模式下节点加入集群。
 ```
 nodetool join
 ```
 
-19、单节点修复
+20、单节点修复
 ```
 nodetool -u cassandra -pw cassandra repair -pr
 ```
 
-20、重建索引
+21、重建索引
 ```
 nodetool -u cassandra -pw cassandra rebuild_index
 ```
 
-21、移动节点到指定的token,只能用在单个token的节点上，通俗讲就是换一个区间给该节点管理，会移动数据，一般是根据业务，自己设计了分区策略，自己计算token的时候可能会用到，默认每个节点随机256个token出来，用不到这个命令
+22、移动节点到指定的token,只能用在单个token的节点上，通俗讲就是换一个区间给该节点管理，会移动数据，一般是根据业务，自己设计了分区策略，自己计算token的时候可能会用到，默认每个节点随机256个token出来，用不到这个命令
 ```
 nodetool -u cassandra -pw cassandra move <new token>
 ```
 
-22、resetlocalschema 解决节点表Schema不一致问题
+23、resetlocalschema 解决节点表Schema不一致问题
 ```
 nodetool resetlocalschema
 ```
 
-23、重启节点上cassandra
+24、重启节点上cassandra
 ```
 nodetool -u cassandra -pw cassandra disablegossip       #禁用gossip通讯，该节点停止与其他节点的gossip通讯，忽略从其他节点发来的请求
 nodetool -u cassandra -pw cassandra disablebinary       #禁止本地传输（二进制协议）binary CQL protocol
@@ -484,13 +493,13 @@ nodetool -u cassandra -pw cassandra stopdaemon          #停止cassandra进程�
 nodetool -u cassandra -pw cassandra status -r           #查看集群所有节点状态
 ```
 
-24、日志相关操作
+25、日志相关操作
 ```
 nodetool -u cassandra -pw cassandra getlogginglevels               #查看日志级别
 nodetool -u cassandra -pw cassandra setlogginglevel ROOT DEBUG     #设置日志级别为DEBUG
 ```
 
-25、压缩相关操作
+26、压缩相关操作
 ```
 #1、手动触发Major Compaction,用以优化读性能和清理被删除的数据释放空间。
 nodetool -u cassandra -pw cassandra compact --user-defined mc-103-big-Date.db
@@ -524,7 +533,7 @@ nodetool -u cassandra -pw cassandra setstreamthroughput 200           #设置str
 nodetool getstreamthroughput
 ```
 
-26、移除节点
+27、移除节点
 ```
 # 需要在删除的机器上执行，缩容数据会迁移到其他节点，执行后命令会一直开着，节点处于LEAVING状态，直到结束。可以提前中断因为实际过程server端异步执行
 nodetool -u cassandra -pw cassandra decommission                                         #退服节点
@@ -535,7 +544,7 @@ nodetool -u cassandra -pw cassandra removenode 88e16e35-50dd-4ee3-aa1a-f10a8c61a
 nodetool -u cassandra -pw cassandra assassinate node_ip                                  #强制删除节点
 ```
 
-27、快照备份
+28、快照备份
 ```
 #创建快照
 nodetool -u cassandra -pw cassandra snapshot
