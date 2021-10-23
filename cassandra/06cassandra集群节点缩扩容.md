@@ -36,20 +36,27 @@ systemctl start cassandra
 ## 7、使用nodetool status来验证节点是否已完全引导，并且所有其他节点都处于运行状态（UN）而不处于任何其他状态。
 
 ## 8、监控迁移情况
+```
 nodetool netstats               # 数据迁移情况
 nodetool compactionstats -H     # SSTABLE压缩情况
 nodetool status                 # 集群情况，UJ：未完成，UN：已完成
-
-9、现在重新开启所有节点自动压缩
-# nodetool enableautocompaction
-
-10、关闭所有节点数据迁移流量
-# nodetool setstreamthroughput 0
-
-11、数据迁移完成后清理数据,手动清理每一台老节点磁盘空间,一个完成后再清理下一个。
-nodetool cleanup
-注：清理数据会大量消耗集群性能，对twcs，不必删除，经过一段时间后冗余数据会自动清理；
 ```
+
+## 9、现在重新开启所有节点自动压缩
+```
+# nodetool enableautocompaction
+```
+
+## 10、关闭所有节点数据迁移流量
+```
+# nodetool setstreamthroughput 0
+```
+
+## 11、数据迁移完成后清理数据,手动清理每一台老节点磁盘空间,一个完成后再清理下一个。
+```
+nodetool cleanup
+```
+注：清理数据会大量消耗集群性能，对twcs，不必删除，经过一段时间后冗余数据会自动清理；
 
 # Cassandra下线节点
 
