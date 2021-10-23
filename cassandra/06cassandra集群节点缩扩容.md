@@ -112,20 +112,41 @@ UN  192.168.101.69  147.75 KiB  256          100.0%            53a8aaf1-f594-456
 
 1、找出状态为DN的节点
 ```
-nodetool status               
-Datacenter: datacenter1
-=======================
+# nodetool status
+Datacenter: DC1
+===============
 Status=Up/Down
 |/ State=Normal/Leaving/Joining/Moving
---  Address         Load       Tokens       Owns (effective)  Host ID                               Rack
-UN  192.168.101.69  137.38 KiB  256          100.0%            53a8aaf1-f594-4561-9e97-d11e0fd6087c  rack1
-DN  192.168.101.71  244.22 KiB  256          100.0%            8bfb1ae5-99ba-4513-a2ca-8464dbd1fb5b  rack1
+--  Address        Load       Tokens  Owns (effective)  Host ID                               Rack
+UN  192.168.2.101  112.82 KB  256     31.7%             420129fc-0d84-42b0-be41-ef7dd3a8ad06  RAC1
+DN  192.168.2.103  91.11 KB   256     33.9%             d0844a21-3698-4883-ab66-9e2fd5150edd  RAC1
+UN  192.168.2.102  124.42 KB  256     32.6%             8d5ed9f4-7764-4dbd-bad8-43fddce94b7c  RAC1
 ```
 
 2、删除节点一般用在节点宕机的情况下使用
 ```
-nodetool removenode 8bfb1ae5-99ba-4513-a2ca-8464dbd1fb5b
+# nodetool removenode d0844a21-3698-4883-ab66-9e2fd5150edd
+```
 
-强制删除
-nodetool removenode 8bfb1ae5-99ba-4513-a2ca-8464dbd1fb5b  force
+3、查看删除节点的操作的状态
+```
+# nodetool removenode status
+RemovalStatus: No token removals in process.
+```
+
+4、确认节点已被删除
+```
+# nodetool status
+Datacenter: DC1
+===============
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens  Owns (effective)  Host ID                               Rack
+UN  192.168.2.101  112.82 KB  256     37.7%             420129fc-0d84-42b0-be41-ef7dd3a8ad06  RAC1
+UN  192.168.2.102  124.42 KB  256     38.3%             8d5ed9f4-7764-4dbd-bad8-43fddce94b7c  RAC1
+```
+
+5、如果删除不了，强制删除
+```
+nodetool removenode d0844a21-3698-4883-ab66-9e2fd5150edd  force
 ```
