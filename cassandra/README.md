@@ -585,17 +585,22 @@ nodetool toppartitions <keyspace> <cfname> <duration>
 nodetool toppartitions school students 100
 ```
 
-5、getendpoints 计算某个partition key会分布在那些节点上，分析热点或者过大的partition时，进一步定位受影响的节点，可以用来预测业务数据均衡情况
+5、查看key分布在哪一个节点上上，分析热点或者过大的partition时，进一步定位受影响的节点，可以用来预测业务数据均衡情况
 ```
 nodetool getendpoints <keyspace> <table> <key>
 ```
 
-6、查看所有线程池的运行情况，可以观察某些任务是否有阻塞现象
+6、查看key分布在哪一个SSTable上
+```
+nodetool getsstables <keyspace> <table> <key>
+```
+
+7、查看所有线程池的运行情况，可以观察某些任务是否有阻塞现象
 ```
 nodetool tpstats
 ```
 
-7、查看某个节点负载，内存使用情况
+8、查看某个节点负载，内存使用情况
 ```
 # nodetool info
 ID                     : 091ff0dc-415b-48a7-b4ce-e70c84bbfafc
