@@ -108,10 +108,24 @@ Status=Up/Down
 UN  192.168.101.69  147.75 KiB  256          100.0%            53a8aaf1-f594-4561-9e97-d11e0fd6087c  rack1
 ```
 
-# 强制删除节点
+# Cassandra删除宕机机器节点步骤
 
-强制删除节点一般用在节点宕机的情况下使用
+1、找出状态为DN的节点
 ```
-nodetool removenode hostid    (force)
-如：nodetool removenode 8b6dbd89-a4ed-479c-9fc2-9f92712bf48a  force;
+nodetool status               
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address         Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  192.168.101.69  137.38 KiB  256          100.0%            53a8aaf1-f594-4561-9e97-d11e0fd6087c  rack1
+DN  192.168.101.71  244.22 KiB  256          100.0%            8bfb1ae5-99ba-4513-a2ca-8464dbd1fb5b  rack1
+```
+
+2、删除节点一般用在节点宕机的情况下使用
+```
+nodetool removenode 8bfb1ae5-99ba-4513-a2ca-8464dbd1fb5b
+
+强制删除
+nodetool removenode 8bfb1ae5-99ba-4513-a2ca-8464dbd1fb5b  force
 ```
