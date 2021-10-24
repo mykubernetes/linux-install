@@ -1,6 +1,6 @@
 Cassandra管理之备份与恢复
 
-1、全量备份
+1、全量备份，每个节点执行
 ```
 # nodetool snapshot
 Requested creating snapshot(s) for [all keyspaces] with snapshot name [1570691336948] and options {skipFlush=false}
