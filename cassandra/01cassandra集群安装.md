@@ -176,7 +176,7 @@ rpc_address: 192.168.1.76
 ```
 vim  ~/.bash_profile
 export CASSANDRA_HOME=/opt/cassandra
-export PATH=PATH:$CASSANDRA_HOME/bin:$CASSANDRA_HOME/tools/bin
+export PATH=PATH:$CASSANDRA_HOME/bin:$CASSANDRA_HOME/bin
  
 使配置生效
 source ~/.bash_profile
