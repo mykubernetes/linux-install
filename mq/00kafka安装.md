@@ -790,22 +790,21 @@ Kafka 目前支持SSL、SASL/Kerberos、SASL/PLAIN三种认证机制。可以支
 在客户端与brokers、brokers与zookeeper之间的认证可以只做客户端与brokers，这并不影响brokers与zookeeper的之间的通讯，当然为了安全我们可以做brokers与zookeeper的认证。
 
 Kafka 的安全机制主要分为两个部分
-- 身份认证（Authentication）：对client 与服务器的连接进行身份认证。
-- 权限控制（Authorization）：实现对于TOPIC的权限控制
+- 身份认证（Authentication）：对客户端与服务器的连接进行身份认证。Kafka目前支持SSL、SASL/Kerberos、SASL/PLAIN三种认证机制。
+- 权限控制（Authorization）：对消息级别的访问控制列表（ACL）权限控制。
 
 一）SASL/PLAIN认证
 
 1、修改server.properties配置文件
 ```
 #之前配置listeners=PLAINTEXT://192.168.101.66:9092以PLAINTEXT协议监听，需要修改为如下配置
-listeners=SASL_PLAINTEXT://192.168.101.66:9092     #修改监听协议为SASL_PLAINTEXT
-
-security.inter.broker.protocol=SASL_PLAINTEXT     #配置安全协议为SASL_PLAINTEXT
-sasl.mechanism.inter.broker.protocol=PLAIN        #使用PLAIN做broker之间通信的协议
-sasl.enabled.mechanisms=PLAIN                     #启用SASL机制
+listeners=SASL_PLAINTEXT://192.168.101.66:9092                    #修改监听协议为SASL_PLAINTEXT
+security.inter.broker.protocol=SASL_PLAINTEXT                     #配置安全协议为SASL_PLAINTEXT
+sasl.mechanism.inter.broker.protocol=PLAIN                        #使用PLAIN做broker之间通信的协议
+sasl.enabled.mechanisms=PLAIN                                     #启用SASL机制
 authorizer.class.name = kafka.security.auth.SimpleAclAuthorizer   #配置java认证类
-super.users=User:admin                            #设置超级用户为：admin
-allow.everyone.if.no.acl.found=true               #如果topic找不到acl配置是否运行操作，true为允许
+super.users=User:admin                                            #设置超级用户为：admin
+allow.everyone.if.no.acl.found=true                               #如果topic找不到acl配置是否运行操作，true为允许
 ```
 - super.users配置了一个超级用户，这个超级用户不受ACL的限制可以自由访问任何的TOPIC，通常不对外使用，仅仅做管理使用，一般而言和JAAS配置的username一致。 allow.everyone.if.no.acl.found 配置了在TOPIC上没有找到ACL如何授权，配置true允许操作，配置false不允许操作，此配默认值为false，如果为false，TOPIC必须指定ACL，并且客户端使用指定的用户名才能访问成功。
 
