@@ -108,7 +108,7 @@ Status=Up/Down
 UN  192.168.101.69  147.75 KiB  256          100.0%            53a8aaf1-f594-4561-9e97-d11e0fd6087c  rack1
 ```
 
-7、删除节点后，直接添加无法添加，通过`describeclustr`还有记录需要删除
+7、删除节点后，通过`describeclustr`还有记录需要删除
 ```
 # nodetool describecluster
 Cluster Information:
