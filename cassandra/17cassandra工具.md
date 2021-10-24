@@ -25,18 +25,6 @@
 ```
 
 
-# 工具 sstableloader
-
-
-用于加载sstable数据
-
-载入大量外部数据至一集群；
-
-将已经存在的SSTable载入到另外一个节点数不同或者复制策略不同的集群；
-
-从快照恢复数据。
-
-直接输入sstableloader会弹出帮助信息
 
 
 # 工具 sstablescrub
