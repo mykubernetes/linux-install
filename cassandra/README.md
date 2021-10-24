@@ -464,23 +464,29 @@ nodetool join
 ```
 nodetool -u cassandra -pw cassandra repair -pr
 ```
+- 在删除数据的时候，Casssandra并非真实的删除，而是重新插入一条的数据，记录了删除的记录的信息和时间，叫做tombstone墓碑。使用nodetool repair，可以删除tombstone数据。频繁修改的数据节点可以使用这个命令节省空间、提高读速度。
 
-21、重建索引
+21、当有新的数据中心加入，运行这个命令复制数据到数据中心
+```
+nodetool rebuild
+```
+
+22、重建索引
 ```
 nodetool -u cassandra -pw cassandra rebuild_index
 ```
 
-22、移动节点到指定的token,只能用在单个token的节点上，通俗讲就是换一个区间给该节点管理，会移动数据，一般是根据业务，自己设计了分区策略，自己计算token的时候可能会用到，默认每个节点随机256个token出来，用不到这个命令
+23、移动节点到指定的token,只能用在单个token的节点上，通俗讲就是换一个区间给该节点管理，会移动数据，一般是根据业务，自己设计了分区策略，自己计算token的时候可能会用到，默认每个节点随机256个token出来，用不到这个命令
 ```
 nodetool -u cassandra -pw cassandra move <new token>
 ```
 
-23、resetlocalschema 解决节点表Schema不一致问题
+24、resetlocalschema 解决节点表Schema不一致问题
 ```
 nodetool resetlocalschema
 ```
 
-24、重启节点上cassandra
+25、重启节点上cassandra
 ```
 nodetool -u cassandra -pw cassandra disablegossip       #禁用gossip通讯，该节点停止与其他节点的gossip通讯，忽略从其他节点发来的请求
 nodetool -u cassandra -pw cassandra disablebinary       #禁止本地传输（二进制协议）binary CQL protocol
@@ -491,13 +497,13 @@ nodetool -u cassandra -pw cassandra stopdaemon          #停止cassandra进程�
 nodetool -u cassandra -pw cassandra status -r           #查看集群所有节点状态
 ```
 
-25、日志相关操作
+26、日志相关操作
 ```
 nodetool -u cassandra -pw cassandra getlogginglevels               #查看日志级别
 nodetool -u cassandra -pw cassandra setlogginglevel ROOT DEBUG     #设置日志级别为DEBUG
 ```
 
-26、压缩相关操作
+27、压缩相关操作
 ```
 #1、手动触发Major Compaction,用以优化读性能和清理被删除的数据释放空间。
 nodetool -u cassandra -pw cassandra compact --user-defined mc-103-big-Date.db
@@ -535,7 +541,7 @@ nodetool -u cassandra -pw cassandra setstreamthroughput 200           #设置str
 nodetool getstreamthroughput
 ```
 
-27、移除节点
+28、移除节点
 ```
 # 需要在删除的机器上执行，缩容数据会迁移到其他节点，执行后命令会一直开着，节点处于LEAVING状态，直到结束。可以提前中断因为实际过程server端异步执行
 nodetool -u cassandra -pw cassandra decommission                                         #退服节点
@@ -546,7 +552,7 @@ nodetool -u cassandra -pw cassandra removenode 88e16e35-50dd-4ee3-aa1a-f10a8c61a
 nodetool -u cassandra -pw cassandra assassinate node_ip                                  #强制删除节点
 ```
 
-28、快照备份
+29、快照备份
 ```
 #创建快照
 nodetool -u cassandra -pw cassandra snapshot
@@ -560,6 +566,14 @@ nodetool -u cassandra -pw cassandra enbalebackup
 清楚本机上的snapshot，如果没有提供keyspace等信息，就清理本机全部的snapshot
 nodetool -u cassandra -pw cassandra clearsnapshot
 ```
+
+30、合并sstable文件。
+```
+nodetool compact
+```
+- 省略表，压缩keyspace下面的所有表
+- 省略keyspace，压缩所有keyspace下的所有表
+
 
 # 性能诊断工具
 
