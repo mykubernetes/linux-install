@@ -4,7 +4,7 @@
 |------|------|
 | 博客 | https://blog.csdn.net/zwq00451?type=blog |
 | 博客 | https://blog.51cto.com/michaelkang/p_2 |
-
+| 博客 | http://zqhxuyuan.github.io/2015/10/15/Cassandra-Daily/#%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C |
 
 1、Cassandra概述
 
