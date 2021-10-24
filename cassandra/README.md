@@ -210,7 +210,9 @@ UN  172.20.101.167  50.4 KiB    256    32.3%             8808aaf7-690c-4f0c-be9b
 UN  172.20.101.160  194.83 KiB  256    31.5%             57cc39fc-e47b-4c96-b9b0-b004f2b79242  rack1
 UN  172.20.101.157  176.67 KiB  256    33.0%             091ff0dc-415b-48a7-b4ce-e70c84bbfafc  rack1
 ```
-- UN正常，DN宕机
+- UN 运行中
+- DN 宕机
+- UL 离线中
 
 5、展示集群的token ring环信息，由于我这里的vnode用了默认的256，所以只列部分数据
 ```
@@ -565,6 +567,18 @@ nodetool -u cassandra -pw cassandra clearsnapshot
 
 性能诊断工具
 ---
+
+cassandra专项监控
+
+| 命令 | 描述 |
+|------|-----|
+| nodetool status | 集群基本信息  |
+| nodetool netstats | 网络链接操作的统计 |
+| nodetool tablestats | 表上的统计信息 |
+| nodetool proxyhistograms | 网络耗时直方图 |
+| nodetool tpstats | 线程统计 |
+| nodetool compactionstats | 压缩情况 |
+| nodetool tablehistograms | 表直方图 |
 
 1、proxyhistograms 从Coordinator视角查看最近读写延迟，可以用来诊断慢节点。Coordinator是负责接受用户请求，再并发读写其他集群内部节点的模块，类似proxy.每个节点都可以作为Coordinator
 ```
