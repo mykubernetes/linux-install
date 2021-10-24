@@ -27,7 +27,7 @@ zookeeper.sync.time.ms 2000           #zk follower落后leader的时间
 delete.topic.enable false             #是否开启topic可以被删除的方式
 ```
 
-producer配置
+# producer配置
 ```
 request.required.acks 0                                   #参与消息确认的broker数量控制，0代表不需要任何确认 1代表需要leader replica确认 -1代表需要ISR中所有进行确认
 request.timeout.ms  10000                                 #从发送请求到收到ACK确认等待的最长时间（超时时间）
