@@ -194,3 +194,132 @@ stream_throughput_outbound_megabits_per_sec      #（默认200）限制所有外
 trickle_fsync                                    #（默认false）当使用顺序写的时候，启用该选项就告诉fsync强制操作系统在trickle_fsync_interval_in_kb设定的间隔刷新脏缓存。建议在SSD启用。
 trickle_fsync_interval_in_kb                     #（默认10240）设置fsync的大小
 ```
+
+
+
+```
+################部署调整############### 
+#集群名称
+cluster_name: XXXXX
+
+#加密验证
+authenticator: PasswordAuthenticator
+
+#数据文件位置
+data_file_directories:/home/xxx/dev/cassandra/cassdata/cassdata1
+
+#日志文件位置 
+commitlog_directory: /home/xxx/dev/cassandra/casscomm/casscomm1
+
+#Key Cache和Row Cache缓存文件对应地址
+saved_caches_directory: /home/xxx/dev/cassandra/applogs/saved_caches/1
+
+#集群种子节点配置，同一个集群的每个节点的种子节点必须一致，配置2-3个种子就可以了
+seed_provider:  
+    - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+    parameters:          
+        - seeds: "xxx.xxx.xxx.xxx,xxx.xxx.xxx.xxx"
+
+#本地IP和端口
+native_transport_port: 9042
+listen_address: xxx.xxx.xxx.xxx
+rpc_address: xxx.xxx.xxx.xxx
+
+#网关设置时间，保持一致
+request_timeout_in_ms: 30000
+
+#集群拓扑结构感知方式
+endpoint_snitch: GossipingPropertyFileSnitch
+dynamic_snitch_update_interval_in_ms: 100
+dynamic_snitch_reset_interval_in_ms: 10000
+dynamic_snitch_badness_threshold: 0.1
+################部署调整###############
+
+
+################数据结构############### 
+#批量数据大小超过5M则报警，增加该值可能引起节点不稳定，根据自己业务数据评估来针对性优化
+batch_size_warn_threshold_in_kb: 5000
+
+#批量数据大小超过100M则批量操作失败
+batch_size_fail_threshold_in_kb: 100000
+
+#提交日志相关优化
+#行情是周期性很强的应用，所以为了保证数据能够异步持久化到磁盘上，并减少损失，使用1s间隔刷新，避免因为batch导致写阻塞block
+commitlog_sync: periodic
+commitlog_sync_period_in_ms: 1000
+#每个commit log 32M
+commitlog_segment_size_in_mb: 32
+#全部commit log大小 4G，促使memtable刷入sstable
+commitlog_total_space_in_mb: 4096
+
+batchlog_replay_throttle_in_kb: 32768
+
+#结合业务特点，大量写，尽快进行压缩
+compaction_throughput_mb_per_sec: 256
+
+
+################数据结构###############
+
+###############线程优化###############  
+#处理CQL的最大线程数          
+native_transport_max_threads: 4092
+
+#刷盘线程
+memtable_flush_writers: 2
+
+#压缩线程
+concurrent_compactors: 8
+
+#并发读线程
+concurrent_reads: 512
+
+#并发写线程
+concurrent_writes: 256
+
+#并发计数器线程
+concurrent_counter_writes: 512
+###############线程优化############### 
+
+
+###############内存优化############### 
+#确保CDC配置关闭
+cdc_enabled: false
+
+#调整key cache占用heap大小，设置为0，关闭key cache
+key_cache_size_in_mb: 0
+
+#调整row cache，使用操作系统物理内存
+row_cache_size_in_mb: 32768
+
+#定时将缓存刷入磁盘，启动时预热缓存，优化读性能
+row_cache_save_period: 1000
+
+#设置缓存的key数量，根据业务场景分析，可以保存所有key值
+row_cache_keys_to_save: 0
+
+#实现类
+row_cache_class_name: org.apache.cassandra.cache.OHCProvider
+
+#通过Java NIO操作非堆，如果允许，配置成offheap_objects
+memtable_allocation_type: offheap_buffers
+memtable_offheap_space_in_mb: 32768
+#memtable_heap_space_in_mb: 4096
+
+
+#SSTable读缓存大小
+file_cache_size_in_mb: 8192
+
+#当SSTable读缓存耗尽，不分配heap作为读缓存
+buffer_pool_use_heap_if_exhausted: false
+
+#数据回传机制的同步带宽 260MB/s
+hinted_handoff_throttle_in_kb: 262144
+
+hints_flush_period_in_ms: 1000
+max_hints_file_size_in_mb: 256
+
+#索引内存大小
+index_summary_capacity_in_mb: 1024
+###############内存优化############### 
+
+```
