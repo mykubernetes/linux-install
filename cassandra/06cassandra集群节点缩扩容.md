@@ -178,7 +178,19 @@ nodetool removenode d0844a21-3698-4883-ab66-9e2fd5150edd  force
 
 # Cassandra节点替换
 
-1、修改配置文件
+1、查看集群状态
+```
+# nodetool status
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address         Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  192.168.101.69  137.38 KiB  256          100.0%            53a8aaf1-f594-4561-9e97-d11e0fd6087c  rack1
+DN  192.168.101.71  244.22 KiB  256          100.0%            8bfb1ae5-99ba-4513-a2ca-8464dbd1fb5b  rack1
+```
+
+2、修改配置文件
 
 - 如果要替换已死亡的节点，请在其位置重新启动指定死节点地址的新节点。 新节点的数据目录中不得包含任何数据.
 ```
@@ -190,7 +202,7 @@ vi /etc/cassandra/conf/jvm.options
 -Dcassandra.replace_address=192.168.101.71
 ```
 
-2、清理无用数据、启动服务
+3、清理无用数据、启动服务
 ```
 # grep -A2 '^data_file_directories' /etc/cassandra/conf/cassandra.yaml
 data_file_directories:
@@ -213,12 +225,12 @@ rm -rf /var/lib/cassandra/commitlog/*
 rm -rf /var/lib/cassandra/saved_caches/*
 ```
 
-3、启动
+4、启动
 ```
 systemctl start cassandra 
 ```
 
-4、等待集群数据恢复完成，验证集群状态
+5、等待集群数据恢复完成，验证集群状态
 ```
 # nodetool status
 Datacenter: datacenter1
@@ -230,5 +242,4 @@ UN  192.168.101.69  251.83 KiB  256          100.0%            53a8aaf1-f594-456
 UN  192.168.101.71  114.69 KiB  256          100.0%            de0445b8-d6aa-47d0-bd74-95b1326741a4  rack1
 ```
 
-
-
+其他步骤和扩容一样
