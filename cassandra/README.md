@@ -516,18 +516,18 @@ nodetool garbagecollect [<keyspace> <tables>]
 #5、禁用自动压缩
 nodetool -u cassandra -pw cassandra disableautocompaction
 
-#6、启动自动压缩
+#6、停止正在执行的压缩，避免备份数据时sstable compaction 变化
+nodetool -u cassandra -pw cassandra stop COMPACTION
+
+#7、启动自动压缩
 nodetool -u cassandra -pw cassandra enableautocompaction
 
-#7、获取compact吞吐
-nodetool -u cassandra -pw cassandra getcompactionthroughput           #打印compaction throughput
+#8、获取compact吞吐
+nodetool -u cassandra -pw cassandra getcompactionthroughput            #打印compaction throughput
 Current compaction throughput: 16 MB/s
 
-#8、设置compact吞吐
+#9、设置compact吞吐
 nodetool -u cassandra -pw cassandra setcompactionthroughput 100        #设置compaction throughput，默认100Mb/s
-
-#9、停止压缩，避免备份数据时sstable compaction 变化
-nodetool -u cassandra -pw cassandra stop --COMPACTION
 ```
 
 集群迁移速度
