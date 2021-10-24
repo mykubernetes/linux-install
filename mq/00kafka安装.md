@@ -471,7 +471,7 @@ console-consumer-42639 test                           0   40              40    
 console-consumer-42639 test                           1   57              57              0               console-consumer-42639_h71-1498000434797-f1c703cf-0
 ```
 
-注意：Apache的kafka_2.11-0.11.0.2版本可执行如下命令
+注意：Apache的kafka_2.11-0.11.0.2版本可执行如下命令,显示出Consumer的Group、Topic、分区ID、分区对应已经消费的Offset、logSize大小，Lag以及Owner等信息。
 ```
 # bin/kafka-consumer-offset-checker.sh --zookeeper 192.166.240.11:2181 --topic weishiDataOGG  --group cb6e251e-b61b-48df-985e-636a54bf8daf
 [2020-04-06 16:40:14,092] WARN WARNING: ConsumerOffsetChecker is deprecated and will be dropped in releases following 0.9.0. Use ConsumerGroupCommand instead. (kafka.tools.ConsumerOffsetChecker$)
@@ -1157,3 +1157,5 @@ $ bin/ke.sh start
 
 6、登录页面展示
 http://IP:8048/ke
+
+https://blog.csdn.net/wuliusir/article/details/51062904
