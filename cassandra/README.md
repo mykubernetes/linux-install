@@ -58,6 +58,8 @@ best practice: 重启node前先使用nodetool flush memtable，这样可以减�
 
 # nodetool常用命令
 
+- https://docs.datastax.com/en/archived/cassandra/2.2/cassandra/tools/toolsNodetool.html
+
 | 命令参数 | 描述|
 |---------|-----|
 | assassinate | 强制的将某个节点remove掉，但是不会把节点上的数据进行摆放到移除节点后的新环的数据节点上 |
