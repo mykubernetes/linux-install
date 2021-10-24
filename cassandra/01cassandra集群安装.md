@@ -172,6 +172,16 @@ native_transport_port: 9042
 rpc_address: 192.168.1.76
 ```
 
+配置环境变量
+```
+vim  ~/.bash_profile
+export CASSANDRA_HOME=/opt/cassandra
+export PATH=PATH:$CASSANDRA_HOME/bin:$CASSANDRA_HOME/tools/bin
+ 
+使配置生效
+source ~/.bash_profile
+```
+
 八、启动
 ```
 然后启动，先启动seed
