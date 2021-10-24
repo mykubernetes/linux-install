@@ -108,6 +108,31 @@ Status=Up/Down
 UN  192.168.101.69  147.75 KiB  256          100.0%            53a8aaf1-f594-4561-9e97-d11e0fd6087c  rack1
 ```
 
+7、删除节点后，直接添加无法添加，通过`describeclustr`还有记录需要删除
+```
+# nodetool describecluster
+Cluster Information:
+	Name: Test Cluster
+	Snitch: org.apache.cassandra.locator.SimpleSnitch
+	DynamicEndPointSnitch: enabled
+	Partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+	Schema versions:
+		e84b6a60-24cf-30ca-9b58-452d92911703: [192.168.101.69]
+
+		UNREACHABLE: [192.168.101.71]
+
+# nodetool assassinate 192.168.101.71
+
+# nodetool describecluster
+Cluster Information:
+	Name: Test Cluster
+	Snitch: org.apache.cassandra.locator.SimpleSnitch
+	DynamicEndPointSnitch: enabled
+	Partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+	Schema versions:
+		e84b6a60-24cf-30ca-9b58-452d92911703: [192.168.101.69]
+```
+
 # Cassandra删除宕机机器节点步骤
 
 1、找出状态为DN的节点
