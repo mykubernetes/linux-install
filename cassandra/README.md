@@ -344,7 +344,7 @@ Percentile  SSTables     Write Latency      Read Latency    Partition Size      
 Max             0.00              0.00              0.00               NaN               NaN
 ```
 
-11、查看keyspace和table的统计信息
+11、查看表的一些信息，包括读的次数，写的次数，sstable的数量，memtable信息，压缩信息，bloomfilter信息；
 ```
 nodetool -u cassandra -pw cassandra tablestats {KEYSPACE_NAME}
 ```
