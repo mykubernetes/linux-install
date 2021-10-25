@@ -1,4 +1,11 @@
+# 创建数据库
+
+```
+CREATE DATABASE  `wordpress` DEFAULT CHARACTER SET utf8mb4;
+```
+
 # 创建表（并初始化数据）
+
 ```
 -- 学生表
 CREATE TABLE `student`(
