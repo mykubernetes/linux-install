@@ -560,7 +560,34 @@ mysql> select * from mysql.procs_priv where User='test';
 mysql> 
 ```
 
+8、回收权限
+```
+mysql> flush privileges;grant select,insert on *.* to test@'%' identified by '123456';
+Query OK, 0 rows affected (0.01 sec)
 
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> show grants for test;
++-------------------------------------------+
+| Grants for test@%                         |
++-------------------------------------------+
+| GRANT SELECT, INSERT ON *.* TO 'test'@'%' |
++-------------------------------------------+
+1 row in set (0.00 sec)
+
+
+mysql> revoke insert on *.* from 'test'@'%';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> show grants for test;
++-----------------------------------+
+| Grants for test@%                 |
++-----------------------------------+
+| GRANT SELECT ON *.* TO 'test'@'%' |
++-----------------------------------+
+1 row in set (0.00 sec)
+```
 
 
 
