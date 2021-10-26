@@ -146,7 +146,7 @@ GRANT 'role1', 'role2' TO 'user1'@'localhost', 'user2'@'localhost';
 
 ### 权限级别(priv_level)
 
-- 指定权限级别的值有以下几类格式：
+指定权限级别的值有以下几类格式：
 
 - *：表示当前数据库中的所有表。
 - .：表示所有数据库中的所有表。
