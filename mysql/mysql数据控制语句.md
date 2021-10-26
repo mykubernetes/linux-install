@@ -258,7 +258,6 @@ mysql> show grants for test;
 +----------------------------------------------------------------+
 | Grants for test@%                                              |
 +----------------------------------------------------------------+
-| GRANT SELECT, INSERT ON *.* TO 'test'@'%'                      |
 | GRANT SELECT, INSERT, UPDATE, DELETE ON `MyDB`.* TO 'test'@'%' |
 +----------------------------------------------------------------+
 2 rows in set (0.00 sec)
