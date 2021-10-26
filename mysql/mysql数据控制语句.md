@@ -228,3 +228,344 @@ REVOKE PROXY ON user
 - 若要使用REVOKE语句，必须拥有MySQL数据库的全局CREATE USER权限或UPDATE权限;
 - 第一种语法格式用于回收指定用户的某些特定的权限，第二种回收指定用户的所有权限；
 
+# 练习
+
+1、查看数据库中所有用户
+```
+mysql> SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;
++------------------------------------+
+| query                              |
++------------------------------------+
+| User: 'mysql.session'@'localhost'; |
+| User: 'mysql.sys'@'localhost';     |
+| User: 'root'@'localhost';          |
++------------------------------------+
+4 rows in set (0.00 sec)
+```
+
+2、创建一个测试账号test，授予全局层级的权限。
+```
+mysql> grant select,insert on *.* to test@'%' identified by '123456';
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+```
+
+3、可以用下面两种方式查询授予test的权限。
+```
+mysql> show grants for test;
++----------------------------------------------------------------+
+| Grants for test@%                                              |
++----------------------------------------------------------------+
+| GRANT SELECT, INSERT ON *.* TO 'test'@'%'                      |
+| GRANT SELECT, INSERT, UPDATE, DELETE ON `MyDB`.* TO 'test'@'%' |
++----------------------------------------------------------------+
+2 rows in set (0.00 sec)
+
+
+
+mysql>  select * from mysql.user where user='test'\G;
+*************************** 1. row ***************************
+                  Host: %
+                  User: test
+           Select_priv: Y                    #可以看到test用户只有select和insert权限，Y代表有权限，N代表没有权限
+           Insert_priv: Y
+           Update_priv: N
+           Delete_priv: N
+           Create_priv: N
+             Drop_priv: N
+           Reload_priv: N
+         Shutdown_priv: N
+          Process_priv: N
+             File_priv: N
+            Grant_priv: N
+       References_priv: N
+            Index_priv: N
+            Alter_priv: N
+          Show_db_priv: N
+            Super_priv: N
+ Create_tmp_table_priv: N
+      Lock_tables_priv: N
+          Execute_priv: N
+       Repl_slave_priv: N
+      Repl_client_priv: N
+      Create_view_priv: N
+        Show_view_priv: N
+   Create_routine_priv: N
+    Alter_routine_priv: N
+      Create_user_priv: N
+            Event_priv: N
+          Trigger_priv: N
+Create_tablespace_priv: N
+              ssl_type: 
+            ssl_cipher: 
+           x509_issuer: 
+          x509_subject: 
+         max_questions: 0
+           max_updates: 0
+       max_connections: 0
+  max_user_connections: 0
+                plugin: mysql_native_password
+ authentication_string: *6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9
+      password_expired: N
+ password_last_changed: 2021-10-26 10:38:07
+     password_lifetime: NULL
+        account_locked: N
+1 row in set (0.00 sec)
+
+ERROR: 
+No query specified
+```
+
+4、创建一个测试账号test，授予数据库层级的权限。
+```
+mysql> drop user test;
+Query OK, 0 rows affected (0.00 sec)
+ 
+mysql> grant select,insert,update,delete on MyDB.* to test@'%' identified by 'test';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> select * from mysql.user where user='test'\G;                  --可以看到无任何授权。
+*************************** 1. row ***************************
+                  Host: %
+                  User: test
+           Select_priv: N
+           Insert_priv: N
+           Update_priv: N
+           Delete_priv: N
+           Create_priv: N
+             Drop_priv: N
+           Reload_priv: N
+         Shutdown_priv: N
+          Process_priv: N
+             File_priv: N
+            Grant_priv: N
+       References_priv: N
+            Index_priv: N
+            Alter_priv: N
+          Show_db_priv: N
+            Super_priv: N
+ Create_tmp_table_priv: N
+      Lock_tables_priv: N
+          Execute_priv: N
+       Repl_slave_priv: N
+      Repl_client_priv: N
+      Create_view_priv: N
+        Show_view_priv: N
+   Create_routine_priv: N
+    Alter_routine_priv: N
+      Create_user_priv: N
+            Event_priv: N
+          Trigger_priv: N
+Create_tablespace_priv: N
+              ssl_type: 
+            ssl_cipher: 
+           x509_issuer: 
+          x509_subject: 
+         max_questions: 0
+           max_updates: 0
+       max_connections: 0
+  max_user_connections: 0
+                plugin: mysql_native_password
+ authentication_string: *6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9
+      password_expired: N
+ password_last_changed: 2021-10-26 10:43:37
+     password_lifetime: NULL
+        account_locked: N
+1 row in set (0.00 sec)
+
+ERROR: 
+No query specified
+
+
+
+mysql> select * from mysql.db where user='test'\G;
+*************************** 1. row ***************************
+                 Host: %
+                   Db: MyDB
+                 User: test
+          Select_priv: Y
+          Insert_priv: Y
+          Update_priv: Y
+          Delete_priv: Y
+          Create_priv: N
+            Drop_priv: N
+           Grant_priv: N
+      References_priv: N
+           Index_priv: N
+           Alter_priv: N
+Create_tmp_table_priv: N
+     Lock_tables_priv: N
+     Create_view_priv: N
+       Show_view_priv: N
+  Create_routine_priv: N
+   Alter_routine_priv: N
+         Execute_priv: N
+           Event_priv: N
+         Trigger_priv: N
+1 row in set (0.00 sec)
+
+ERROR: 
+No query specified
+
+
+mysql> show grants for test;
++----------------------------------------------------------------+
+| Grants for test@%                                              |
++----------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'test'@'%'                               |
+| GRANT SELECT, INSERT, UPDATE, DELETE ON `MyDB`.* TO 'test'@'%' |
++----------------------------------------------------------------+
+2 rows in set (0.00 sec)
+```
+
+5、创建一个测试账号test，授予表层级的权限。
+```
+mysql> drop user test;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> grant all on MyDB.kkk to test@'%' identified by '123456';
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+
+
+mysql> show grants for test;
++----------------------------------------------------+
+| Grants for test@%                                  |
++----------------------------------------------------+
+| GRANT USAGE ON *.* TO 'test'@'%'                   |
+| GRANT ALL PRIVILEGES ON `MyDB`.`kkk` TO 'test'@'%' |
++----------------------------------------------------+
+2 rows in set (0.00 sec)
+
+
+
+
+mysql> select * from mysql.tables_priv\G;
+*************************** 1. row ***************************
+       Host: localhost
+         Db: mysql
+       User: mysql.session
+ Table_name: user
+    Grantor: boot@connecting host
+  Timestamp: 0000-00-00 00:00:00
+ Table_priv: Select
+Column_priv: 
+*************************** 2. row ***************************
+       Host: localhost
+         Db: sys
+       User: mysql.sys
+ Table_name: sys_config
+    Grantor: root@localhost
+  Timestamp: 2021-10-25 11:13:35
+ Table_priv: Select
+Column_priv: 
+*************************** 3. row ***************************
+       Host: %
+         Db: MyDB
+       User: test
+ Table_name: kkk
+    Grantor: root@localhost
+  Timestamp: 0000-00-00 00:00:00
+ Table_priv: Select,Insert,Update,Delete,Create,Drop,References,Index,Alter,Create View,Show view,Trigger
+Column_priv: 
+3 rows in set (0.00 sec)
+
+ERROR: 
+No query specified
+```
+
+6、创建一个测试账号test，授予列层级的权限。
+```
+mysql> drop user test;
+Query OK, 0 rows affected (0.00 sec)
+ 
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+ 
+mysql> grant select (id, col1) on MyDB.TEST1 to test@'%' identified by '123456';
+Query OK, 0 rows affected (0.01 sec)
+ 
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+
+
+ 
+ 
+mysql> select * from mysql.columns_priv;
++------+------+------+------------+-------------+---------------------+-------------+
+| Host | Db   | User | Table_name | Column_name | Timestamp           | Column_priv |
++------+------+------+------------+-------------+---------------------+-------------+
+| %    | MyDB | test | TEST1      | id          | 0000-00-00 00:00:00 | Select      |
+| %    | MyDB | test | TEST1      | col1        | 0000-00-00 00:00:00 | Select      |
++------+------+------+------------+-------------+---------------------+-------------+
+2 rows in set (0.00 sec)
+ 
+ 
+mysql> show grants for test;
++-----------------------------------------------------------------------------------------------------+
+| Grants for test@%                                                                                   |
++-----------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'test'@'%' IDENTIFIED BY PASSWORD '*94BDCEBE19083CE2A1F959FD02F964C7AF4CFC29' |
+| GRANT SELECT (id, col1) ON `MyDB`.`TEST1` TO 'test'@'%'                                             |
++-----------------------------------------------------------------------------------------------------+
+2 rows in set (0.00 sec)
+ 
+mysql> 
+```
+
+7、创建一个测试账号test，授子程序层级的权限。
+```
+mysql> DROP PROCEDURE IF EXISTS PRC_TEST;
+Query OK, 0 rows affected (0.00 sec)
+ 
+mysql> DELIMITER //
+mysql> CREATE PROCEDURE PRC_TEST()
+    -> BEGIN
+    ->    SELECT * FROM kkk;
+    -> END //
+Query OK, 0 rows affected (0.00 sec)
+ 
+mysql> DELIMITER ;
+ 
+mysql> grant execute on procedure MyDB.PRC_TEST to test@'%' identified by 'test';
+Query OK, 0 rows affected (0.01 sec)
+ 
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+ 
+mysql> 
+ 
+ 
+mysql> show grants for test;
++-----------------------------------------------------------------------------------------------------+
+| Grants for test@%                                                                                   |
++-----------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'test'@'%' IDENTIFIED BY PASSWORD '*94BDCEBE19083CE2A1F959FD02F964C7AF4CFC29' |
+| GRANT EXECUTE ON PROCEDURE `MyDB`.`prc_test` TO 'test'@'%'                                          |
++-----------------------------------------------------------------------------------------------------+
+2 rows in set (0.00 sec)
+ 
+mysql> select * from mysql.procs_priv where User='test';
++------+------+------+--------------+--------------+----------------+-----------+---------------------+
+| Host | Db   | User | Routine_name | Routine_type | Grantor        | Proc_priv | Timestamp           |
++------+------+------+--------------+--------------+----------------+-----------+---------------------+
+| %    | MyDB | test | PRC_TEST     | PROCEDURE    | root@localhost | Execute   | 0000-00-00 00:00:00 |
++------+------+------+--------------+--------------+----------------+-----------+---------------------+
+1 row in set (0.00 sec)
+ 
+mysql> 
+```
+
+
+
+
+
+
+
+
+
