@@ -225,5 +225,83 @@ mysql>  select * from customers;
 |  3 | zhangheng |  27 |
 +----+-----------+-----+
 3 rows in set (0.00 sec)
+```
+- 此时恢复了全备时刻的数据
+
+
+11、接着，使用002bin.sql文件恢复全备时刻到删除数据库之间，新增的数据
 
 ```
+# mysql -uroot -p < 003bin.sql 
+Enter password: 
+ERROR 1790 (HY000) at line 93: @@SESSION.GTID_NEXT cannot be changed by a client that owns a GTID. The client owns ANONYMOUS. Ownership is released on COMMIT or ROLLBACK.
+
+# 登录验证
+# mysql -uroot -p 
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 5.7.35-log MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| csdn               |
+| mysql              |
+| ops                |
+| performance_schema |
+| sqltest            |
+| sys                |
+| wordpress          |
++--------------------+
+8 rows in set (0.00 sec)
+
+mysql> use ops 
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql>  select * from customers;
++----+-----------+-----+
+| id | name      | age |
++----+-----------+-----+
+|  1 | wangbo    |  24 |
+|  2 | guohui    |  22 |
+|  3 | zhangheng |  27 |
+|  4 | liupeng   |  21 |
+|  5 | xiaoda    |  31 |
+|  6 | fuaiai    |  26 |
++----+-----------+-----+
+6 rows in set (0.00 sec)
+```
+- 以上就是mysql数据库增量数据恢复的实例过程！
+
+## 最后，总结几点：
+- 1）本案例适用于人为SQL语句造成的误操作或者没有主从复制等的热备情况宕机时的修复
+- 2）恢复条件为mysql要开启binlog日志功能，并且要全备和增量的所有数据
+- 3）恢复时建议对外停止更新，即禁止更新数据库
+- 4）先恢复全量，然后把全备时刻点以后的增量日志，按顺序恢复成SQL文件，然后把文件中有问题的SQL语句删除（也可通过时间和位置点），再恢复到数据库。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
