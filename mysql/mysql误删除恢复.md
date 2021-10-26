@@ -128,3 +128,102 @@ mysql> select * from customers;
 +----+-----------+-----+
 6 rows in set (0.00 sec)
 ```
+
+7、此时误操作，删除了test数据库
+```
+mysql> drop database ops;
+Query OK, 1 row affected (0.01 sec)
+```
+
+8、查看全备之后新增的binlog文件
+```
+[root@localhost ~]# cd /opt/backup/
+
+[root@localhost backup]# ls
+ops_2021-10-26.sql.gz
+
+[root@localhost backup]# gzip -d ops_2021-10-26.sql.gz
+
+[root@localhost backup]# ls
+ops_2021-10-26.sql
+
+[root@localhost backup]# grep CHANGE ops_2021-10-26.sql 
+-- CHANGE MASTER TO MASTER_LOG_FILE='myslq-bin.000003', MASTER_LOG_POS=154;
+```
+- 这是全备时刻的binlog文件位置,即mysql-bin.000003的154行，因此在该文件之前的binlog文件中的数据都已经包含在这个全备的sql文件中了
+
+9、移动binlog文件，并导出为sql文件，剔除其中的drop语句
+```
+# cd /var/lib/mysql
+
+# ls |grep  myslq-bin
+myslq-bin.000001
+myslq-bin.000002
+myslq-bin.000003
+myslq-bin.index
+
+# cp myslq-bin.000003 /opt/backup/
+
+# 将binlog文件导出sql文件，并vim编辑它删除其中的drop语句
+# cd /opt/backup/
+
+# ls
+myslq-bin.000003  ops_2021-10-26.sql
+
+# mysqlbinlog myslq-bin.000003 > 003bin.sql              # 即将binlog日志转化为可正常导入的sql文件
+
+# ls
+003bin.sql  myslq-bin.000003  ops_2021-10-26.sql
+
+# vim 003bin.sql                                         # 删除里面的drop语句
+```
+
+10、恢复
+```
+# mysql -uroot -p < ops_2021-10-26.sql 
+Enter password: 
+
+# 登录验证
+# mysql -uroot -p 
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 6
+Server version: 5.7.35-log MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| csdn               |
+| mysql              |
+| ops                |
+| performance_schema |
+| sqltest            |
+| sys                |
+| wordpress          |
++--------------------+
+8 rows in set (0.00 sec)
+
+
+mysql> use ops;
+
+mysql>  select * from customers;
++----+-----------+-----+
+| id | name      | age |
++----+-----------+-----+
+|  1 | wangbo    |  24 |
+|  2 | guohui    |  22 |
+|  3 | zhangheng |  27 |
++----+-----------+-----+
+3 rows in set (0.00 sec)
+
+```
