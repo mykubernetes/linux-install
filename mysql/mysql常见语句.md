@@ -231,11 +231,22 @@ alter table 表 modify column 字段名 字段类型 约束 auto_increment
 alter table 表 modify column 字段名 字段类型 约束 
 ```
 
-DDL语音
-===
+# DDL（Data Definition Languages）语句：即数据库定义语句
 
+对于数据库而言实际上每一张表都表示是一个数据库的对象，而数据库对象指的就是DDL定义的所有操作，例如：表，视图，索引，序列，约束等等，都属于对象的操作，所以表的建立就是对象的建立，而对象的操作主要分为以下三类语法
+- 创建对象：CREATE 对象名称;
+- 删除对象：DROP 对象名称;
+- 修改对象：ALTER 对象名称;
 
 ```
+##############################数据库操作##############################
+#创建数据库
+create database 库名;
+CREATE DATABASE [IF NOT EXISTS] 库名;                               # 如果不存在就创建
+
+create database [if not exists] 库名 [character set 字符集名];
+
+#查看数据库
 mysql> SHOW DATABASES;
 +--------------------+
 | Database           |
@@ -248,20 +259,22 @@ mysql> SHOW DATABASES;
 +--------------------+
 6 rows in set (0.02 sec)
 
-##############################数据库操作##############################
-#创建数据库
-create database 库名;
-CREATE DATABASE [IF NOT EXISTS] 库名;    #如果不存在就创建
-
-create database [if not exists] 库名 [character set 字符集名];
-
 #删除数据库
 drop database 库名;
 DROP DATABASE [IF EXISTS] 库名;        #如果存在就删除
+```
+- information_schema：主要存储了系统中的一些数据库对象信息。比如用户表信息、列信息、权限信息、字符集信息、分区信息等。
+- cluster：存储了系统的集群信息。
+- mysql：存储了系统的用户权限信息。
+- test：系统自动创建的测试数据库，任何用户都可以使用。
 
+```
 ##############################表操作##############################
-#使用表
+#使用数据库
 use 表名；
+
+#查看数据库中的表
+show tables;
 
 #创建表
 create table 表名 (id int(5) not null,name char(10) );
@@ -269,7 +282,9 @@ CREATE TABLE [IF  NOT EXISTS] 表名 (id int(5) not null,name char(10) );
 
 删除表
 drop table [if exists] 表名;
+```
 
+```
 ##############################修改表##############################
 1.添加列
 alter table 表名 add column 列名 类型 [first|after 字段名];
@@ -297,9 +312,9 @@ create table 表名 like 旧表;
 create table 表名 select 查询列表 from 旧表 [where 筛选];
 ```
 
-设置表的类型
----
--Mysql的数据类型： MyISAM、InnoDB、HEAP、 BOB、CSV等
+# 设置表的类型
+
+- Mysql的数据类型： MyISAM、InnoDB、HEAP、 BOB、CSV等
 
 | **对比项** |**MyISAM** | **InnoDB** |
 |-------|--------|--------|
@@ -322,21 +337,33 @@ CREATE TABLE 表名(
 - 1. 使用MyISAM：节约空间及响应速度快；不需事务，空间小，以查询访问为主
 - 2. 使用InnoDB：安全性，事务处理及多用户操作数据表；多删除、更新操作，安全性高，事务处理及并发控制
 
-查看mysql所支持的引擎类型
----
+# 查看mysql所支持的引擎类型
 ```
-SHOW ENGINES
+SHOW ENGINES;
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+| MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+| BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+| MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+| CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+| ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+| PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+| FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+9 rows in set (0.00 sec)
 ```
 
-查看默认引擎
----
+# 查看默认引擎
 ```
-SHOW VARIABLES LIKE 'storage_engine';
+mysql> SHOW VARIABLES LIKE 'storage_engine';
 ```
 
 ## 一、创建表
 ```
-CREATE TABLE `Student`(
+mysql> CREATE TABLE `Student`(
 	`s_id` VARCHAR(20),
 	`s_name` VARCHAR(20) NOT NULL DEFAULT '',
 	`s_birth` VARCHAR(20) NOT NULL DEFAULT '',
