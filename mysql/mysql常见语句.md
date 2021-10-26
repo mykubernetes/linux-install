@@ -2,8 +2,9 @@
 
 修改密码
 ```
-mysqladmin -u root password '123456'
-alter user 'root@localhost' IDENTIFIED BY '123456';
+mysqladmin -uroot -p123456 password 1234567
+
+set password for 'root'@'localhost'=password('123456');
 ```
 
 刷新
