@@ -452,8 +452,8 @@ mysql> alter table Student modify s_name varchar(30) default '' first;
 mysql> alter table Student rename student;
 ```
 
-DML语言
-===
+# DML语言（Data Manipulation Language）语句：即数据操纵语句
+
 ```
 #插入值
 insert into mysql.user(Host,User,Password) values("localhost","test",password("1234"));
@@ -544,10 +544,12 @@ DELETE FROM student WHERE s_id='09'
 TRUNCATE student1;
 ```
 
-DQL语言
-===
+# DQL语言（Data Query Language）语句：即数据查询语句
 
-数学运算符
+搜索条件的组成：
+
+- 数学运算符
+
 | 运算符 | 含义 | 范例 | 结果 |
 |-------|------|-----|------|
 | = | 等于| 5=6 | false |
@@ -557,14 +559,16 @@ DQL语言
 | >= | 大于等于| 5>=6 | false |
 | <= | 小于等于| 5<=6 | true |
 
-逻辑操作符
+- 逻辑操作符
+
 | 操作符名称| 语法 | 描述 |
 |----------|-----|------|
 | AND或&& | a AND b 或a && b | 逻辑与，同时为真结果才为真 |
 | OR | a OR b | 逻辑或，只要一个为真，则结果为真 |
 | NOT或! | NOT a 或!a | 逻辑非，若操作数为假，结果为真 |
 
-比较运算符
+- 比较运算符
+
 | 操作符名称 | 语法 | 描述 |
 |-----------|-----|------|
 | IS NULL | a IS NULL | 若操作符为NULL则结果为真 |
@@ -956,15 +960,7 @@ select * from  表1 inner join 表2;
 - 右边的表无论是否能够匹配都要完整显示，左边的仅展示匹配上的记录
 
 
-
-
-
-
-
-
-
-mysql_secure_installation安全配置向导
-===
+# mysql_secure_installation安全配置向导
 ```
 # mysql_secure_installation
 NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
