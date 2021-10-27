@@ -4,6 +4,8 @@
 ```
 mysqladmin -uroot -p123456 password 1234567
 
+alter user root@'localhost' identified by '123456';
+
 set password for 'root'@'localhost'=password('123456');
 ```
 
