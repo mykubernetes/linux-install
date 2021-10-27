@@ -17,6 +17,15 @@ show variables like 'log_error%';
 ![1553993244446](assets/1553993244446.png) 
 
 
+```
+mysql> show variables like 'log_error%';
++---------------------+---------------------+
+| Variable_name       | Value               |
++---------------------+---------------------+
+| log_error           | /var/log/mysqld.log |
+| log_error_verbosity | 3                   |
++---------------------+---------------------+
+```
 
 查看日志内容 ： 
 
