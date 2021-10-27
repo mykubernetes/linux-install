@@ -230,6 +230,25 @@ REVOKE PROXY ON user
 
 # 练习
 
+```
+-- 创建用户及密码
+mysql> create user 'huiq'@'%' identified by 'huiq%123';
+
+-- 修改用户密码
+mysql> set password for 'huiq'@'%' = password('huiq%123456');
+
+-- 删除用户
+mysql> delete from mysql.user where user='huiq' and host='%';
+
+-- 删除账户及权限（想删除用户的话一般用这种方式）
+mysql> drop user 用户名@'%';
+
+mysql> flush privileges;
+
+查看所有用户
+mysql> select user,host from mysql.user;
+```
+
 1、查看数据库中所有用户
 ```
 mysql> SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;
