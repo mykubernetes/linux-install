@@ -2,10 +2,6 @@
 https://blog.csdn.net/weixin_45692705/article/details/119003128?spm=1001.2014.3001.5501
 
 
-https://blog.csdn.net/m0_37739193/article/details/104198023
-
-https://blog.csdn.net/m0_37739193/article/details/105967532
-
 社区版  
 https://dev.mysql.com/downloads/mysql/
 
