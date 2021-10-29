@@ -1,5 +1,7 @@
-etcdctl 命令
-===
+# etcdctl 命令
+
+https://wiki.shileizcc.com/confluence/display/etcd/Etcd
+
 ```
 ETCDCTL_API=3 ./etcdctl --endpoints=https://0:2379,https://1:2379,https://2:2379 --cacert /etc/etcd/ssl/ca.pem --cert /etc/etcd/ssl/etcd.pem --key /etc/etcd/ssl/etcd-key.pem endpoint status --write-out=table
 ```
