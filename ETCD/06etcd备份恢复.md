@@ -63,3 +63,19 @@ $ etcdctl --endpoints 127.0.0.1:2379 snapshot save $(date +%Y%m%d_%H%M%S)_snapsh
 [root@k8s001 ~]# etcdctl snapshot restore 20200629_141504_snapshot.db --data-dir /var/lib/etcd
 [root@k8s001 ~]# systemctl restart etcd
 ```
+
+# 备份恢复,整体步骤
+- 通过 etcdctl 子命令即可完成，注意需要停止 etcd 服务并清空对应的 data 目录。
+```
+# 备份数据
+ETCDCTL_API=3 etcdctl snapshot save etcd.db
+# 数据状态
+etcdctl snapshot status etcd.db  -w table
++----------+----------+------------+------------+
+|   HASH   | REVISION | TOTAL KEYS | TOTAL SIZE |
++----------+----------+------------+------------+
+| 77e8a851 |        2 |          5 |      20 kB |
++----------+----------+------------+------------+
+
+etcdctl --endpoints $ENDPOINT snapshot restore snapshot.db --data-dir /var/lib/etcd
+```
