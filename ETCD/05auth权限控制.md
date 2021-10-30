@@ -286,3 +286,347 @@ Password:
 mengyuan
 root
 ```
+
+# etcd 访问控制实践
+
+## User 相关命令
+- 可使用 etcdctl user 子命令来处理与用户相关的操作，比如：
+
+1. 获取所有的 User
+```
+[root@kano ~]# etcdctl user list
+[root@kano ~]# 
+```
+当前没有任何的User。
+
+
+2. 创建一个 User
+```
+# 创建成功
+[root@kano ~]# etcdctl user add mea
+Password of mea: 
+Type password of mea again for confirmation: 
+User mea created
+[root@kano ~]# 
+[root@kano ~]# etcdctl user list
+mea
+[root@kano ~]#
+```
+
+3. 授予用户对应的 Role 和撤销用户所拥有的 Role（允许部分撤销）
+```
+# 给 mea 添加角色, 但是 super 显然不存在, 这里只是演示命令
+[root@kano ~]# etcdctl user grant-role mea super
+Error: etcdserver: role name not found
+[root@kano ~]#
+# 显然是失败的, 因为 super 不是一个角色, 也没有授予用户 mea
+[root@kano ~]# etcdctl user revoke-role mea super
+Error: etcdserver: role is not granted to the user
+[root@kano ~]# 
+```
+
+4. 一个用户的详细信息可以通过下面的命令进行获取
+```
+# 角色为空
+[root@kano ~]# etcdctl user get mea
+User: mea
+Roles:
+[root@kano ~]# 
+```
+
+5. 修改密码
+```
+[root@kano ~]# etcdctl user passwd mea
+Password of mea: 
+Type password of mea again for confirmation: 
+Password updated
+[root@kano ~]# 
+```
+
+6. 删除用户
+```
+[root@kano ~]# etcdctl user delete mea
+User mea deleted
+[root@kano ~]#
+```
+
+## Role 相关命令
+- 与 User 子命令类似，Role 子命令可用来处理与角色相关的操作。可使用 etcdctl 子命令 etcdctl role 来为对应的 Role 角色指定相应的权限，然后将 Role 角色授予相应的 User，从而使 User 具有相应的权限。
+
+1. 列出所有的 Role
+```
+[root@kano ~]# etcdctl role list
+[root@kano ~]#
+```
+
+2. 创建一个 Role
+```
+[root@kano ~]# etcdctl role add common
+Role common created
+[root@kano ~]#
+```
+
+一个角色没有密码，它定义了一组访问权限，etcd 里的角色被授予访问一个或一个范围内的key。这个范围可以由一个区间 `[start-key, end-key]`，其中起始值 start-key 的字典序要小于结束值 end-key。
+
+访问权限可以是读、写或者可读可写，Role 角色能够指定键空间下不同部分的访问权限，不过一次只能设置一个 path 或 一组path（使用前缀 + * 来表示，相当于以某个字符串为开头）的访问权限。
+
+3. 授予对某个 key 只读权限
+```
+# 授予 name的只读权限
+[root@kano ~]# etcdctl role grant-permission common read name
+Role common updated
+[root@kano ~]# 
+```
+
+4. 授予对一个范围的 key 只写权限
+```
+# 授予 a 开头的key的只写权限
+[root@kano ~]# etcdctl role grant-permission common write a b
+Role common updated
+[root@kano ~]# 
+```
+
+5. 授予对一组 key 只写权限
+```
+# 授予 c 开头的key的可读可写权限, 需要加上--prefix
+[root@kano ~]# etcdctl role grant-permission common readwrite c --prefix
+Role common updated
+[root@kano ~]# 
+```
+
+6. 查看一个角色具有的权限
+```
+[root@kano ~]# etcdctl role get common
+Role common
+KV Read:
+	c*
+	name
+KV Write:
+	[a, b) (prefix a)
+	c*
+[root@kano ~]# 
+```
+
+7. 收回一个角色的某个权限
+```
+# 收回对 c* 进行操作的权限, 这里不需要指定读或写, 显然是读写都收回
+[root@kano ~]# etcdctl role revoke-permission common c*
+Permission of key c* is revoked from role common
+# 对 c* 进行操作的权限已经没了
+[root@kano ~]# etcdctl role get common
+Role common
+KV Read:
+	name
+KV Write:
+	[a, b) (prefix a)
+[root@kano ~]# 
+# 收回一个本来就没有权限操作的key会报错
+[root@kano ~]# etcdctl role revoke-permission common d*
+Error: etcdserver: permission is not granted to the role
+[root@kano ~]# 
+# 只有读或写一种权限也可以, 只要有权限, 在收回的时候就不会报错
+[root@kano ~]# etcdctl role revoke-permission common name
+Permission of key name is revoked from role common
+[root@kano ~]# 
+# 可以看到只剩下对 [a, b) 的写权限了
+[root@kano ~]# etcdctl role get common
+Role common
+KV Read:
+KV Write:
+	[a, b) (prefix a)
+[root@kano ~]# 
+```
+
+8. 移除某个角色
+```
+# 此时整个角色就被删除了
+[root@kano ~]# etcdctl role delete common
+Role common deleted
+[root@kano ~]# etcdctl role get common
+Error: etcdserver: role name not found
+[root@kano ~]# 
+```
+
+## 启用用户权限功能
+
+- 虽然我们介绍了权限相关，但是我们之前貌似并不需要权限就可以操作，这是因为没有开启权限。而开始权限可以通过 etcdctl auth 子命令开启。
+
+1. 确认 root 用户已经创建
+```
+[root@kano ~]# etcdctl user list
+[root@kano ~]# etcdctl user add root
+Password of root: 
+Type password of root again for confirmation: 
+User root created
+[root@kano ~]# 
+```
+
+2. 启用权限认证功能
+```
+# 此时认证就开启了
+[root@kano ~]# etcdctl auth enable
+Authentication Enabled
+[root@kano ~]# 
+# 也就不能随随便便地写了
+[root@kano ~]# etcdctl put name nana
+Error: etcdserver: user name is empty
+[root@kano ~]# etcdctl get name
+Error: etcdserver: user name is empty
+# 如果想写的话, 需要指定用户, 然后会提示输入密码
+[root@kano ~]# etcdctl put name nana --user="root"
+Password: 
+OK
+# 也可以直接指定, 通过 user:password 方式
+[root@kano ~]# etcdctl put age 16 --user="root:123456"
+OK
+# 读也是同理
+[root@kano ~]# etcdctl get name --user="root"
+Password: 
+name
+nana
+# 直接指定密码
+[root@kano ~]# etcdctl get age --user="root:123456"
+age
+16
+[root@kano ~]# 
+```
+
+3. 关闭权限认证功能
+```
+[root@kano ~]# etcdctl auth disable
+Error: etcdserver: user name not found
+# 即便是关闭权限, 也依旧需要指定一个用户
+[root@kano ~]# etcdctl auth disable --user="root:123456"
+Authentication Disabled
+[root@kano ~]# 
+```
+
+这个时候可能有人好奇了，要是没有用户怎么办？答案是如果没有用户，etcd是不会允许你开启认证的，我们举个栗子。
+```
+[root@kano ~]# etcdctl user delete root
+User root deleted
+[root@kano ~]# etcdctl auth enable
+Error: etcdserver: root user does not exist
+```
+
+注意：我们说角色会被授予用户，而当我们开启认证的时候，会自动创建 root 角色并授予 root 用户。
+```
+# 此时 用户 和 角色 都没有
+[root@kano ~]# etcdctl user list
+[root@kano ~]# etcdctl role list
+# 创建一个root, 否则无法开启认证
+[root@kano ~]# etcdctl user add root
+Password of root: 
+Type password of root again for confirmation: 
+User root created
+[root@kano ~]# etcdctl user list
+root
+# 用户多了 root, 但是角色还不存在
+[root@kano ~]# etcdctl role list
+# 开启认证
+[root@kano ~]# etcdctl auth enable
+Authentication Enabled
+# 发现root角色自动被创建了
+[root@kano ~]# etcdctl role list --user="root:123456"
+root
+```
+
+而我们说 root 用户 和 root 角色都是可以被删除的，但那是在没有开启认证的情况下，如果开启了认证呢？
+```
+# 此时再创建一个用户 mea
+[root@kano ~]# etcdctl role add mea --user="root:123456"
+Role mea created
+# 用户 mea 是可以被删除的, 当然权限也可以
+[root@kano ~]# etcdctl role delete mea --user="root:123456"
+Role mea deleted
+# 但是: root用户和root权限, 是无法被删除的
+[root@kano ~]# etcdctl role delete root --user="root:123456"
+Error: etcdserver: invalid auth management
+[root@kano ~]# etcdctl user delete root --user="root:123456"
+Error: etcdserver: invalid auth management
+# 如果想删除, 那么需要先把认证给关掉
+[root@kano ~]# etcdctl auth disable --user="root:123456"
+Authentication Disabled
+# 此时 root 就可以删除了
+[root@kano ~]# etcdctl user delete root
+User root deleted
+# 但是这里还有一个容易忽略的地方, 如果我们想再次启动认证呢? 显然再创建一个 root 启动不就行了吗? 我们来试试
+# 创建root
+[root@kano ~]# etcdctl user add root
+Password of root: 
+Type password of root again for confirmation: 
+User root created
+# 开启认证, 但是报错了: 告诉我们角色已存在, 相信你肯定想到了
+# 因为我们刚才只把 root用户 删掉了, 但是没有删 root角色, 而我们说开启认证的时候会自动创建 root 角色
+# 但是 root角色已经存在了, 所以就报错了
+[root@kano ~]# etcdctl auth enable
+Error: etcdserver: role name already exists
+# 此时认证是没有开启的
+[root@kano ~]# etcdctl put name hanser
+OK
+[root@kano ~]# etcdctl get name
+name
+hanser
+# 而解决办法也很简单, 直接把 root角色给删掉就可以了
+[root@kano ~]# etcdctl role delete root
+Role root deleted
+# 此时成功开启认证
+[root@kano ~]# etcdctl auth enable
+Authentication Enabled
+[root@kano ~]# 
+```
+
+4. 综合以上例子
+```
+# 创建一个普通用户, 由于开启了认证, 所以下面每一步都需要指定用户
+[root@kano ~]# etcdctl role add common --user="root:123456"
+Role common created
+# 就是我们刚才演示的, 赋予对name的只读权限
+[root@kano ~]# etcdctl role grant-permission common read name --user="root:123456"
+Role common updated
+# 赋予对[a, b)的只写权限
+[root@kano ~]# etcdctl role grant-permission common write a b --user="root:123456"
+Role common updated
+# 赋予对c*的可读可写权限
+[root@kano ~]# etcdctl role grant-permission common readwrite c --prefix --user="root:123456"
+Role common updated
+# 然后创建一个用户 mea
+[root@kano ~]# etcdctl user add mea --user="root:123456"
+Password of mea: 
+Type password of mea again for confirmation: 
+User mea created
+# 以后让别人不使用root, 只能使用mea这个用户, 但是默认它是没有任何权限的
+# 所以我们将角色common授予用户mea
+[root@kano ~]# etcdctl user grant-role mea common --user="root:123456"
+Role common is granted to user mea
+# 那么以后通过 --user="mea:123456" 便可以操作指定的key了; 这里的密码是123456, 只是为了方便
+# 如果 用户mea 还希望操作其它key, 则需要root再次赋予新的角色, 一个用户可以有多个角色, 或者更新common所具有的权限也是可以的
+[root@kano ~]# 
+# 我们看到写name这个key的时候, 被告知权限不够
+[root@kano ~]# etcdctl put name nana --user="mea:123456"
+Error: etcdserver: permission denied
+# 我们用 root 写一下
+[root@kano ~]# etcdctl put name nana --user="root:123456"
+OK
+# 虽然写不行, 但是读可以
+[root@kano ~]# etcdctl get name --user="mea:123456"
+name
+nana
+# [a, b)具有写权限
+[root@kano ~]# etcdctl put aaaa bbbb --user="mea:123456"
+OK
+# 但是没有读权限
+[root@kano ~]# etcdctl get aaaa --user="mea:123456"
+Error: etcdserver: permission denied
+[root@kano ~]# etcdctl get aaaa --user="root:123456"
+aaaa
+bbbb
+[root@kano ~]#
+# c开头的key是可读可写
+[root@kano ~]# etcdctl put crystal krystal --user="mea:123456"
+OK
+[root@kano ~]# etcdctl get crystal --user="mea:123456"
+crystal
+krystal
+[root@kano ~]#
+```
