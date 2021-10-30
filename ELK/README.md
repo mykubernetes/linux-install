@@ -77,7 +77,7 @@ curl http://localhost:9200/_cat/count?v
 
 查看所有node存储空间转台
 ```
-curl http://localhost:9200/ _cat/allocation?v
+curl http://localhost:9200/_cat/allocation?v
 ```
 
 查看所有node文件系统状态
@@ -87,7 +87,7 @@ curl http://localhost:9200/_nodes/stats/fs?pretty
 
 查看所有node可用磁盘大小
 ```
-curl http://localhost:9200/ _cat/nodes?h=h,diskAvail
+curl http://localhost:9200/_cat/nodes?h=h,diskAvail
 ```
 
 二、使用_cluster系列  
