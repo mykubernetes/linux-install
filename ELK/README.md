@@ -42,27 +42,33 @@ _cat系列提供了一系列查询elasticsearch集群状态的接口。
 curl -XGET localhost:9200/_cat
 获取所有_cat系列的操作
 =^.^=
-/_cat/allocation              #查看节点分配情况
+/_cat/allocation              #查看资源信息
 /_cat/shards                  #查看分片情况
-/_cat/shards/{index}
+/_cat/shards/{index}          #查看具体索引的分片信息
 /_cat/master                  #查看主节点信息
-/_cat/nodes                   #查看所有节点
+/_cat/nodes                   #查看节点状态
+/_cat/nodeattrs               #查看节点的自定义属性
 /_cat/indices                 #查看所有索引 类似于数据库的show databases;
-/_cat/indices/{index}
+/_cat/indices/{index}         #查看具体索引信息
 /_cat/segments                #查看索引的分片信息
-/_cat/segments/{index}
-/_cat/count                   #查看文档个数
-/_cat/count/{index}
-/_cat/recovery
-/_cat/recovery/{index}
+/_cat/segments/{index}        #查看具体索引的存储片段信息
+/_cat/snapshots/{repository}  #查看快照库
+/_cat/count                   #查看文档总数
+/_cat/count/{index}           #查看具体索引的文档总数
+/_cat/recovery                #查看数据恢复状态
+/_cat/recovery/{index}        #查看数据恢复状态
+/_cat/repositories            #查看存储库
 /_cat/health                  #查看集群健康情况
-/_cat/pending_tasks
-/_cat/aliases
-/_cat/aliases/{alias}
-/_cat/thread_pool
-/_cat/plugins
-/_cat/fielddata
-/_cat/fielddata/{fields}
+/_cat/pending_tasks           #查看待处理任务
+/_cat/aliases                 #查看别名信息
+/_cat/aliases/{alias}         #指定别名查看信息
+/_cat/thread_pool             #查看线程池信息
+/_cat/thread_pool/{thread_pools}/_cat/plugins            #查看线程池下插件
+/_cat/tasks                   #查看任务
+/_cat/templates               #查看模板
+/_cat/plugins                 #查看插件信息
+/_cat/fielddata               #查看fielddata占用内存情况(查询时es会把fielddata信息load进内存)
+/_cat/fielddata/{fields}      #针对某一字段进行查看
 ```  
 
 查看所有index
