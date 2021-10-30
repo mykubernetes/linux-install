@@ -70,6 +70,8 @@ curl -XGET localhost:9200/_cat
 /_cat/fielddata               #查看fielddata占用内存情况(查询时es会把fielddata信息load进内存)
 /_cat/fielddata/{fields}      #针对某一字段进行查看
 ```  
+- ?v 打印出表头信息
+- ?pretty 美化输出
 
 查看所有index
 ```
@@ -96,8 +98,39 @@ curl http://localhost:9200/_nodes/stats/fs?pretty
 curl http://localhost:9200/_cat/nodes?h=h,diskAvail
 ```
 
-二、使用_cluster系列  
----
+# 二、使用_cluster系列  
+
+_cluster
+```
+/_cluster/health                     #查看集群状态
+/_cluster/stats?pretty=true          #查看集群系统信息
+/_cluster/state?pretty=true          #查看集群详细信息
+/_cluster/pending_tasks?pretty=true  #查看集群堆积的任务
+
+/_cluster/settings -d '{             #修改集群配置(-XPUT)
+"persistent" : { 
+      "discovery.zen.minimum_master_nodes" : 2 
+ } 
+}'
+** transient 表示临时的，persistent表示永久的
+
+
+/_cluster/reroute -d 'xxxxxx'       #对shard的手动控制(-XPOST)
+
+# 关闭节点(-XPOST)
+# a.关闭指定127.0.0.1节点 
+/_cluster/nodes/_local/_shutdown
+/_cluster/nodes/192.168.1.1/_shutdown
+
+# b.关闭主节点 
+/_cluster/nodes/_master/_shutdown
+
+# c.关闭整个集群 
+/_shutdown?delay=10s
+/_cluster/nodes/_shutdown
+/_cluster/nodes/_all/_shutdown
+** delay=10s表示延迟10秒关闭
+```
 
 1、集群健康检测
 ```
@@ -187,8 +220,24 @@ delay=10s表示延迟10秒关闭
 # curl -XGET http://127.0.0.1:9200/_cat/snapshots/{repository}
 ```
 
+
 三、使用_nodes系列
 ---
+
+```
+  1.集群JVM状态
+  /_nodes/stats/jvm
+  2.查询节点状态
+  /_nodes/stats?pretty=true’ 
+  /_nodes/192.168.1.2/stats?pretty=true’ 
+  /_nodes/process’ 
+  /_nodes/_all/process’ 
+  /_nodes/192.168.1.2,192.168.1.3/jvm,process’ 
+  /_nodes/192.168.1.2,192.168.1.3/info/jvm,process’ 
+  /_nodes/192.168.1.2,192.168.1.3/_all 
+  /_nodes/hot_threads
+```
+
 
 1、查询节点的状态  
 ```
