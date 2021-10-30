@@ -69,7 +69,7 @@ etcd除了受到Zookeeper与doozer启发而催生的项目，还拥有与之类�
 | 使用接口(多语言能力) | 支持http和dns | 客户端 | http/grpc | http（sidecar） |
 | watch支持 | 全量/支持long polling | 支持 | 支持 long polling | 支持 long polling/大部分增量 |
 | 自身监控 | metrics | — | metrics | metrics |
-| 安全 | acl | /https	acl | https支持（弱） | — |
+| 安全 | acl /https | acl | https支持（弱） | — |
 | spring cloud集成 | 已支持 | 已支持 | 已支持 | 已支持 |
 
 
