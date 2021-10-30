@@ -63,19 +63,27 @@ OPTIONS:
 ### 3.2.1. 添加root用户并设置密码
 ```
 etcdctl --endpoints http://172.16.22.36:2379 user add root
+Password of root: 
+Type password of root again for confirmation: 
+User root created
 ```
 
 ### 3.2.2. 添加非root用户并设置密码
 ```
 etcdctl --endpoints http://172.16.22.36:2379 --username root:123 user add huwh
+Password of huwh: 
+Type password of huwh again for confirmation: 
+User huwh created
 ```
 
 ### 3.2.3. 查看当前所有用户
 ```
 etcdctl --endpoints http://172.16.22.36:2379 --username root:123 user list
+root
+huwh
 ```
 
-### 3.2.4. 将用户添加到对应角色
+### 3.2.4.授予用户对应的 Role 和撤销用户所拥有的 Role（允许部分撤销）
 ```
 etcdctl --endpoints http://172.16.22.36:2379 --username root:123 user grant --roles test1 phpor
 ```
@@ -83,6 +91,17 @@ etcdctl --endpoints http://172.16.22.36:2379 --username root:123 user grant --ro
 ### 3.2.5. 查看用户拥有哪些角色
 ```
 etcdctl --endpoints http://172.16.22.36:2379 --username root:123 user get phpor
+```
+
+### 3.2.6. 修改密码
+```
+etcdctl --endpoints http://172.16.22.36:2379 --username root:123 user passwd huwh
+```
+
+### 3.2.7. 删除用户
+```
+etcdctl --endpoints http://172.16.22.36:2379 --username root:123 user delete huwu
+****
 ```
 
 ## 3.3. role相关命令
