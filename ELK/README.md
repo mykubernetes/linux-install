@@ -225,17 +225,18 @@ delay=10s表示延迟10秒关闭
 ---
 
 ```
-  1.集群JVM状态
-  /_nodes/stats/jvm
-  2.查询节点状态
-  /_nodes/stats?pretty=true’ 
-  /_nodes/192.168.1.2/stats?pretty=true’ 
-  /_nodes/process’ 
-  /_nodes/_all/process’ 
-  /_nodes/192.168.1.2,192.168.1.3/jvm,process’ 
-  /_nodes/192.168.1.2,192.168.1.3/info/jvm,process’ 
-  /_nodes/192.168.1.2,192.168.1.3/_all 
-  /_nodes/hot_threads
+1.集群JVM状态
+/_nodes/stats/jvm
+
+2.查询节点状态
+/_nodes/stats?pretty=true
+/_nodes/192.168.1.2/stats?pretty=true
+/_nodes/process
+/_nodes/_all/process
+/_nodes/192.168.1.2,192.168.1.3/jvm,process
+/_nodes/192.168.1.2,192.168.1.3/info/jvm,process
+/_nodes/192.168.1.2,192.168.1.3/_all
+/_nodes/hot_threads
 ```
 
 
@@ -258,7 +259,6 @@ curl -XGET 'http://localhost:9200/_node/${nodeid}/jvm/stats
 curl -XGET 'http://localhost:9200/_node/${nodeip}/jvm/stats
 curl -XGET 'http://localhost:9200/_node/${nodeattribute}/jvm/stats
 ```
-
 
 
 2、集群节点列表api
@@ -329,8 +329,38 @@ logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 12
 # curl -XPUT http://127.0.0.1:9200/index/type/id/update   #更新一个文档，如果该文档不已存在，则返回失败
 ```
 
-五、日常巡检
----
+# 五、CURD
+```
+1.查询数据
+curl -XGET 'http://localhost:9200/{index}/{type}/{id}'
+
+2.索引(插入)数据
+curl -XPOST 'http://localhost:9200/{index}/{type}/{id}’ -d'{“key”:”value”,“key”:”value”}'
+
+3.批量导入数据(在a.json文件所在当前文件下)
+curl -XPOST 'localhost:9200/{index}/{type}/_bulk' --data-binary "@a.json"
+
+4.删除数据
+curl -XDELETE 'http://localhost:9200/{index}/{type}/{id}'
+
+5.按照查询结果删除数据
+curl -XPOST 'localhost:9200/{index}/{type}/_delete_by_query?pretty' -d'
+{"query": {"query_string": {"message": "some message"}}}'
+```
+
+# 六、settings
+```
+1.修改分片数
+curl -XPUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -d '{
+"index.number_of_shards" : “3”}'
+
+2.修改副本数
+curl  -XPUT 'http://115.28.157.41:9222/_all/_settings' -d ' {
+"index.number_of_replicas":"0"}'
+```
+- 分片数在有数据之后不能再改动，副本数可以随时修改。
+
+# 七、日常巡检
 
 1、查看集群状态
 ```
