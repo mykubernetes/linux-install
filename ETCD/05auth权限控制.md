@@ -134,7 +134,13 @@ etcdctl --endpoints http://172.16.22.36:2379 --username root:2379 role add test1
 etcdctl --endpoints http://172.16.22.36:2379 --username root:123 role list
 ```
 
-### 3.3.3. 给角色分配权限
+### 3.3.3. 移除某个角色
+```
+etcdctl --endpoints http://172.16.22.36:2379 --username root:123 role delete test1
+Role test1 deleted
+```
+
+### 3.3.4. 给角色分配权限
 ```
 # etcdctl role grant --help
 NAME:
@@ -158,10 +164,11 @@ etcdctl --endpoints http://172.16.22.36:2379 --username root:123 role grant --re
 etcdctl --endpoints http://172.16.22.36:2379 --username root:123 role grant --readwrite --path /test1/* test1
 ```
 
-### 3.3.4. 查看角色所拥有的权限
+### 3.3.5. 查看角色所拥有的权限
 ```
-etcdctl --endpoints http://172.16.22.36:2379 --username root:2379 role get test1
+etcdctl --endpoints http://172.16.22.36:2379 --username root:123 role get test1
 ```
+
 
 ## 3.4. auth相关操作
 ```
