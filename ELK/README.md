@@ -24,16 +24,16 @@ ES  内置的REST 接口
 ---
 | URL | 说明 |
 |-----|------|
-| /index/_search | 搜索指定索引下的数据 |
-| /_aliases | 获取或者操作索引下的别名 |
-| /index/ | 查看指定索引下的详细信息 |
-| /index/type/ | 创建或者操作类型 |
-| /index/mapping | 创建或者操作mapping |
-| /index/settings | 创建或者操作settings |
-| /index/_open | 打开指定索引 |
-| /index/_close | 关闭指定索引 |
-| /index/_refresh | 刷新索引（使新增加内容对搜索可见，不保证数据被写入磁盘） |
-| /index/_flush | 刷新索引（会触发Lucene提交数据） |
+| `/index/_search` | 搜索指定索引下的数据 |
+| `/_aliases` | 获取或者操作索引下的别名 |
+| `/index/` | 查看指定索引下的详细信息 |
+| `/index/type/` | 创建或者操作类型 |
+| `/index/mapping` | 创建或者操作mapping |
+| `/index/settings` | 创建或者操作settings |
+| `/index/_open` | 打开指定索引 |
+| `/index/_close` | 关闭指定索引 |
+| `/index/_refresh` | 刷新索引（使新增加内容对搜索可见，不保证数据被写入磁盘） |
+| `/index/_flush` | 刷新索引（会触发Lucene提交数据） |
 
 一、使用_cat系列
 ---
@@ -65,30 +65,29 @@ curl -XGET localhost:9200/_cat
 /_cat/fielddata/{fields}
 ```  
 
-后面加一个v，让输出内容表格显示表头  
+查看所有index
 ```
-curl localhost:9200/_cat/indices?v
-name       component        version type url
-Prometheus analysis-mmseg   NA      j
-Prometheus analysis-pinyin  NA      j
-Prometheus analysis-ik      NA      j
-Prometheus analysis-ik      NA      j
-Prometheus analysis-smartcn 2.1.0   j
-Prometheus segmentspy       NA      s    /_plugin/segmentspy/
-Prometheus head             NA      s    /_plugin/head/
-Prometheus bigdesk          NA      s    /_plugin/bigdesk/
-Xandu      analysis-ik      NA      j
-Xandu      analysis-pinyin  NA      j
-Xandu      analysis-mmseg   NA      j
-Xandu      analysis-smartcn 2.1.0   j
-Xandu      head             NA      s    /_plugin/head/
-Xandu      bigdesk          NA      s    /_plugin/bigdesk/
-Onyxx      analysis-ik      NA      j
-Onyxx      analysis-mmseg   NA      j
-Onyxx      analysis-smartcn 2.1.0   j
-Onyxx      analysis-pinyin  NA      j
-Onyxx      head             NA      s    /_plugin/head/
-Onyxx      bigdesk          NA      s    /_plugin/bigdesk/
+curl http://localhost:9200/_cat/indices?v
+```
+
+查看所有doc数量
+```
+curl http://localhost:9200/_cat/count?v
+```
+
+查看所有node存储空间转台
+```
+curl http://localhost:9200/ _cat/allocation?v
+```
+
+查看所有node文件系统状态
+```
+curl http://localhost:9200/_nodes/stats/fs?pretty
+```
+
+查看所有node可用磁盘大小
+```
+curl http://localhost:9200/ _cat/nodes?h=h,diskAvail
 ```
 
 二、使用_cluster系列  
