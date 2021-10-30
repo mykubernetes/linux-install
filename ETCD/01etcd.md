@@ -2,6 +2,8 @@
 ===
 http://www.xuyasong.com/?p=1983
 
+https://www.cnblogs.com/traditional/p/9445930.html
+
 1、etcd 简介
 
 etcd 是 CoreOS 团队于 2013 年 6月发起的开源项目，它的目标是构建一个高可用的分布式键值(key-value)数据库。etcd 内部采用raft协议作为一致性算法，etcd 基于 Go 语言实现。
