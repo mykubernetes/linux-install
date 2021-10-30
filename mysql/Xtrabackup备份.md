@@ -6,6 +6,11 @@ xtrabackup实现完全备份、增量备份和部分备份
 http://repo.percona.com/centos/  
 https://www.percona.com/downloads/percona-release/  
 
+https://blog.51cto.com/cuixiang/1736469
+
+https://juejin.cn/post/6844904120663408647#heading-10
+
+
 2、下载rpm源
 ```
 wget https://www.percona.com/redir/downloads/percona-release/percona-release-0.0-1.x86_64.rpm
