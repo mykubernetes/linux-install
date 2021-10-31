@@ -22,6 +22,8 @@ https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md
 
 https://segmentfault.com/a/1190000039781580?utm_source=sf-similar-article
 
+https://haicoder.net/elasticsearch/elasticsearch-tutorial.html
+
 ES  内置的REST 接口
 ---
 | URL | 说明 |
