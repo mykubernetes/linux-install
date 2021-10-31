@@ -1,7 +1,7 @@
 # Pool 开启 enabled
-```
-pool 的 enabled 开启：
 
+1、pool 的 enabled 开启：
+```
 $ ceph -s
   cluster:
     id:     b313ec26-5aa0-4db2-9fb5-a38b207471ee
@@ -19,7 +19,7 @@ MON_DISK_LOW mon master003 is low on available space
     mon.master003 has 24% avail
 ```
 
-执行 enabled：
+2、执行 enabled：
 ```
 $ ceph osd pool application enable nextcloud rbd
 $ ceph osd pool application enable gitlab-ops rbd
