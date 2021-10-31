@@ -9,13 +9,15 @@
 -i INVENTORY, --inventory=INVENTORY                 指定主机清单文件路径
 --list-hosts                                        输出匹配的主机列表，不执行任何操作
 -m MODULE_NAME, --module-name=MODULE_NAME           执行的模块名，默认command
+-M                                                  指定要使用的模块路径
+-S                                                  使用su命令
 --syntax-check                                      语法检查playbook文件，不执行任何操作
 -t TREE, --tree=TREE                                将日志输出到此目录
 -v, --verbose                                       详细信息，-vvv更多, -vvvv debug
 --version                                           查看程序版本
 
 连接选项：控制谁连接主机和如何连接
--k, --ask-pass                                      请求连接密码
+-k, --ask-pass                                      手动输入SSH协议密码
 --private-key=PRIVATE_KEY_FILE, --key-file=PRIVATE_KEY_FILE      私钥文件
 -u REMOTE_USER, --user=REMOTE_USER                  连接用户，默认None
 -T TIMEOUT, --timeout=TIMEOUT                       覆盖连接超时时间，默认10秒
@@ -92,35 +94,37 @@ ssh 192.168.0.2            #其他机器ip
 
 # 二、ansible常用模块
 
-- [command](#command)
-- [shell](#shell)
-- [script](#script)
-- [user](#user)
-- [group](#group)
-- [hostname](#hostname)
-- [selinux](#selinux)
-- [firewalld](#firewalld)
-- [systemd](#systemd)
-- [service](#service)
-- [yum](#yum)
-- [yum_repository](#yum_repository)
-- [get_url](#get_url)
-- [copy](#copy)
-- [file](#file)
-- [fetch](#fetch)
-- [lineinfile](#lineinfile)
-- [replace](#replace)
-- [blockinfile](#blockinfile)
-- [mount](#mount)
-- [cron](#cron)
-- [find](#find)
-- [template](#template)
-- [stat](#stat)
-- [synchronize](#synchronize)
-- [unarchive](#unarchive)
-- [mydql_user](#mysql_user)
-- [mysql_db](#mysql_db)
-- [pam_limits](#pam_limits)
+| 模块名称 | 模块作用 |
+|----------|---------|
+| [command](#command) | 直接执行用户指定的命令 |
+| [shell](#shell) | 直接执行用户指定的命令（支持特殊字符） |
+| [script](#script) | 收集受管节点主机上的系统及变量信息 |
+| [user](#user)  | 创建、修改及删除用户 |
+| [group](#group)  | 创建、修改及删除用户组 |
+| [hostname](#hostname) | 修改主机名 |
+| [selinux](#selinux) | 修改selinux |
+| [firewalld](#firewalld) | 添加、修改及删除防火墙策略 |
+| [systemd](#systemd)  |  |
+| [service](#service)  | 启动、关闭及查看服务状态 |
+| [yum](#yum) | 安装、更新及卸载软件包
+| [yum_repository](#yum_repository) | 管理主机的软件仓库配置文件 |
+| [get_url](#get_url) | 从网络中下载文件 |
+| [copy](#copy) | 新建、修改及复制文件 |
+| [file](#file) | 设置文件权限及创建快捷方式 |
+| [fetch](#fetch) |  |
+| [lineinfile](#lineinfile) | 通过正则表达式修改文件内容 |
+| [replace](#replace) |  |
+| [blockinfile](#blockinfile) |  |
+| [mount](#mount) | 挂载硬盘设备文件 |
+| [cron](#cron) | 添加、修改及删除计划任务 |
+| [find](#find) |  |
+| [template](#template) | 复制模板文件到受管节点主机 |
+| [stat](#stat) |  |
+| [synchronize](#synchronize) |  |
+| [unarchive](#unarchive) |  |
+| [mydql_user](#mysql_user) |  |
+| [mysql_db](#mysql_db) |  |
+| [pam_limits](#pam_limits) |  |
 
 
 ## command
