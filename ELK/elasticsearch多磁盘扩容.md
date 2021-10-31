@@ -64,7 +64,10 @@ curl -XPOST "http://xxxx:9200/_cluster/reroute" -d  '{
   "commands" : [ {
         "allocate_stale_primary" :
             {
-              "index" : "index", "shard" : 4, "node" : "node56", "accept_data_loss" : true
+              "index" : "index",
+              "shard" : 4,
+              "node" : "node56",
+              "accept_data_loss" : true
             }
         }
   ]
@@ -77,7 +80,9 @@ curl -XPOST "http://xxxx:9200/_cluster/reroute" -d  '{
   "commands" : [ {
         "allocate_replica" :
             {
-              "index" : "index", "shard" : 4, "node" : "node56"
+              "index" : "index",
+              "shard" : 4, 
+              "node" : "node56"
             }
         }
   ]
