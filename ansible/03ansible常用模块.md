@@ -369,7 +369,7 @@ ansible node02 -m firewalld -a "zone=public service=https permanent=yes state=en
 | name | 指定服务名称 |
 | enabled | 设置开机自启yes、no |
 | daemon_reload | 读取配置文件，每次修改了文件，最好都运行一次，确保应用了（systemd） |
-| masked | 是否将服务设置为masked状态，被mask的服务是无法启动的(systemd),（yes|no）默认为no |
+| masked | 是否将服务设置为masked状态，被mask的服务是无法启动的(systemd),（yes or no）默认为no |
 
 
 2、远程停止服务
