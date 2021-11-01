@@ -61,6 +61,9 @@ curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/jso
 
 修改 es 配置文件：
 ```
-discovery.zen.ping.unicast.hosts: ["host1","host2"] 
+cluster.name: escluster
+node.name: host4
+discovery.zen.minimum_master_nodes: 2                  #节点数+1 再除2
+discovery.zen.ping.unicast.hosts: ["host1","host2","host3","host4"]
 ```
 主需要在配置文件里面写明需要上线的服务即可，如果这里集群节点有很多其实并不需要都写入，只要配置好 集群名称，node-name，network.host 的配置即可。
