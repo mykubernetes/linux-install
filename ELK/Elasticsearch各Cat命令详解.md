@@ -4,7 +4,10 @@
 GET _cat
 
 =^.^=
+
+# 磁盘还有数据分配信息
 /_cat/allocation
+
 /_cat/shards
 /_cat/shards/{index}
 /_cat/master
@@ -14,23 +17,43 @@ GET _cat
 /_cat/indices/{index}
 /_cat/segments
 /_cat/segments/{index}
+
+#  集群或者索引文档数量 
 /_cat/count
 /_cat/count/{index}
+
 /_cat/recovery
 /_cat/recovery/{index}
 /_cat/health
 /_cat/pending_tasks
+
+# 索引别名
 /_cat/aliases
 /_cat/aliases/{alias}
+
 /_cat/thread_pool
 /_cat/thread_pool/{thread_pools}
+
+# 插件列表
 /_cat/plugins
 /_cat/fielddata
 /_cat/fielddata/{fields}
+
+# 获取node属性信息
 /_cat/nodeattrs
 /_cat/repositories
 /_cat/snapshots/{repository}
 /_cat/templates
+/_cat/ml/anomaly_detectors
+/_cat/ml/anomaly_detectors/{job_id}
+/_cat/ml/trained_models
+/_cat/ml/trained_models/{model_id}
+/_cat/ml/datafeeds
+/_cat/ml/datafeeds/{datafeed_id}
+/_cat/ml/data_frame/analytics
+/_cat/ml/data_frame/analytics/{id}
+/_cat/transforms
+/_cat/transforms/{transform_id}
 ```
 
 ## verbose显示指令的详细信息
