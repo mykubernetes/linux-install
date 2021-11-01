@@ -56,3 +56,11 @@ curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/jso
 }
 '
 ```
+
+# Elasticsearch 节点上线
+
+修改 es 配置文件：
+```
+discovery.zen.ping.unicast.hosts: ["host1","host2"] 
+```
+主需要在配置文件里面写明需要上线的服务即可，如果这里集群节点有很多其实并不需要都写入，只要配置好 集群名称，node-name，network.host 的配置即可。
