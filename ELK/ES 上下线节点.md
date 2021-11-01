@@ -27,6 +27,11 @@ curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/jso
 3、耐心等待后即可通过以下命令检查node中的分片数量
 ```
 curl -X GET "localhost:9200/_cat/allocation?v"
+shards disk.indices disk.used disk.avail disk.total disk.percent host      ip        node
+   45       24.7kb    36.2gb     33.9gb     70.2gb           51 10.1.1.23 10.1.1.23 node-2
+   45       24.7kb    36.2gb     33.9gb     70.2gb           51 10.1.1.33 10.1.1.33 node-4
+   45       24.7kb    36.2gb     33.9gb     70.2gb           51 10.1.1.25 10.1.1.25 node-3
+   45       24.7kb    36.2gb     33.9gb     70.2gb           51 10.1.1.24 10.1.1.24 node-1
 ```
 - 确认分片数量为0后，即可登入到elasticsearch节点关闭服务
 
