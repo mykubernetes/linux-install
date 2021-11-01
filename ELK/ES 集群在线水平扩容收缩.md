@@ -57,7 +57,7 @@ curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/jso
 '
 ```
 
-# Elasticsearch 节点上线
+# 节点上线
 
 修改 es 配置文件：
 ```
