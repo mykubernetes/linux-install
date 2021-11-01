@@ -1,3 +1,30 @@
+# 如果集群需要升级就需要做好前提准备：
+
+首先把集群分配的分片等设置进行限速限制
+```
+$ curl 'localhost:9200/_cluster/settings' -d '{
+"persistent" : {
+  "cluster" : {
+    "routing" : {
+      "allocation" : {
+        "disable_allocation" : "false",
+        "cluster_concurrent_rebalance" : "5",
+        "node_concurrent_recoveries" : "5",
+        "enable" : "all"
+    }
+  }
+},
+"indices": {
+  "recovery" : {
+    "concurrent_streams" : "30"
+    "max_bytes_per_sec" : "2gb"
+    }
+  }
+}
+}
+```
+
+
 # 集群重启升级
 
 1）关闭分片分配，当试图关闭一个节点的时候，Elasticsearch 会立刻尝试复制这个节点的数据到集群中的其他节点上。这将导致大量的 IO 请求。在关闭该节点的时候可以通过设置一个参数来避免此问题的发生：
