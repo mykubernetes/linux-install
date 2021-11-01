@@ -102,49 +102,110 @@ curl http://localhost:9200/_nodes/stats/fs?pretty
 curl http://localhost:9200/_cat/nodes?h=h,diskAvail
 ```
 
-# 二、使用_cluster系列  
-
-_cluster
+集群健康检测
 ```
-/_cluster/health                     #查看集群状态
-/_cluster/stats?pretty=true          #查看集群系统信息
-/_cluster/state?pretty=true          #查看集群详细信息
-/_cluster/pending_tasks?pretty=true  #查看集群堆积的任务
+curl http://localhost:9200/_cat/health?v
 
-/_cluster/settings -d '{             #修改集群配置(-XPUT)
-"persistent" : { 
-      "discovery.zen.minimum_master_nodes" : 2 
- } 
-}'
-** transient 表示临时的，persistent表示永久的
-
-
-/_cluster/reroute -d 'xxxxxx'       #对shard的手动控制(-XPOST)
-
-# 关闭节点(-XPOST)
-# a.关闭指定127.0.0.1节点 
-/_cluster/nodes/_local/_shutdown
-/_cluster/nodes/192.168.1.1/_shutdown
-
-# b.关闭主节点 
-/_cluster/nodes/_master/_shutdown
-
-# c.关闭整个集群 
-/_shutdown?delay=10s
-/_cluster/nodes/_shutdown
-/_cluster/nodes/_all/_shutdown
-** delay=10s表示延迟10秒关闭
-```
-
-1、集群健康检测
-```
-http://172.0.0.1:9200/_cat/health?v
-     
 epoch      timestamp cluster    status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent
 1498119164 16:12:44  es-cluster yellow          1         1     20  20    0    0       20             0                  -                 50.0%
 ```
 
-2、查询设置集群状态  
+# 二、使用_cluster系列  
+
+查看集群概要信息：
+```
+curl -XGET 'http://127.0.0.1:9200/_cluster/stats?pretty'
+```
+查看集群健康状态信息：
+```
+curl -XGET 'http://127.0.0.1:9200/_cluster/health?pretty'
+```
+
+查看集群堆积的任务
+```
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/_cluster/pending_tasks?pretty=true  
+```
+
+查看集群设置信息：
+```
+curl -XGET 'http://127.0.0.1:9200/_cluster/settings?pretty'
+```
+
+允许集群生成新的分片：
+```	
+curl -XPUT http://127.0.0.1:9200/_cluster/settings?pretty=1 -d '{
+"persistent":{
+"cluster.routing.allocation.enable": "all"
+}
+}'
+```
+- transient 表示临时的
+- persistent 表示永久的
+
+禁止集群生成新的分片：
+```
+curl -XPUT http://127.0.0.1:9200/_cluster/settings?pretty=1 -d '{
+"persistent":{
+"cluster.routing.allocation.enable": "none"
+}
+}'
+```
+
+允许集群中所有分片自动均衡：
+```
+curl -XPUT http://127.0.0.1:9200/_cluster/settings?pretty=1 -d '{
+"persistent":{
+"cluster.routing.rebalance.enable": "all"
+}
+}'
+```
+
+只允许集群中的副本分片自动均衡：
+```
+curl -XPUT http://127.0.0.1:9200/_cluster/settings?pretty=1 -d '{
+"persistent":{
+"cluster.routing.rebalance.enable": "replicas"
+}
+}'
+```
+
+禁止集群中的分片自动均衡：
+```
+curl -XPUT http://127.0.0.1:9200/_cluster/settings?pretty=1 -d '{
+"persistent":{
+"cluster.routing.rebalance.enable": "none"
+}
+}'
+```
+
+设置集群自动均衡最低剩余存储容量(es7)：
+```
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/_cluster/settings?pretty=true' -d '{
+"persistent":{
+"cluster.routing.allocation.disk.watermark.low": "90%"
+}
+}'
+```
+
+设置集群自动均衡最高使用存储容量(es7)：
+```
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/_cluster/settings?pretty=true' -d '{
+"persistent":{
+"cluster.routing.allocation.disk.watermark.low": "95%"
+}
+}'
+```
+
+设置集群信息更新时间(es7):
+```
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/_cluster/settings?pretty=true' -d '{
+"persistent":{
+"cluster.info.update.interval": "1m"
+}
+}'
+```
+
+查询设置集群状态  
 ```
 curl -XGET localhost:9200/_cluster/health?pretty=true
 {
@@ -173,17 +234,8 @@ curl -XGET localhost:9200/_cluster/health?level=shards        #表示显示分�
 - yellow 黄灯，所有主分片都正确运行，但是有副本分片缺失。
 - red 红灯，有主分片缺失。这部分数据完全不可用。
 
-3、集群的详细信息。包括节点、分片等。  
-```
-curl -XGET localhost:9200/_cluster/state?pretty=true
-```  
 
-4、获取集群堆积的任务  
-```
-curl -XGET localhost:9200/_cluster/pending_tasks?pretty=true
-```  
-
-5、修改集群配置
+修改集群配置
 ```
 curl -XPUT localhost:9200/_cluster/settings -d '{
     "persistent" : {
@@ -191,14 +243,6 @@ curl -XPUT localhost:9200/_cluster/settings -d '{
     }
 }'
 ```  
-transient 表示临时的，persistent表示永久的  
-
-6、对shard的手动控制  
-```
-curl -XPOST 'localhost:9200/_cluster/reroute' -d 'xxxxxx'
-```
-
-7、关闭节点
 
 关闭指定192.168.1.1节点  
 ```
@@ -219,38 +263,50 @@ $ curl -XPOST 'http://localhost:9200/_cluster/nodes/_all/_shutdown'
 delay=10s表示延迟10秒关闭
 ```
 
-8、查看snspshots
+查看snspshots
 ```
 # curl -XGET http://127.0.0.1:9200/_cat/snapshots/{repository}
 ```
 
 
-三、使用_nodes系列
----
+# 三、使用_nodes系列
 
+
+查看节点信息：
 ```
-1.集群JVM状态
-/_nodes/stats/jvm
-
-2.查询节点状态
-/_nodes/stats?pretty=true
-/_nodes/192.168.1.2/stats?pretty=true
-/_nodes/process
-/_nodes/_all/process
-/_nodes/192.168.1.2,192.168.1.3/jvm,process
-/_nodes/192.168.1.2,192.168.1.3/info/jvm,process
-/_nodes/192.168.1.2,192.168.1.3/_all
-/_nodes/hot_threads
+curl -XGET 'http://127.0.0.1:9200/_cat/nodes?v'
+ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+192.168.0.128           19          72  58                          mdi       *      master
 ```
 
+查看所有节点信息：
+```
+curl -XGET 'http://127.0.0.1:9200/_nodes?pretty=true'
+```
 
-1、查询节点的状态  
+查看指定节点(node-es-03)的信息：
+```
+curl -XGET 'http://127.0.0.1:9200/_nodes/node-es-03?pretty=true'
+```
+
+#显示更详细的节点信息
+```
+curl -XGET http://172.0.0.1:9200/_nodes/process?pretty
+```
+- heap.percent 查看内存是否爆表
+
+
+查询节点的状态  
 ```
 curl -XGET 'http://localhost:9200/_nodes/stats?pretty=true'
-curl -XGET 'http://localhost:9200/_nodes/process'            
+curl -XGET 'http://localhost:9200/_nodes/process'
+curl -XGET 'http://localhost:9200/_nodes/_all
+curl -XGET 'http://localhost:9200/_nodes/_all/process
 curl -XGET 'http://localhost:9200/_nodes/process/stats'                            #统计信息（内存、cpu）
 curl -XGET 'http://localhost:9200/_nodes/jvm'                                      #获取各节点的虚拟机统计和配置信息
+curl -XGET 'http://localhost:9200/_nodes/jvm,process'  
 curl -XGET 'http://localhost:9200/_nodes/jvm/stats'                                #更详细的虚拟机信息
+curl -XGET 'http://localhost:9200/_nodes/info/jvm,process'
 curl -XGET 'http://localhost:9200/_nodes/http'                                     #获取各个节点的http信息（如ip地址）
 curl -XGET 'http://localhost:9200/_nodes/http/stats'                               #获取各个节点处理http请求的统计情况
 curl -XGET 'http://localhost:9200/_nodes/hot_threads/stats'
@@ -264,22 +320,8 @@ curl -XGET 'http://localhost:9200/_node/${nodeip}/jvm/stats
 curl -XGET 'http://localhost:9200/_node/${nodeattribute}/jvm/stats
 ```
 
+# 四、使用索引操作
 
-2、集群节点列表api
-```
-curl -XGET http://172.0.0.1:9200/_cat/nodes?v
- 
-ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
-192.168.0.128           19          72  58                          mdi       *      master
-
-#显示更详细的节点信息
-curl -XGET http://172.0.0.1:9200/_nodes/process?pretty
-```
--  heap.percent 查看内存是否爆表
-
-
-四、使用索引操作
----
 1、列出集群中所有的索引
 ```
 curl -XGET http://172.0.0.1:9200/_cat/indices?v
