@@ -77,6 +77,11 @@ curl -XGET localhost:9200/_cat
 - ?v 打印出表头信息
 - ?pretty 美化输出
 
+查看系统基本信息
+```
+curl -XGET 'http://127.0.0.1:9200/?pretty'
+```
+
 查看所有index
 ```
 curl http://localhost:9200/_cat/indices?v
@@ -123,7 +128,7 @@ curl -XGET 'http://127.0.0.1:9200/_cluster/health?pretty'
 
 查看集群堆积的任务
 ```
-curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/_cluster/pending_tasks?pretty=true  
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9200/_cluster/pending_tasks?pretty=true  
 ```
 
 查看集群设置信息：
@@ -180,7 +185,7 @@ curl -XPUT http://127.0.0.1:9200/_cluster/settings?pretty=1 -d '{
 
 设置集群自动均衡最低剩余存储容量(es7)：
 ```
-curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/_cluster/settings?pretty=true' -d '{
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9200/_cluster/settings?pretty=true' -d '{
 "persistent":{
 "cluster.routing.allocation.disk.watermark.low": "90%"
 }
@@ -189,7 +194,7 @@ curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://12
 
 设置集群自动均衡最高使用存储容量(es7)：
 ```
-curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/_cluster/settings?pretty=true' -d '{
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9200/_cluster/settings?pretty=true' -d '{
 "persistent":{
 "cluster.routing.allocation.disk.watermark.low": "95%"
 }
@@ -198,7 +203,7 @@ curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://12
 
 设置集群信息更新时间(es7):
 ```
-curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/_cluster/settings?pretty=true' -d '{
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9200/_cluster/settings?pretty=true' -d '{
 "persistent":{
 "cluster.info.update.interval": "1m"
 }
@@ -355,27 +360,108 @@ logstash-mweibo-h5view-2015.06.10 2     r      STARTED       4725961  684.3mb 12
 
 
 ```
-# curl -XGET http://127.0.0.1:9200/index/_search          #搜索
-# curl -XGET http://127.0.0.1:9200/_aliases               #获取或操作索引的别名
-# curl -XGET http://127.0.0.1:9200/index/                 #查看当前索引
-# curl -XGET http://127.0.0.1:9200/index/type/            #创建或操作类型
-# curl -XGET http://127.0.0.1:9200/index/_mapping         #创建或操作mapping
-# curl -XGET http://127.0.0.1:9200/index/_settings        #创建或操作设置（number_of_shards是不可更改的）
-# curl -XGET http://127.0.0.1:9200/index/_open            #打开被关闭的索引
-# curl -XGET http://127.0.0.1:9200/index/_close           #关闭索引
-# curl -XGET http://127.0.0.1:9200/index/_refresh         #刷新索引（使新加内容对搜索课件）
-# curl -XGET http://127.0.0.1:9200/index/_flush           #刷新索引（将变动提交到ucene索引文件中，并清空elasticsearch的transaction log）
-# curl -XGET http://127.0.0.1:9200/index/_optimize        #优化segement
-# curl -XGET http://127.0.0.1:9200/index/_status          #获取索引的状态信息
-# curl -XGET http://127.0.0.1:9200/index/_segments        #获取索引的segments的状态信息
-# curl -XGET http://127.0.0.1:9200/index/_explain         #不执行实际搜索，而返回解释信息
-# curl -XGET http://127.0.0.1:9200/index/_analyze         #不执行实际搜索，根据输入的参数进行文本分析
-# curl -XGET http://127.0.0.1:9200/index/type/id          #操作指定文档
-# curl -XPUT http://127.0.0.1:9200/index/type/id/_create  #创建一个文档，如果该文档已存在，则返回失败
-# curl -XPUT http://127.0.0.1:9200/index/type/id/update   #更新一个文档，如果该文档不已存在，则返回失败
+# curl -XGET http://127.0.0.1:9200/${index}/_search          #搜索
+# curl -XGET http://127.0.0.1:9200/_aliases                  #获取或操作索引的别名
+# curl -XGET http://127.0.0.1:9200/${index}/                 #查看当前索引
+# curl -XGET http://127.0.0.1:9200/${index}?pretty           #查看指定索引的结构
+# curl -XGET http://127.0.0.1:9200/${index}/_stats?prtty     #查看指定索引的状态
+# curl -XGET http://127.0.0.1:9200/${index}/type/            #创建或操作类型
+# curl -XGET http://127.0.0.1:9200/${index}/_mapping         #创建或操作索引的映射机构
+# curl -XGET http://127.0.0.1:9200/${index}/_settings        #创建或操作设置（number_of_shards是不可更改的）
+# curl -XGET http://127.0.0.1:9200/${index}/_open            #打开被关闭的索引
+# curl -XGET http://127.0.0.1:9200/${index}/_close           #关闭索引
+# curl -XGET http://127.0.0.1:9200/${index}/_refresh         #刷新索引（使新加内容对搜索课件）
+# curl -XGET http://127.0.0.1:9200/${index}/_flush           #刷新索引（将变动提交到ucene索引文件中，并清空elasticsearch的transaction log）
+# curl -XGET http://127.0.0.1:9200/${index}/_optimize        #优化segement
+# curl -XGET http://127.0.0.1:9200/${index}/_status          #获取索引的状态信息
+# curl -XGET http://127.0.0.1:9200/${index}/_segments        #获取索引的segments的状态信息
+# curl -XGET http://127.0.0.1:9200/${index}/_explain         #不执行实际搜索，而返回解释信息
+# curl -XGET http://127.0.0.1:9200/${index}/_analyze         #不执行实际搜索，根据输入的参数进行文本分析
+# curl -XGET http://127.0.0.1:9200/${index}/type/id          #操作指定文档
+# curl -XPUT http://127.0.0.1:9200/${index}/type/id/_create  #创建一个文档，如果该文档已存在，则返回失败
+# curl -XPUT http://127.0.0.1:9200/${index}/type/id/update   #更新一个文档，如果该文档不已存在，则返回失败
 ```
 
-# 五、CURD
+创建新的索引：
+```
+curl -XPUT "http://127.0.0.1:9200/logstash-bbl?pretty" -d '
+{
+"settings" : {
+"index" : {
+"refresh_interval" : "5s",
+"number_of_shards" : "1",
+"number_of_replicas" : "1"
+}
+}
+}'
+```
+
+删除指定的索引:
+```
+curl -XDELETE 'http://127.0.0.1:9200/logstash-bbl'
+```
+
+删除指定索引的副本分片(es5)：
+```
+curl -XPUT "http://127.0.0.1:9200/logstash-bbl/_settings?pretty=1" -d '{
+"index" :{
+"number_of_replicas" : 1
+}
+}'　
+```
+
+删除指定索引的副本分片(es7)：
+```
+curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://127.0.0.1:9210/user-access-2000.01.01/_settings?pretty=true' -d '{
+"index" :{
+"number_of_replicas" : 0
+}
+}'
+```
+
+# 五、分片(Shards)相关
+
+查各节点中分片的分布情况：
+```
+curl -XGET 'http://127.0.0.1:9200/_cat/allocation?v'
+```
+
+查看集群中所有分片信息：
+```
+curl -XGET 'http://127.0.0.1:9200/_cat/shards?v'
+```
+
+查看指定分片信息：
+```
+curl -XGET 'http://127.0.0.1:9200/_cat/shards/statistics?v' 
+```
+
+迁移分片(es5)：node-es-04 --> storage.track(0) --> node-es-01
+```
+curl -XPOST 'http://127.0.0.1:9200/_cluster/reroute' -d '{
+"commands":[{
+"move":{
+"index":"storage.track",
+"shard":0,
+"from_node":"node-es-04",
+"to_node":"node-es-01"
+}}]}'
+```
+
+迁移分片(es7)：node-es-04 --> storage.track(0) --> node-es-01
+```
+curl -u es-user:es-password -H "Content-Type: application/json" -XPOST 'http://127.0.0.1:9210/_cluster/reroute' -d '{
+"commands":[{
+"move":{
+"index":"storage.track",
+"shard":0,
+"from_node":"node-es-04",
+"to_node":"node-es-01"
+}}]}'
+```
+
+
+# 六、CURD
 ```
 1.查询数据
 curl -XGET 'http://localhost:9200/{index}/{type}/{id}'
@@ -394,7 +480,7 @@ curl -XPOST 'localhost:9200/{index}/{type}/_delete_by_query?pretty' -d'
 {"query": {"query_string": {"message": "some message"}}}'
 ```
 
-# 六、settings
+# 七、settings
 ```
 1.修改分片数
 curl -XPUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -d '{
@@ -406,7 +492,7 @@ curl  -XPUT 'http://115.28.157.41:9222/_all/_settings' -d ' {
 ```
 - 分片数在有数据之后不能再改动，副本数可以随时修改。
 
-# 七、日常巡检
+# 八、日常巡检
 
 1、查看集群状态
 ```
