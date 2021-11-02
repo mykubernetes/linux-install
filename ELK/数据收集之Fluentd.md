@@ -162,11 +162,32 @@ for i in `seq 1 1000`;do echo ${click} >> click-1534525200.log;sleep 1;done
 ```
 
 结果: kafka topic browse_log 收到的日志
-
+```
+bin/kafka-console-consumer.sh --bootstrap-server node1:9200,node2:9200,node3:9200 --topic browselog
+{"userID":1,"productID":1,"event_time":12333,"log_type":"browse_log","now_date":"2018-08-19 19:32:46"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"browse_log","now_date":"2018-08-19 19:32:48"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"browse_log","now_date":"2018-08-19 19:32:49"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"browse_log","now_date":"2018-08-19 19:32:46"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"browse_log","now_date":"2018-08-19 19:32:47"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"browse_log","now_date":"2018-08-19 19:32:48"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"browse_log","now_date":"2018-08-19 19:32:49"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"browse_log","now_date":"2018-08-19 19:32:50"}
+```
 
 
 结果：kafka topic click_log 收到的日志
-
+```
+bin/kafka-console-consumer.sh --bootstrap-server node1:9200,node2:9200,node3:9200 --topic clich_log
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}
+```
 
 
 # 同一 Fluentd Agent同步同一输入到不同输出
@@ -223,15 +244,44 @@ for i in `seq 1 1000`;do echo "Fluent is logging ....">> test-1.log;sleep 1;done
 ```
 
 结果:本地目录
-
-
+```
+tail -f 7844ac885a0bc28buffer.b573c8b906ec16e6fc.log
+2018-08-19T20:14:01+08:00            test      {"message":"Fluent is logging ...."}
+2018-08-19T20:14:02+08:00            test      {"message":"Fluent is logging ...."}
+2018-08-19T20:14:03+08:00            test      {"message":"Fluent is logging ...."}
+2018-08-19T20:14:04+08:00            test      {"message":"Fluent is logging ...."}
+2018-08-19T20:14:05+08:00            test      {"message":"Fluent is logging ...."}
+2018-08-19T20:14:06+08:00            test      {"message":"Fluent is logging ...."}
+2018-08-19T20:14:07+08:00            test      {"message":"Fluent is logging ...."}
+2018-08-19T20:14:08+08:00            test      {"message":"Fluent is logging ...."}
+```
 
 结果:标准输出
-
+```
+tail -f /var/log/td-agent/td-agent2.log
+2018-08-19 20:14:46.592940261 +0800 test: {"message":"Fluent is logging ...."}
+2018-08-19 20:14:47.607707956 +0800 test: {"message":"Fluent is logging ...."}
+2018-08-19 20:14:48.617084709 +0800 test: {"message":"Fluent is logging ...."}
+2018-08-19 20:14:49.638059276 +0800 test: {"message":"Fluent is logging ...."}
+2018-08-19 20:14:50.662753952 +0800 test: {"message":"Fluent is logging ...."}
+2018-08-19 20:14:51.667721588 +0800 test: {"message":"Fluent is logging ...."}
+2018-08-19 20:14:52.673620531 +0800 test: {"message":"Fluent is logging ...."}
+2018-08-19 20:14:53.678351009 +0800 test: {"message":"Fluent is logging ...."}
+```
 
 
 结果:kafka
-
+```
+bin/kafka-console-consumer.sh --bootstrap-server node1:9200,node2:9200,node3:9200 --topic testTopic3
+{"message":"Fluent is logging ...."}
+{"message":"Fluent is logging ...."}
+{"message":"Fluent is logging ...."}
+{"message":"Fluent is logging ...."}
+{"message":"Fluent is logging ...."}
+{"message":"Fluent is logging ...."}
+{"message":"Fluent is logging ...."}
+{"message":"Fluent is logging ...."}
+```
 
 
 # 监控
