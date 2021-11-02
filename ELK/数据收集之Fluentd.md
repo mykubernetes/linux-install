@@ -1,16 +1,16 @@
-# Fluentd
+# 一、Fluentd
 Fluentd是一个完全免费且开源的日志收集系统，性能敏感的部分用C语言编写，插件部分用Ruby编写，500多种插件，只需很少的系统资源即可轻松实现”Log Everything”。一般叫Fluentd为td-agent。
 
 Fluentd与td-agent关系：td-agent是Fluentd的稳定发行包。
 
 Fluentd与Flume关系:是两个类似工具，都可用于数据采集。Fluentd的Input／Buffer／Output类似于Flume的Source／Channel／Sink。
 
-# Fluentd主要组成部分
+# 二、Fluentd主要组成部分
 
 
 Fluentd 主要由Input输出、Buffer缓冲、Output输出三大部分组成。这三大部分都是以插件的形式存在。当然还有其他辅助插件如Filter、Formatter等用于数据处理或格式化。
 
-# 快速部署
+# 三、快速部署
 
 Fluentd官网下载对应版本并安装。
 ```
@@ -30,7 +30,7 @@ curl -X POST -d 'json={"json":"Hello Fluentd"}' http://localhost:8888/debug
 debug: {"json":"Hello Fluentd"}
 ```
 
-# Fluentd插件
+# 四、Fluentd插件
 
 Fluentd有七种类型的插件：输入(Input)，分析器(Parser)，过滤器(Filter)，输出(Output)，格式化(Formatter)，存储(Storage)，缓冲(Buffer)。
 - Input: 输入插件。内置的有tail、http、tcp、udp等。
@@ -41,9 +41,9 @@ Fluentd有七种类型的插件：输入(Input)，分析器(Parser)，过滤器(
 - Storage: Storage插件可将各状态保存在文件或其他存储中，如Redis、MongoDB等。
 - Buffer: Buffer缓冲插件。缓冲插件由输出插件使用。在输出之前先缓冲，然后以如Kafka Producer Client的方式批量提交。有file、memory两种类型。flush_interval参数决定了提交的间隔，默认60秒刷新一次。
 
-# 同一 Fluentd Agent同步不同类型日志到对应Kaka Topic
+# 五、同一 Fluentd Agent同步不同类型日志到对应Kaka Topic
 
-## 在/etc/td-agent目录创建配置文件browseFile_browseTopic.conf,内容如下：
+1、在/etc/td-agent目录创建配置文件browseFile_browseTopic.conf,内容如下：
 ```
 ##### input file #####
 <source>
@@ -86,7 +86,7 @@ Fluentd有七种类型的插件：输入(Input)，分析器(Parser)，过滤器(
 </match>
 ```
 
-## 在/etc/td-agent目录创建配置文件clickFile_clickTopic.conf,内容如下：
+2、在/etc/td-agent目录创建配置文件clickFile_clickTopic.conf,内容如下：
 ```
 ##### input file #####
 <source>
@@ -129,7 +129,7 @@ Fluentd有七种类型的插件：输入(Input)，分析器(Parser)，过滤器(
 </match>
 ```
 
-## 在/etc/td-agent目录创建配置文件td-agent1.conf,内容如下：
+3、在/etc/td-agent目录创建配置文件td-agent1.conf,内容如下：
 ```
 #用户浏览日志
 @include /etc/td-agent/browseFile_browseTopic.conf
@@ -138,12 +138,12 @@ Fluentd有七种类型的插件：输入(Input)，分析器(Parser)，过滤器(
 @include /etc/td-agent/clickFile_clickTopic.conf
 ```
 
-## 启动td-agent
+4、启动td-agent
 ```
 td-agent -c /etc/td-agent/td-agent1.conf -o /var/log/td-agent/td-agent1.log
 ```
 
-## 向用户浏览日志日志文件追加数据
+5、向用户浏览日志日志文件追加数据
 ```
 for i in `seq 1 1000`;
 do
@@ -155,7 +155,7 @@ do
 done
 ```
 
-## 向用户点击日志日志文件追加数据
+6、向用户点击日志日志文件追加数据
 ```
 click='{"userID":1,"productID":1,"event_time":12333,"log_type":"click_log"}'
 for i in `seq 1 1000`;do echo ${click} >> click-1534525200.log;sleep 1;done
@@ -190,9 +190,9 @@ bin/kafka-console-consumer.sh --bootstrap-server node1:9200,node2:9200,node3:920
 ```
 
 
-# 同一 Fluentd Agent同步同一输入到不同输出
+# 五、同一 Fluentd Agent同步同一输入到不同输出
 
-## 在/etc/td-agent目录创建配置文件 td-agent2.conf，内容如下：
+1、在/etc/td-agent目录创建配置文件 td-agent2.conf，内容如下：
 ```
 #####配置input#####
 <source>
@@ -233,12 +233,12 @@ bin/kafka-console-consumer.sh --bootstrap-server node1:9200,node2:9200,node3:920
 </match>
 ```
 
-## 启动td-agent
+2、启动td-agent
 ```
 td-agent -c /etc/td-agent/td-agent2.conf -o /var/log/td-agent/td-agent2.log
 ```
 
-## 向test-1.log追加日志
+3、向test-1.log追加日志
 ```
 for i in `seq 1 1000`;do echo "Fluent is logging ....">> test-1.log;sleep 1;done
 ```
@@ -284,7 +284,7 @@ bin/kafka-console-consumer.sh --bootstrap-server node1:9200,node2:9200,node3:920
 ```
 
 
-# 监控
+# 六、监控
 
 ## 进程监控
 
