@@ -393,3 +393,5 @@ ps w -C ruby -C td-agent --no-heading
     ]
 }
 ```
+
+https://docs.fluentd.org/input/tail
