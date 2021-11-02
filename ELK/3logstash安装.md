@@ -63,9 +63,17 @@ wget https://artifacts.elastic.co/downloads/logstash/logstash-6.6.1.rpm
 yum install -y logstash-6.6.1.rpm
 ```  
 
-2、测试logstash是否可用
+2、自检-接收标准输入并输出到控制台
 ```
-/usr/share/logstash/bin/logstash -e 'input { stdin{} } output { stdout { codec => rubydebug}}'
+# bin/logstash -e 'input { stdin { } } output { stdout {} }'
+输入 Hello
+输出
+    {
+          "@version" => "1",
+           "message" => "Hello",
+        "@timestamp" => 2018-08-11T11:49:31.059Z,
+              "host" => "localhost.local"
+    }
 ```
 
 示例
