@@ -563,6 +563,7 @@ PUT user_info_test/user/1/_create
   "name":"name1",
   "age":20
 }
+```
 
 ### 更新文档
 
