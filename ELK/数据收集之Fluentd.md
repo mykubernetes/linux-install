@@ -394,4 +394,7 @@ ps w -C ruby -C td-agent --no-heading
 }
 ```
 
-https://docs.fluentd.org/input/tail
+参考：
+- https://cloud.tencent.com/developer/column/87531
+- https://docs.fluentd.org/input/tail
+- https://www.jianshu.com/p/e7c5f51f290b
