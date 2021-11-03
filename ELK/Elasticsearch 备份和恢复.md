@@ -268,9 +268,61 @@ curl -XPOST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
  
 可以使用下面两个api查看状态：
 ```
-curl -XGET http://127.0.0.1:9200/_recovery/restored_index_3
+curl -XGET http://127.0.0.1:9200/_recovery/snapshot_1
+
 curl -XGET http://127.0.0.1:9200/_recovery/
+{
+  "snapshot_1" : {
+    "shards" : [ {
+      "id" : 0,
+      "type" : "snapshot",                            #type
+      "stage" : "index",
+      "primary" : true,
+      "start_time" : "2014-02-24T12:15:59.716",
+      "stop_time" : 0,
+      "total_time_in_millis" : 175576,
+      "source" : {                                    #source
+        "repository" : "my_backup",
+        "snapshot" : "snapshot_3",
+        "index" : "restored_index_3"
+      },
+      "target" : {
+        "id" : "ryqJ5lO5S4-lSFbGntkEkg",
+        "hostname" : "my.fqdn",
+        "ip" : "10.0.1.7",
+        "name" : "my_es_node"
+      },
+      "index" : {
+        "files" : {
+          "total" : 73,
+          "reused" : 0,
+          "recovered" : 69,
+          "percent" : "94.5%"                          #percent
+        },
+        "bytes" : {
+          "total" : 79063092,
+          "reused" : 0,
+          "recovered" : 68891939,
+          "percent" : "87.1%"
+        },
+        "total_time_in_millis" : 0
+      },
+      "translog" : {
+        "recovered" : 0,
+        "total_time_in_millis" : 0
+      },
+      "start" : {
+        "check_index_time" : 0,
+        "total_time_in_millis" : 0
+      }
+    } ]
+  }
+}
 ```
+- type 字段告诉你恢复的本质；这个分片是在从一个快照恢复。
+- source 哈希描述了作为恢复来源的特定快照和仓库。
+- percent 字段让你对恢复的状态有个概念。这个特定分片目前已经恢复了 94% 的文件；它就快完成了。
+
 
 如果要取消恢复过程（不管是已经恢复完，还是正在恢复），直接删除索引即可：
 ```
