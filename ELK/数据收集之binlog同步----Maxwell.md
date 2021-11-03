@@ -104,7 +104,7 @@ create table if not exists `user_info`(
 ### kafka消费者客户端
 ```
 [root@node1 /usr/hdp/2.6.4.0-91/kafka]# bin/kafka-console-consumer.sh --bootstrap-server 192.168.113.101:6667 --topic qaTopic
-
+```
 
 ### 解析Insert
 ```
