@@ -109,7 +109,6 @@ curl -XDELETE localhost:9200/_snapshot/EsBackup?pretty
 
 - 一个仓库可以包含多个快照（snapshots），快照可以存所有的索引或者部分索引，当然也可以存储一个单独的索引。(要注意的一点就是快照只会备份open状态的索引，close状态的不会备份)
 
-
 1、备份所有索引
 
 将所有正在运行的open状态的索引，备份到EsBacup仓库下一个叫snapshot_all的快照中。
@@ -121,7 +120,6 @@ api同步执行，可以加wait_for_completion,备份完全完成后才返回，
 curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_all?wait_for_completion=true
 ```
 
-
 2、备份部分索引
 
 默认是备份所有open状态的索引，如果只备份某些或者某个索引，可以指定indices参数来完成：
@@ -131,12 +129,12 @@ curl -XPUT 'http://localhost:9200/_snapshot/EsBackup/snapshot_1' -d '{ "indices"
 
 # 三、快照状态
 
-正在运行的快照的详细信息可以通过如下的命令来获取：
+1、获取当前正在运行的快照及其详细状态信息的列表
 ```
 $ curl -XGET "localhost:9200/_snapshot/_status"
 ```
 
-在这种格式下，这个命令将会返回所有正在运行的快照的信息。通过指明仓库名字，能够把结果限定到具体的一个仓库。
+2、获取指定仓库正在运行的快照的信息
 ```
 $ curl -XGET "localhost:9200/_snapshot/EsBackup/_status"
 ```
