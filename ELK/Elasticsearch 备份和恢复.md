@@ -185,28 +185,21 @@ curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/_all
 curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1/_status
 ```
  
-# 四、删除快照
-```
-curl -XDELETE http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1
-```
-重要的是使用API来删除快照,而不是其他一些机制(如手工删除,或使用自动s3清理工具)。因为快照增量,它是可能的,许多快照依靠old seaments。删除API了解最近仍在使用的数据快照,并将只删除未使用的部分。如果你手动文件删除,但是,你有可能严重破坏你的备份,因为你删除数据仍在使用,如果备份正在后台进行，也可以直接删除来取消此次备份。
- 
-
-# 五、监控快照进展
+# 四、监控快照进展
  
 查看更细节的状态的快照
 ```
-curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3
+curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1
 ```
  
 API立即返回并给出一个更详细的输出的统计
 ```
-curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3/_status
+curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1/_status
 {
    "snapshots": [
       {
-         "snapshot": "snapshot_3",
-         "repository": "my_backup",
+         "snapshot": "snapshot_1",
+         "repository": "EsBackup",
          "state": "IN_PROGRESS", 
          "shards_stats": {
             "initializing": 0,
@@ -264,10 +257,9 @@ curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_3/_status
 - FINALIZING：数据传输完成;碎片现在发送快照的元数据。
 - DONE：快照完成。
 - FAILED：在快照过程中错误的出处,这碎片/索引/快照无法完成。检查你的日志以获取更多信息。
- 
 
-六、恢复
----
+# 五、恢复
+
 恢复snapshot_1里的全部索引
 ```
 curl -XPOST http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1/_restore
@@ -297,8 +289,14 @@ curl -XGET http://127.0.0.1:9200/_recovery/
 curl -XDELETE http://127.0.0.1:9200/restored_index_3
 ```
 
-七、备份数据要在新集群恢复
----
+# 六、删除快照
+```
+curl -XDELETE http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1
+```
+重要的是使用API来删除快照,而不是其他一些机制(如手工删除,或使用自动s3清理工具)。因为快照增量,它是可能的,许多快照依靠old seaments。删除API了解最近仍在使用的数据快照,并将只删除未使用的部分。如果你手动文件删除,但是,你有可能严重破坏你的备份,因为你删除数据仍在使用,如果备份正在后台进行，也可以直接删除来取消此次备份。
+ 
+
+# 七、备份数据要在新集群恢复
 
 1、需要先在新集群创建相同结构的index及type，并创建快照仓储
 ```
