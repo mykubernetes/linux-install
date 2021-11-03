@@ -150,6 +150,9 @@ $ curl -XGET "localhost:9200/_snapshot/EsBackup/snapshot_1,snapshot_2/_status"
 ```
 
 ```
+# 查看所有快照信息如下
+curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/_all
+
 # 查看快照snapshot_1的详细信息
 curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1
 
@@ -178,22 +181,7 @@ curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1
    ]
 }
 
-# 查看所有快照信息如下
-curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/_all
-
 # 查看更加详细的信息
-curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1/_status
-```
- 
-# 四、监控快照进展
- 
-查看更细节的状态的快照
-```
-curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1
-```
- 
-API立即返回并给出一个更详细的输出的统计
-```
 curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1/_status
 {
    "snapshots": [
