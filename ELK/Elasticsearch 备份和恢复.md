@@ -353,3 +353,8 @@ curl -X POST  http://192.168.0.38:9200/yuqing/_open
 
 # 查看看到备份的数据
 curl -X GET   http://192.168.0.38:9200/yuqing/article/_search
+
+
+
+参考:
+- https://www.elastic.co/guide/en/elasticsearch/reference/6.8/modules-snapshots.html#_snapshot
