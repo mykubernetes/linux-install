@@ -1,3 +1,4 @@
+```
 ################### Filebeat Configuration Example #########################
 
 ############################# Filebeat ######################################
@@ -470,5 +471,5 @@ logging:
   # Available log levels are: critical, error, warning, info, debug
   # 日志级别，默认是error
   #level: error
-
+```
 
