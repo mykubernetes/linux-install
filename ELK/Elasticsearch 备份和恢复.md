@@ -139,26 +139,24 @@ $ curl -XGET "localhost:9200/_snapshot/_status"
 $ curl -XGET "localhost:9200/_snapshot/EsBackup/_status"
 ```
 
-如果仓库名字和快照id都指明了，这个命令就会返回这个快照的详细信息，甚至这个快照不是正在运行。
+3、如果仓库名字和快照id都指明了，这个命令就会返回这个快照的详细信息，甚至这个快照不是正在运行。
 ```
 $ curl -XGET "localhost:9200/_snapshot/EsBackup/snapshot_1/_status"
 ```
 
-同样支持多个快照id：
+4、同样支持多个快照id：
 ```
 $ curl -XGET "localhost:9200/_snapshot/EsBackup/snapshot_1,snapshot_2/_status"
 ```
 
-# 四、查看快照信息
-
-查看快照snapshot_2的详细信息：
 ```
-curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
+# 查看快照snapshot_1的详细信息
+curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1
 
 {
    "snapshots": [
       {
-         "snapshot": "snapshot_2",
+         "snapshot": "snapshot_1",
          "indices": [
             ".marvel_2014_28_10",
             "index1",
@@ -179,25 +177,22 @@ curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
       }
    ]
 }
-```
 
-```
 # 查看所有快照信息如下
-curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/_all
+curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/_all
 
 # 查看更加详细的信息
-curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2/_status
+curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1/_status
 ```
  
-# 五、删除快照
-
+# 四、删除快照
 ```
-curl -XDELETE http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
+curl -XDELETE http://127.0.0.1:9200/_snapshot/my_backup/snapshot_1
 ```
 重要的是使用API来删除快照,而不是其他一些机制(如手工删除,或使用自动s3清理工具)。因为快照增量,它是可能的,许多快照依靠old seaments。删除API了解最近仍在使用的数据快照,并将只删除未使用的部分。如果你手动文件删除,但是,你有可能严重破坏你的备份,因为你删除数据仍在使用,如果备份正在后台进行，也可以直接删除来取消此次备份。
  
 
-# 六、监控快照进展
+# 五、监控快照进展
  
 查看更细节的状态的快照
 ```
