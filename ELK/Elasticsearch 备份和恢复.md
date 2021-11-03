@@ -100,7 +100,7 @@ elasticsearch_backup   fs
 EsBackup               fs
 ```
 
-8、删除一个快照存储桶
+8、删除一个快照仓库
 ```
 curl -XDELETE localhost:9200/_snapshot/EsBackup?pretty
 ```
@@ -126,11 +126,33 @@ curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_all?wait_for_comple
 
 默认是备份所有open状态的索引，如果只备份某些或者某个索引，可以指定indices参数来完成：
 ```
-curl -XPUT 'http://localhost:9200/_snapshot/EsBackup/snapshot_12' -d '{ "indices": "index_1,index_2" }'
+curl -XPUT 'http://localhost:9200/_snapshot/EsBackup/snapshot_1' -d '{ "indices": "index_1,index_2" }'
 ```
 
-三、查看快照信息
----
+# 三、快照状态
+
+正在运行的快照的详细信息可以通过如下的命令来获取：
+```
+$ curl -XGET "localhost:9200/_snapshot/_status"
+```
+
+在这种格式下，这个命令将会返回所有正在运行的快照的信息。通过指明仓库名字，能够把结果限定到具体的一个仓库。
+```
+$ curl -XGET "localhost:9200/_snapshot/EsBackup/_status"
+```
+
+如果仓库名字和快照id都指明了，这个命令就会返回这个快照的详细信息，甚至这个快照不是正在运行。
+```
+$ curl -XGET "localhost:9200/_snapshot/EsBackup/snapshot_1/_status"
+```
+
+同样支持多个快照id：
+```
+$ curl -XGET "localhost:9200/_snapshot/EsBackup/snapshot_1,snapshot_2/_status"
+```
+
+# 四、查看快照信息
+
 查看快照snapshot_2的详细信息：
 ```
 curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
@@ -169,16 +191,15 @@ curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/_all
 curl -XGET http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2/_status
 ```
  
-四、删除快照
----
+# 五、删除快照
+
 ```
 curl -XDELETE http://127.0.0.1:9200/_snapshot/my_backup/snapshot_2
 ```
 重要的是使用API来删除快照,而不是其他一些机制(如手工删除,或使用自动s3清理工具)。因为快照增量,它是可能的,许多快照依靠old seaments。删除API了解最近仍在使用的数据快照,并将只删除未使用的部分。如果你手动文件删除,但是,你有可能严重破坏你的备份,因为你删除数据仍在使用,如果备份正在后台进行，也可以直接删除来取消此次备份。
  
 
-五、监控快照进展
----
+# 六、监控快照进展
  
 查看更细节的状态的快照
 ```
