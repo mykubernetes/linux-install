@@ -10,6 +10,8 @@ Elasticsearch的一大特点就是使用简单，api也比较强大，备份也�
  
 # 一、创建存储仓库
 
+- 在进行任何快照或者恢复操作之前必须有一个快照仓库注册在Elasticsearch里。
+
 1、修改ES配置文件
 ```
 vi config/elasticsearch.yml
