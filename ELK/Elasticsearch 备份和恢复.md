@@ -121,7 +121,7 @@ curl -XDELETE localhost:9200/_snapshot/EsBackup?pretty
 # curl -X GET "10.17.4.200:9200/_cat/repositories?v"
 id                   type
 elasticsearch_backup   fs
-test                   fs
+EsBackup               fs
 ```
 
 # 二、备份索引
