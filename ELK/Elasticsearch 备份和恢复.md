@@ -2,15 +2,23 @@
 
 备份数据之前，要创建一个仓库来保存数据，仓库的类型支持共享文件系统、Amazon S3、 HDFS和Azure Cloud。 
 
-
-Elasticsearch的一大特点就是使用简单，api也比较强大，备份也不例外。简单来说，备份分两步：
-- 创建一个仓库
-- 备份指定索引
-
  
 # 一、创建存储仓库
 
 - 在进行任何快照或者恢复操作之前必须有一个快照仓库注册在Elasticsearch里。
+
+### 共享文件系统的仓库
+
+共享文件系统仓库 ("type": "fs") 是使用共享的文件系统去存储快照。 在 location 参数里指定的具体存储路径必须和共享文件系统里的位置是一样的并且能被所有的数据节点和master节点访问。 另外还支持如下的一些参数设置：
+
+| 参数 | 描述 |
+|-----|-------|
+| location | 指定快照的存储位置。必须要有 |
+| compress | 指定是否对快照文件进行压缩. 默认是 true. |
+| chunk_size | 如果需要在做快照的时候大文件可以被分解成几块。这个参数指明了每块的字节数。也可用不同的单位标识。 比如，1g，10m，5k等。默认是 null (表示不限制块大小)。 |
+| max_restore_bytes_per_sec | 每个节点恢复数据的最高速度限制. 默认是 20mb/s |
+| max_snapshot_bytes_per_sec | 每个节点做快照的最高速度限制。默认是 20mb/s |
+
 
 1、修改ES配置文件
 ```
@@ -34,8 +42,28 @@ curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup
 
 注意：共享存储路径，必须是所有的ES节点都可以访问的，最简单的就是nfs系统，然后每个节点都需要挂载到本地。
  
+3、一旦仓库被注册了，就可以只用下面的命令去获取这个仓库的信息
+```
+curl -XGET 'http://localhost:9200/_snapshot/EsBackup?pretty'
+{
+  "my_backup" : {
+    "type" : "fs",
+    "settings" : {
+      "compress" : "true",
+      "location" : "/mount/EsDataBackupDir"
+    }
+  }
+}
+```
 
-3、更新已经存在的存储库的settings配置。 
+4、查看所有的存储桶
+```
+curl -XGET localhost:9200/_snapshot
+或者
+curl -XGET localhost:9200/_snapshot/_all?pretty
+```
+
+5、更新已经存在的存储库的settings配置。 
 ```
 curl -XPOST http://127.0.0.1:9200/_snapshot/EsBackup
 {
@@ -51,7 +79,7 @@ curl -XPOST http://127.0.0.1:9200/_snapshot/EsBackup
 - max_restore_bytes_per_sec 指定恢复时的速度，默认值都是20mb/s
 
 
-4、Amazon S3存储库实例如下：
+6、Amazon S3存储库实例如下：
 ```
 curl -XPUT 'http://localhost:9200/_snapshot/s3-backup' -d '{
     "type": "s3",
@@ -74,29 +102,7 @@ curl -XPUT 'http://localhost:9200/_snapshot/s3-backup' -d '{
 使用上面的命令，创建一个仓库（s3-backup），并且还创建了存储桶（esbackup）,返回{"acknowledged":true} 信息证明创建成功。
 
 
-### 确认存储桶是否创建成功：
-```
-curl -XPOST http://localhost:9200/_snapshot/EsBackup/_verify
-```
 
-### 查看已注册快照仓库
-```
-curl -XGET localhost:9200/_snapshot/EsBackup?pretty
-或者
-curl -X GET "localhost:9200/_snapshot/repo*,*backup*"
-```
-
-可以使用逗号间隔多个仓库，星号通配符匹配仓库名字，下面示例返回仓库名以repo开头的和包含backup的仓库信息
-```
-curl -X GET "localhost:9200/_snapshot/repo*,*backup*"
-```
-
-### 查看所有的存储桶
-```
-curl -XGET localhost:9200/_snapshot
-或者
-curl -XGET localhost:9200/_snapshot/_all?pretty
-```
 
 ### 删除一个快照存储桶
 ```
