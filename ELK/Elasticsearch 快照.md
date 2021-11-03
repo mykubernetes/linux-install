@@ -149,11 +149,14 @@ $ curl -XGET "localhost:9200/_snapshot/EsBackup/snapshot_1/_status"
 $ curl -XGET "localhost:9200/_snapshot/EsBackup/snapshot_1,snapshot_2/_status"
 ```
 
-```
-# 查看所有快照信息如下
-curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/_all
 
-# 查看快照snapshot_1的详细信息
+查看所有快照信息如下
+```
+curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/_all
+```
+
+查看快照snapshot_1的详细信息
+```
 curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1
 
 {
@@ -180,8 +183,20 @@ curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1
       }
    ]
 }
+```
 
-# 查看更加详细的信息
+| 状态 | 描述|
+|-----|-----|
+| IN_PROGRESS | 快照当前正在运行。 |
+| SUCCESS | 快照完成，所有分片存储成功。 |
+| FAILED | 快照完成时出现错误并且无法存储任何数据。 |
+| PARTIAL | 全局集群状态已存储，但至少有一个分片的数据未成功存储。failure这种情况下的部分应包含有关未正确处理的分片的更多详细信息。 |
+| INCOMPATIBLE | 快照是使用旧版本的 Elasticsearch 创建的，因此与当前版本的集群不兼容。 |
+
+
+
+查看更加详细的信息
+```
 curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1/_status
 {
    "snapshots": [
