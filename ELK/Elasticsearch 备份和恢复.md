@@ -1,5 +1,5 @@
-备份
-===
+# 快照
+
 备份数据之前，要创建一个仓库来保存数据，仓库的类型支持共享文件系统、Amazon S3、 HDFS和Azure Cloud。 
 
 
@@ -8,8 +8,7 @@ Elasticsearch的一大特点就是使用简单，api也比较强大，备份也�
 - 备份指定索引
 
  
-一、创建存储仓库
----
+# 一、创建存储仓库
 
 1、修改ES配置文件
 ```
@@ -50,7 +49,6 @@ curl -XPOST http://127.0.0.1:9200/_snapshot/EsBackup
 - max_restore_bytes_per_sec 指定恢复时的速度，默认值都是20mb/s
 
 
-
 4、Amazon S3存储库实例如下：
 ```
 curl -XPUT 'http://localhost:9200/_snapshot/s3-backup' -d '{
@@ -73,23 +71,47 @@ curl -XPUT 'http://localhost:9200/_snapshot/s3-backup' -d '{
 不同的ES版本支持的region参考：https://github.com/elastic/elasticsearch-cloud-aws#aws-cloud-plugin-for-elasticsearch  
 使用上面的命令，创建一个仓库（s3-backup），并且还创建了存储桶（esbackup）,返回{"acknowledged":true} 信息证明创建成功。
 
+
+### 确认存储桶是否创建成功：
 ```
-确认存储桶是否创建成功：
-curl -XPOST http://localhost:9200/_snapshot/s3-backup/_verify
+curl -XPOST http://localhost:9200/_snapshot/EsBackup/_verify
+```
 
-查看刚创建的存储桶
-curl -XGET localhost:9200/_snapshot/s3-backup?pretty
+### 查看已注册快照仓库
+```
+curl -XGET localhost:9200/_snapshot/EsBackup?pretty
+或者
+curl -X GET "localhost:9200/_snapshot/repo*,*backup*"
+```
 
-查看所有的存储桶
+可以使用逗号间隔多个仓库，星号通配符匹配仓库名字，下面示例返回仓库名以repo开头的和包含backup的仓库信息
+```
+curl -X GET "localhost:9200/_snapshot/repo*,*backup*"
+```
+
+### 查看所有的存储桶
+```
+curl -XGET localhost:9200/_snapshot
+或者
 curl -XGET localhost:9200/_snapshot/_all?pretty
-
-删除一个快照存储桶
-curl -XDELETE localhost:9200/_snapshot/s3-backup?pretty
 ```
 
-二、备份索引
----
-一个仓库可以包含多个快照（snapshots），快照可以存所有的索引或者部分索引，当然也可以存储一个单独的索引。(要注意的一点就是快照只会备份open状态的索引，close状态的不会备份)
+### 删除一个快照存储桶
+```
+curl -XDELETE localhost:9200/_snapshot/EsBackup?pretty
+```
+
+### 查看快照仓库列表
+```
+# curl -X GET "10.17.4.200:9200/_cat/repositories?v"
+id                   type
+elasticsearch_backup   fs
+test                   fs
+```
+
+# 二、备份索引
+
+- 一个仓库可以包含多个快照（snapshots），快照可以存所有的索引或者部分索引，当然也可以存储一个单独的索引。(要注意的一点就是快照只会备份open状态的索引，close状态的不会备份)
 
 
 1、备份所有索引
