@@ -33,7 +33,7 @@ vi config/elasticsearch.yml
 path.repo: ["/mount/EsDataBackupDir"]        #添加仓库路径
 ```
 
-2、共享文件系统实例如下：
+2、创建共享文件系统
 ```
 curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup
 {
@@ -43,13 +43,20 @@ curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup
     }
 }
 ```
-- 创建了一个名为EsBackup的存仓库
-- 指定的备份方式为共享文件系统(type: fs)
-- 指定共享存储的具体路径（location参数）
-
 注意：共享存储路径，必须是所有的ES节点都可以访问的，最简单的就是nfs系统，然后每个节点都需要挂载到本地。
  
-3、一旦仓库被注册了，就可以只用下面的命令去获取这个仓库的信息
+3、如果指定的是相对路径，则根据配置文件中的`path.repo`路径位置
+```
+curl -XPUT http://127.0.0.1:9200/_snapshot/EsBackup
+{
+    "type": "fs", 
+    "settings": {
+        "location": "EsDataBackupDir" 
+    }
+}
+```
+
+4、查看仓库的信息
 ```
 curl -XGET 'http://localhost:9200/_snapshot/EsBackup?pretty'
 {
@@ -63,14 +70,14 @@ curl -XGET 'http://localhost:9200/_snapshot/EsBackup?pretty'
 }
 ```
 
-4、查看所有的存储桶
+5、查看所有的存储桶
 ```
 curl -XGET localhost:9200/_snapshot
 或者
 curl -XGET localhost:9200/_snapshot/_all?pretty
 ```
 
-5、更新已经存在的存储库的settings配置。 
+6、更新已经存在的存储库的settings配置。 
 ```
 curl -XPOST http://127.0.0.1:9200/_snapshot/EsBackup
 {
@@ -85,43 +92,17 @@ curl -XPOST http://127.0.0.1:9200/_snapshot/EsBackup
 - max_snapshot_bytes_per_sec 指定备份时的速度，默认值都是20mb/s
 - max_restore_bytes_per_sec 指定恢复时的速度，默认值都是20mb/s
 
-
-6、Amazon S3存储库实例如下：
-```
-curl -XPUT 'http://localhost:9200/_snapshot/s3-backup' -d '{
-    "type": "s3",
-    "settings": {
-        "bucket": "esbackup",
-        "region": "cn-north-1",
-        "access_key": "xxooxxooxxoo",
-        "secret_key": "xxxxxxxxxooooooooooooyyyyyyyyy"
-    }
-}'
-```
-- Type: 仓库类型
-- Setting: 仓库的额外信息
-- Region: AWS Region
-- Access_key: 访问秘钥
-- Secret_key: 私有访问秘钥
-- Bucket: 存储桶名称
-
-不同的ES版本支持的region参考：https://github.com/elastic/elasticsearch-cloud-aws#aws-cloud-plugin-for-elasticsearch  
-使用上面的命令，创建一个仓库（s3-backup），并且还创建了存储桶（esbackup）,返回{"acknowledged":true} 信息证明创建成功。
-
-
-
-
-### 删除一个快照存储桶
-```
-curl -XDELETE localhost:9200/_snapshot/EsBackup?pretty
-```
-
-### 查看快照仓库列表
+7、查看快照仓库列表
 ```
 # curl -X GET "10.17.4.200:9200/_cat/repositories?v"
 id                   type
 elasticsearch_backup   fs
 EsBackup               fs
+```
+
+8、删除一个快照存储桶
+```
+curl -XDELETE localhost:9200/_snapshot/EsBackup?pretty
 ```
 
 # 二、备份索引
@@ -358,3 +339,4 @@ curl -X GET   http://192.168.0.38:9200/yuqing/article/_search
 
 参考:
 - https://www.elastic.co/guide/en/elasticsearch/reference/6.8/modules-snapshots.html#_snapshot
+- https://blog.51cto.com/niubdada/1959065
