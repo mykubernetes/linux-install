@@ -1157,4 +1157,6 @@ $ bin/ke.sh start
 6、登录页面展示
 http://IP:8048/ke
 
-https://blog.csdn.net/wuliusir/article/details/51062904
+参考:
+- https://blog.csdn.net/wuliusir/article/details/51062904
+- https://cloud.tencent.com/developer/article/1846819
