@@ -1688,3 +1688,5 @@ rule ec_8_3-fast_host {
 
 # end crush map
 ```
+
+https://cloud.tencent.com/developer/article/1664653
