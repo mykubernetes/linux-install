@@ -2,15 +2,6 @@
 https://blog.csdn.net/weixin_45692705/article/details/119003128?spm=1001.2014.3001.5501
 
 
-社区版  
-https://dev.mysql.com/downloads/mysql/
-
-
-YUM或APT安装或更新MySQL是最方面的方法。  
-https://dev.mysql.com/downloads/repo/yum/  
-https://dev.mysql.com/doc/mysql-yum-repo-quick-guide/en/  
-
-
 # 社区版mysql安装
 
 ```
@@ -90,3 +81,11 @@ relay-log-info-repository=TABLE
 mysql> create database aliangedu;
 mysql> grant all on aliangedu.* to 'aliangedu'@'192.168.0.%' identified by 'Aliangedu6!';
 ```
+
+社区版  
+https://dev.mysql.com/downloads/mysql/
+
+
+YUM或APT安装或更新MySQL是最方面的方法。  
+https://dev.mysql.com/downloads/repo/yum/  
+https://dev.mysql.com/doc/mysql-yum-repo-quick-guide/en/  
