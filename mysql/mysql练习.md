@@ -276,16 +276,17 @@ WHERE
 
 ```
 SELECT
-    -> st.s_id AS '学生编号',
-    -> st.s_name AS '学生姓名',
-    -> AVG( s.s_score ) AS avgScore 
-    -> FROM
-    -> student st
-    -> LEFT JOIN score s ON st.s_id = s.s_id 
-    -> GROUP BY
-    -> st.s_id 
-    -> HAVING
-    -> avgScore >= 60;
+	st.s_id AS '学生编号',
+	st.s_name AS '学生姓名',
+	AVG( s.s_score ) AS avgScore 
+FROM
+	student st
+	LEFT JOIN score s ON st.s_id = s.s_id 
+GROUP BY
+	st.s_id 
+HAVING
+	avgScore >= 60；
+
 
 +--------------+--------------+----------+
 | 学生编号     | 学生姓名     | avgScore |
