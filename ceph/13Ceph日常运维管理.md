@@ -64,6 +64,30 @@ ok
 ceph pg dump -format plain
 ```
 
+```
+# 检查处于stuck状态的pg
+[root@ceph2 ceph]# ceph pg  dump_stuck
+ok
+PG_STAT STATE         UP    UP_PRIMARY ACTING ACTING_PRIMARY 
+17.5    stale+peering [0,2]          0  [0,2]              0 
+17.4    stale+peering [2,0]          2  [2,0]              2 
+17.3    stale+peering [2,0]          2  [2,0]              2 
+17.2    stale+peering [2,0]          2  [2,0]              2 
+17.1    stale+peering [0,2]          0  [0,2]              0 
+17.0    stale+peering [2,0]          2  [2,0]              2 
+17.1f   stale+peering [2,0]          2  [2,0]              2 
+17.1e   stale+peering [0,2]          0  [0,2]              0 
+17.1d   stale+peering [2,0]          2  [2,0]              2 
+17.1c   stale+peering [0,2]          0  [0,2]              0 
+
+# 检查导致pg一直阻塞在peering 状态的osd
+# ceph osd blocked-by
+osd num_blocked 
+  0          19 
+  2          13 
+```
+
+
 ### pg操作
 ```
 # 恢复一个丢失的pg
