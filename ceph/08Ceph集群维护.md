@@ -256,6 +256,67 @@ osd_recovery_op_priority = 1            # 降低恢复优先
 ```
 - 注意回填和恢复完成后调回之前参数
 
+```
+# 10 as default
+[root@rook-ceph-tools-7bb5797c8-584k5 ~]# ceph tell 'osd.*' injectargs '--osd-max-backfills 16'
+osd.0: osd_max_backfills = '16' 
+osd.1: osd_max_backfills = '16' 
+Error ENXIO: problem getting command descriptions from osd.2
+osd.2: problem getting command descriptions from osd.2
+osd.3: osd_max_backfills = '16' 
+osd.4: osd_max_backfills = '16' 
+osd.5: osd_max_backfills = '16' 
+osd.6: osd_max_backfills = '16' 
+osd.7: osd_max_backfills = '16' 
+osd.8: osd_max_backfills = '16' 
+osd.9: osd_max_backfills = '16' 
+osd.10: osd_max_backfills = '16' 
+osd.11: osd_max_backfills = '16' 
+osd.12: osd_max_backfills = '16' 
+osd.13: osd_max_backfills = '16'
+
+#15 as default
+[root@rook-ceph-tools-7bb5797c8-584k5 ~]# ceph tell osd.* injectargs '--osd-recovery-max-active 30'
+osd.0: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.1: osd_recovery_max_active = '30' (not observed, change may require restart) 
+Error ENXIO: problem getting command descriptions from osd.2
+osd.2: problem getting command descriptions from osd.2
+osd.3: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.4: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.5: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.6: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.7: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.8: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.9: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.10: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.11: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.12: osd_recovery_max_active = '30' (not observed, change may require restart) 
+osd.13: osd_recovery_max_active = '30' (not observed, change may require restart)
+```
+
+
+# 查看OSD的性能：
+```
+[root@rook-ceph-tools-7bb5797c8-df9tk /]# ceph osd perf
+osd commit_latency(ms) apply_latency(ms) 
+ 13                 55                55 
+ 12                326               326 
+ 11                 32                32 
+ 10                 91                91 
+  3                 32                32 
+  2                101               101 
+  1                 44                44 
+  0                 76                76 
+  4                 16                16 
+  5                 21                21 
+  6                 31                31 
+  7                 40                40 
+  8                 43                43 
+  9                 28                28
+```
+
+
+
 # OSD	和	PG	修复
 
 ```
