@@ -172,7 +172,39 @@ ceph-deploy osd create node03 --data $dev
 done
 ```
 
-> 10、查看集群硬盘
+> 10、查看集群状态
+```
+[root@cephnode01 ~]# ceph -s 
+cluster:
+    id:     8230a918-a0de-4784-9ab8-cd2a2b8671d0
+    health: HEALTH_WARN
+            application not enabled on 1 pool(s)
+ 
+  services:
+    mon: 3 daemons, quorum cephnode01,cephnode02,cephnode03 (age 27h)
+    mgr: cephnode01(active, since 53m), standbys: cephnode03, cephnode02
+    osd: 4 osds: 4 up (since 27h), 4 in (since 19h)
+    rgw: 1 daemon active (cephnode01)
+ 
+  data:
+    pools:   6 pools, 96 pgs
+    objects: 235 objects, 3.6 KiB
+    usage:   4.0 GiB used, 56 GiB / 60 GiB avail
+    pgs:     96 active+clean
+```
+- id：集群ID
+- health：集群运行状态，这里有一个警告，说明是有问题，意思是pg数大于pgp数，通常此数值相等。
+- mon：Monitors运行状态。
+- osd：OSDs运行状态。
+- mgr：Managers运行状态。
+- mds：Metadatas运行状态。
+- pools：存储池与PGs的数量。
+- objects：存储对象的数量。
+- usage：存储的理论用量。
+- pgs：PGs的运行状态
+
+
+> 11、查看集群硬盘
 ```
 # ceph osd tree
 ID CLASS WEIGHT  TYPE NAME       STATUS REWEIGHT PRI-AFF 
@@ -192,7 +224,7 @@ ID CLASS WEIGHT  TYPE NAME       STATUS REWEIGHT PRI-AFF
 
 
 
-> 11、查看使用容量
+> 12、查看使用容量
 ```
 # ceph df
 GLOBAL:
@@ -239,7 +271,7 @@ MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
 - **%USE:** 已用空间百分比
 - **PGS:** pg数量
 
-> 12、查询osd在哪个主机上
+> 13、查询osd在哪个主机上
 ```
 # ceph osd find 0
 {
@@ -253,7 +285,7 @@ MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
 }
 ```
 
-> 13、查看集群状态
+> 14、查看集群状态
 ```
 # ceph -s
 # ceph health
@@ -261,7 +293,7 @@ MIN/MAX VAR: 1.00/1.00  STDDEV: 0.02
 # ceph quorum_status --format json-pretty
 ```
 
-> 14、查看osd是否启动
+> 15、查看osd是否启动
 ```
 # netstat -utpln |grep osd
 tcp        0      0 192.168.101.67:6800     0.0.0.0:*               LISTEN      19079/ceph-osd      
@@ -270,7 +302,7 @@ tcp        0      0 192.168.101.67:6802     0.0.0.0:*               LISTEN      
 tcp        0      0 192.168.101.67:6803     0.0.0.0:*               LISTEN      19079/ceph-osd
 ```
 
-> 15、查看节点信息
+> 16、查看节点信息
 ```
 ceph node ls
 ceph node ls mon
@@ -278,12 +310,12 @@ ceph node ls osd
 ceph node ls mds
 ```
 
-> 16、部署 mgr ， L版以后才需要部署
+> 17、部署 mgr ， L版以后才需要部署
 ```
 # ceph-deploy mgr create node01 node02 node03 
 ```
 
-> 17、开启 dashboard 模块，用于UI查看  
+> 18、开启 dashboard 模块，用于UI查看  
 ```
 # ceph mgr module enable dashboard
 ```
