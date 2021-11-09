@@ -93,19 +93,27 @@ pool 1 'testpool' replicated size 3 min_size 2 crush_rule 0 object_hash rjenkins
 - pgp_num: pgp数量
 - application: 存储池类型
 
-## 2.3、查看某个pool的pg个数
+## 2.3、查看某个pool的pg和pgp个数
 ```
 # ceph osd pool get testpool pg_num
 pg_num: 128
+
+# ceph osd pool get testool  pgp_num
 ```
 
-## 2.4、修改pool中对象的副本数
+## 2.4、设置某个pool的pg和pgp个数
+```
+# ceph osd pool set testpool pg_num 512
+# ceph osd pool set testpool pgp_num 512
+```
+
+## 2.5、修改pool中对象的副本数
 ```
 # ceph osd pool set testpool size 5
 set pool 1 size to 5
 ```
 
-## 2.5、查看所有pool的状态
+## 2.6、查看所有pool的状态
 ```
 # ceph osd pool stats
 pool rbd id 0
@@ -120,14 +128,14 @@ pool testpool id 1
 - pool后面是pool的名称，比如rbd、volumes等，id后面是pool的id。
 - io表示的是客户端使用这个pool的io情况，B/s rd表示读的速率，kB/s wr表示写速度；op/s rd表示读的iops，op/s wr表示写的iops
 
-## 2.6、查看单个pool的状态
+## 2.7、查看单个pool的状态
 ```
 # ceph osd pool stats testpool
 pool testpool id 1
   nothing is going on
 ```
 
-## 2.7、获取pool的配额信息
+## 2.8、获取pool的配额信息
 ```
 # ceph osd pool get-quota testpool
 quotas for pool 'testpool':
@@ -137,7 +145,7 @@ quotas for pool 'testpool':
 - max objects: 最大对象数，默认为N/A，表示不限制
 - max bytes: 最大空间，默认为N/A，表示不限制
 
-## 2.8、设置配额
+## 2.9、设置配额
 ```
 # ceph osd pool set-quota testpool max_bytes 1048576
 set-quota max_bytes = 1048576 for pool testpool
@@ -146,7 +154,7 @@ set-quota max_bytes = 1048576 for pool testpool
 set-quota max_bytes = 0 for pool testpool
 ```
 
-## 2.9、池的重命名
+## 2.10、池的重命名
 ```
 # ceph osd pool rename testpool mytestpool
 pool 'testpool' renamed to 'mytestpool'
