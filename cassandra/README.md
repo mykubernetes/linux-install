@@ -263,7 +263,7 @@ The most commonly used nodetool commands are:
     version                      打印cassandra版本
     viewbuildstatus              Show progress of a materialized view build
 
-See ‘nodetool help <command>‘ for more information on a specific command.
+See 'nodetool help <command>' for more information on a specific command.
 ```
 
 2、列出指定command 的帮助内容
