@@ -160,7 +160,110 @@ best practice: 重启node前先使用nodetool flush memtable，这样可以减�
 
 1、列出nodetool所有可用的命令
 ```
-nodetool help 
+# nodetool help
+usage: nodetool [(-p <port> | --port <port>)] [(-h <host> | --host <host>)]
+        [(-pwf <passwordFilePath> | --password-file <passwordFilePath>)]
+        [(-pw <password> | --password <password>)]
+        [(-u <username> | --username <username>)] <command> [<args>]
+
+The most commonly used nodetool commands are:
+    assassinate                  Forcefully remove a dead node without re-replicating any data.  Use as a last resort if you cannot removenode
+    bootstrap                    Monitor/manage node‘s bootstrap process
+    cleanup                      Triggers the immediate cleanup of keys no longer belonging to a node. By default, clean all keyspaces
+    clearsnapshot                Remove the snapshot with the given name from the given keyspaces. If no snapshotName is specified we will remove all snapshots
+    compact                      Force a (major) compaction on one or more tables or user-defined compaction on given SSTables
+    compactionhistory            Print history of compaction
+    compactionstats              Print statistics on compactions
+    decommission                 Decommission the *node I am connecting to*
+    describecluster              打印集群信息
+    describering                 Shows the token ranges info of a given keyspace
+    disableautocompaction        Disable autocompaction for the given keyspace and table
+    disablebackup                Disable incremental backup
+    disablebinary                Disable native transport (binary protocol)
+    disablegossip                Disable gossip (effectively marking the node down)
+    disablehandoff               Disable storing hinted handoffs
+    disablehintsfordc            Disable hints for a data center
+    disablethrift                Disable thrift server
+    drain                        Drain the node (stop accepting writes and flush all tables)
+    enableautocompaction         Enable autocompaction for the given keyspace and table
+    enablebackup                 Enable incremental backup
+    enablebinary                 Reenable native transport (binary protocol)
+    enablegossip                 Reenable gossip
+    enablehandoff                Reenable future hints storing on the current node
+    enablehintsfordc             Enable hints for a data center that was previsouly disabled
+    enablethrift                 Reenable thrift server
+    failuredetector              Shows the failure detector information for the cluster
+    flush                        Flush one or more tables
+    garbagecollect               Remove deleted data from one or more tables
+    gcstats                      Print GC Statistics
+    getcompactionthreshold       Print min and max compaction thresholds for a given table
+    getcompactionthroughput      Print the MB/s throughput cap for compaction in the system
+    getconcurrentcompactors      Get the number of concurrent compactors in the system.
+    getendpoints                 Print the end points that owns the key
+    getinterdcstreamthroughput   Print the Mb/s throughput cap for inter-datacenter streaming in the system
+    getlogginglevels             打印日志级别
+    getsstables                  Print the sstable filenames that own the key
+    getstreamthroughput          Print the Mb/s throughput cap for streaming in the system
+    gettimeout                   Print the timeout of the given type in ms
+    gettraceprobability          Print the current trace probability value
+    gossipinfo                   打印这个节点通过gossip向其他节点传递的参数
+    help                         打印帮助信息
+    info                         打印节点信息
+    invalidatecountercache       Invalidate the counter cache
+    invalidatekeycache           Invalidate the key cache
+    invalidaterowcache           Invalidate the row cache
+    join                         Join the ring
+    listsnapshots                Lists all the snapshots along with the size on disk and true size.
+    move                         Move node on the token ring to a new token
+    netstats                     Print network information on provided host (connecting node by default)
+    pausehandoff                 Pause hints delivery process
+    proxyhistograms              Print statistic histograms for network operations
+    rangekeysample               Shows the sampled keys held across all keyspaces
+    rebuild                      Rebuild data by streaming from other nodes (similarly to bootstrap)
+    rebuild_index                A full rebuild of native secondary indexes for a given table
+    refresh                      Load newly placed SSTables to the system without restart
+    refreshsizeestimates         Refresh system.size_estimates
+    reloadlocalschema            Reload local node schema from system tables
+    reloadtriggers               Reload trigger classes
+    relocatesstables             Relocates sstables to the correct disk
+    removenode                   Show status of current node removal, force completion of pending removal or remove provided ID
+    repair                       Repair one or more tables
+    replaybatchlog               Kick off batchlog replay and wait for finish
+    resetlocalschema             Reset node‘s local schema and resync
+    resumehandoff                Resume hints delivery process
+    ring                         查看token环信息
+    scrub                        Scrub (rebuild sstables for) one or more tables
+    setcachecapacity             Set global key, row, and counter cache capacities (in MB units)
+    setcachekeystosave           Set number of keys saved by each cache for faster post-restart warmup. 0 to disable
+    setcompactionthreshold       Set min and max compaction thresholds for a given table
+    setcompactionthroughput      Set the MB/s throughput cap for compaction in the system, or 0 to disable throttling
+    setconcurrentcompactors      Set number of concurrent compactors in the system.
+    sethintedhandoffthrottlekb   Set hinted handoff throttle in kb per second, per delivery thread.
+    setinterdcstreamthroughput   Set the Mb/s throughput cap for inter-datacenter streaming in the system, or 0 to disable throttling
+    setlogginglevel              动态设置日志级别
+    setstreamthroughput          Set the Mb/s throughput cap for streaming in the system, or 0 to disable throttling
+    settimeout                   Set the specified timeout in ms, or 0 to disable timeout
+    settraceprobability          Sets the probability for tracing any given request to value. 0 disables, 1 enables for all requests, 0 is the default
+    snapshot                     Take a snapshot of specified keyspaces or a snapshot of the specified table
+    status                       打印集群信息
+    statusbackup                 Status of incremental backup
+    statusbinary                 Status of native transport (binary protocol)
+    statusgossip                 打印gossip状态
+    statushandoff                打印当前节点storing future hints状态
+    statusthrift                 打印thrift服务状态
+    stop                         Stop compaction
+    stopdaemon                   Stop cassandra daemon
+    tablehistograms              Print statistic histograms for a given table
+    tablestats                   打印表统计信息
+    toppartitions                Sample and print the most active partitions for a given column family
+    tpstats                      打印线程池统计信息
+    truncatehints                Truncate all hints on the local node, or truncate hints for the endpoint(s) specified.
+    upgradesstables              Rewrite sstables (for the requested tables) that are not on the current version (thus upgrading them to said current version)
+    verify                       Verify (check data checksum for) one or more tables
+    version                      打印cassandra版本
+    viewbuildstatus              Show progress of a materialized view build
+
+See ‘nodetool help <command>‘ for more information on a specific command.
 ```
 
 2、列出指定command 的帮助内容
