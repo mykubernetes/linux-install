@@ -208,9 +208,9 @@ logging:
 
 - **logfile** 支持：
   - **default**
-  - **json**,
+  - **json**
   - **logstash**
-  - **留空**；
+  - **留空**
 
 - **blacklist** 支持：
   - 那些关键字开头索引日志不输出，默认即可。
