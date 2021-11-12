@@ -208,7 +208,7 @@ logging:
 
 - **logfile** 支持：
   - **default**
-  - ** json**,
+  - **json**,
   - **logstash**
   - **留空**；
 
