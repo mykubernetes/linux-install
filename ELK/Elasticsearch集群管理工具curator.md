@@ -54,12 +54,30 @@ yum install elasticsearch-curator -y
 
 1、查看帮助
 ```
-curator_cli --help
+$ curator_cli --help
 Usage: curator_cli [OPTIONS] COMMAND [ARGS]...
-```
 
-2、常用命令
-```
+Options:
+  --config PATH       Path to configuration file. Default:
+                      ~/.curator/curator.yml
+  --host TEXT         Elasticsearch host.
+  --url_prefix TEXT   Elasticsearch http url prefix.
+  --port TEXT         Elasticsearch port.
+  --use_ssl           Connect to Elasticsearch through SSL.
+  --certificate TEXT  Path to certificate to use for SSL validation.
+  --client-cert TEXT  Path to file containing SSL certificate for client auth.
+  --client-key TEXT   Path to file containing SSL key for client auth.
+  --ssl-no-validate   Do not validate SSL certificate
+  --http_auth TEXT    Use Basic Authentication ex: user:pass
+  --timeout INTEGER   Connection timeout in seconds.
+  --master-only       Only operate on elected master node.
+  --dry-run           Do not perform any changes.
+  --loglevel TEXT     Log level
+  --logfile TEXT      log file
+  --logformat TEXT    Log output format [default|logstash|json].
+  --version           Show the version and exit.
+  --help              Show this message and exit.
+
 Commands:
   allocation        Shard Routing Allocation
   close             Close indices
@@ -73,9 +91,7 @@ Commands:
   snapshot          Snapshot indices
 ```
 
-3、实例
-
-查看 index
+2、查看 index
 ```
 # curator_cli --host 10.33.4.160 --port 9200 show_indices --verbos
 ptlog-prod-userservice-2018.11.20         open    58.4MB     185964   5   1 2018-11-20T00:00:09Z
@@ -85,7 +101,7 @@ ptlog-prod-userservice-2018.11.23         open    56.7MB     180296   5   1 2018
 ```
 
 
-4、查看 snapshots
+3、查看 snapshots
 ```
 curator_cli --host 10.33.4.160 --port 9200 show_snapshots --verbose
 ```
@@ -229,7 +245,83 @@ logging:
 
 
 ## option: 选项 ,filter:过滤条件，哪些index需要执行action,详细参考官网；
-- https://www.elastic.co/guide/en/elasticsearch/client/curator/current/actions.html
+- allocation_type
+- continue_if_exception
+- count
+- delay
+- delete_after
+- delete_aliases
+- disable_action
+- extra_settings
+- ignore_empty_list
+- ignore_unavailable
+- include_aliases
+- include_global_state
+- indices
+- key
+- max_age
+- max_docs
+- max_num_segments
+- max_wait
+- migration_prefix
+- migration_suffix
+- name
+- node_filters
+- number_of_replicas
+- number_of_shards
+- partial
+- post_allocation
+- preserve_existing-
+- refresh
+- remote_aws_key
+- remote_aws_region
+- remote_aws_secret_key
+- remote_certificate
+- remote_client_cert
+- remote_client_key
+- remote_filters
+- remote_ssl_no_validate
+- remote_url_prefix
+- rename_pattern
+- rename_replacement
+- repository
+- requests_per_second
+- request_body
+- retry_count
+- retry_interval
+- routing_type
+- setting
+- shrink_node
+- shrink_prefix
+- shrink_suffix
+- slices
+- skip_repo_fs_check
+- timeout
+- timeout_override
+- value
+- wait_for_active_shards
+- wait_for_completion
+- wait_interval
+- warn_if_no_indices
+
+参考官网: https://www.elastic.co/guide/en/elasticsearch/client/curator/current/actions.html
+
+## filters
+
+### 最常用的filtertype是pattern和age:
+- age
+- alias
+- allocated
+- closed
+- count
+- forcemerged
+- kibana
+- none
+- opened
+- pattern
+- period
+- space
+- state
 
 
 1、定期删除旧index
