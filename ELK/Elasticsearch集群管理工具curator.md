@@ -404,3 +404,25 @@ actions:
       kind: prefix
       value: ptlog-dd-trace-prod-app-gateway-2018.11.
 ```
+
+## 使用crontab定期执行curator
+
+- curator是一个命令行工具，而我们的需要是需要自动化的定期维护，因此需要crontab等工具。一般的linux操作系统都自带crontab。修改/etc/crontab文件
+```
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+
+0 0 * * * root curator --config /opt/curator/curator.yml /opt/curator/action.yml
+```
