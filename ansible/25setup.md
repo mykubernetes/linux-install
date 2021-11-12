@@ -1,0 +1,43 @@
+| 关键字 | 说明 |
+|-------|-----|
+| ansible_nodename | 节点名 |
+| ansible_fqdn | FQDN名 |
+| ansible_hostname | 主机短名称 |
+| ansible_domain | 主机域名后缀 |
+| ansible_memtotal_mb | 总物理内存 |
+| ansible_swaptotal_mb | SWAP总大小 |
+| ansible_processor | CPU信息 |
+| ansible_processor_cores | CPU核心数量 |
+| ansible_processor_vcpus | CPU逻辑核心数量 |
+| ansible_all_ipv4_addresses | 有所IPV4地址 |
+| ansible_all_ipv6_addresses | 所有IPV6地址 |
+| ansible_default_ipv4 | 默认网关的网卡配置信息 |
+| ansible_eth2 | 具体某张网卡信息 |
+| ansible_dns | DNS设置信 |
+| ansible_architecture | 系统架构 |
+| ansible_machine | 主机类型 |
+| ansible_kernel | 内核版本 |
+| ansible_distribution | 发行版本 |
+| ansible_distribution_major_version | 操作系统主版本号 |
+| ansible_distribution_release | 发行版名称 |
+| ansible_distribution_version | 完整版本号 |
+| ansible_pkg_mgr | 软件包管理方式 |
+| ansible_service_mgr | 进行服务方式 |
+| ansible_os_family | 家族系列 |
+| ansible_cmdline | 内核启动参数 |
+| ansible_selinux | SElinux状态 |
+| ansible_env | 当前环境变量参数 |
+| ansible_date_time | 时间相关 |
+| ansible_python_version | python版本 |
+| ansible_lvm | LVM卷相关信息 |
+| ansible_mounts | 所有挂载点 |
+| ansible_device_links | 所有挂载的设备的UUID和卷标名 |
+| ansible_devices | 所有/dev/下的正在使用的设备的信息 |
+| ansible_user_dir | 执行用户的家目录 |
+| ansible_user_gecos | 执行用户的描述信息 |
+| ansible_user_gid | 执行用户的的GID |
+| ansible_user_id | 执行用户的的用户名 |
+| ansible_user_shell | 执行用户的shell类型 |
+| ansible_user_uid | 执行用户的UID |
+
+
