@@ -180,9 +180,9 @@ vim ~/.curator/curator.yml
 client:
   hosts:
     - 172.20.11.32                        # 集群节点IP地址，可以写多个
-  port: 9200                              # datanode 接口
-  url_prefix:
-  use_ssl: False
+  port: 9200                              # ES端口
+  url_prefix:                             # 保持默认
+  use_ssl: False                          # 默认即可
   certificate:
   client_cert:
   client_key:
@@ -424,5 +424,5 @@ MAILTO=root
 # |  |  |  |  |
 # *  *  *  *  * user-name  command to be executed
 
-0 0 * * * root curator --config /opt/curator/curator.yml /opt/curator/action.yml
+0 0 * * * root curator --config /opt/curator/config.yml /opt/curator/action.yml
 ```
