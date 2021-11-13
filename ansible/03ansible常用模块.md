@@ -899,9 +899,11 @@ ansible node01 -m blockinfile -a 'path=/etc/test block="test" marker="#{mark} te
 | day 日 | Day of the month the job should run `( 1-31, *, */2, etc )` |
 | month 月 | Month of the year the job should run `( 1-12, *, */2, etc )` |
 | weekday 周 | Day of the week that the job should run `( 0-6 for Sunday-Saturday, *, etc )` |
-| job | 工作 ;要做的事情 |
-| name | 定义定时任务的描述信息 |
-| disabled | 注释定时任务 |
+| user | 用于设置当前计划任务属于哪个用户,当不使用此参数时,默认为管理员用户 |
+| job | 指定计划的任务中需要实际执行的命令或者脚本 |
+| name | 用于设置计划任务的名称,计划任务的名称会在注释中显示 |
+| disabled | 当计划任务有名称时,我们可以根据名称使对应的任务失效,注释定时任务 |
+| backup | 此参数的值设置为yes,那么当修改或者删除对应的计划任务时,会对计划任务备份 |
 | state | 1、absent删除定时任务 2、present创建定时任务，默认为present  |
 
 2、添加定时任务
