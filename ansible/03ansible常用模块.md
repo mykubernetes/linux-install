@@ -1110,9 +1110,14 @@ ansible 172.25.70.2 -m synchronize -a 'src=/tmp/helloworld dest=/var/www/hellowo
 
 | 参数 | 描述 |
 |------|------|
-| copy | 默认为yes，当copy=yes，那么拷贝的文件是从ansible主机复制到远程主机上的，如果设置为copy=no，那么会在远程主机上寻找src源文件 |
-| src | 源路径，可以是ansible主机上的路径，也可以是远程主机上的路径，如果是远程主机上的路径，则需要设置copy=no |
-| dest | 远程主机上的目标路径 |
+| copy | 在解压文件之前,是否先将文件复制到远程主机,默认为yes |
+| creates | 指定一个文件名,当该文件存在时,则解压指令不执行 |
+| src | 如果copy为yes,则需要指定压缩文件的源路径 |
+| dest | 远程主机上的一个路径,即文件解压的路径 |
+| list_files | 列出压缩包里的文件,默认两个参数yes/no |
+| mode | 解压后文件的权限设置 |
+| group | 解压后的目录或文件的属组 |
+| owner | 解压后文件或目录的属主 |
 
 1、解压ansible管理机上的压缩文件到远程主机
 ```
