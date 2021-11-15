@@ -14,7 +14,6 @@
 | max_restore_bytes_per_sec | 每个节点恢复数据的最高速度限制. 默认是 20mb/s |
 | max_snapshot_bytes_per_sec | 每个节点做快照的最高速度限制。默认是 20mb/s |
 
-
 ### 只读URL仓库
 
 - URL仓库("type": "url")可以作为使用共享文件系统存储快照创建的共享文件系统仓库的只读访问方式。 url 参数指定的URL必须指向共享文件系统仓库的根。支持的配置方式如下：
@@ -170,12 +169,17 @@ curl -XPUT -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
 
 6、删除快照
 ```
-# curl -XDELETE -uelastic:elastic -H "Content-Type: application/json" 'http://localhost:9200/_snapshot/EsBackup/snapshot_20211116'
+# curl -XDELETE -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_20211116'
 ```
 
-7、查看所有快照
+7、当前正在运行的快照
 ```
-# curl -XDELETE -uelastic:elastic -H "Content-Type: application/json" 'http://localhost:9200/_snapshot/EsBackup/_all
+# curl -XGET -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/_snapshot/EsBackup/_current"
+```
+
+8、查看所有快照
+```
+# curl -XDELETE -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/_snapshot/EsBackup/_all
 {
   "snapshots": [
     {
@@ -234,7 +238,7 @@ curl -XPUT -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
 | INCOMPATIBLE | 快照与阿里云ES实例的版本不兼容。 |
 
 
-8、查看指定快照详细信息
+9、查看指定快照详细信息
 ```
 curl -XGET -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_20211115'
 
@@ -264,7 +268,7 @@ curl -XGET -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
 }
 ```
 
-9、查看更加详细的信息
+10、查看更加详细的信息
 ```
 curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_20211115/_status
 {
@@ -401,20 +405,23 @@ curl -XGET -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
 - source 哈希描述了作为恢复来源的特定快照和仓库。
 - percent 字段让你对恢复的状态有个概念。这个特定分片目前已经恢复了 94% 的文件；它就快完成了。
 
+# 六、取消一个恢复中的快照
 
-如果要取消恢复过程（不管是已经恢复完，还是正在恢复），直接删除索引即可：
+- 取消一个恢复，需要删除正在恢复的索引。因为恢复进程其实就是分片恢复，发送一个`删除索引` API修改集群状态，就可以停止恢复进程。
 ```
 curl -XDELETE -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/restored_index_3'
 ```
+- 如果 restored_index_3 正在恢复中，这个删除命令会停止恢复，同时删除所有已经恢复到集群里的数据。
 
-# 六、删除快照
+
+# 七、删除快照
 ```
 curl -XDELETE -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_20211115'
 ```
 重要的是使用API来删除快照,而不是其他一些机制(如手工删除,或使用自动s3清理工具)。因为快照增量,它是可能的,许多快照依靠old seaments。删除API了解最近仍在使用的数据快照,并将只删除未使用的部分。如果你手动文件删除,但是,你有可能严重破坏你的备份,因为你删除数据仍在使用,如果备份正在后台进行，也可以直接删除来取消此次备份。
  
 
-# 七、备份数据要在新集群恢复
+# 八、备份数据要在新集群恢复
 
 1、需要先在新集群创建相同结构的index及type，并创建快照仓储
 ```
