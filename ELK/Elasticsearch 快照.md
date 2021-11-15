@@ -155,7 +155,68 @@ curl -XPUT -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
 3、如果仓库名字和快照id都指明了，这个命令就会返回这个快照的详细信息，甚至这个快照不是正在运行。
 ```
 # curl -XGET -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_20211115/_status'
+{
+   "snapshots": [
+      {
+         "snapshot": "snapshot_20211115",
+         "repository": "EsBackup",
+         "state": "IN_PROGRESS", 
+         "shards_stats": {
+            "initializing": 0,
+            "started": 1, 
+            "finalizing": 0,
+            "done": 4,
+            "failed": 0,
+            "total": 5
+         },
+         "stats": {
+            "number_of_files": 5,
+            "processed_files": 5,
+            "total_size_in_bytes": 1792,
+            "processed_size_in_bytes": 1792,
+            "start_time_in_millis": 1409663054859,
+            "time_in_millis": 64
+         },
+         "indices": {
+            "index_3": {
+               "shards_stats": {
+                  "initializing": 0,
+                  "started": 0,
+                  "finalizing": 0,
+                  "done": 5,
+                  "failed": 0,
+                  "total": 5
+               },
+               "stats": {
+                  "number_of_files": 5,
+                  "processed_files": 5,
+                  "total_size_in_bytes": 1792,
+                  "processed_size_in_bytes": 1792,
+                  "start_time_in_millis": 1409663054859,
+                  "time_in_millis": 64
+               },
+               "shards": {
+                  "0": {
+                     "stage": "DONE",
+                     "stats": {
+                        "number_of_files": 1,
+                        "processed_files": 1,
+                        "total_size_in_bytes": 514,
+                        "processed_size_in_bytes": 514,
+                        "start_time_in_millis": 1409663054862,
+                        "time_in_millis": 22
+                     }
+                  },
+                  ...
 ```
+- stat
+
+| 状态 | 描述|
+| INITIALIZING | 集群的碎片是检查状态是否可以快照。这通常是非常快。 |
+| STARTED| 数据被转移到存储库。 |
+| FINALIZING| 数据传输完成;碎片现在发送快照的元数据。 |
+| DONE| 快照完成。 |
+| FAILED| 在快照过程中错误的出处,这碎片/索引/快照无法完成。检查你的日志以获取更多信息。 |
 
 4、同样支持多个快照id：
 ```
