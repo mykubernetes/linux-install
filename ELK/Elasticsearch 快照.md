@@ -209,7 +209,7 @@ curl -XPUT -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
                   },
                   ...
 ```
-- stat
+- state
 
 | 状态 | 描述|
 |-----|-----|
