@@ -212,6 +212,7 @@ curl -XPUT -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
 - stat
 
 | 状态 | 描述|
+|-----|-----|
 | INITIALIZING | 集群的碎片是检查状态是否可以快照。这通常是非常快。 |
 | STARTED| 数据被转移到存储库。 |
 | FINALIZING| 数据传输完成;碎片现在发送快照的元数据。 |
