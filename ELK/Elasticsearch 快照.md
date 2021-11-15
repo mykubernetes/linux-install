@@ -173,23 +173,84 @@ curl -XPUT -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
 # curl -XDELETE -uelastic:elastic -H "Content-Type: application/json" 'http://localhost:9200/_snapshot/EsBackup/snapshot_20211116'
 ```
 
-查看快照snapshot_1的详细信息
+7、查看所有快照
 ```
-curl -XGET -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1'
+# curl -XDELETE -uelastic:elastic -H "Content-Type: application/json" 'http://localhost:9200/_snapshot/EsBackup/_all
+{
+  "snapshots": [
+    {
+      "snapshot": "snapshot_20211115",
+      "uuid": "n7YxxxxxxxxxxxxdA",
+      "version_id": 5050399,
+      "version": "5.5.3",
+      "indices": [
+        ".kibana"
+      ],
+      "state": "SUCCESS",
+      "start_time": "2021-11-15T01:22:39.609Z",
+      "start_time_in_millis": 1530148959609,
+      "end_time": "2021-11-15T01:22:39.923Z",
+      "end_time_in_millis": 1530148959923,
+      "duration_in_millis": 314,
+      "failures": [],
+      "shards": {
+        "total": 1,
+        "failed": 0,
+        "successful": 1
+      }
+    },
+    {
+      "snapshot": "snapshot_20211116",
+      "uuid": "frdxxxxxxxxxxxxKLA",
+      "version_id": 5050399,
+      "version": "5.5.3",
+      "indices": [
+        ".kibana"
+      ],
+      "state": "SUCCESS",
+      "start_time": "2021-11-16T01:25:00.764Z",
+      "start_time_in_millis": 1530149100764,
+      "end_time": "2021-11-16T01:25:01.482Z",
+      "end_time_in_millis": 1530149101482,
+      "duration_in_millis": 718,
+      "failures": [],
+      "shards": {
+        "total": 1,
+        "failed": 0,
+        "successful": 1
+      }
+    }
+  ]
+}
+```
+- state：快照状态
+
+| 快照状态 | 说明 |
+|--------|------|
+| IN_PROGRESS | 快照正在执行。 |
+| SUCCESS | 快照执行结束，且所有shard中的数据都存储成功。 |
+| FAILED | 快照执行结束，但部分索引中的数据存储不成功。 |
+| PARTIAL | 部分数据存储成功，但至少有1个shard中的数据没有存储成功。 |
+| INCOMPATIBLE | 快照与阿里云ES实例的版本不兼容。 |
+
+
+8、查看指定快照详细信息
+```
+curl -XGET -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_20211115'
 
 {
    "snapshots": [
       {
-         "snapshot": "snapshot_1",
+         "snapshot": "snapshot_20211115",
          "indices": [
             ".marvel_2014_28_10",
             "index1",
             "index2"
          ],
          "state": "SUCCESS",
-         "start_time": "2014-09-02T13:01:43.115Z",
+         "start_time": "2021-11-15T13:01:43.115Z",
          "start_time_in_millis": 1409662903115,
-         "end_time": "2014-09-02T13:01:43.439Z",
+         "end_time": "2021-11-15T13:01:43.439Z",
          "end_time_in_millis": 1409662903439,
          "duration_in_millis": 324,
          "failures": [],
@@ -203,25 +264,15 @@ curl -XGET -uelastic:elastic -H "Content-Type: application/json" 'http://127.0.0
 }
 ```
 
-| 状态 | 描述|
-|-----|-----|
-| IN_PROGRESS | 快照当前正在运行。 |
-| SUCCESS | 快照完成，所有分片存储成功。 |
-| FAILED | 快照完成时出现错误并且无法存储任何数据。 |
-| PARTIAL | 全局集群状态已存储，但至少有一个分片的数据未成功存储。failure这种情况下的部分应包含有关未正确处理的分片的更多详细信息。 |
-| INCOMPATIBLE | 快照是使用旧版本的 Elasticsearch 创建的，因此与当前版本的集群不兼容。 |
-
-
-
-查看更加详细的信息
+9、查看更加详细的信息
 ```
-curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1/_status
+curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_20211115/_status
 {
    "snapshots": [
       {
-         "snapshot": "snapshot_1",
+         "snapshot": "snapshot_20211115",
          "repository": "EsBackup",
-         "state": "IN_PROGRESS", 
+         "state": "SUCCESS", 
          "shards_stats": {
             "initializing": 0,
             "started": 1, 
@@ -270,14 +321,7 @@ curl -XGET http://127.0.0.1:9200/_snapshot/EsBackup/snapshot_1/_status
                   },
                   ...
 ```
-快照当前运行将显示IN_PROGRESS作为其状态，这个特定的快照有一个碎片仍然转移(其他四个已经完成)。
- 
-响应包括总体状况的快照,但还深入每和每个实例统计数据。
-- INITIALIZING： 集群的碎片是检查状态是否可以快照。这通常是非常快。
-- STARTED：数据被转移到存储库。
-- FINALIZING：数据传输完成;碎片现在发送快照的元数据。
-- DONE：快照完成。
-- FAILED：在快照过程中错误的出处,这碎片/索引/快照无法完成。检查你的日志以获取更多信息。
+
 
 # 四、恢复快照
 
