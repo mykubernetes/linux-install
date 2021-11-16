@@ -520,10 +520,61 @@ k1
 v1
 ```
 
+## 1.6. etcd证书替换
 
+etcd的证书替换分为四种类型：
+- 1. server 证书更换：从v3.2.0开始，每个请求会重载证书，因此证书替换会变得非常方便
+- 2. peer 证书更换：从v3.2.0开始，每个请求会重载证书，因此证书替换会变得非常方便
+- 3. ca 证书更换: ca证书的替换会变得比较麻烦，需要停服维护，做好前期准备工作，停服时间在1分钟以内
 
+上述的第一和第二种情况很容易处理，签发证书直接下发即可，老版本的etcd可用逐个重启服务。以下针对第三种情况进行操作：
 
+1. 生成新的证书
+```
 
+```
+
+2. 下发证书，并重启etcd
+```
+[root@duduniao etcd]# scan_host.sh cmd -h 10.4.7.121 10.4.7.122 10.4.7.124 "cp -r /data/etcd/ssl /data/etcd/ssl-20211021.bak"
+[root@duduniao ssl-new]# scan_host.sh cmd -h 10.4.7.121 10.4.7.122 10.4.7.124 "mkdir /data/etcd/ssl-new"
+[root@duduniao ssl-new]# scp ca.pem server.pem server-key.pem etcd-1.pem etcd-1-key.pem 10.4.7.121:/data/etcd/ssl-new/
+[root@duduniao ssl-new]# scp ca.pem server.pem server-key.pem etcd-2.pem etcd-2-key.pem 10.4.7.122:/data/etcd/ssl-new/
+[root@duduniao ssl-new]# scp ca.pem server.pem server-key.pem etcd-3.pem etcd-3-key.pem 10.4.7.124:/data/etcd/ssl-new/
+
+[root@duduniao etcd]# scan_host.sh cmd -h 10.4.7.121 10.4.7.122 10.4.7.124 "systemctl stop etcd "
+[root@duduniao etcd]# scan_host.sh cmd -h 10.4.7.121 10.4.7.122 10.4.7.124 "rm -fr /data/etcd/ssl ; mv /data/etcd/ssl-new /data/etcd/ssl"
+[root@duduniao etcd]# scan_host.sh cmd -h 10.4.7.121 10.4.7.122 10.4.7.124 "systemctl start etcd "
+```
+
+```
+[root@duduniao etcd]# etcdctl --cacert ssl-new/ca.pem --cert ssl-new/client.pem --key ssl-new/client-key.pem --endpoints https://10.4.7.121:2379 member list --write-out table
++------------------+---------+--------+-------------------------+-------------------------+------------+
+|        ID        | STATUS  |  NAME  |       PEER ADDRS        |      CLIENT ADDRS       | IS LEARNER |
++------------------+---------+--------+-------------------------+-------------------------+------------+
+| 8bb2a873a59fd89b | started | etcd-3 | https://10.4.7.124:2380 | https://10.4.7.124:2379 |      false |
+| bbd6739258f69625 | started | etcd-1 | https://10.4.7.121:2380 | https://10.4.7.121:2379 |      false |
+| c5542f3740ec56cd | started | etcd-2 | https://10.4.7.122:2380 | https://10.4.7.122:2379 |      false |
++------------------+---------+--------+-------------------------+-------------------------+------------+
+[root@duduniao etcd]# etcdctl --cacert ssl-new/ca.pem --cert ssl-new/client.pem --key ssl-new/client-key.pem --endpoints https://10.4.7.121:2379 endpoint status --write-out table
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+|        ENDPOINT         |        ID        | VERSION | DB SIZE | IS LEADER | IS LEARNER | RAFT TERM | RAFT INDEX | RAFT APPLIED INDEX | ERRORS |
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+| https://10.4.7.121:2379 | bbd6739258f69625 |   3.5.1 |   20 kB |     false |      false |         7 |         37 |                 37 |        |
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+[root@duduniao etcd]# etcdctl --cacert ssl-new/ca.pem --cert ssl-new/client.pem --key ssl-new/client-key.pem --endpoints https://10.4.7.122:2379 endpoint status --write-out table
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+|        ENDPOINT         |        ID        | VERSION | DB SIZE | IS LEADER | IS LEARNER | RAFT TERM | RAFT INDEX | RAFT APPLIED INDEX | ERRORS |
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+| https://10.4.7.122:2379 | c5542f3740ec56cd |   3.5.1 |   20 kB |     false |      false |         7 |         37 |                 37 |        |
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+[root@duduniao etcd]# etcdctl --cacert ssl-new/ca.pem --cert ssl-new/client.pem --key ssl-new/client-key.pem --endpoints https://10.4.7.124:2379 endpoint status --write-out table
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+|        ENDPOINT         |        ID        | VERSION | DB SIZE | IS LEADER | IS LEARNER | RAFT TERM | RAFT INDEX | RAFT APPLIED INDEX | ERRORS |
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+| https://10.4.7.124:2379 | 8bb2a873a59fd89b |   3.5.1 |   20 kB |      true |      false |         7 |         37 |                 37 |        |
++-------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+```
 
 
 
