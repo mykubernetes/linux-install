@@ -26,6 +26,11 @@ $ ETCDCTL_API=2 etcdctl --ca-file=./etcd-ca.pem --key-file=./etcd-client-key.pem
 ```
 
 4、此时相应节点的服务也停止。
+```
+$ ssh 192.168.111.204
+$ systemctl stop etcd 
+$ systemctl disable etcd
+```
 
 5、查看集群当前的心跳状态：
 ```
