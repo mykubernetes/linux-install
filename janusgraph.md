@@ -7,6 +7,8 @@ https://github.com/JanusGraph/janusgraph/releases/
 提供了Gremlin和SQL语句的转化样例，帮助快速上手Gremlin图查询语言  
 http://sql2gremlin.com/ 提供了Gremlin和SQL语句的转化样例，帮助快速上手Gremlin图查询语言
 
+https://blog.csdn.net/meifannao789456/category_9289048.html?spm=1001.2014.3001.5482
+
 Gremlin中文文档  
 http://tinkerpop-gremlin.cn/
 
