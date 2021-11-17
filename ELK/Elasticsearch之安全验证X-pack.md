@@ -38,6 +38,41 @@ xpack.security.transport.ssl.enabled: true
 
 # 手动设置密码
 ➜  elasticsearch-setup-passwords interactive
+
+Initiating the setup of passwords for reserved users 
+elastic,apm_system,kibana,logstash_system,beats_system,remote_monitoring_user.
+You will be prompted to enter passwords as the process progresses.
+Please confirm that you would like to continue [y/N]y
+
+
+Enter password for [elastic]: 
+Reenter password for [elastic]: 
+Enter password for [apm_system]: 
+Reenter password for [apm_system]: 
+Enter password for [kibana]: 
+Reenter password for [kibana]: 
+Enter password for [logstash_system]: 
+Reenter password for [logstash_system]: 
+Enter password for [beats_system]: 
+Reenter password for [beats_system]: 
+Enter password for [remote_monitoring_user]: 
+Reenter password for [remote_monitoring_user]: 
+Changed password for user [apm_system]
+Changed password for user [kibana]
+Changed password for user [logstash_system]
+Changed password for user [beats_system]
+Changed password for user [remote_monitoring_user]
+Changed password for user [elastic]
+```
+
+### 测试
+```
+curl -XGET -u "elastic:123456" http://127.0.0.1:9200/_cat/indices
+green  open .kibana_task_manager aA2f1cDOSU6nqCx9P-hFPQ 1 0       2       4  45.1kb  45.1kb
+green  open .security-7          kLzahwFyQ2aep2EzmrdLrQ 1 0      44       0  88.2kb  88.2kb
+yellow open con_error            ku-d1jaQQ8q9eNLSYZAKow 1 1   63023    6368    47mb    47mb
+yellow open alive_ip             p9EgMpYEQLabuke05CBMKA 1 1 6538723 1279843 706.5mb 706.5mb
+green  open .kibana_1            qc9bm_m7TqiH53JHGxXXww 1 0      19       4  83.6kb  83.6kb
 ```
 
 ## 三、kibana && head 访问
