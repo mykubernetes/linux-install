@@ -33,6 +33,13 @@ curl -X GET http://192.168.99.101:2379/e77afb997af5a84983baa98fd42cf12f
         }
     }
 ```
+- 从结果中可以发现，etcd1 的节点的 key 为 f84fe4a4e816e778。
+
+2、向 discovery 发送一个 DELETE 请求, 删除该节点 member
+```
+curl -X DELETE http://10.127.3.110:8087/e77afb997af5a84983baa98fd42cf12f/f84fe4a4e816e778
+```
+
 
 # 操作
 
