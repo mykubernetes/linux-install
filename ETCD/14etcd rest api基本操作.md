@@ -327,3 +327,16 @@ curl http://192.168.99.101:2379/v2/stats/store
         "watchers": 0
     }
 ```
+
+
+# V3版本，注意在V3版本中所有的key和value都必须转换为base64编码然后才可以存储
+```
+# foo is 'Zm9v' in Base64
+# bar is 'YmFy' in Base64
+
+# 创建键值对 foo:bar
+# curl -L http://127.0.0.1:2379/v3beta/kv/put -X POST -d '{"key": "Zm9v", "value": "YmFy"}'
+
+# 查看键值对 foo
+# curl -L http://127.0.0.1:2379/v3beta/kv/range -X POST -d '{"key": "Zm9v"}' 
+```
