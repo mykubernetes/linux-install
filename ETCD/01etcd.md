@@ -819,7 +819,6 @@ member add          #已有集群中增加成员
 member remove       #移除已有集群中的成员
 member update       #更新集群中的成员
 member list         #集群成员列表
-
 ```
 
 2、查看集群中存在的节点
@@ -829,6 +828,21 @@ $ etcdctl member list
 ```
 - --write-out table
 - --endpoints=http://localhost:2379
+
+etcd隐藏目录
+```
+etcdctl ls /_etcd/machines --recursive
+
+/_etcd/machines/2ddbdb7c872b4bc59dd1969ac166501e
+/_etcd/machines/921a7241c31a499a97d43f785108b17c
+/_etcd/machines/27987f5eaac243f88ca6823b47012c5b
+```
+
+```
+etcdctl get /_etcd/machines/2ddbdb7c872b4bc59dd1969ac166501e
+
+etcd=http%3A%2F%2F10.132.252.38%3A4001&raft=http%3A%2F%2F10.132.252.38%3A7001
+```
 
 3、更新成员
 - 更新 client URLs
@@ -858,9 +872,7 @@ $ etcdctl --endpoints=http://localhost:22379  member list -w table
 | 91bc3c398fb3c146 | started | infra2 | http://127.0.0.1:22380 | http://127.0.0.1:22379 |      false |
 | fd422379fda50e48 | started | infra3 | http://127.0.0.1:32380 | http://127.0.0.1:32379 |      false |
 +------------------+---------+--------+------------------------+------------------------+------------+
-
 ```
-
 
 4、删除集群中存在的节点
 ```
