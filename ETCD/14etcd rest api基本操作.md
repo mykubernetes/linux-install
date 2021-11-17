@@ -1,5 +1,7 @@
 
+向该集群的 discovery 发送一个 GET 请求, 查看 member 组成。
 ```
+curl -X GET http://192.168.99.101:2379/e77afb997af5a84983baa98fd42cf12f
 返回
     {
         "action": "get", 
