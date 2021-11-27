@@ -1,4 +1,4 @@
-1) 操作系统设置，需要在所有ES节点上执行
+1、操作系统设置，需要在所有ES节点上执行
 ```
 # vim /etc/sysctl.conf 文件，添加或修改 vm.max_map_count 配置
 vm.max_map_count=655360
@@ -7,7 +7,7 @@ vm.max_map_count=655360
 # sysctl -p
 ```
 
-2）修改系统资源配置，需要在所有ES节点执行
+2、修改系统资源配置，需要在所有ES节点执行
 ```
 # 修改 /etc/security/limits.conf 文件，在最后添加内容
 *  soft    nproc   1024000
@@ -16,13 +16,13 @@ vm.max_map_count=655360
 *  hard    nofile  1024000
 ```
 
-3）添加ES用户，需要在所有ES节点执行
+3、添加ES用户，需要在所有ES节点执行
 ```
 # groupadd elasticsearch
 # useradd elasticsearch -g elasticsearch -b /opt
 ```
 
-4) 解压es安装包到 /opt/elasticsearch 目录下，并修改解压后的目录属主为elasticsearch，在所有ES节点执行
+4、解压es安装包到 /opt/elasticsearch 目录下，并修改解压后的目录属主为elasticsearch，在所有ES节点执行
 ```
 # cd /opt
 # tar -zxvf elasticsearch-6.8.2.tar.gz -C /opt/elasticsearch
@@ -31,7 +31,7 @@ vm.max_map_count=655360
 # chown -R elasticsearch:elasticsearch elasticsearch-6.8.2/
 ```
 
-5）配置JAVA_HOME环境变量，需要在所有ES节点执行
+5、配置JAVA_HOME环境变量，需要在所有ES节点执行
 ```
 # vim /etc/profile
 export JAVA_HOME=/opt/java
@@ -40,13 +40,13 @@ export PATH=$JAVA_HOME/bin:$PATH
 # source /etc/profile
 ```
 
-6）创建ES集群的数据和日志目录，需要在ES所有节点执行
+6、创建ES集群的数据和日志目录，需要在ES所有节点执行
 ```
 # mkdir -p /opt/elasticsearch/{data,logs}
 # chown -R elasticsearch:elasticsearch /opt/elasticsearch
 ```
 
-7）切换到elasticsearch用户, 在所有ES节点进行如下操作：
+7、切换到elasticsearch用户, 在所有ES节点进行如下操作：
 ```
 # cd /opt/elasticsearch/elasticsearch-6.8.2/config
 
@@ -63,7 +63,7 @@ discovery.zen.ping.unicast.hosts: ["192.168.101.66:9300", "192.168.101.67:9300",
 discovery.zen.minimum_master_nodes: 2
 ```
 
-8）以elasticsearch用户，修改ES配置信息，在所有ES节点进行如下操作：
+8、以elasticsearch用户，修改ES配置信息，在所有ES节点进行如下操作：
 ```
 # cd /opt/elasticsearch/elasticsearch-6.8.2/config
 # vim jvm.options文件，修改或添加 Xms 和 Xmx 配置
@@ -71,12 +71,12 @@ discovery.zen.minimum_master_nodes: 2
 -Xmx8g                                              #与xms值保持一致
 ```
 
-9) 以elasticsearch用户，启动ES进程，在所有ES节点进行：
+9、以elasticsearch用户，启动ES进程，在所有ES节点进行：
 ```
 # cd /opt/elasticsearch/elasticsearch-6.8.2/bin && ./elasticsearch -d
 ```
 
-10) 检查ES集群状态信息，确认9200服务端口处于监听状态
+10、检查ES集群状态信息，确认9200服务端口处于监听状态
 
 - 查看端口是否监听
 ```
@@ -215,7 +215,7 @@ epoch      timestamp cluster    status node.total node.data shards pri relo init
 
 通过刚刚的测试，已经看出，master在node01，现在将node1的es停掉，看看是否会自动漂移。
 ```
-[root@localhost ~]$curl -XGET 'http://127.0.0.1:9200/_cat/nodes?v'
+# curl -XGET 'http://127.0.0.1:9200/_cat/nodes?v'
 ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
 192.168.101.66          36          39   0    0.03    0.04     0.05 mdi       *      elk-node01
 192.168.101.67          22          98   0    0.00    0.02     0.05 -         -      elk-node02
@@ -223,18 +223,18 @@ ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role ma
 
 [root@localhost ~]$systemctl stop elasticsearch
 ```
+
 然后到另外一个节点查看一下：
 ```
-[root@localhost ~]$curl -XGET 'http://127.0.0.1:9200/_cat/nodes?v'
+# curl -XGET 'http://127.0.0.1:9200/_cat/nodes?v'
 ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
 192.168.101.67           30          62   0    0.00    0.01     0.05 mdi       *      elk-node02
 192.168.101.68           24          98   0    0.00    0.02     0.05 -         -      elk-node03
 ```
 
-11) 以elasticsearch用户运行，在其中一个ES节点上运行配置xpack
+11、以elasticsearch用户运行，在其中一个ES节点上运行配置xpack
 
 - es6.8已经可以免费使用xpack了,所以不需要进行破解即可使用了
-
 ```
 # cd /opt/elasticsearch/elasticsearch-6.8.2/bin
 # ./elasticsearch-certgen                                #根据前面的ES集群信息进行配置
@@ -274,7 +274,7 @@ configure the client to trust this certificate.
   inflating: elasticsearch/elasticsearch.key 
 ```
 
-12）以elasticsearch用户操作，在所有的ES节点新增xpack配置
+12、以elasticsearch用户操作，在所有的ES节点新增xpack配置
 ```
 # vim /opt/elasticsearch/elasticsearch-6.8.2/config/elasticsearch.yml
 
@@ -310,13 +310,13 @@ xpack.ssl.certificate: elasticsearch/elasticsearch.crt
 xpack.ssl.certificate_authorities: ca/ca.crt
 ```
 
-13) 以elasticsearch用户运行，重启ES节点服务，在所有的ES节点进行
+13、以elasticsearch用户运行，重启ES节点服务，在所有的ES节点进行
 ```
 # ps -ef | grep elasticsearch | grep -v grep | awk '{print $2}' | xargs kill -9
 # cd /opt/elasticsearch/elasticsearch-6.8.2/bin && ./elasticsearch -d
 ```
 
-14）以elasticsearch用户运行，设置ES集群密码，在任意一个ES节点上运行
+14、以elasticsearch用户运行，设置ES集群密码，在任意一个ES节点上运行
 
 - ES中内置了几个管理其他集成组件的账号即：`apm_system`, `beats_system`, `elastic`, `kibana`, `logstash_system`, `remote_monitoring_user`，使用之前，首先需要添加一下密码。
 ```
@@ -366,7 +366,7 @@ Do you want to continue with the password setup process [y/N]y
 # curl -XDELETE http://localhost:9200/.secutity-6
 ```
 
-15) 验证集群状态，确认集群状态为green
+15、验证集群状态，确认集群状态为green
 ```
 # curl -XGET -uelastic:elastic 'localhost:9200/_xpack/security/user?pretty'
 # curl -XGET -uelastic:elastic 'localhost:9200/_cluster/health?pretty'
