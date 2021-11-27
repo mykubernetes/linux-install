@@ -686,3 +686,7 @@ eg:
 | write | 对文档执行所有写入操作的权限，包括索引，更新和删除文档以及执行批量操作的权限。还授予对更新映射操作的访问权限。 |
 | delete_index | 删除索引。 |
 | create_index | 创建索引。创建索引请求可能包含在创建索引时添加到索引的别名。在这种情况下，该请求最好有manage权限，同时设置索引和别名。 |
+
+参考：
+- https://www.modb.pro/db/105875
+- https://blog.csdn.net/pistolove/article/details/53838138
