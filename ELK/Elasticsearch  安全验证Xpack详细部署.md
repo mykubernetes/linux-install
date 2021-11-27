@@ -372,7 +372,7 @@ Do you want to continue with the password setup process [y/N]y
 # curl -XGET -uelastic:elastic 'localhost:9200/_cluster/health?pretty'
 ```
 
-16、es六个内置账号及权限
+16、es内置账号及权限
 
 | username | role | 权限 |
 |----------|-------|-----|
