@@ -372,7 +372,7 @@ Do you want to continue with the password setup process [y/N]y
 # curl -XGET -uelastic:elastic 'localhost:9200/_cluster/health?pretty'
 ```
 
-16、es三个内置账号及权限
+16、es六个内置账号及权限
 
 | username | role | 权限 |
 |----------|-------|-----|
@@ -380,13 +380,76 @@ Do you want to continue with the password setup process [y/N]y
 | kibana | kibana_system | 用户kibana用来连接elasticsearch并与之通信。Kibana服务器以该用户身份提交请求以访问集群监视API和 .kibana索引。不能访问index。 |
 | logstash_system | logstash_system | 用户Logstash在Elasticsearch中存储监控信息时使用 |
 
-16.1修改账户密码
-```
-# curl -XPOST -H 'Content-type: application/json' -u elastic:elastic 'http://localhost:9200/_xpack/security/user/kibana/_password?pretty' -d '{"password": "123456"}'
 
-返回
-{ }
+查询所有用户
 ```
+# curl -XGET -uelastic:elastic 'localhost:9200/_xpack/security/user?pretty'
+```
+
+查看指定用户
+```
+# curl -X GET -uelastic:elastic "localhost:9200/_xpack/security/user/jacknich"
+```
+
+查询所有roles
+```
+# curl -XGET -uelastic:elastic 'localhost:9200/_xpack/security/role?pretty'
+```
+
+创建用户[chengen]
+```
+# curl -X POST -u elastic "localhost:9200/_xpack/security/user/chengen" -H 'Content-Type: application/json' -d'
+{
+  "password" : "your passwd",
+  "roles" : [ "admin"],
+  "full_name" : "chengen",
+  "email" : "xxxxxx@qq.com",
+  "metadata" : {
+    "intelligence" : 7
+  }
+}'
+```
+- 加上`-u elastic`是因为只有elastic用户有管理用户权限，另外，请求参数后面可以带上`?pretty`，这样返回的格式会好看一点儿
+
+修改账户密码
+```
+# curl -X POST -uelastic:elastic "localhost:9200/_xpack/security/user/test/_password" -H 'Content-Type: application/json' -d'
+{
+  "password" : "your passwd"
+}'
+```
+
+禁用/启动/删除用户
+```
+# curl -X PUT -uelastic:elastic "localhost:9200/_xpack/security/user/test/_disable"  
+# curl -X PUT -uelastic:elastic "localhost:9200/_xpack/security/user/test/_enable"
+# curl -X DELETE -uelastic:elastic "localhost:9200/_xpack/security/user/test"
+```
+
+```
+# 创建events_admin的roles，该用户组对events*有all权限，对.kibana有manage，read，index权限
+# curl -XPOST -uelastic:elastic 'localhost:9200/_xpack/security/role/events_admin' -H "Content-Type: application/json" -d '{
+  "indices" : [
+    {
+      "names" : [ "events*" ],
+      "privileges" : [ "all" ]
+    },
+    {
+      "names" : [ ".kibana*" ],
+      "privileges" : [ "manage", "read", "index" ]
+    }
+  ]
+}'
+
+# 创建johndoe用户，设置密码为123456，使用events_admin角色
+# curl -XPOST -uelastic:elastic 'localhost:9200/_xpack/security/user/johndoe' -H "Content-Type: application/json" -d '{
+  "password" : "123456",
+  "full_name" : "John Doe",
+  "email" : "john.doe@anony.mous",
+  "roles" : [ "events_admin" ]
+}'
+```
+
 
 角色管理API：
 - https://www.elastic.co/guide/en/elasticsearch/reference/6.0/security-api-roles.html
