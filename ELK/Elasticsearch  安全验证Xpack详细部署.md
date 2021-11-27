@@ -469,8 +469,152 @@ curl -X POST "localhost:9200/_xpack/security/role/my_admin_role" -H 'Content-Typ
   "metadata" : { // 可选
     "version" : 1
   }
+}'
+```
+
+验证admin用户，通过admin账户和admin的密码访问ES的/_xpack/security/_authenticate接口，能看到用户的信息
+```
+# curl -XGET -uelastic:elastic 'localhost:9200/_xpack/security/_authenticate -u admin:admin
+返回：
+{
+  "username": "admin",
+  "roles": [],                       #注意，还没有绑定任何角色，现在角色是空的
+  "full_name": null,
+  "email": null,
+  "metadata": {
+    "ldap_dn": "cn=admin,ou=person,dc=intelli706,dc=com",
+    "ldap_groups": []
+  },
+  "enabled": true,
+  "authentication_realm": {
+    "name": "ldap1",
+    "type": "ldap"
+  },
+  "lookup_realm": {
+    "name": "ldap1",
+    "type": "ldap"
+  }
 }
-'
+```
+
+```
+# 1、创建角色
+curl -X POST "localhost:9200/_xpack/security/role/xsjc -H 'Content-Type: application/json' -d'
+{
+  "cluster": ["all"],
+  "indices": [
+    {
+      "names": [ "tyyw*"],
+      "privileges": ["read"],
+      "field_security" : {
+        "grant" : [ "TYYW_2001_AJ__CBDW_MC", "TYYW_2001_AJ__CBDW_MC.keyword" ]
+      }
+    }
+  ]
+}
+返回：
+{
+  "role": {
+    "created": true
+  }
+}
+
+# 2、查询角色
+# curl -XGET -uelastic:elastic 'localhost:9200/_xpack/security/role/xsjc #查询指定角色
+
+返回
+{
+  "xsjc": {
+    "cluster": [
+      "all"
+    ],
+    "indices": [
+      {
+        "names": [
+          "tyyw*"
+        ],
+        "privileges": [
+          "read"
+        ],
+        "field_security": {
+          "grant": [
+            "TYYW_2001_AJ__CBDW_MC",
+            "TYYW_2001_AJ__CBDW_MC.keyword"          #注意，这个角色只给这两列的read权限
+          ]
+        },
+        "allow_restricted_indices": false
+      }
+    ],
+    "applications": [],
+    "run_as": [],
+    "metadata": {},
+    "transient_metadata": {
+      "enabled": true
+    }
+  }
+}
+
+# 3、给用户绑定角色
+# 本质上是创建一个用户和角色的映射关系，<user_role_map_name>就是这个角色和映射关系的名称
+curl -X POST "localhost:9200/_xpack/security/role_mapping/zhangyan_role -H 'Content-Type: application/json' -d'
+{
+    "enabled": true,
+    "roles": "xsjc",
+    "rules": {
+        "field": {
+            "dn": "cn=zhangyan,ou=person,dc=intelli706,dc=com"
+        }
+    }
+}
+返回：
+{
+  "role_mapping": {
+    "created": true
+  }
+}
+
+# 4、查询用户_角色绑定映射关系
+# curl -XGET -uelastic:elastic 'localhost:9200/_xpack/security/role_mapping/zhangyan_role           #查询指定的用户_角色映射关系
+返回：
+{
+  "zhangyan_role": {
+    "enabled": true,
+    "roles": [
+      "xsjc"
+    ],
+    "rules": {
+      "field": {
+        "dn": "cn=zhangyan,ou=person,dc=intelli706,dc=com"
+      }
+    },
+    "metadata": {}
+  }
+}
+
+# 5、查询用户信息
+# curl -XGET -uelastic:elastic 'localhost:9200/_xpack/security/_authenticate -u zhangyan:zhangyan
+返回:
+{
+  "username": "zhangyan",
+  "roles": [
+    "xsjc" # 可以看到已经有权限了
+  ],
+  "full_name": null,
+  "email": null,
+  "metadata": {
+    "ldap_dn": "cn=zhangyan,ou=person,dc=intelli706,dc=com",
+    "ldap_groups": []
+  },
+  "enabled": true,
+  "authentication_realm": {
+    "name": "ldap1",
+    "type": "ldap"
+  },
+  "lookup_realm": {
+    "name": "ldap1",
+    "type": "ldap"
+  }
+}
 ```
 
 角色管理API：
