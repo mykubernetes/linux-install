@@ -115,6 +115,16 @@ configure the client to trust this certificate.
 # unzip cert.zip
 ```
 
+解压cert.zip文件会得到
+```
+   creating: ca/
+  inflating: ca/ca.crt               
+  inflating: ca/ca.key               
+   creating: elasticsearch/
+  inflating: elasticsearch/elasticsearch.crt  
+  inflating: elasticsearch/elasticsearch.key 
+```
+
 12）以elasticsearch用户操作，在所有的ES节点新增xpack配置
 ```
 # vim /opt/elasticsearch/elasticsearch-6.8.2/config/elasticsearch.yml
@@ -144,10 +154,76 @@ discovery.zen.minimum_master_nodes: 2
 # 开通高级权限后,打开安全配置功能
 xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: true
+
 # 配置ssl和CA证书配置
-xpack.security.transport.ssl.enabled: true
 xpack.ssl.key: elasticsearch/elasticsearch.key
 xpack.ssl.certificate: elasticsearch/elasticsearch.crt
+xpack.ssl.certificate_authorities: ca/ca.crt
 ```
+
+13) 以elasticsearch用户运行，重启ES节点服务，在所有的ES节点进行
+```
+# ps -ef | grep elasticsearch | grep -v grep | awk '{print $2}' | xargs kill -9
+# cd /opt/elasticsearch/elasticsearch-6.8.2/bin && ./elasticsearch -d
+```
+
+14）以elasticsearch用户运行，设置ES集群密码，在任意一个ES节点上运行
+
+- ES中内置了几个管理其他集成组件的账号即：`apm_system`, `beats_system`, `elastic`, `kibana`, `logstash_system`, `remote_monitoring_user`，使用之前，首先需要添加一下密码。
+```
+# cd cd /opt/elasticsearch/elasticsearch-6.8.2/bin 
+# ./elasticsearch-setup-passwords interactive                       # 密码全都填写 elastic （现场根据需求修改）
+Initiating the setup of passwords for reserved users elastic,apm_system,kibana,logstash_system,beats_system,remote_monitoring_user.
+You will be prompted to enter passwords as the process progresses.
+Please confirm that you would like to continue [y/N]y
+
+Enter password for [elastic]:
+Reenter password for [elastic]:
+Enter password for [apm_system]:
+Reenter password for [apm_system]:
+Enter password for [kibana]:
+Reenter password for [kibana]:
+Enter password for [logstash_system]:
+Reenter password for [logstash_system]:
+Enter password for [beats_system]:
+Reenter password for [beats_system]:
+Enter password for [remote_monitoring_user]:
+Reenter password for [remote_monitoring_user]:
+Changed password for user [apm_system]
+Changed password for user [kibana]
+Changed password for user [logstash_system]
+Changed password for user [beats_system]
+Changed password for user [remote_monitoring_user]
+Changed password for user [elastic]
+```
+- interactive：给用户一一设置密码。
+- auto：自动生成密码。
+
+如果这个地方报如下错误：
+```
+Failed to determine the health of the cluster running at http://10.3.7.7:9200
+Unexpected response code [503] from calling GET http://10.3.7.7:9200/_cluster/health?pretty
+Cause: master_not_discovered_exception
+
+It is recommended that you resolve the issues with your cluster before running elasticsearch-setup-passwords.
+It is very likely that the password changes will fail when run against an unhealthy cluster.
+
+Do you want to continue with the password setup process [y/N]y
+```
+- 可能是有脏数据导致，此时可以停掉es，删除 data 数据目录，然后重新启动在进行操作。
+
+清理密码数据方法
+```
+curl -XDELETE http://localhost:9200/.secutity-6
+```
+
+15) 验证集群状态，确认集群状态为green
+```
+# curl -uelastic:elastic localhost:9200/_cluster/health?pretty
+```
+
+
+
+
 
 
