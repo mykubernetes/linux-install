@@ -372,8 +372,53 @@ Do you want to continue with the password setup process [y/N]y
 # curl -XGET -uelastic:elastic 'localhost:9200/_cluster/health?pretty'
 ```
 
+16、es三个内置账号及权限
 
+| username | role | 权限 |
+|----------|-------|-----|
+| elastic | superuser | 内置的超级用户 |
+| kibana | kibana_system | 用户kibana用来连接elasticsearch并与之通信。Kibana服务器以该用户身份提交请求以访问集群监视API和 .kibana索引。不能访问index。 |
+| logstash_system | logstash_system | 用户Logstash在Elasticsearch中存储监控信息时使用 |
 
+16.1修改账户密码
+```
+# curl -XPOST -H 'Content-type: application/json' -u elastic:elastic 'http://localhost:9200/_xpack/security/user/kibana/_password?pretty' -d '{"password": "123456"}'
 
+返回
+{ }
+```
 
+角色管理API：
+- https://www.elastic.co/guide/en/elasticsearch/reference/6.0/security-api-roles.html
 
+用户管理API：
+- https://www.elastic.co/guide/en/elasticsearch/reference/6.0/security-api-users.html
+
+将用户和组映射到角色API：
+- https://www.elastic.co/guide/en/x-pack/6.0/mapping-roles.html#ldap-role-mapping
+
+设置字段和文档级别的安全性：
+- https://www.elastic.co/guide/en/x-pack/6.0/field-and-document-access-control.html
+
+安全特权
+- https://www.elastic.co/guide/en/x-pack/6.0/security-privileges.html#privileges-list-cluster
+
+x-pack内置角色
+- https://www.elastic.co/guide/en/x-pack/6.0/built-in-roles.html
+
+eg:
+- ingest_admin: #授予访问权限以管理所有索引模板和所有摄取管道配置。这个角色不能提供创建索引的能力; 这些特权必须在一个单独的角色中定义。
+- kibana_dashboard_only_user: #授予对Kibana仪表板的访问权限以及对.kibana索引的只读权限。 这个角色无法访问Kibana中的编辑工具。
+- kibana_system: #授予Kibana系统用户读取和写入Kibana索引所需的访问权限，管理索引模板并检查Elasticsearch集群的可用性。 此角色授予对.monitoring- 索引的读取访问权限以及对.reporting- 索引的读取和写入访问权限。
+- kibana_user: #授予Kibana用户所需的最低权限。 此角色授予访问集群的Kibana索引和授予监视权限。
+- logstash_admin: #授予访问用于管理配置的.logstash *索引的权限。
+- logstash_system: #授予Logstash系统用户所需的访问权限，以将系统级别的数据（如监视）发送给Elasticsearch。不应将此角色分配给用户，因为授予的权限可能会在不同版本之间发生变化。此角色不提供对logstash索引的访问权限，不适合在Logstash管道中使用。
+- machine_learning_admin: #授予manage_ml群集权限并读取.ml- *索引的访问权限。
+- machine_learning_user: #授予查看X-Pack机器学习配置，状态和结果所需的最低权限。此角色授予monitor_ml集群特权，并可以读取.ml-notifications和.ml-anomalies *索引，以存储机器学习结果。
+- monitoring_user: #授予除使用Kibana所需的X-Pack监视用户以外的任何用户所需的最低权限。 这个角色允许访问监控指标。 监控用户也应该分配kibana_user角色。
+- remote_monitoring_agent: #授予远程监视代理程序将数据写入此群集所需的最低权限。
+- reporting_user: #授予使用Kibana所需的X-Pack报告用户所需的特定权限。 这个角色允许访问报告指数。 还应该为报告用户分配kibana_user角色和一个授予他们访问将用于生成报告的数据的角色。
+- superuser: #授予对群集的完全访问权限，包括所有索引和数据。 具有超级用户角色的用户还可以管理用户和角色，并模拟系统中的任何其他用户。 由于此角色的宽容性质，在将其分配给用户时要格外小心。
+- transport_client: #通过Java传输客户端授予访问集群所需的权限。 Java传输客户端使用节点活性API和群集状态API（当启用嗅探时）获取有关群集中节点的信息。 如果他们使用传输客户端，请为您的用户分配此角色。使用传输客户端有效地意味着用户被授予访问群集状态的权限。这意味着用户可以查看所有索引，索引模板，映射，节点以及集群基本所有内容的元数据。但是，此角色不授予查看所有索引中的数据的权限。
+- watcher_admin: #授予对.watches索引的写入权限，读取对监视历史记录的访问权限和触发的监视索引，并允许执行所有监视器操作。
+- watcher_user: #授予读取.watches索引，获取观看动作和观察者统计信息的权限。
