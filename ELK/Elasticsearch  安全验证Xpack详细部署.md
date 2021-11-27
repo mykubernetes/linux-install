@@ -450,6 +450,28 @@ Do you want to continue with the password setup process [y/N]y
 }'
 ```
 
+```
+# 设置集群权限角色
+curl -X POST "localhost:9200/_xpack/security/role/my_admin_role" -H 'Content-Type: application/json' -d'
+{
+  "cluster": ["all"],
+  "indices": [
+    {
+      "names": [ "index1", "index2" ],
+      "privileges": ["all"],
+      "field_security" : { // 可选
+        "grant" : [ "title", "body" ]
+      },
+      "query": "{\"match\": {\"title\": \"foo\"}}" // 可选
+    }
+  ],
+  "run_as": [ "other_user" ], // 可选
+  "metadata" : { // 可选
+    "version" : 1
+  }
+}
+'
+```
 
 角色管理API：
 - https://www.elastic.co/guide/en/elasticsearch/reference/6.0/security-api-roles.html
