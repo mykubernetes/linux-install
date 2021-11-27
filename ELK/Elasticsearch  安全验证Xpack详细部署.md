@@ -326,7 +326,7 @@ Initiating the setup of passwords for reserved users elastic,apm_system,kibana,l
 You will be prompted to enter passwords as the process progresses.
 Please confirm that you would like to continue [y/N]y
 
-Enter password for [elastic]:
+Enter password for [elastic]:                                       # 在这里设置密码，注意最少六位，下面也一样
 Reenter password for [elastic]:
 Enter password for [apm_system]:
 Reenter password for [apm_system]:
