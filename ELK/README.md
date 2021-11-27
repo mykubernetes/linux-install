@@ -1,13 +1,10 @@
-https://wiki.eryajf.net/pages/2371.html#_4-%E5%AF%B9%E6%8E%A5%E9%85%8D%E7%BD%AE%E3%80%82
-
-https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
-
-https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md
-
-https://segmentfault.com/a/1190000039781580?utm_source=sf-similar-article
-
-https://haicoder.net/elasticsearch/elasticsearch-tutorial.html
-
+| 资料 | 地址 |
+|-----|------|
+| 博客 | https://wiki.eryajf.net/pages/2371.html#_4-%E5%AF%B9%E6%8E%A5%E9%85%8D%E7%BD%AE%E3%80%82 |
+| 官网 | https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html |
+| github | https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md |
+| 博客 | https://haicoder.net/elasticsearch/elasticsearch-tutorial.html |
+| 博客 | https://wiki.eryajf.net/pages/2351.html |
 
 # 使用curl命令操作elasticsearch
 
