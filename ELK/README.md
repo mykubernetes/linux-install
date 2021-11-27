@@ -16,6 +16,8 @@ http://www.jwsblog.com/archives/59.html
 使用curl命令操作elasticsearch
 =============================
 
+https://wiki.eryajf.net/pages/2371.html#_4-%E5%AF%B9%E6%8E%A5%E9%85%8D%E7%BD%AE%E3%80%82
+
 https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
 
 https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md
