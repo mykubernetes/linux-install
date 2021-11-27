@@ -20,7 +20,7 @@ ip        heap.percent ram.percent cpu load_1m load_5m load_15m node.role master
 curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
 {
   "transient" : {
-    "cluster.routing.allocation.exclude._name" : "elk-node2"
+    "cluster.routing.allocation.exclude._name" : "node-4"
   }
 }'
 ```
