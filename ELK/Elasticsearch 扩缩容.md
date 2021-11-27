@@ -53,8 +53,7 @@ curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/jso
   "transient" : {
     "cluster.routing.allocation.include._ip" : "10.1.1.*"
   }
-}
-'
+}'
 ```
 
 5、当有一个node从集群中离线时会出现Unassigned Shards，直至新node加入并恢复（recovery），而默认情况下，恢复的速度被限制在40mbps。如果你的网络和磁盘IO都支持更高的速度，则可以通过以下命令对该参数进行调整：
@@ -64,8 +63,38 @@ curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/jso
     "persistent" : {
         "indices.recovery.max_bytes_per_sec" : "100mb"
     }
-}
-'
+}'
+```
+
+6、调整单个节点的入口并发恢复的分片数量，默认是2
+```
+curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
+{
+  "transient" : {
+    "cluster.routing.allocation.node_concurrent_incoming_recoveries" : "3"
+  }
+}'
+```
+
+7、调整单个节点的出口并发恢复的分片数量，默认是2
+```
+curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
+{
+  "transient" : {
+    "cluster.routing.allocation.node_concurrent_outgoing_recoveries" : "3"
+  }
+}'
+```
+> 如上两个参数在遇到节点需要上下线时调整移动队列有非常大的作用。
+
+8、集群内同时启动的数据任务个数，默认是2个
+```
+curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
+{
+  "transient" : {
+    "cluster.routing.allocation.cluster_concurrent_rebalance" : "30"
+  }
+}'
 ```
 
 # 节点上线
