@@ -14,14 +14,25 @@ ip        heap.percent ram.percent cpu load_1m load_5m load_15m node.role master
 2、节点剔除
 
 节点下线只需要一条命令即可，如果有多台服务器需要下线，在后面用逗号隔开然后写入节点 IP，如果提交的命令有两个，它会覆盖前一个，被下线的服务器会把数据迁移后才会在集群中消失，如果数据没被迁移完，又执行了命令，这个节点不会被下线。
+
 ```
+# 通过节点name下线
+curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
+{
+  "transient" : {
+    "cluster.routing.allocation.exclude._name" : "elk-node2"
+  }
+}'
+```
+
+```
+# 通过IP下线
 curl -X PUT "localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
 {
   "transient" : {
     "cluster.routing.allocation.exclude._ip" : "10.1.1.33"
   }
-}
-'
+}'
 ```
 
 3、耐心等待后即可通过以下命令检查node中的分片数量
