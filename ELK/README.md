@@ -1,21 +1,3 @@
-
-Promtail + Loki + Grafana 构建日志监控告警系统
-- promtail： 日志收集的代理，安装部署在需要收集和分析日志的服务器，promtail会将日志发给Loki服务。
-- Loki： 主服务器，负责存储日志和处理查询。
-- Grafana：提供web管理界面，数据展示功能。 
-
-https://blog.csdn.net/m0_38075425/article/details/108386005
-
-https://www.freesion.com/article/41801004511/
-
-https://blog.csdn.net/yangbosos/article/details/88903846
-
-http://www.jwsblog.com/archives/59.html
-
-
-使用curl命令操作elasticsearch
-=============================
-
 https://wiki.eryajf.net/pages/2371.html#_4-%E5%AF%B9%E6%8E%A5%E9%85%8D%E7%BD%AE%E3%80%82
 
 https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
@@ -25,6 +7,9 @@ https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md
 https://segmentfault.com/a/1190000039781580?utm_source=sf-similar-article
 
 https://haicoder.net/elasticsearch/elasticsearch-tutorial.html
+
+
+# 使用curl命令操作elasticsearch
 
 ES  内置的REST 接口
 ---
@@ -567,3 +552,14 @@ ES集群出现Unassigned shards问题
 # curl -XDELETE 'http://127.0.0.1:9200/index_name
 ```
 
+
+# Promtail + Loki + Grafana 构建日志监控告警系统
+- promtail： 日志收集的代理，安装部署在需要收集和分析日志的服务器，promtail会将日志发给Loki服务。
+- Loki： 主服务器，负责存储日志和处理查询。
+- Grafana：提供web管理界面，数据展示功能。 
+
+参考：
+- https://blog.csdn.net/m0_38075425/article/details/108386005
+- https://www.freesion.com/article/41801004511/
+- https://blog.csdn.net/yangbosos/article/details/88903846
+- http://www.jwsblog.com/archives/59.html
