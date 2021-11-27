@@ -77,9 +77,158 @@ discovery.zen.minimum_master_nodes: 2
 ```
 
 10) 检查ES集群状态信息，确认9200服务端口处于监听状态
+
+- 查看端口是否监听
 ```
 # netstat -ltnp | grep 9200
-# curl localhost:9200/_cluster/health?pretty
+```
+
+- 查看es是否正常启动
+```
+# curl -X GET 'localhost:9200/'
+{
+  "name" : "node01",
+  "cluster_name" : "es-cluster",
+  "cluster_uuid" : "53LLexx8RSW16nE4lsJMQQ",
+  "version" : {
+    "number" : "6.8.2",
+    "build_flavor" : "default",
+    "build_type" : "rpm",
+    "build_hash" : "159a78a",
+    "build_date" : "2021-11-06T20:11:28.826501Z",
+    "build_snapshot" : false,
+    "lucene_version" : "7.5.0",
+    "minimum_wire_compatibility_version" : "5.6.0",
+    "minimum_index_compatibility_version" : "5.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
+```
+
+- 查看集群是否正常
+```
+# curl -X GET 'localhost:9200/_cluster/health?pretty'
+{
+  "cluster_name" : "es-cluster",
+  "status" : "green",
+  "timed_out" : false,
+  "number_of_nodes" : 3,
+  "number_of_data_nodes" : 3,
+  "active_primary_shards" : 0,
+  "active_shards" : 0,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 0,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 100.0
+}
+```
+
+- 查看集群状态
+```
+# curl -XGET 'http://localhost:9200/_cat/nodes'
+192.168.101.66 48 39 0 0.22 0.07 0.06 mdi * node01       # 带*号的表示master
+192.168.101.67 41 98 0 0.03 0.06 0.05 -   - node02       # 注意这个节点并不参与数据处理。
+192.168.101.68 44 57 0 0.00 0.01 0.05 mdi - node03
+```
+
+- 查看集群详细状态
+```
+# curl -XGET 'http://127.0.0.1:9200/_cat/nodes?v'
+ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+192.168.101.66           34          39   0    0.13    0.10     0.07 mdi       *      node01
+192.168.101.67           20          98   0    0.01    0.05     0.05 -         -      node02
+192.168.101.68           32          57   0    0.00    0.01     0.05 mdi       -      node03
+```
+
+- 查询master。
+```
+# curl -XGET 'http://localhost:9200/_cluster/state/master_node?pretty'
+{
+  "cluster_name" : "es-clusterr",
+  "compressed_size_in_bytes" : 14291,
+  "cluster_uuid" : "53LLexx8RSW16nE4lsJMQQ",
+  "master_node" : "oCNARqdUT5KXLZTlcS22GA"
+}
+
+# curl -XGET 'http://localhost:9200/_cat/master?v'
+id                     host           ip             node
+oCNARqdUT5KXLZTlcS22GA 192.168.101.67 192.168.101.67 node02
+```
+
+- 查询集群健康状态。
+```
+# curl -XGET 'http://localhost1:9200/_cat/health?v'
+epoch      timestamp cluster    status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent
+1545386516 10:01:56  es-cluster green           4         3     22  11    0    0        0             0                  -                100.0%
+```
+
+- 查看集群详细信息。
+```
+# curl -XGET 'http://localhost:9200/_cluster/state/nodes?pretty'
+{
+  "cluster_name" : "es-cluster",                        #集群名称
+  "compressed_size_in_bytes" : 14291,
+  "cluster_uuid" : "53LLexx8RSW16nE4lsJMQQ",            #集群id
+  "nodes" : {
+    "oCNARqdUT5KXLZTlcS22GA" : {                        #node的ID值
+      "name" : "node01",                                #node名称
+      "ephemeral_id" : "y-NCFJULTEmWdWjNjCPS2A",
+      "transport_address" : "192.168.101.66:9300",       #集群通讯地址
+      "attributes" : {
+        "ml.machine_memory" : "8202727424",
+        "xpack.installed" : "true",
+        "ml.max_open_jobs" : "20",
+        "ml.enabled" : "true"
+      }
+    },
+    "8F_rZuR1TByEb6bXz0EgzA" : {
+      "name" : "node02",
+      "ephemeral_id" : "b3CtPKpyRUahT4njpRqjlQ",
+      "transport_address" : "192.168.101.67:9300",
+      "attributes" : {
+        "ml.machine_memory" : "8202039296",
+        "ml.max_open_jobs" : "20",
+        "xpack.installed" : "true",
+        "ml.enabled" : "true"
+      }
+    },
+    "ptEOHzaPTgmlqW3NRhd7SQ" : {
+      "name" : "node03",
+      "ephemeral_id" : "YgypZZNcTfWcIYDhOlUAzw",
+      "transport_address" : "192.168.101.68:9300",
+      "attributes" : {
+        "ml.machine_memory" : "8202039296",
+        "ml.max_open_jobs" : "20",
+        "xpack.installed" : "true",
+        "ml.enabled" : "true"
+      }
+    }
+  }
+}
+```
+
+### 高可用验证
+
+通过刚刚的测试，已经看出，master在node01，现在将node1的es停掉，看看是否会自动漂移。
+```
+[root@localhost ~]$curl -XGET 'http://127.0.0.1:9200/_cat/nodes?v'
+ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+192.168.101.66          36          39   0    0.03    0.04     0.05 mdi       *      elk-node01
+192.168.101.67          22          98   0    0.00    0.02     0.05 -         -      elk-node02
+192.168.101.68          38          57   0    0.00    0.01     0.05 mdi       -      elk-node03
+
+[root@localhost ~]$systemctl stop elasticsearch
+```
+然后到另外一个节点查看一下：
+```
+[root@localhost ~]$curl -XGET 'http://127.0.0.1:9200/_cat/nodes?v'
+ip            heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+192.168.101.67           30          62   0    0.00    0.01     0.05 mdi       *      elk-node02
+192.168.101.68           24          98   0    0.00    0.02     0.05 -         -      elk-node03
 ```
 
 11) 以elasticsearch用户运行，在其中一个ES节点上运行配置xpack
