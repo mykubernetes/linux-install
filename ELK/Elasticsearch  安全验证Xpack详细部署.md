@@ -214,12 +214,13 @@ Do you want to continue with the password setup process [y/N]y
 
 清理密码数据方法
 ```
-curl -XDELETE http://localhost:9200/.secutity-6
+# curl -XDELETE http://localhost:9200/.secutity-6
 ```
 
 15) 验证集群状态，确认集群状态为green
 ```
-# curl -uelastic:elastic localhost:9200/_cluster/health?pretty
+# curl -XGET -uelastic:elastic 'localhost:9200/_xpack/security/user?pretty'
+# curl -XGET -uelastic:elastic 'localhost:9200/_cluster/health?pretty'
 ```
 
 
