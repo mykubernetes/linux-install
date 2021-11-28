@@ -10,3 +10,5 @@ ansible中文指南: http://www.ansible.com.cn/index.html#
 ansible官网模块介绍: https://docs.ansible.com/ansible/2.4/modules_by_category.html
 
 https://github.com/kwoodson/ansible-role-yedit
+
+看云 https://www.kancloud.cn/willseecloud/ansible/2103992
