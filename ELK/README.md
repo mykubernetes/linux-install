@@ -60,39 +60,56 @@ curl -XGET localhost:9200/_cat
 - ?v 打印出表头信息
 - ?pretty 美化输出
 
-查看系统基本信息
+查看es是否正常启动
 ```
-curl -XGET 'http://127.0.0.1:9200/?pretty'
+curl -XGET 'http://localhost:9200/?pretty'
+{
+  "name" : "node01",
+  "cluster_name" : "es-cluster",
+  "cluster_uuid" : "53LLexx8RSW16nE4lsJMQQ",
+  "version" : {
+    "number" : "6.8.2",
+    "build_flavor" : "default",
+    "build_type" : "rpm",
+    "build_hash" : "159a78a",
+    "build_date" : "2021-11-06T20:11:28.826501Z",
+    "build_snapshot" : false,
+    "lucene_version" : "7.5.0",
+    "minimum_wire_compatibility_version" : "5.6.0",
+    "minimum_index_compatibility_version" : "5.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
 ```
 
 查看所有index
 ```
-curl http://localhost:9200/_cat/indices?v
+curl -XGET http://localhost:9200/_cat/indices?v
 ```
 
 查看所有doc数量
 ```
-curl http://localhost:9200/_cat/count?v
+curl -XGET http://localhost:9200/_cat/count?v
 ```
 
 查看所有node存储空间转台
 ```
-curl http://localhost:9200/_cat/allocation?v
+curl -XGET http://localhost:9200/_cat/allocation?v
 ```
 
 查看所有node文件系统状态
 ```
-curl http://localhost:9200/_nodes/stats/fs?pretty
+curl -XGET http://localhost:9200/_nodes/stats/fs?pretty
 ```
 
 查看所有node可用磁盘大小
 ```
-curl http://localhost:9200/_cat/nodes?h=h,diskAvail
+curl -XGET http://localhost:9200/_cat/nodes?h=h,diskAvail
 ```
 
 集群健康检测
 ```
-curl http://localhost:9200/_cat/health?v
+curl -XGET http://localhost:9200/_cat/health?v
 
 epoch      timestamp cluster    status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent
 1498119164 16:12:44  es-cluster yellow          1         1     20  20    0    0       20             0                  -                 50.0%
