@@ -1,4 +1,4 @@
-
+## 查看集群状态报Implicated
 ```
 # ceph -s
 cluster:
@@ -6,10 +6,10 @@ cluster:
     health: HEALTH_ERR
             Reduced data availability: 63 pgs inactive, 62 pgs peering
             119 slow requests are blocked > 32 sec. Implicated osds
-            9017 stuck requests are blocked > 4096 sec. Implicated osd 42,104,193,219
+            9017 stuck requests are blocked > 4096 sec. Implicated osd 42,104,193,219              # 重启四个osd解决
  
   services:
-    mon: 3 daemons, quorum 11.141.0.14-CLUSTERMON_A,11.140.1.14-CLUSTERMON_B, out of quorum: 11.141.0.142-CLUSTERMON_C
+    mon: 3 daemons, quorum 192.168.101.66-CLUSTERMON_A,192.168.101.67-CLUSTERMON_B, out of quorum: 192.168.101.68-CLUSTERMON_C
     mgr: CLUSTERMGR-11.140.1.14(active), standbys: CLUSTERMGR-11.141.0.14
     osd: 220 osds: 209 up, 220 in
     rgw: 1 daemon active
@@ -23,3 +23,6 @@ cluster:
              62    peering
              1     activating
 ```
+
+参考：
+- http://bailix.com/49.html
