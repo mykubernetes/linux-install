@@ -99,17 +99,20 @@ ceph pg repair 9.1e
 
 | 配置项 | 默认值 | 说明 |
 |-------|-------|------|
-| osd_scrub_chunk_min | 5 | PGScrub对应的Object数目的最小值 |
-| osd_scrub_chunk_max | 25 | PGScrub对应的Object数目的最大值 |
-| osd_deep_scrub_interval | 604800 | Deep scrub周期，单位是秒，默认是604800，也就是一周 |
-| osd_scrub_sleep | 0 | 两个PGScrub Op间休息一段时间 |
+| osd_scrub_chunk_min | 5 | 执行scrub的时候，锁住最小读写对象数量。 这个值越大，锁住的对象越多，越容易造成读写缓慢，影响业务系统 |
+| osd_scrub_chunk_max | 25 | 执行scrub的时候，锁住最大读写对象数量。 这个值越大，锁住的对象越多，越容易造成读写缓慢，影响业务系统, |
+| osd_deep_scrub_interval | 604800 | osd 深度清洗间隔，默认为一周，604800秒 |
+| osd_deep_scrub_randomize_ratio | | 随机执行深度清洗的概率，可设置0.01 ，太大，清洗概率增大，也容易影响业务。这个不收osd_deep_scrub_interval影响，但会在osd_scrub_begin_hour-osd_scrub_end_hour之间执行 |
+| osd_scrub_sleep | 0 | scrub 时间间隔 扫描完一组scrub，执行下一组扫描的间隔。值越小，扫描休息时间越短 |
 | osd_heartbeat_interval | 6 | 周期性执行OSD::sched_scrub函数 |
-| osd_scrub_begin_hour | 0 | 允许触发Scrub的时间段的起始时间 |
-| osd_scrub_end_hour | 0 | 允许触发Scrub的时间段的结束时间，结束时间可以小于起始时间 |
+| osd_scrub_begin_hour | 0 | scrub 开始时间，根据业务情况，可以选择在业务不繁忙的时候执行。24小时制 |
+| osd_scrub_end_hour | 0 | scrub 结束时间，根据业务情况，可以选择在业务不繁忙的时候执行。24小时制 |
 | osd_scrub_auto_repair | FALSE | 自动repair不一致Object，不支持副本池，只支持EC池 |
 | osd_max_scrubs | 1 | OSD允许同时运行的Scrub任务的最大数目 |
-| osd_scrub_min_interval | 86400 | 一天，单位是秒，默认是86400，也就是一天 |
-| osd_scrub_max_interval | 604800 | 一周，单位是秒，默认是604800，也就是一周 |
-| osd_scrub_interval_randomize_ratio | 0.5 | [min, min*(1+randomize_ratio)] |
+| osd_scrub_min_interval | 86400 | 执行scrub的最小时间间隔，默认是1天，86400秒。也就是每天的osd_scrub_begin_hour-osd_scrub_end_hour之间执行scrub操作 |
+| osd_scrub_max_interval | 604800 | 执行scrub的最大时间间隔 |
+| osd_scrub_interval_randomize_ratio | 0.5 | 随机执行scrub的概率，在osd_scrub_begin_hour-osd_scrub_end_hour之间会执行 |
 | osd_scrub_during_recovery | TRUE | 允许在OSD Recovery过程中执行Scrub任务 |
 | osd_scrub_load_threshold | 0.5 | 只有负载低于该值时才允许触发Scrub |
+
+- 如果读写影响业务的话，可以考虑设置scrub的时间(比如晚上)，调整scrub和deep-scrub的概率，调小min-chunk和max-chunk的数量
