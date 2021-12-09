@@ -11,6 +11,8 @@
 | 博客 | https://blog.csdn.net/weixin_43719988 |
 | 博客 | https://www.cnblogs.com/zyxnhr/tag/Ceph/ |
 | pglog | https://blog.51cto.com/wendashuai/2493295 |
+| 博客 | http://tang-lei.com/categories/ceph/ |
+
 
 # ceph最小硬件要求
 
