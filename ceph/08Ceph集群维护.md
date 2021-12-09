@@ -11,6 +11,8 @@ Ceph是一个分布式系统，旨在从数十个OSD扩展到数千个。维护C
 
 | Flag字段 | 描述 |
 |----------|-----|
+| full | 使集群到达设置的full_ratio值,标记集群已满。将拒绝任何数据写入，但可读 |
+| pause | 集群将会阻止读写操作，但不会影响集群的in、out、up或down状态。集群扔保持正常运行,就是客户端无法读写 |
 | noup | 防止osd进入up状态，标记osd进程未启动，一般用于新添加osd。 |
 | nodown | 防止osd进入down状态，一般用在检查osd进程时，而导致osd down，发生数据迁移。 |
 | noout | 防止osd进入out状态，down状态的osd	300s后会自动被标记未	out，此时，数据就会发生迁移。noout标记后，如果osd	down,	该osd的pg会切换到副本osd上 |
@@ -20,8 +22,8 @@ Ceph是一个分布式系统，旨在从数十个OSD扩展到数千个。维护C
 | norecover | 防止数据发生恢复操作。 |
 | noscrub | 防止集群清洗操作，在高负载、recovery,	backfilling,rebalancing等期间，为了保证集群性能，可以和	nodeep-scrub	一起设置。 |
 | nodeep-scrub | 防止集群进行深度清洗操作。因为会阻塞读写操作，影响性能。一般不要长时间设置该值，否则，一旦取消该值，则会由大量的pg进行深度清洗。 |
-| pause | 设置该标志位，则集群停止读写，但不影响osd自检 |
-| full | 标记集群已满，将拒绝任何数据写入，但可读 |
+| notieragent | 集群将停止tier引擎查找 冷/脏 对象下刷到后端存储层 |
+
 
 设置flag
 ```
