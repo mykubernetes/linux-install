@@ -46,6 +46,9 @@ ceph daemon osd.0 config show|grep osd |grep scrub
 [osd]
 osd_scrub_begin_hour = 0    # scrub操作的起始时间为0点
 osd_scrub_end_hour = 5      # scrub操作的结束时间为5点
+osd_scrub_chunk_min = 1     # 标记每次scrub的最小数
+osd_scrub_chunk_max = 1     # 标记每次scrub的最大数据块
+osd_scrub_sleep = 3         # 标记当前scrub结束，执行下次scrub的等待时间，增加该值，会导致scrub变慢，客户端影响反而会减小
 ```
 注意: 该时间设置需要参考物理节点的时区设置
 
