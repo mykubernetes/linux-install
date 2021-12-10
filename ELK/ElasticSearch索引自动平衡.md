@@ -1,16 +1,16 @@
- 以下动态设置可用于控制分片和恢复： `cluster.routing.allocation.enable` 启用或禁用特定种类的分片的分配：
+ ### 以下动态设置可用于控制分片和恢复： `cluster.routing.allocation.enable` 启用或禁用特定种类的分片的分配：
 - all - （默认值）允许为所有类型的分片分配分片。
 - primaries - 仅允许分配主分片的分片。
 - new_primaries - 仅允许为新索引的主分片分配分片。
 - none - 任何索引都不允许任何类型的分片。
 
-cluster.routing.rebalance.enable 为特定类型的分片启用或禁用重新平衡：
+### cluster.routing.rebalance.enable 为特定类型的分片启用或禁用重新平衡：
 - all - （默认值）允许各种分片的分片平衡。
 - primaries - 仅允许主分片的分片平衡。
 - replicas - 仅允许对副本分片进行分片平衡。
 - none - 任何索引都不允许任何类型的分片平衡。
 
-cluster.routing.allocation.allow_rebalance
+### cluster.routing.allocation.allow_rebalance
 
 当分片再平衡时允许的操作
 - 始终 - 始终允许重新平衡。
@@ -56,3 +56,6 @@ curl -XPUT "http://127.0.0.1:9200/_cluster/settings" -H 'Content-Type: applicati
     }
 }'
 ```
+
+参考：
+https://www.jianshu.com/p/a81ca31bb316
