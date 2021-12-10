@@ -1,4 +1,72 @@
-方案一
+# 集群标red的处理
+```
+# 方法一：极端情况 删除索引
+curl -XDELETE 'localhost:9200/index_name/'
+# 方法二：
+１）添加节点处理，即Ｎ增大；
+２）删除副本分片，即R置为0。
+curl --location --request PUT 'http://localhost:9200/_settings' \
+--header 'Content-Type: application/json' \
+--data-raw '{"number_of_replicas" : 0}'
+
+# 方法三：未分片设置节点
+NODE="YOUR NODE NAME"
+IFS=$'\n'
+for line in $(curl -s 'localhost:9200/_cat/shards' | fgrep UNASSIGNED); do
+  INDEX=$(echo $line | (awk '{print $1}'))
+  SHARD=$(echo $line | (awk '{print $2}'))
+
+  curl -XPOST 'localhost:9200/_cluster/reroute' -d '{
+     "commands": [
+        {
+            " allocate_replica ": {
+                "index": "'$INDEX'",
+                "shard": "'$SHARD'",
+                "node": "'$NODE'",
+                "allow_primary": true
+          }
+        }
+    ]
+  }'
+done
+
+# 分配主分片
+curl -XPOST -H 'Content-Type: application/json' "http://127.0.0.1:9200/_cluster/reroute" -d'
+{
+    "commands": [
+        {
+            "allocate_stale_primary": {
+                "index": "index",
+                "shard": 4,
+                "node": "node56",
+                "accept_data_loss": true
+            }
+        }
+    ]
+}'
+```
+
+索引未分配原因
+```
+curl -XGET -s 'http://localhost:9200/_cat/shards?v&h=index,shard,prirep,state,unassigned.reason' | grep UNASSIGNED
+```
+```
+These are the possible reasons for a shard to be in a unassigned state:
+1. INDEX_CREATED    Unassigned as a result of an API creation of an index.    索引创建  由于API创建索引而未分配的
+2. CLUSTER_RECOVERED    Unassigned as a result of a full cluster recovery.   集群恢复   由于整个集群恢复而未分配
+3. INDEX_REOPENED    Unassigned as a result of opening a closed index.        索引重新打开   
+4. DANGLING_INDEX_IMPORTED    Unassigned as a result of importing a dangling index.   导入危险的索引
+5. NEW_INDEX_RESTORED     Unassigned as a result of restoring into a new index.   重新恢复一个新索引
+6. EXISTING_INDEX_RESTORED    Unassigned as a result of restoring into a closed index.  重新恢复一个已关闭的索引
+7. REPLICA_ADDED     Unassigned as a result of explicit addition of a replica.      添加副本
+8. ALLOCATION_FAILED    Unassigned as a result of a failed allocation of the shard.    分配分片失败
+9. NODE_LEFT     Unassigned as a result of the node hosting it leaving the cluster.  集群中节点丢失
+10. REROUTE_CANCELLED     Unassigned as a result of explicit cancel reroute command.   reroute命令取消
+11. REINITIALIZED     When a shard moves from started back to initializing, for example, with shadow replicas.   重新初始化
+12. REALLOCATED_REPLICA       A better replica location is identified and causes the existing replica allocation to be cancelled.   重新分配副本
+```
+
+## 方案一
 
 1、找到状态为 red 的索引，状态为 red 是无法对外提供服务的，说明有主节点没有分配到对应的机子上。
 ```
@@ -191,6 +259,9 @@ green  open   index                          5   1    3058268        97588      
 索引状态已经为 green，恢复正常使用。
 
 
-方案二
-===
+## 方案二
+
 找一台空的机子，与现有的机子组成集群，由于新机子的加入机子的节点将会被分配，状态也就会恢复。等集群中所有的节点的状态变为 green 就可以关闭新加入的机子。
+
+
+
