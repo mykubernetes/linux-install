@@ -50,3 +50,69 @@ systemctl start ceph-osd@{osd-number}
 8. 去除noout的标记
 ceph osd set noout
 ```
+
+# ceph 更换日志盘详解
+
+现在，通常的部署情况是ssd作为日志分区，sas或者hdd磁盘作为osd；为了节省成本，一块ssd划分多个区给多个osd服务使用,所以这里假设ssd故障，如何更换ssd磁盘
+
+大家都知道，ceph的日志是基于事务的，为了确保数据完整，所以在更新ssd的时候，需要先把日志里的数据下刷存储到osd服务。
+
+而且日志在下刷的时候，osd是停止的，拒绝从外部新的写入
+
+1、首先，停止该ssd对应的所有osd服务
+```
+ceph osd set noout
+systemctl stop ceph-osd@1 ceph-osd@2 ceph-osd@3 ceph-osd@4
+```
+
+2、然后，下刷日志到osd
+```
+ceph-osd -i id --flush-journal  ##-i:后面跟osd的id 1、2、3、4
+```
+3、删除每个osd(1、2、3、4)的日志目录
+```
+rm -rf /var/lib/ceph/osd/ceph-id/journal   ##id为1、2、3、4
+```
+
+4、拔掉老的ssd，插上新的ssd，然后同样分为4个分区(根据实际需求),把各分区分别软连到个osd/var/lib/ceph/osd/ceph-id/journal
+```
+ln -s /dev/disk/by-partuuid/0a9b2162-3f95-42b8-b041-6dfdd54354a7 /var/lib/cpeh/osd/ceph-1/journal
+echo a9b2162-3f95-42b8-b041-6dfdd54354a7 > /var/lib/cpeh/osd/ceph-1/journal_uuid
+
+ln -s /dev/disk/by-partuuid/370e4aa8-3406-46de-9c89-6e0e46021e72 /var/lib/cpeh/osd/ceph-2/journal
+echo 370e4aa8-3406-46de-9c89-6e0e46021e72 > /var/lib/cpeh/osd/ceph-2/journal_uuid
+
+ln -s /dev/disk/by-partuuid/2e2c88fd-15cc-44a0-9eb7-57d4c2ffc9b3 /var/lib/cpeh/osd/ceph-3/journal
+echo e2c88fd-15cc-44a0-9eb7-57d4c2ffc9b3 > /var/lib/cpeh/osd/ceph-3/journal_uuid
+
+ln -s /dev/disk/by-partuuid/2d9c471f-4e0f-469b-add5-b599f2441a9a /var/lib/cpeh/osd/ceph-4/journal
+echo 2d9c471f-4e0f-469b-add5-b599f2441a9a > /var/lib/cpeh/osd/ceph-4/journal_uuid
+```
+
+5、修改每个目录的组
+```
+chown ceph:ceph /var/lib/cpeh/osd/ceph-1/journal
+chown ceph:ceph /var/lib/cpeh/osd/ceph-2/journal
+chown ceph:ceph /var/lib/cpeh/osd/ceph-3/journal
+chown ceph:ceph /var/lib/cpeh/osd/ceph-4/journal
+```
+
+6、为各个osd创建日志
+```
+ceph-osd -i 1 --mkjournal
+ceph-osd -i 2 --mkjournal
+ceph-osd -i 3 --mkjournal
+ceph-osd -i 4 --mkjournal
+```
+
+7、启动osd服务
+```
+systemctl start ceph-osd@1 ceph-osd@2 ceph-osd@3 ceph-osd@4 
+```
+
+8、删除 noout 标记
+```
+ceph osd unset noout
+```
+
+9、最后查看集群状态是否ok
