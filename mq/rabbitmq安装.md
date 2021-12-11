@@ -189,8 +189,23 @@ scp /var/lib/rabbitmq/.erlang.cookie 192.168.101.67:/var/lib/rabbitmq
 scp /var/lib/rabbitmq/.erlang.cookie 192.168.101.68:/var/lib/rabbitmq
 ```
 
-组件成集群
----
+# 组件成集群
+
+## 基础概念
+
+RabbitMQ 集群分为两种:
+- 普通集群
+- 镜像集群(普通集群的升级)
+
+普通集群：
+```
+rabbit01和rabbit02两个节点仅有相同的元数据，即队列的结构，但消息实体只存在于其中一个节点rabbit01（或者rabbit02）中。当消息进入rabbit01节点的Queue后，consumer从rabbit02节点消费时，RabbitMQ会临时在rabbit01、rabbit02间进行消息传输，把A中的消息实体取出并经过B发送给consumer。所以consumer应尽量连接每一个节点，从中取消息。即对于同一个逻辑队列，要在多个节点建立物理Queue。否则无论consumer连rabbit01或rabbit02，出口总在rabbit01，会产生瓶颈。当rabbit01节点故障后，rabbit02节点无法取到rabbit01节点中还未消费的消息实体。如果做了消息持久化，那么得等rabbit01节点恢复，然后才可被消费；如果没有持久化的话，就会产生消息丢失的现象。
+```
+镜像集群：
+```
+在普通集群的基础上，把需要的队列做成镜像队列，消息实体会主动在镜像节点间同步，而不是在客户端取数据时临时拉取，也就是说多少节点消息就会备份多少份。该模式
+```
+
 1、停止MQ服务
 ```
 rabbitmqctl stop
