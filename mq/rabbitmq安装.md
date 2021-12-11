@@ -119,21 +119,64 @@ vim /etc/hosts
 192.168.101.68      rabbitmq3
 ```
 
-4、启动服务
+4、配置文件
+
+我们要自己在$Home/etc/rabbitmq中创建rabbitmq-env.conf, 详细信息请参阅 官方配置说明
+```
+# 创建持久化目录
+➜  mkdir -p /ahdata/rabbitmq/store
+➜  mkdir -p /ahdata/rabbitmq/logs
+
+# 创建配置文件
+➜  vim /opt/rabbitmq_server-3.8.2/etc/rabbitmq/rabbitmq-env.conf
+
+# 指定节点的名字，默认rabbit@${hostname}
+NODENAME=rabbit@MQ1
+
+# 指定端口，默认5672
+NODE_PORT=5672
+
+# 配置持久目录
+MNESIA_BASE=/ahdata/rabbitmq/store
+
+# 配置日志目录 默认文件名字：${NODENAME}.log 可以用配置修改
+LOG_BASE=/ahdata/rabbitmq/logs
+```
+
+5、常用命令
+```
+➜  sbin/rabbitmq-server                          # 启动server
+➜  sbin/rabbitmq-server -detached                # 后台启动server
+➜  sbin/rabbitmqctl status                       # 查看节点状态
+➜  sbin/rabbitmqctl shutdown                     # 停止运行的节点
+➜  sbin/rabbitmqctl stop_app
+➜  sbin/rabbitmqctl start_app
+➜  sbin/rabbitmqctl cluster_status               # 查看集群状态
+➜  sbin/rabbitmqctl set_cluster_name rabbit@MQ1  # 修改集群名称
+➜  sbin/rabbitmqctl join_cluster <cluster_name>  # 加入集群
+➜  sbin/rabbitmqctl change_cluster_node_type --node <node_name> [ disk | ram ]  # 修改节点类型、
+```
+
+6、启动服务
 ```
 rabbitmq-server start stop status restart
 lsof -i:5672
+
+# 查看节点状态
+rabbitmqctl status
 
 rabbitmq-plugins enable rabbitmq_management
 lsof -i:15672 或者 netstat -tnlp|grep 15672
 ```
 
-5、网页验证  
+7、网页验证  
 http://192.168.101.66:15672/
 
 以上操作三个节点同时进行操作
 
-6、选择66、67、68任意一个节点为Master（这里选择66为Master），需要把66的Cookie文件同步到67、68节点上，
+8、选择66、67、68任意一个节点为Master（这里选择66为Master），需要把66的Cookie文件同步到67、68节点上，
+
+- Erlang 节点间通过认证 Erlang cookie 的方式允许互相通信。因为 rabbitmqctl 使用 Erlang OTP 通信机制来和 Rabbit 节点通信，运行 rabbitmqctl 的机器和所要连接的 Rabbit 节点必须使用相同的 Erlang cookie 。否则你会得到一个错误。
 ```
 # rabbitmq-server stop 
 # cd /var/lib/rabbitmq
