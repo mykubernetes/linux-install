@@ -165,8 +165,42 @@ lsof -i:5672
 # 查看节点状态
 rabbitmqctl status
 
-rabbitmq-plugins enable rabbitmq_management
+
+
+# 启动web管理插件
+# rabbitmq-plugins enable rabbitmq_management
 lsof -i:15672 或者 netstat -tnlp|grep 15672
+
+# 启用插件列表
+# rabbitmq-plugins list
+Listing plugins with pattern ".*" ...
+ Configured: E = explicitly enabled; e = implicitly enabled
+ | Status: * = running on rabbit@ty-db1
+ |/
+[  ] rabbitmq_amqp1_0                  3.8.2
+[  ] rabbitmq_auth_backend_cache       3.8.2
+[  ] rabbitmq_auth_backend_http        3.8.2
+[  ] rabbitmq_auth_backend_ldap        3.8.2
+[  ] rabbitmq_auth_backend_oauth2      3.8.2
+[  ] rabbitmq_auth_mechanism_ssl       3.8.2
+[  ] rabbitmq_consistent_hash_exchange 3.8.2
+[  ] rabbitmq_event_exchange           3.8.2
+[  ] rabbitmq_federation               3.8.2
+[  ] rabbitmq_federation_management    3.8.2
+[  ] rabbitmq_jms_topic_exchange       3.8.2
+[E*] rabbitmq_management               3.8.2    # E 显式启用
+[e*] rabbitmq_management_agent         3.8.2    # e 隐式启用
+
+# 增加用户 && 设置用户角色
+# rabbitmqctl add_user ahy ahy                  # 执行一遍
+# rabbitmqctl set_user_tags ahy administrator   # 执行一遍
+```
+
+```
+ss -tnlp | grep 5672
+LISTEN     0      128          *:25672                    *:*                   users:(("beam.smp",pid=3593,fd=77))
+LISTEN     0      128          *:15672                    *:*                   users:(("beam.smp",pid=3593,fd=93))
+LISTEN     0      128         :::5672                    :::*                   users:(("beam.smp",pid=3593,fd=92))
 ```
 
 7、网页验证  
