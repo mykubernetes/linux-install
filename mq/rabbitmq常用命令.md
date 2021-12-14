@@ -177,7 +177,14 @@ rabbitmqctl list_permissions [-p vhost]
 # 用来显示用户在已分配虚拟机上的权限。
 rabbitmqctl list_user_permissions {username}
 # 设置用户权限。
-rabbitmqctl  set_permissions  -p {vhostpath} {username}  ".*"  ".*"  ".*"
+rabbitmqctl set permissions [-p vhostName] {userName} {conf} {write} {read} 
+rabbitmqctl set_permissions -p {vhostpath} {username} ".*"  ".*"  ".*"
+vhostName Vhost路径
+user 用户名
+Conf 一个正则表达式match哪些配置资源能够被该用户访问。
+Write 一个正则表达式match哪些配置资源能够被该用户读。
+Read 一个正则表达式match哪些配置资源能够被该用户访问
+
 ```
 
 # 命令实战
