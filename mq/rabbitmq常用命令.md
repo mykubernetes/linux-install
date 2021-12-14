@@ -43,20 +43,30 @@
 ```
 # 查询节点状态
 rabbitmqctl status
+
 # 停止RabbitMQ应用，但是Erlang虚拟机还是处于运行状态。此命令的执行优先于其他管理操作，比如rabbitmqctl reset。
 rabbitmqctl stop_ app 
+
 # 启动RabbitMQ应用。在执行了其他管理操作之后，重新启动之前停止的RabbitMQ应用，比rabbitmqctl reset。
 rabbitmqctl start_app
+
 # 重置RabbitMQ节点，将RabbitMQ节点重置还原到最初状态。包括从原来所在的集群中删除此节点，从管理数据库 中删除所有的配置数据，如己配置的用户、 vhost 等，以及删除所有的持久化消息。执行 rabbi tmqctl reset 命令前必须停止RabbitMQ 应用。
 rabbitmqctl reset
+
 # 强制将 RabbitMQ 节点重置还原到最初状态。不同于 rabbitmqctl reset 命令， rabbitmqctl force_reset 命令不论当前管理数据库的状态和集群配置是什么，都会无条件地重直节点。它只能在数据库或集群配置己损坏的情况下使用。与 rabbitmqctl reset 命令一样，执行 rabbitmqctl force_reset 命令前必须先停止 RabbitMQ 应用。
 rabbitmqctl force_reset
+
 # 指示RabbitMQ节点轮换日志文件。RabbitMQ节点会将原来的日志文件中的内容追加到"原 始名称+后缀"的日志文件中，然后再将新的日志内容记录到新创建的日志中(与原日志文件同名)。当目标文件不存在时，会重新创建。如果不指定后缀suffix. 则日志文件只是重新打开而不会进行轮换。
 rabbitmqctl rotate_logs {suffix}
+
 # 停止运行RabbitMQ的Erlang虚拟机和RabbitMQ应用。如果RabbitMQ没有成功关闭，则会返回一个非零值。这个命令和rabbitmqctl stop 不同的是，它不需要指定pid_file而可以阻塞等待指定进程的关闭。
 rabbitmqctl shutdown
+
 # 停止运行RabbitMQ的Erlang虚拟机和RabbitMQ服务应用，其中pid_file是通过rabbitmq-server命令启动RabbitMQ 服务时创建的，默认情况下存放于mnesia目录中。注意rabbitmq-server -detach 这个带有 -detach后缀的命令来启动 RabbitMQ 服务则不会生成 pid_file 文件。指定pid_file会等待指定进程的结束。
 rabbitmqctl stop [pid_file] 
+
+# 修改节点名称。
+rabbitmqctl rename_cluster_node {oldnode1} {newnode1}  [oldnode2  newnode2] 
 ```
 
 ## 插件管理
@@ -132,7 +142,7 @@ rabbitmqctl cluster_status
 # 将节点加入指定集群中。在这个命令执行前需要停止 RabbitMQ应用井重置节点。
 rabbitmqctl joio_cluster {cluster_node} [--ram] 
 # 修改集群节点的类型。在这个命令执行前需要停止 RabbitMQ应用。
-rabbitmqctl change_cluster_node_type {disclram}
+rabbitmqctl change_cluster_node_type {disc|ram}
 # 将节点从集群中删除，允许离线执行。
 rabbitmqctl forget_cluster_node [--offiine] 
 
@@ -166,6 +176,8 @@ rabbitmqctl clear_permissions [-p vhostName] {username}
 rabbitmqctl list_permissions [-p vhost] 
 # 用来显示用户在已分配虚拟机上的权限。
 rabbitmqctl list_user_permissions {username}
+# 设置用户权限。
+rabbitmqctl  set_permissions  -p {vhostpath} {username}  ".*"  ".*"  ".*"
 ```
 
 # 命令实战
