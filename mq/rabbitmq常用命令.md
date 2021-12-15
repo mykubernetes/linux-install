@@ -76,18 +76,24 @@ rabbitmqctl rename_cluster_node {oldnode1} {newnode1}  [oldnode2  newnode2]
 # 启动插件
 # rabbitmq-plugins enable [--offline] [--online] {plugin ...}
 rabbitmq-plugins enable rabbitmq_management
+
 # 禁用插件
 # rabbitmq-plugins disable [--offline] [--online] {plugin ...}
 rabbitmq-plugins disable  rabbitmq_management
 # 表示启用参数指定的插件，并且禁用其他所有插件
+
 # 没有参数表示禁用所有的插件
 rabbitmq-plugin set rabbitmq_management
+
 # 显示所有的插件，每一行一个
 rabbitmq-plugins list
+
 # 显示所有的插件，并且显示插件的版本号和描述信息
 rabbitmq-plugins list -v
+
 # 显示所有名称含有 "management" 的插件
 rabbitmq-plugins list -v management
+
 # 显示所有显示或者隐式启动的插件
 rabbitmq-plugins list -e rabbit
 ```
@@ -129,8 +135,10 @@ rabbitmqctl status
 ```
 # 策略查看
 rabbitmqctl list_policies [-p <vhost>]
+
 # 策略设置
 rabbitmqctl set_policy [-p <vhost>] [--priority <priority>] [--apply-to <apply-to>] <name> <pattern>  <definition>
+
 # 策略清除
 rabbitmqctl clear_policy [-p <vhost>] <name>
 ```
@@ -158,24 +166,34 @@ rabbitmqctl cancel_sync_queue {queue_name}
 ```
 # 查看用户列表
 rabbitmqctl list_users
+
 # 删除用户
 rabbitmqctl delete_user {username}
+
 # 清除用户密码
 rabbitmqctl clear_password {username}
+
 # 修改密码
 rabbitmqctl change_password {username} {newPassword}
+
 # 验证用户
 rabbitmqctl authentiçate_user {username} {passWord}
+
 # 新增用户
 rabbitmqctl add_user {username} {password}
+
 # 给用户授权
 rabbitmqctl set_user_tags {username} {roles}
+
 # 清楚用户对某个虚拟机的权限。
 rabbitmqctl clear_permissions [-p vhostName] {username}
+
 # 用来显示虚拟主机上的权限。
 rabbitmqctl list_permissions [-p vhost] 
+
 # 用来显示用户在已分配虚拟机上的权限。
 rabbitmqctl list_user_permissions {username}
+
 # 设置用户权限。
 rabbitmqctl set permissions [-p vhostName] {userName} {conf} {write} {read} 
 rabbitmqctl set_permissions -p {vhostpath} {username} ".*"  ".*"  ".*"
@@ -184,7 +202,6 @@ user 用户名
 Conf 一个正则表达式match哪些配置资源能够被该用户访问。
 Write 一个正则表达式match哪些配置资源能够被该用户读。
 Read 一个正则表达式match哪些配置资源能够被该用户访问
-
 ```
 
 # 命令实战
@@ -203,3 +220,4 @@ rabbitmqctl set_user_tags user_monitoring monitoring
 
 参考：
 - https://blog.51cto.com/u_13917261/2164003
+- https://www.cnblogs.com/xishuai/p/rabbitmq-cli-rabbitmqadmin.html
