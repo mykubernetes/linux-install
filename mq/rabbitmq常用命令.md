@@ -200,3 +200,6 @@ rabbitmqctl add_user  user_monitoring  passwd_monitor
 # 赋予其monitoring角色
 rabbitmqctl set_user_tags user_monitoring monitoring
 ```
+
+参考：
+- https://blog.51cto.com/u_13917261/2164003
