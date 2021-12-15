@@ -231,3 +231,4 @@ rabbitmqctl set_user_tags user_monitoring monitoring
 - https://blog.51cto.com/u_13917261/2164003
 - https://www.cnblogs.com/xishuai/p/rabbitmq-cli-rabbitmqadmin.html
 - http://www.blogjava.net/qbna350816/archive/2016/08/02/431415.aspx
+- https://www.cnblogs.com/WindGods/p/13570819.html
