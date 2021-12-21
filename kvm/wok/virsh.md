@@ -315,14 +315,24 @@ virt-manager
 
 # 三、常用命令
 
-1、查看虚拟主机
+1、查看虚拟主机 (获取当前节点上所有域(VM)的列表)
 ```
 virsh list              查看启动的虚拟机
 virsh list --inactive   查看没有运行的虚拟机
 virsh list --all        查看所有的虚拟机
 ```
 
-2、命令创建虚拟机并远程装机
+2、连接虚拟机
+```
+virsh console <ID>                     连接到一个VM上.
+virsh domid <Name | UUID>              根据名称或UUID返回ID值
+virsh domname <ID | UUID>
+virsh domstatc <[ID | Name | UUID]>    获取一个VM的运行状态
+virsh dominfo <ID>                     获取一个VM的基本信息
+virsh vncdisplay <ID>                  显示一个VM的VNC连接IP和端口
+```
+
+3、命令创建虚拟机并远程装机
 ```
 mkdir /foo
 virsh pool-create-as --name foo --type dir --target /foo
@@ -337,20 +347,36 @@ virt-install --name foo --vcpus 2 --ram 1024 --cdrom /iso/x.iso --disk /foo/foo.
 VNC客户端连接装机即可
 ```
 
-3、开关机
+4、定义和创建、关闭、暂停
 ```
-virsh start VM_NAME
-virsh shutdown VM_NAME
-virsh reboot VM_NAME
-virsh destroy VM_NAME
+virsh define <VM.xml>          定义一个VM域.使其永久有效,并可使用start来启动VM,VM.xml会被复制一份到/etc/libvirt/qemu/下。
+virsh create <VM.xml>          它可通过VM.xml来启动临时VM.
+virsh suspend <ID>　　          在内存挂起一台VM
+virsh resume <ID> 　　          唤醒一台VM
+virsh save <ID> <file.img>     类似与VMware上的暂停,并保存内存数据到image文件.
+virsh restore <file.img> 　　   重新载入暂停的VM
 ```
 
-4、修改虚拟机配置
+```
+保存当前状态,并destroy VM 【注: 当VM的启动配置文件在/etc/libvirt/qemu下时,才能使用它保存VM】.
+# --bypass: 保存VM时不保存文件系统缓存
+# --running：使用start恢复运行时,直接进入running状态.
+
+virsh managedsave [--bypass] <VMName> [--running | --paused] 
+virsh start <VMName>            重新启动managedsave 保存的VM.
+virsh shutdown <ID>
+virsh reboot <ID>
+virsh reset <ID>
+virsh destroy <ID>
+virsh undefine <VM.xml>
+```
+
+5、修改虚拟机配置
 ```
 virsh edit VM_NAME
 ```
 
-5、磁盘格式转换并使用它启动虚拟机
+6、磁盘格式转换并使用它启动虚拟机
 ```
 virsh shutdown foo
 qemu-img convert -f qcow2 -O raw /foo/foo.qcow2 /foo/foo.raw
@@ -367,17 +393,123 @@ virsh start foo
 VNC客户端连接测试
 ```
 
-6、快照管理
+7、快照管理
+
+创建一个VM快照;直接创建其名为'date +%s'所的得值.指定一个xml的快照配置可自定义名称.
 ```
-virsh snapshot-list foo
-virsh snapshot-create-as --name foo-hello --domain foo
-virsh snapshot-revert --domain foo --snapshotname foo-hello
-virsh snapshot-delete --domain foo --snapshotname foo-hello
-virsh snapshot-info --domain foo --snapshotname foo-hello
-virsh snapshot-current --domain foo
+virsh snapshot-create <VMName | xxx.xml>
+virsh snapshot-list <VMName> 　　               显示当前VM的所有快照
+virsh snapshot-current <VMName>                 查看快照配置
+virsh snapshot-info <VMName> <SnapName>         查看快照详细信息
 ```
 
-7、迁移
+导出一个快照的配置文件.
+```
+# 注: 测试时,我是先创建一个快照,然后,导出成xml配置文件,修改其<name>标签值,
+# 再通过"date +%s"计算当前时间,最后创建快照,这样就实现了自定义快照名的目的.
+# 另注：virsh创建快照时,总是默认会将前一个快照做为当前创建快照的parent快照.
+# 但我测试时,即便删除parent快照,也不会对当前快照有影响.
+
+virsh snapshot-dumpxml <VMName> <SnapName>
+```
+
+编辑一个快照的配置信息
+```
+#注： --rename：参数可改名,但在qemu-kvm 0.12.1这边版本中存在bug,改名后,快照将失效.
+virsh snapshot-edit <VMName> <SnapName>
+virsh snapshot-delete <VMName> <SnapName>          删除快照
+```
+
+恢复一个快照.注:0.12.1版本中存在bug,只能恢复一次,第二次将当中VM宕机。
+```
+virsh snapshot-revert <VMName> <SnapName>
+virsh snapshot-info <VMName> <SnapName>             显示快照的详情.
+```
+
+8、VM的网络接口管理
+```
+virsh domiflist <VMName>                显示VM的接口信息
+virsh domifstat <VMName> <Viface>       显示VM的接口通信统计信息
+```
+
+9、网络管理
+
+接口管理
+```
+virsh iface-list 　　　　　　              显示物理主机的网络接口列表
+virsh iface-mac <if-name>                显示指定接口名的MAC
+virsh iface-name <MAC>
+virsh iface-dempxml <if-name | UUID>     导出一份xml格式的接口状态信息
+virsh iface-edit <if-name | UUID>　　　   编辑一个物理主机的网络接口的xml配置文件.
+virsh iface-destrey <if-name | UUID>     关闭宿主机上一个物理网卡
+```
+
+虚拟网络管理
+```
+virsh net-list 　　　　　　                显示libvirt的虚拟网络
+virsh net-info <NetName | UUID>          根据名称或UUID查询一个虚拟网络的基本信息
+virsh net-uuid <NetName>　　　　          根据名称查询虚拟网络的UUID
+virsh net-name <NetUUID>
+virsh net-dumpxml <NetName | UUID> 　　   导出一份xml格式的虚拟网络配置信息
+virsh net-edit <NetName | UUID> 　　　　  编辑一个虚拟网络的xml配置文件
+virsh net-create <net.xml> 　　　　　　    根据网络xml配置信息文件创建一个虚拟网络
+virsh net-destroy <NetName | UUID>　　    删除一个虚拟网络
+```
+ 
+10、VM磁盘管理
+```
+virsh domblklist <VMName> 　　　　                          显示VM当前连接的块设备
+virsh domblkinfo <VMName> </path/to/img.img> 　　　　       显示img.img的容量信息.
+virsh domblkstat <VMName> [--human] </path/to/img.img>     显示img的读写等信息的统计结果
+virsh domblkerror <VMName> 　　                            显示VM连接的块设备的错误信息
+```
+
+11、存储池管理
+- 关于存储池的构建,可参看IBM知识库的一篇文章:http://www.ibm.com/developerworks/cn/linux/l-cn-mgrtvm2/
+```
+virsh pool-list 　　　　　　　　           显示出libvirt管理的存储池
+virsh pool-info <poolName> 　　          根据一个存储池名称查询其基本信息
+virsh pool-uuid <PoolName>
+virsh pool-edit <PoolName | UUID> 　　   编辑一个存储池的xml配置文件
+virsh pool-create <pool.xml> 　　　　     根据xml配置文件的信息创建一个存储池
+virsh pool-destroy <PoolName | UUID>     关闭一个存储池
+virsh pool-delete <PoolName | UUID>      删除一个存储池
+```
+
+12、存储卷管理
+```
+virsh vol-list <PoolName | UUID> 　　 #查询一个存储池中存储卷的列表
+virsh vol-name <VolKey | Path> 　　    #查询一个存储卷的名字
+virsh vol-path --pool <pool> <VolName | Key>    #查询一个存储卷的路径
+virsh vol-create <Vol.xml> 　　　　　　 #根据xml配置文件创建一个存储池
+virsh vol-clone <VolNamePath> <Name>  　#克隆一个存储卷
+virsh vol-delete <VolName | Key | Path>        #删除一个存储卷
+```
+
+13、迁移
+```
+# virsh migrate [OptionParas] <VMName> <TargetURI> [<MigrateURI>] [--dname <DestNewVMName>]
+```
+OptionParas:
+- --live : 在线迁移
+- --p2p : 点到点的迁移
+- --direct : 直接迁移
+- --tunnelled：隧道模式迁移
+- --persistent ：指迁移VM到目标后,再执行virsh define VM，使其持久化。
+- --undefinesource ：指迁移VM到目标后,在源宿主机上执行 virsh undefine VM。
+- --suspend ： 迁移到目标后不重启VM
+- --copy-storage-all ：在不使用共享存储的情况下,迁移时一同将VM的磁盘映像一起复制到目标端。
+- --copy-storage-inc : 在不使用共享存储时,仅将VM的磁盘映像的增量文件复制到目标端,但前提是后端磁盘映像文件必须先复制到目标端,且位置要与源端一致。
+- --dname :指定迁移到目标后,将VM的名字该成指定名称.
+
+```
+virsh migrate <ID> <Target_URL> #将一个VM迁移到另一个目的地址
+示例：
+#注: 源和目的宿主机采用NFS共享cirros-01的磁盘映像文件.
+virsh migrate --live cirros-01 qemu+tcp://192.168.10.12:16666/system --dname cirros0001
+```
+
+14、迁移
 
 1）offline:
 ```
@@ -414,7 +546,57 @@ A: virsh dumpxml foo > foo.xml
   VNC在B上测试
 ```
 
-8、help
+15、vCPU相关
+```
+virsh vcpinfo <ID>
+virsh vcppin <ID> <vCPU> <pCPU>       将一个VM的vCPU绑定到指定的物理核心上
+virsh setvcpus <ID> <vCPU-Num> 　　   设置一个VM的最多vCPU个数。
+virsh nodecpustats <CPU-Num> 　　     显示VM(某个)CPU使用情况的统计
+```
+
+16、内存相关
+```
+virsh dommemstat <ID> 　　　　    获取一个VM内存使用情况统计信息。
+virsh setmem <ID> <MemSize>      设置一个VM的内存大小(默认单位:KB)
+virsh freecell 　　　　　　　　     显示当前MUMA单元的可用空闲内存
+virsh nodememstats <cell>　　     显示VM的(某个)内存单元使用情况的统计
+```
+
+17、热插拔设备
+- 注：USB控制器、IDE等设备是不支持热插拔的,测试添加SCSI 磁盘是可以的.
+```
+# 如: scsi.xml
+# <disk type='file' device='disk'>
+# 　　 <driver name='qemu' type='qcow2' cache='none'/>
+# 　　 <source file='/images/kvm/10g.img'/>
+# 　　 <target dev='sda' bus='scsi'/>
+# 　　 <alias name='scsi0-0-0'/>
+# 　　 <address type='drive' controller='1' bus='0' target='0' unit='0'/>
+# </disk>
+
+attach-device <ID> <device.xml> 　　  向一个域中添加XML文件中的热插拔设备.
+detach-device <ID> <device.xml> 　　  从一个VM中移除XML文件中指定的热插拔设备。
+```
+
+18、其它
+```
+virsh dumpxml <ID> 　　     显示一个运行中的VM的xml格式的配置信息.
+virsh version 　　　　　　   显示libvirt 和 Hypervisor的版本信息
+virsh sysinfo 　　　　　　   以xml格式打印宿主机的系统信息
+virsh capabilities 　　　　 显示当前连接节点所在的宿主机和其自身的架构和特性
+virsh nodeinfo 　　　　　　  显示当前连接节点的基本信息
+virsh uri 　　　　 　　　　   显示当前连接节点的URI
+virsh hostname
+virsh connect <URI> 　　     连接到URI指定的Hypervisor
+virsh qemu-attach <PID>     根据PID添加一个Qemu进程到libvirt中
+````
+
+19、直接向Qemu monitor中发送命令; --hmp:直接传入monitor中无需转换.
+```
+virsh qemu-monitor-command domain [--hmp] CMD 
+```
+
+20、help
 ```
 [root@localhost ~]# virsh help snapshot
  Snapshot (help keyword 'snapshot'):
@@ -621,14 +803,167 @@ A: virsh dumpxml foo > foo.xml
     --clone          允许克隆为新名称
 ```
 
+# 使用virt-install创建虚拟机并安装GuestOS
+
+virt-install是一个命令行工具，它能够为KVM、Xen或其它支持libvirt API的hypervisor创建虚拟机并完成GuestOS安装；此外，它能够基于串行控制台、VNC或SDL支持文本或图形安装界面。安装过程可以使用本地的安装介质如CDROM，也可以通过网络方式如NFS、HTTP或FTP服务实现。对于通过网络安装的方式，virt-install可以自动加载必要的文件以启动安装过程而无须额外提供引导工具。当然，virt-install也支持PXE方式的安装过程，也能够直接使用现有的磁盘映像直接启动安装过程。
+
+### virt-install命令有许多选项，这些选项大体可分为下面几大类，同时对每类中的常用选项也做出简单说明。
+一般选项：指定虚拟机的名称、内存大小、VCPU个数及特性等；
+```
+-n NAME, --name=NAME：虚拟机名称，需全局惟一；
+-r MEMORY, --ram=MEMORY：虚拟机内在大小，单位为MB；
+--vcpus=VCPUS[,maxvcpus=MAX][,sockets=#][,cores=#][,threads=#]：VCPU个数及相关配置；
+--cpu=CPU：CPU模式及特性，如coreduo等；可以使用qemu-kvm -cpu ?来获取支持的CPU模式；
+--keymap=en-us #指定键盘布局.
+#xml配置文件中可修改VNC配置项: <graphics type='vnc' port='-1' keymap='en-us'/>
+```
+
+安装方法：指定安装方法、GuestOS类型等；
+```
+-c CDROM, --cdrom=CDROM：光盘安装介质；
+-l LOCATION, --location=LOCATION：安装源URL，支持FTP、HTTP及NFS等，如ftp://172.16.0.1/pub；
+--pxe：基于PXE完成安装；
+--livecd: 把光盘当作LiveCD；
+--os-type=DISTRO_TYPE：操作系统类型，如linux、unix或windows等；
+--os-variant=DISTRO_VARIANT：某类型操作系统的变体，如rhel5、fedora8等；
+-x EXTRA, --extra-args=EXTRA：根据--location指定的方式安装GuestOS时，用于传递给内核的额外选项，例如指定kickstart文件的位置，--extra-args "ks=http://172.16.0.1/class.cfg"
+--boot=BOOTOPTS：指定安装过程完成后的配置选项，如指定引导设备次序、使用指定的而非安装的kernel/initrd来引导系统启动等 ；例如：
+--boot cdrom,hd,network：指定引导次序；
+--boot kernel=KERNEL,initrd=INITRD,kernel_args=”console=/dev/ttyS0”：指定启动系统的内核及initrd文件；
+```
+
+存储配置：指定存储类型、位置及属性等；
+```
+--disk=DISKOPTS：指定存储设备及其属性；格式为--disk /some/storage/path,opt1=val1，opt2=val2等；常用的选项有：
+  device：设备类型，如cdrom、disk或floppy等，默认为disk；
+  bus：磁盘总线类型，其值可以为ide、scsi、usb、virtio或xen；
+  perms：访问权限，如rw、ro或sh（共享的可读写），默认为rw；
+  size：新建磁盘映像的大小，单位为GB；
+  cache：缓存模型，其值有none、writethrouth（缓存读）及writeback（缓存读写）；
+  format：磁盘映像格式，如raw、qcow2、vmdk等；
+  sparse：磁盘映像使用稀疏格式，即不立即分配指定大小的空间；
+--nodisks：不使用本地磁盘，在LiveCD模式中常用；
+```
+
+网络配置：指定网络接口的网络类型及接口属性如MAC地址、驱动模式等；
+```
+-w NETWORK, --network=NETWORK,opt1=val1,opt2=val2：将虚拟机连入宿主机的网络中，其中NETWORK可以为：
+　　bridge=BRIDGE：连接至名为“BRIDEG”的桥设备；
+　　network=NAME：连接至名为“NAME”的网络；
+其它常用的选项还有：
+　　model：GuestOS中看到的网络设备型号，如e1000、rtl8139或virtio等；
+　　mac：固定的MAC地址；省略此选项时将使用随机地址，但无论何种方式，对于KVM来说，其前三段必须为52:54:00；
+　　--nonetworks：虚拟机不使用网络功能；
+```
+
+图形配置：定义虚拟机显示功能相关的配置，如VNC相关配置；
+```
+--graphics TYPE,opt1=val1,opt2=val2：指定图形显示相关的配置，此选项不会配置任何显示硬件（如显卡），而是仅指定虚拟机启动后对其进行访问的接口；
+　　TYPE：指定显示类型，可以为vnc、sdl、spice或none等，默认为vnc；
+　　port：TYPE为vnc或spice时其监听的端口；
+　　listen：TYPE为vnc或spice时所监听的IP地址，默认为127.0.0.1，可以通过修改/etc/libvirt/qemu.conf定义新的默认值；
+　　password：TYPE为vnc或spice时，为远程访问监听的服务进指定认证密码；
+--noautoconsole：禁止自动连接至虚拟机的控制台；
+```
+
+设备选项：指定文本控制台、声音设备、串行接口、并行接口、显示接口等；
+```
+--serial=CHAROPTS：附加一个串行设备至当前虚拟机，根据设备类型的不同，可以使用不同的选项，格式为“--serial type,opt1=val1,opt2=val2,...”，例如：
+--serial pty：创建伪终端；
+--serial dev,path=HOSTPATH：附加主机设备至此虚拟机；
+--video=VIDEO：指定显卡设备模型，可用取值为cirrus、vga、qxl或vmvga；
+```
+
+虚拟化平台：虚拟化模型（hvm或paravirt）、模拟的CPU平台类型、模拟的主机类型、hypervisor类型（如kvm、xen或qemu等）以及当前虚拟机的UUID等；
+```
+-v, --hvm：当物理机同时支持完全虚拟化和半虚拟化时，指定使用完全虚拟化；
+-p, --paravirt：指定使用半虚拟化；
+--virt-type：使用的hypervisor，如kvm、qemu、xen等；所有可用值可以使用’virsh capabilities’命令获取；
+```
+
+其它：
+```
+--autostart：指定虚拟机是否在物理启动后自动启动；
+--print-xml：如果虚拟机不需要安装过程(--import、--boot)，则显示生成的XML而不是创建此虚拟机；默认情况下，此选项仍会创建磁盘映像；
+--force：禁止命令进入交互式模式，如果有需要回答yes或no选项，则自动回答为yes；
+--dry-run：执行创建虚拟机的整个过程，但不真正创建虚拟机、改变主机上的设备配置信息及将其创建的需求通知给libvirt；
+-d, --debug：显示debug信息；
+```
+
+　　尽管virt-install命令有着类似上述的众多选项，但实际使用中，其必须提供的选项仅包括--name、--ram、--disk（也可是--nodisks）及安装过程相关的选项。此外，有时还需要使用括--connect=CONNCT选项来指定连接至一个非默认的hypervisor。
 
 
+## 使用示例：
 
+(1) 
+```
+# virt-install \
+-n "centos6" \
+-r 512 \
+--vcpus=2 \
+-l http://172.16.0.1/cobbler/ks_mirror/CentOS-6.6-x86_64/ \
+-x "ks=http://172.16.0.1/centos6.x86_64.cfg" \
+--disk path=/images/kvm/centos6.img,size=120,sparse \
+--force \
+-w bridge=br100,model=virtio
+```
 
+(2)下面这个示例创建一个名为rhel5的虚拟机，其hypervisor为KVM，内存大小为512MB，磁盘为8G的映像文件/var/lib/libvirt/images/rhel5.8.img，通过boot.iso光盘镜像来引导启动安装过程。
+```
+# virt-install \
+--connect qemu:///system \
+--virt-type kvm \
+--name rhel5 \
+--ram 512 \
+--disk path=/var/lib/libvirt/images/rhel5.img,size=8 \
+--graphics vnc \
+--cdrom /tmp/boot.iso \
+--os-variant rhel5
+```
 
+(3) 下面的示例将创建一个名为rhel6的虚拟机，其有两个虚拟CPU，安装方法为FTP，并指定了ks文件的位置，磁盘映像文件为稀疏格式，连接至物理主机上的名为brnet0的桥接网络：
+```
+# virt-install \
+--connect qemu:///system \
+--virt-type kvm \
+--name rhel6 \
+--ram 1024 \
+--vcpus 2 \
+--network bridge=brnet0 \
+--disk path=/VMs/images/rhel6.img,size=120,sparse \
+--location ftp://172.16.0.1/rhel6/dvd \
+--extra_args “ks=http://172.16.0.1/rhel6.cfg” \
+--os-variant rhel6 \
+--force
+```
 
+(4) 下面的示例将创建一个名为rhel5.8的虚拟机，磁盘映像文件为稀疏模式的格式为qcow2且总线类型为virtio，安装过程不启动图形界面（--nographics），但会启动一个串行终端将安装过程以字符形式显示在当前文本模式下，虚拟机显卡类型为cirrus：
+```
+# virt-install \
+--connect qemu:///system \
+--virt-type kvm \
+--name rhel5.8 \
+--vcpus 2,maxvcpus=4 \
+--ram 512 \
+--disk path=/VMs/images/rhel5.8.img,size=120,format=qcow2,bus=virtio,sparse \
+--network bridge=brnet0,model=virtio
+--nographics \
+--location ftp://172.16.0.1/pub \
+--extra-args "ks=http://172.16.0.1/class.cfg console=ttyS0 serial" \
+--os-variant rhel5 \
+--force \
+--video=cirrus
+```
 
-
+(5) 下面的示例则利用已经存在的磁盘映像文件（已经有安装好的系统）创建一个名为rhel5.8的虚拟机：
+```
+# virt-install \
+--name rhel5.8
+--ram 512
+--disk /VMs/rhel5.8.img
+--import
+```
+注意：每个虚拟机创建后，其配置信息保存在/etc/libvirt/qemu目录中，文件名与虚拟机相同，格式为XML。
 
 
 
