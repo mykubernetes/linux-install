@@ -364,10 +364,10 @@ virsh restore <file.img> 　　   重新载入暂停的VM
 
 virsh managedsave [--bypass] <VMName> [--running | --paused] 
 virsh start <VMName>            重新启动managedsave 保存的VM.
-virsh shutdown <ID>
+virsh shutdown <ID>             关闭指令，是虚拟机进入shutoff状态，系统提示虚拟机正在被关闭，却未必能成功
 virsh reboot <ID>
 virsh reset <ID>
-virsh destroy <ID>
+virsh destroy <ID>              强制关闭该虚拟机，但并非真的销毁该虚拟机，只是关闭而已。
 virsh undefine <VM.xml>
 ```
 
