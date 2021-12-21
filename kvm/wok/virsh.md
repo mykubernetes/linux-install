@@ -315,6 +315,18 @@ virt-manager
 
 # 三、常用命令
 
+## 虚拟机状态
+
+通过 virsh 管理虚拟机，虚拟机的状态显示为以下几种：
+- runing 是运行状态 
+- idel 是空闲状态 
+- pause 暂停状态 
+- shutdown 关闭状态 
+- crash 虚拟机崩坏状态 
+- daying 垂死状态 
+- shut off 不运行完全关闭 
+- pmsuspended客户机被关掉电源中中断
+
 1、查看虚拟主机 (获取当前节点上所有域(VM)的列表)
 ```
 virsh list              查看启动的虚拟机
@@ -968,3 +980,4 @@ virt-install是一个命令行工具，它能够为KVM、Xen或其它支持libvi
 
 
 
+https://blog.csdn.net/weixin_30651273/article/details/99660277
