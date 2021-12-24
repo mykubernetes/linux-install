@@ -445,9 +445,13 @@ Security DOI:   0
 ```
 
 （2）开启虚拟机，进行内存大小的调整
-
-调整前，虚拟机内存大小：
 ```
+# 调整前，虚拟机内存大小：
+[root@192.168.118.14 ~]free -h
+              total        used        free      shared  buff/cache   available
+Mem:           623M        107M        426M         16M         90M        376M
+Swap:            0B          0B          0B
+
 [root@192.168.118.14 ~]#virsh setmem centos 2G --config --live
 [root@192.168.118.14 ~]#virsh dominfo centos
 Id:             93
@@ -465,11 +469,13 @@ Managed save:   no
 Security model: selinux
 Security DOI:   0
 Security label: system_u:system_r:svirt_t:s0:c645,c949 (permissive)
+
+#调整后，虚拟机内存大小：
+[root@192.168.118.14 ~]free -h
+              total        used        free      shared  buff/cache   available
+Mem:           1.6G        148M        1.3G         16M        121M        1.3G
+Swap:            0B          0B          0B
 ```
-
-调整后，虚拟机内存大小：
-
-
 内存动态调整完成。
 
  
