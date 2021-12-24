@@ -521,8 +521,13 @@ vdb        /images/share-device.qcow2
 ```
 
 查看虚拟机磁盘：
-
- 
+```
+# lsblk
+NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+vda     253:0    0  39.2M 0  disk
+`-vda1  253:1    0  31.4M 0  part /
+vdb     253:16   0     5G 0  disk
+```
 
 删除添加过的磁盘：
 ```
@@ -534,10 +539,14 @@ Target     Source
 ------------------------------------------------
 vda        /images/cirros-0.3.5-i386-disk.img
 ```
- 
 
 查看虚拟机磁盘：
-
+```
+# lsblk
+NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+vda     253:0    0  39.2M 0  disk
+`-vda1  253:1    0  31.4M 0  part /
+```
 删除成功。
 
  
