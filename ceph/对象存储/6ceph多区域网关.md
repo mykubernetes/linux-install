@@ -1435,4 +1435,5 @@ rgw_zonegroup = default
 ceph      19622      1  5 13:53 ?        00:00:00 /user/bin/radosgw -f --cluster backup --name client.rgw.ceph5 --setuser ceph --setgroup ceph
 ```
 
-https://blog.csdn.net/zhouzixin053/article/details/106420562
+- https://blog.csdn.net/zhouzixin053/article/details/106420562
+- https://docs.ceph.com/en/pacific/radosgw/multisite/
