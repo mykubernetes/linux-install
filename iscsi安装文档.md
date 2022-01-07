@@ -115,3 +115,4 @@ iscsiadm --mode node  --targetname iqn.20180214.com:test.target2  --portal targe
 使用fdisk 命令查看新出现的磁盘是否跟LIO配置的磁盘大小一致。  
 
  
+http://www.idcat.cn/centos7%E7%B3%BB%E7%BB%9Flio%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8.html
