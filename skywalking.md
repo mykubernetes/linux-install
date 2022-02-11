@@ -355,4 +355,6 @@ java -javaagent:/opt/apache-skywalking-apm-bin/agent/skywalking-agent.jar \
 
 # 七、告警
 
+https://blog.csdn.net/yy756127197/article/details/107465620?spm=1001.2014.3001.5502
+
 https://github.com/apache/skywalking/blob/v8.2.0/docs/en/setup/backend/backend-alarm.md
