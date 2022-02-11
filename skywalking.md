@@ -353,6 +353,9 @@ java -javaagent:/opt/apache-skywalking-apm-bin/agent/skywalking-agent.jar \
 - -Dskywalking.agent.service_name: 指定服务名
 - -Dskywalking.collector.backend_service: 指定 oap 服务的地址
 
+参考：
+- https://github.com/apache/skywalking/blob/master/docs/en/setup/service-agent/server-agents.md
+
 # 七、告警
 
 https://blog.csdn.net/yy756127197/article/details/107465620?spm=1001.2014.3001.5502
