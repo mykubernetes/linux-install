@@ -30,7 +30,9 @@ Skywalking用于分布式系统的应用程序性能监视工具，特别为微�
 | **jvm监控** | 支持 | 不支持 | 不支持 | 支持 |
 | **性能损失** | 高 | 中 | 中 | 低 |
 
-# 四、遵循的协议
+# 四、OpenTracing规范
+
+- 由于以上APM系统较多，各个分布式链路追踪产品的API并不兼容，如果用户在各个产品之间进行切换，成本非常高，因此成立了OpenTracing组织，OpenTracing通过制定统一的API标准和数据结构模型，从而帮助开发人员和用户能够方便地使用或更换追踪系统。https://opentracing.io/
 
 https://github.com/opentracing-contrib/opentracing-specification-zh
 
@@ -246,7 +248,7 @@ sh bin/startup.sh
 
 5、启动成功后访问http://localhost:8080
 
-# 部署 skywalking 的 Java Agent
+# 六、部署 skywalking 的 Java Agent
 
 https://github.com/apache/skywalking/blob/v8.2.0/docs/en/setup/service-agent/java-agent/README.md
 
@@ -270,7 +272,7 @@ drwxrwxr-x. 2 1001 1002     8192 Jan 28 21:38 plugins                       #生
 -rw-rw-r--. 1 1001 1002 20391972 Jan 28 21:36 skywalking-agent.jar
 ```
 
-有四种方式配置，优先级如下
+### 有四种方式配置，优先级如下
 ```
 探针配置 > JVM配置 > 系统环境变量配置 > agent.config文件
 ```
@@ -286,7 +288,7 @@ drwxrwxr-x. 2 1001 1002     8192 Jan 28 21:38 plugins                       #生
 # 默认格式是 -javaagent:agent.jar=[option1]=[value1],[option2]=[value2]
 ```
 
-我们使用JVM 配置，所以此处不修改。
+### 我们使用JVM 配置，所以此处不修改。
 
 /agent/config/agent.config主要配置
 ```
@@ -316,10 +318,15 @@ agent.sample_n_per_3_secs=${SW_AGENT_SAMPLE:-1}
 
 完整的启动命令
 ```
-java -javaagent:/var/local/apache-skywalking-apm-bin/agent/skywalking-agent.jar -Dskywalking.agent.service_name=service-pfm   -Dskywalking.collector.backend_service=127.0.0.1:11800  -jar simple-skywalking-test.jar
+java -javaagent:/opt/apache-skywalking-apm-bin/agent/skywalking-agent.jar \
+-Dskywalking.agent.service_name=service-pfm  \
+-Dskywalking.collector.backend_service=127.0.0.1:11800 \
+-jar simple-skywalking-test.jar
 ```
+- -javaagent: 指定 agent jar 包的位置
+- -Dskywalking.agent.service_name: 指定服务名
+- -Dskywalking.collector.backend_service: 指定 oap 服务的地址
 
-
-
+# 七、告警
 
 https://github.com/apache/skywalking/blob/v8.2.0/docs/en/setup/backend/backend-alarm.md
