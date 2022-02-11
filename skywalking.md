@@ -224,6 +224,31 @@ storage:
 - SW_NAMESPACE es的namespace
 - SW_STORAGE_ES_CLUSTER_NODES es地址，多个地址以，分割
 
+使用zk作为集群部署配置
+```
+cluster:
+   selector: ${SW_CLUSTER:zookeeper}
+   # 单节点模式
+   standalone:
+   # zk用于管理collector集群协作.
+   zookeeper:
+     nameSpace: ${SW_NAMESPACE:""}
+     # 多个用,分割
+     hostPort: ${SW_CLUSTER_ZK_HOST_PORT:localhost:2181}
+     # Retry Policy
+     baseSleepTimeMs: ${SW_CLUSTER_ZK_SLEEP_TIME:1000} # initial amount of time to wait between retries
+    maxRetries: ${SW_CLUSTER_ZK_MAX_RETRIES:3} # max number of times to retry
+    # Enable ACL
+    enableACL: ${SW_ZK_ENABLE_ACL:false} # disable ACL in default
+    schema: ${SW_ZK_SCHEMA:digest} # only support digest schema
+    expression: ${SW_ZK_EXPRESSION:skywalking:skywalking}
+   # 分布式 kv 存储设施，类似于zk，但没有zk重型（除了etcd，consul、Nacos等都是类似功能）
+   # etcd:
+      # serviceName: ${SW_SERVICE_NAME:"SkyWalking_OAP_Cluster"}
+      # 多个节点用逗号分隔, 如: 10.0.0.1:2379,10.0.0.2:2379,10.0.0.3:2379
+      # hostPort: ${SW_CLUSTER_ETCD_HOST_PORT:localhost:2379}
+```
+
 3、webapp配置
 
 - 可以在这里修改前端工程端口，默认8080
@@ -247,6 +272,7 @@ sh bin/startup.sh
 - 后端工程会启动两个端口11800和12800，大多数代理使用11800端口，只有少数不支持grpc的代理使用12800。前端工程使用12800
 
 5、启动成功后访问http://localhost:8080
+
 
 # 六、部署 skywalking 的 Java Agent
 
