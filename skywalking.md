@@ -71,10 +71,56 @@ SkyWalking有两中版本，ES版本和非ES版。如果我们决定采用Elasti
 # wget https://archive.apache.org/dist/skywalking/8.0.1/apache-skywalking-apm-es7-8.0.1.tar.gz
 # tar xvf apache-skywalking-apm-es7-8.0.1.tar.gz
 # cd apache-skywalking-apm-bin-es7
-# ls
-agent  bin  collector-libs  config  DISCLAIMER  LICENSE  licenses  NOTICE  README.txt  webapp
+total 92
+drwxrwxr-x. 8 1001 1002   143 Jun 18  2020 agent
+drwxr-xr-x. 2 root root   241 Feb 11 14:28 bin
+drwxr-xr-x. 4 root root  4096 Feb 11 14:28 config
+-rwxrwxr-x. 1 1001 1002 29805 Jun 18  2020 LICENSE
+drwxrwxr-x. 3 1001 1002  4096 Feb 11 14:28 licenses
+-rwxrwxr-x. 1 1001 1002 31548 Jun 18  2020 NOTICE
+drwxrwxr-x. 2 1001 1002 12288 Jun 18  2020 oap-libs
+-rw-rw-r--. 1 1001 1002  1978 Jun 18  2020 README.txt
+drwxr-xr-x. 3 root root    30 Feb 11 14:28 tools
+drwxr-xr-x. 2 root root    53 Feb 11 14:28 webapp
+```
+- agent: 目录将来要拷贝到各服务所在机器上用作探针
+- bin: 目录是服务启动脚本
+- config: 目录是配置文件
+- oap-libs: 目录是oap服务运行所需的jar包
+- webapp: 目录是web服务运行所需的jar包
+
+2、修改配置application.yml
+```
+# cd config/
+
+# ll
+total 92
+-rw-rw-r--. 1 1001 1002  2048 Jun 18  2020 alarm-settings-sample.yml
+-rw-rw-r--. 1 1001 1002  3298 Jun 18  2020 alarm-settings.yml                #预警
+-rwxrwxr-x. 1 1001 1002 13477 Jun 18  2020 application.yml                   #核心配置
+-rwxrwxr-x. 1 1001 1002  7748 Jun 18  2020 component-libraries.yml
+-rw-rw-r--. 1 1001 1002  1437 Jun 18  2020 endpoint-name-grouping.yml
+drwxr-xr-x. 2 root root    23 Feb 11 14:28 fetcher-prom-rules
+-rwxrwxr-x. 1 1001 1002   963 Jun 18  2020 gateways.yml                      #外接网关
+-rw-rw-r--. 1 1001 1002  1812 Jun 18  2020 log4j2.xml
+drwxr-xr-x. 2 root root    85 Feb 11 14:28 oal
+-rw-rw-r--. 1 1001 1002   958 Jun 18  2020 service-apdex-threshold.yml       #服务apdex设置
+-rw-rw-r--. 1 1001 1002 43307 Jun 18  2020 ui-initialized-templates.yml
 ```
 
+作为监控系统，首先排除H2和MySQL，这里推荐InfluxDB，它本身就是时序数据库，非常适合这种场景，这里用ElasticSearch7,支持的存储有
+- H2
+- ElasticSearch 6, 7
+- MySQL
+- TiDB
+- InfluxDB
+
+
+https://github.com/apache/skywalking/blob/master/docs/en/setup/backend/backend-storage.md
+
+
+
+/config/application.yml部分配置
 ```
 cluster:
    selector: ${SW_CLUSTER:standalone}
@@ -176,12 +222,104 @@ storage:
 - SW_NAMESPACE es的namespace
 - SW_STORAGE_ES_CLUSTER_NODES es地址，多个地址以，分割
 
+3、webapp配置
+
+- 可以在这里修改前端工程端口，默认8080
+```
+# vim webapp/webapp.yml
+server:
+  port: 8080
+
+collector:
+  path: /graphql
+  ribbon:
+    ReadTimeout: 10000
+    # Point to all backend's restHost:restPort, split by ,
+    listOfServers: 127.0.0.1:12800
+```
+
+4、启动
+```
+sh bin/startup.sh
+```
+- 后端工程会启动两个端口11800和12800，大多数代理使用11800端口，只有少数不支持grpc的代理使用12800。前端工程使用12800
+
+5、启动成功后访问http://localhost:8080
+
+# 部署 skywalking 的 Java Agent
+
+https://github.com/apache/skywalking/blob/v8.2.0/docs/en/setup/service-agent/java-agent/README.md
+
+```
+wget https://archive.apache.org/dist/skywalking/java-agent/8.9.0/apache-skywalking-java-agent-8.9.0.tgz
+tar apache-skywalking-java-agent-8.9.0.tgz
+# cd skywalking-agent
+
+# ll
+total 19964
+drwxrwxr-x. 2 1001 1002     4096 Jan 28 21:38 activations
+drwxrwxr-x. 2 1001 1002       85 Jan 28 21:38 bootstrap-plugins
+drwxrwxr-x. 2 1001 1002       26 Jan 28 21:36 config                        #配置文件#
+-rw-rw-r--. 1 1001 1002    12911 Jan 28 21:36 LICENSE
+drwxrwxr-x. 2 1001 1002       29 Jan 28 21:36 licenses
+drwxrwxr-x. 2 1001 1002        6 Jan 28 21:36 logs                          #日志
+-rw-rw-r--. 1 1001 1002    10003 Jan 28 21:36 NOTICE
+drwxrwxr-x. 2 1001 1002     4096 Jan 28 21:39 optional-plugins              #可选插件
+drwxrwxr-x. 2 1001 1002      130 Jan 28 21:39 optional-reporter-plugins
+drwxrwxr-x. 2 1001 1002     8192 Jan 28 21:38 plugins                       #生效插件
+-rw-rw-r--. 1 1001 1002 20391972 Jan 28 21:36 skywalking-agent.jar
+```
+
+有四种方式配置，优先级如下
+```
+探针配置 > JVM配置 > 系统环境变量配置 > agent.config文件
+```
+
+1.JVM配置覆盖
+```
+-Dskywalking.agent.service_name = demo-provider
+```
+
+2.探针配置覆盖
+```
+-javaagent:/var/local/agent/skywalking-agent.jar=agent.service_name=service-pfm
+# 默认格式是 -javaagent:agent.jar=[option1]=[value1],[option2]=[value2]
+```
+
+我们使用JVM 配置，所以此处不修改。
+
+/agent/config/agent.config主要配置
+```
+# 不同的namespace会导致调用链路追踪中断
+agent.namespace=${SW_AGENT_NAMESPACE:default-namespace}
+
+# 页面上展示的service的名称，也可以通过-Dskywalking.agent.service_name=xxx指定
+agent.service_name=${SW_AGENT_NAME:service-pfm}
+
+# 平台的调用地址，也可以通过-Dskywalking.collector.backend_service=127.0.0.1:11800指定
+collector.backend_service=${SW_AGENT_COLLECTOR_BACKEND_SERVICES:127.0.0.1:11800}
+
+# 忽略指定后缀的请求收集
+agent.ignore_suffix=${SW_AGENT_IGNORE_SUFFIX:.jpg,.jpeg,.js,.css,.png,.bmp,.gif,.ico,.mp3,.mp4,.html,.svg}
+
+# 每3秒的采样率，负数代表100%
+agent.sample_n_per_3_secs=${SW_AGENT_SAMPLE:-1}
+```
+- 注意：如果Collector以集群方式部署，比如：Acollector和Bcollector，建议Acollector.sampleRate = Bcollector.sampleRate
+
+启动工程接入Agent
+
+在jvm启动参数上添加
+```
+-javaagent:/var/local/apache-skywalking-apm-bin/agent/skywalking-agent.jar
+```
+
+完整的启动命令
+```
+java -javaagent:/var/local/apache-skywalking-apm-bin/agent/skywalking-agent.jar -Dskywalking.agent.service_name=service-pfm   -Dskywalking.collector.backend_service=127.0.0.1:11800  -jar simple-skywalking-test.jar
+```
 
 
 
 
-
-
-https://github.com/apache/skywalking/blob/master/docs/en/setup/backend/backend-storage.md
-
-https://skywalking.apache.org/docs/skywalking-java/v8.9.0/en/setup/service-agent/java-agent/readme/
+https://github.com/apache/skywalking/blob/v8.2.0/docs/en/setup/backend/backend-alarm.md
