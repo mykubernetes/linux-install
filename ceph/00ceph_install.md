@@ -4,6 +4,9 @@
 - ceph-container: https://github.com/ceph/ceph-container #shell
 - ceph-chef: https://github.com/ceph/ceph-chef #Ruby
 - cephadm: https://docs.ceph.com/en/latest/cephadm/ #ceph官方在ceph15版本加入的
+- ceph-deploy: https://github.com/ceph/ceph-deploy #python 是一个ceph官方维护基于ceph-deploy命令行部署的工具，基于ssh执行可以sudo权限的shell命令以及一些python脚本，实现cephalexin集群的部署和管理维护。Ceph-deploy只用于部署和管理ceph集群，客户端需要访问ceph，需要部署客户端工具
+
+
 
 官方网站: http://ceph.org.cn/
 
