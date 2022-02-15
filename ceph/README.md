@@ -158,6 +158,72 @@ BlueStore通过直接管理物理HDD或SSD而不使用诸如XFS的中间文件�
 
 第六步：主OSD将写入完成返回给客户端
 
+
+# ceph 元数据保存方式：
+
+Ceph对象数据的元数据信息放在哪里呢？对象数据元数据以key-value的形式存在，在RADOS中有两种实现：xattrs和omap
+
+ceph可选后端支持多种存储引擎，比如`filestore`、`bluestore`、`kvstore`、`memstore`,ceph使用bluestore存储对象数据的元数据信息
+
+xattts(扩展属性)
+> 是将元数据保存在对象对应文件的扩展属性中并保存到系统盘上，这要求支持对象存储的本地文件系统（一般是XFS)支持扩展属性。
+
+omap(object map 对象映射）
+> omap：是object map 的简称，是将元数据保存在本地文件系统之外的独立key-value 存储系统中，在使用filestore时是leveldb,在使用bluestore时是rocksdb,由于filestore存在功能问题（需要将磁盘格式化为XFS格式）及元数据高可用问题等问题，因此在目前ceph主要使用bluestore
+
+filestore与leveldb:
+ceph早期基于filestore使用google的levelDB保存对象的元数据，LevelDb是一个持久化存储的KV系统，和Redis这种内存的KV系统不同,leveldb不好想Redis一样将数据放在内存从而占用大量的内存空间，而是将大部分数据存储到磁盘上，但是需要把磁盘上的leveldb空间格式化为文件系统（XFS)
+
+FileStore将数据保存到与Posix兼容的系统文件系统（例如Btrfs、XFS、Ext4),在Ceph后端使用传统的Linux文件系统尽管提供了一些好处，但也有代价，如性能、对象属性与磁盘本地文件系统属性匹配存在限制等。
+
+```
+------------------------------------------------------------------
+| FileStore                                                       |
+|                                                                 |
+|      data                    data                     omap      |
+|       ||                      ||                       ||       |
+|       ||                      ||                       ||       |
+|       \/                      \/                       \/       |
+|   FileJournal                                        LevelDB    |
+|                                                                 |
+------------------------------------------------------------------
+  
+------------------------------------------------------------------
+|                              XFS                                |
+|                                                                 |
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+|                           HDD or SDD                            |
+|                                                                 |
+------------------------------------------------------------------
+```
+
+bluestore与rocksdb
+
+由于levelDB依然需要磁盘文件系统的支持，后期facebok对levelDB进行改进为RocksDB https://github.com/facebook/rocksdb RocksDB将对象数据的元数据保存在RocksDB，但是RocksDB的数据又放在哪里呢？放在内存怕丢失，放在本地磁盘但是解决不了高可用，ceph对象数据放在了每个OSD中，那么就在在当前OSD中划分出一部分空间，格式化为BlueFS文件系统用于保存RocksDB中的元数据信息（称为BlueStore),并实现元数据的高可用，BlueStore最大的特点就是构建在裸盘设备之上，并且对诸如SSD等新的存储设备做了很多优化工作
+```
+对全SSD及全NVMe SSD闪存适配
+绕过本地文件系统层，直接管理裸设备，缩短IO路径
+严格分离元数据和数据，提高索引效率
+使用KV索引，解决文件系统目录结构遍历效率低的问题
+支持多种设备类型
+解决日志“双写”问题
+期望带来至少2倍的写性能提升和同等性能
+增加数据晓燕和数据压缩功能
+```
+
+RocksDB通过中间层BlueRocksDB访问文件系统的接口，这个文件系统与系统的Linux文件系统（例如Ext4和XFS)是不同的，它不是VFS下面的通用文件系统，而是一个用户态的逻辑，BlueFS通过函数接口（API,非POSIX)的方式为BlueRocksDB提高类似文件系统的能力 
+
+
+
+
+
+
+
+
+
 https://www.jianshu.com/p/9d740d025034
 
 https://www.cnblogs.com/kevingrace/p/5569737.html
