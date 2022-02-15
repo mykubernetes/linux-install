@@ -171,7 +171,7 @@ xattts(扩展属性)
 omap(object map 对象映射）
 > omap：是object map 的简称，是将元数据保存在本地文件系统之外的独立key-value 存储系统中，在使用filestore时是leveldb,在使用bluestore时是rocksdb,由于filestore存在功能问题（需要将磁盘格式化为XFS格式）及元数据高可用问题等问题，因此在目前ceph主要使用bluestore
 
-filestore与leveldb:
+### filestore与leveldb:
 ceph早期基于filestore使用google的levelDB保存对象的元数据，LevelDb是一个持久化存储的KV系统，和Redis这种内存的KV系统不同,leveldb不好想Redis一样将数据放在内存从而占用大量的内存空间，而是将大部分数据存储到磁盘上，但是需要把磁盘上的leveldb空间格式化为文件系统（XFS)
 
 FileStore将数据保存到与Posix兼容的系统文件系统（例如Btrfs、XFS、Ext4),在Ceph后端使用传统的Linux文件系统尽管提供了一些好处，但也有代价，如性能、对象属性与磁盘本地文件系统属性匹配存在限制等。
@@ -200,7 +200,7 @@ FileStore将数据保存到与Posix兼容的系统文件系统（例如Btrfs、X
 ------------------------------------------------------------------
 ```
 
-bluestore与rocksdb
+### bluestore与rocksdb
 
 由于levelDB依然需要磁盘文件系统的支持，后期facebok对levelDB进行改进为RocksDB https://github.com/facebook/rocksdb RocksDB将对象数据的元数据保存在RocksDB，但是RocksDB的数据又放在哪里呢？放在内存怕丢失，放在本地磁盘但是解决不了高可用，ceph对象数据放在了每个OSD中，那么就在在当前OSD中划分出一部分空间，格式化为BlueFS文件系统用于保存RocksDB中的元数据信息（称为BlueStore),并实现元数据的高可用，BlueStore最大的特点就是构建在裸盘设备之上，并且对诸如SSD等新的存储设备做了很多优化工作
 ```
@@ -216,9 +216,31 @@ bluestore与rocksdb
 
 RocksDB通过中间层BlueRocksDB访问文件系统的接口，这个文件系统与系统的Linux文件系统（例如Ext4和XFS)是不同的，它不是VFS下面的通用文件系统，而是一个用户态的逻辑，BlueFS通过函数接口（API,非POSIX)的方式为BlueRocksDB提高类似文件系统的能力 
 
+```
+------------------------------------------------------------------
+|                                                      BlueStore |
+|             data                           metadata            |
+| Allocator     |                                |               |
+|               |                             rocksDB            |
+|               |                           BlueRocksEnv         |
+|               |                              BlueFS            |
+|               |                       |                 |      |
+|               \/                      \/                \/     |
+|-----------------------------------------------------------------
+       --------------           --------------     --------------
+       | BlockDevice |          | BlockDevice |    | BlockDevice |
+       ---------------          ---------------    ---------------
+```
 
+**BlueStore** 的逻辑架构如上图所示，模块的划分都还比较清晰，我们来看下模块的作用
+- **Allocator**: 负责裸设备的空间管理分配
+- **RocksDB**: **rocksdb** 是 **facebook** 基于**leveldb** 开发的一款kv数据库， **BlueStore**将元数据全部存放至**RocksDB**中，这些元数据包括存储预写世日志、数据对象元数据、Ceph的omap数据信息、以及分配器的元数据
+- **BlueRocksEnv**: 这是**RocksDB**与**BlueFS**交互的接口，**RocksDB**提供了文件操作的接口
+- **EnvWrapper**(Env 封装器)，可以通过继承实现该接口来自定义底层的读写操作，**BlueRocksEnv**就是继承自**EnvWrapper**实现对**BlueFS**的读写
+- **BlueFS**: **BlueFS**是**BlueStore**针对**RocksDB**开发的轻量级文件系统，用于存放**RocksDB**产生的`.sst`和`.log`等文件
+- **BlockDecive**: **BlueStore**抛弃了传统的ext4、xfs文件系统，使用直接管理裸盘的方式，**BlueStore**支持同时使用多种不同类型的设备，在逻辑上**BlueStore**将存储空间划分为三层，慢速（Slow）空间、高速（DB)空间、超高速（WAL)空间，不同的空间可以指定使用不同的设备类型，当然也可使用同一块设备
 
-
+**BlueStore**的设计考虑了**FileStore**中存在的一些硬伤，抛弃了传统的文件系统直接管理裸设备，缩短了IO路径，同时采用ROW的方式，避免了日志双写问题，在写入性能上有了极大的提高
 
 
 
