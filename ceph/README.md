@@ -139,6 +139,24 @@ BlueStore通过直接管理物理HDD或SSD而不使用诸如XFS的中间文件�
   * ceph-mgr还包括一个Prometheus插件。
   * ceph-mgr现在有一个Zabbix插件。使用zabbix_sender，它可以将集群故障事件发送到Zabbix Server主机。这样可以方便地监视Ceph群集的状态，并在发生故障时发送通知。
 
+## 文件存储过程
+
+第一步：文件计算到对象的映射：
+> 计算文件到对象的映射，列如file为客户端要读写的文件，得到oid(object id) = ino + ono
+> ion: inode number(ION), file的元数据序列号，file的唯一id.
+> ono: object number(ONO), file切分产生的某个object的序号，默认以4M切分一个块大小
+
+第二步：通过hash算法计算出文件对应的pool中的PG:
+> 通过一致性HASH计算Object到PG,Object -> PG映射hash(oid) & mask -> pgid
+
+第三步：通过CRUSH把对象映射到OSD
+> 通过CRUSH算法计算PG到OSD,PG -> OSD映射：[CRUSH(pgid)->(osd1,osd2,osd3)]
+
+第四步：PG中的主OSD将对象写入到硬盘
+
+第五步：主OSD将数据同步给备份OSD,并等待备份OSD返回确认
+
+第六步：主OSD将写入完成返回给客户端
 
 https://www.jianshu.com/p/9d740d025034
 
