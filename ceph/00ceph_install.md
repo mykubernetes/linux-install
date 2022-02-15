@@ -1,8 +1,16 @@
+# 部署方式
+- ceph-ansible: https://github.com/ceph/ceph-ansible #python
+- ceph-salt: https://github.com/ceph/ceph-salt #python
+- ceph-container: https://github.com/ceph/ceph-container #shell
+- ceph-chef: https://github.com/ceph/ceph-chef #Ruby
+- cephadm: https://docs.ceph.com/en/latest/cephadm/ #ceph官方在ceph15版本加入的
+
 官方网站: http://ceph.org.cn/
 
 官方yum源: https://download.ceph.com/rpm-hammer/
 
 官方提供ansible部署:http://docs.ceph.com/ceph-ansible/master/
+
 
 
 # 一、安装前准备
