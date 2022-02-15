@@ -242,8 +242,19 @@ RocksDB通过中间层BlueRocksDB访问文件系统的接口，这个文件系�
 
 **BlueStore**的设计考虑了**FileStore**中存在的一些硬伤，抛弃了传统的文件系统直接管理裸设备，缩短了IO路径，同时采用ROW的方式，避免了日志双写问题，在写入性能上有了极大的提高
 
+# Ceph CRUSH算法简介
 
+**Controllers replication under scalable hashing** #可控的，可复制的、可伸缩的一致性hash算法
 
+Ceph使用CURSH算法来存放和管理数据，它是Ceph的智能数据分发机制，Ceph使用CRUSH算法来准确计算数据应该被保存到哪里，以及应该从哪里读取，和保存元数据不同的是，CRUSH按需计算出元数据，因此它就消除了对中心式的服务器/网关的需求，它使得Ceph客户端能够计算出元数据，该过程也称为CRUSH查找，然后和OSD直接通信
+- 1、如果是把对象之间映射到OSD之上会导致对象与OSD的对应关系过于紧密和耦合，当OSD由于故障发生变更时将会对整个ceph产生影响
+- 2、于是ceph将一个对象映射到RADOS集群的时候分为两步走
+  -  首先使用一致性hash算法将对象名称映射到PG
+  -  然后将PG ID基于CRUSH算法映射到OSD即可查到对象
+- 3、以上两个过程都是以“实时计算”的方式完成，而没有使用传统的查询数据与块设备的对应表的方式，这样有效避免了组件的“中心化”问题，也解决了查询吸能和冗余问题，使得ceph集群扩展不再受查询的性能限制
+- 4、这个实时计算操作使用的就是CRUSH算法
+  - Controllers replication under scalable hashing #可控的，可复制的、可伸缩的一致性hash算法
+  - CRUSH是一种分布算法，类似于一致性hash算法，用于为RADOS存储集群控制数据的分配
 
 
 https://www.jianshu.com/p/9d740d025034
