@@ -237,6 +237,40 @@ ceph-deploy osd create node03 --data $dev
 done
 ```
 
+### 拓展：
+默认采用的是bluestore，如果需要指定更详细的参数请参照下面步骤：
+
+#### 使用filestore
+
+9.1 使用filestore采用journal模式（每个节点数据盘需要两块盘或两个分区）
+
+创建OSD
+```
+# ceph-deploy osd create --filestore --fs-type xfs --data /dev/sdc --journal data/log   storage1
+# ceph-deploy osd create --filestore --fs-type xfs --data /dev/sdc --journal data/log   storage2
+# ceph-deploy osd create --filestore --fs-type xfs --data /dev/sdc --journal data/log   storage3
+```
+
+9.2 使用bluestore
+
+创建OSD
+```
+# ceph-deploy osd create --bluestore storage1 --data /dev/sdc --block-db cache/db-lv-0 --block-wal cache/wal-lv-0
+# ceph-deploy osd create --bluestore storage2 --data /dev/sdc --block-db cache/db-lv-0 --block-wal cache/wal-lv-0
+# ceph-deploy osd create --bluestore storage3 --data /dev/sdc --block-db cache/db-lv-0 --block-wal cache/wal-lv-0
+```
+
+9.3 wal & db 的大小问题
+
+使用混合机械和固态硬盘设置时，block.db为Bluestore创建足够大的逻辑卷非常重要 。通常，block.db应该具有 尽可能大的逻辑卷。
+
+建议block.db尺寸不小于4％ block。例如，如果block大小为1TB，则block.db 不应小于40GB。
+
+如果不使用快速和慢速设备的混合，则不需要为block.db（或block.wal）创建单独的逻辑卷。Bluestore将在空间内自动管理这些内容block。
+
+
+
+
 > 10、查看集群状态
 ```
 [root@cephnode01 ~]# ceph -s 
