@@ -169,13 +169,13 @@ See 'ceph-deploy <command> --help' for help on a specific command
 
 > 3、部署节点,参数为monitor结点的主机名列表 
 ```
-# ceph-deploy new node01 node02 node03
+# ceph-deploy new node01 node02 node03               # 可以指定参数 ceph-deploy new --cluster-network 192.168.0.0/21 --public-network 172.31.0.0/21 node01
 
 # 该命令会在当前目录下创建如下文件
 # ls
 ceph.conf  ceph-deploy-ceph.log  ceph.mon.keyring
 ```
-  
+
 > 4、编辑 ceph.conf 配置文件最后添加两行
 ```
 cat ceph.conf
