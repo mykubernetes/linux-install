@@ -113,6 +113,60 @@ ssh-copy-id ceph@node03
 # cd my-cluster
 ```
 
+```
+# ceph-deploy --help
+usage: ceph-deploy [-h] [-v | -q] [--version] [--username USERNAME] [--overwrite-conf]
+                   [--ceph-conf CEPH_CONF]
+                   COMMAND ...
+
+Easy Ceph deployment
+
+    -^-
+   /   \
+   |O o|  ceph-deploy v2.0.1
+   ).-.(
+  '/|||\`
+  | '|` |
+    '|`
+
+Full documentation can be found at: http://ceph.com/ceph-deploy/docs
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         be more verbose
+  -q, --quiet           be less verbose
+  --version             the current installed version of ceph-deploy
+  --username USERNAME   the username to connect to the remote host
+  --overwrite-conf      overwrite an existing conf file on remote host (if present)
+  --ceph-conf CEPH_CONF
+                        use (or reuse) a given ceph.conf file
+
+commands:
+  COMMAND               description
+    new                 Start deploying a new cluster, and write a CLUSTER.conf and keyring for it.   # 开始部署一个新的ceph存储集群，并生成CLUSTER.conf集群配置文件和keyring认证文件
+    install             Install Ceph packages on remote hosts.                                        # 在远程主机上安装ceph相关的软件包，可以通过--release指定安装的版本
+    mds                 Ceph MDS daemon management                                                    # 管理MDS守护程序（Ceph Metadata Server,ceph 管理守护程序）
+    mgr                 Ceph MGR daemon management                                                    # 管理MGR守护程序（ceph-mgr,Ceph Manager DaemonCeph 管理器守护程序）
+    mon                 Ceph MON Daemon management                                                    # 管理MON守护程序（ceph-mon,ceph监视器）
+    rgw                 Ceph RGW daemon management                                                    # 管理RGW守护程序（RADOSGW,对象存储网关）
+    gatherkeys          Gather authentication keys for provisioning new nodes.                        # 从指定获取提供新节点的验证keys,这些keys会在添加新的MON/OSD/MDR 加入的时候使用
+    disk                Manage disks on a remote host.                                                # 管理远程主机磁盘
+    osd                 Prepare a data disk on remote host.                                           # 在远程主机准备数据盘，即将指定远程主机的指定磁盘添加到ceph集群作为osd使用
+    admin               Push configuration and client.admin key to a remote host.                     # 推送ceph集群配置文件和client.admin认证文件到远程主机
+    config              Copy ceph.conf to/from remote host(s)                                         # 将ceph.conf配置文件推送到远程主机或从远程主机拷贝
+    repo                Repo definition management                                                    # 远程主机仓库管理
+    purge               Remove Ceph packages from remote hosts and purge all data.                    # 删除远程主机的安装包和所有数据
+    purgedata           Purge (delete, destroy, discard, shred) any Ceph data from /var/lib/ceph      # 从/var/lib/ceph 删除ceph数据，会删除/etc/ceph 下的内容
+    uninstall           Remove Ceph packages from remote hosts.                                       # 从远端主机删除安装包
+    calamari            Install and configure Calamari nodes. Assumes that a repository with          # 安装并配置一个calamari web 节点，calamari是一个web监控平台
+                        Calamari packages is already configured. Refer to the docs for examples
+                        (http://ceph.com/ceph-deploy/docs/conf.html)
+    forgetkeys          Remove authentication keys from the local directory.                          # 从本地主机删除所有的验证keyring,包括client.admin,monitor,bootstrap等认证文件
+    pkg                 Manage packages on remote hosts.                                              # 管理远程主机的安装包
+
+See 'ceph-deploy <command> --help' for help on a specific command
+```
+
 > 3、部署节点,参数为monitor结点的主机名列表 
 ```
 # ceph-deploy new node01 node02 node03
