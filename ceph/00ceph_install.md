@@ -242,7 +242,7 @@ done
 
 #### 使用filestore
 
-9.1 使用filestore采用journal模式（每个节点数据盘需要两块盘或两个分区）
+使用filestore采用journal模式（每个节点数据盘需要两块盘或两个分区）
 
 创建OSD
 ```
@@ -251,7 +251,7 @@ done
 # ceph-deploy osd create --filestore --fs-type xfs --data /dev/sdc --journal data/log   storage3
 ```
 
-9.2 使用bluestore
+#### 使用bluestore
 
 创建OSD
 ```
