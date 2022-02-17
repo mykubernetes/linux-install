@@ -46,7 +46,17 @@ https://docs.amazonaws.cn/AmazonS3/latest/userguide/bucketnamingrules.html
 - 存储桶名称不能使用IP地址格式
 - Bucket名称必须全局唯一
 
+# 对象存储访问对比
 
+Amazon S3: 提供了user、bucket和object分别标识用户、存储桶和对象，其中bucket隶属于user,可以针对user设置不同bucket的名称空间的访问权限，而且不同用户允许访问相同的bucket
+
+OpenStack Swift: 提供了user、container和acount用于表示一个项目或租户（OpenStack用户），因此一个account中可以包含一到多个User,它们可共享使用同一组container，并为container提供名称空间
+
+RadosGW: 提供了user、subuser、bucket和object,其中user对应于S3的user,而subuser则对应于Swift的user,不过user和subuser都不支持为bucket提供名称空间，因此，不同用户的存储桶也不允许同名，不过自Jewel版本起，RadosGW引入了tenant(租户）用于为user和bucket提供名称空间，但它是个可选组件，RadosGW基于ACL为不同的用户设置不同的权限控制，如：
+- Read: 读权限
+- Write: 写权限
+- Readwrite: 读写权限
+- full-control: 全部控制权限
 
 
 
