@@ -49,6 +49,7 @@ default.rgw.control
 default.rgw.meta
 default.rgw.buckets.index
 default.rgw.buckets.data
+default.rgw.buckets.non-ec
 
 # ceph osd pool get default.rgw.buckets.data crush_rule
 crush_rule: replicated_rule            # 默认是副本池
@@ -62,6 +63,14 @@ pgp_num: 32                            # 默认的pgp数量
 # ceph osd pool get default.rgw.buckets.data pg_num
 pg_num: 32                             # 默认的pg数量
 ```
+- .rgw.root: 包含realm(领域信息)。比如zone和zonegroup。
+- default.rgw.log: 存储日志信息，用于记录各种log信息。
+- default.rgw.control: 系统控制池，在有数据更新时，通知其他RGW更新缓存。
+- default.rgw.meta: 元数据存储池，通过不同的名称空间分别存储不同的rados对象，这些名称空间包括用户UID及其bucket映射信息的名称空间users.uid、用户的密钥名称空间users.keys、用户的email名称空间users.email、用户的subuser的名称空间users.swift,以及bucket的名称空间root等。
+- default.rgw.buckets.index: 存放bucket到object的索引信息
+- default.rgw.buckets.data: 存放对象的数据
+- default.rgw.buckets.non-ec: 数据的额外信息存储池
+
 
 5、访问radosgw服务
 ```
