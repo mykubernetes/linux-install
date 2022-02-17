@@ -152,8 +152,8 @@ frontend  http_web *:8080
 backend rgw
     balance     roundrobin
     mode http
-    server node1 172.16.79.100:80 check
-    server node2 172.16.79.101:80 check
+    server node1 172.16.79.100:80 check inter 3s fall 3 rise 5
+    server node2 172.16.79.101:80 check inter 3s fall 3 rise 5
 ```
 
 # 修改客户端指向为集群 Vip 地址即可
