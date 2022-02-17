@@ -317,28 +317,28 @@ Refer to user manual for detailed description of all options.
 Access key and Secret key are your identifiers for Amazon S3. Leave them empty for using the env variables.
 Access Key: 6LO8046SQ3DVGVKS84LX                                 #创建用户的时候的access key
 Secret Key: iiVFHXC6qc4iTnKVcKDVJaOLeIpl39EbQ2OwueRV             #创建用户的secret key
-Default Region [US]: 
+Default Region [US]:                                             #region选项
 
 Use "s3.amazonaws.com" for S3 Endpoint and not modify it to the target Amazon S3.
-S3 Endpoint [s3.amazonaws.com]: rgw.test.net:9900
+S3 Endpoint [s3.amazonaws.com]: rgw.test.net:9900                #RGW域名
 
 Use "%(bucket)s.s3.amazonaws.com" to the target Amazon S3. "%(bucket)s" and "%(location)s" vars can be used
 if the target S3 system supports dns based buckets.
-DNS-style bucket+hostname:port template for accessing a bucket [%(bucket)s.s3.amazonaws.com]: rgw.test.net:9900/%(bucket)
+DNS-style bucket+hostname:port template for accessing a bucket [%(bucket)s.s3.amazonaws.com]: rgw.test.net:9900/%(bucket)           #bucket域名格式
 
 Encryption password is used to protect your files from reading
 by unauthorized persons while in transfer to S3
-Encryption password: 
+Encryption password:                                             #是否需要加密
 Path to GPG program [/usr/bin/gpg]: 
 
 When using secure HTTPS protocol all communication with Amazon S3
 servers is protected from 3rd party eavesdropping. This method is
 slower than plain HTTP, and can only be proxied with Python 2.7 or newer
-Use HTTPS protocol [Yes]: No
+Use HTTPS protocol [Yes]: No                                     #是否使用https
 
 On some networks all internet access must go through a HTTP proxy.
 Try setting it here if you can't connect to S3 directly
-HTTP Proxy server name: 
+HTTP Proxy server name:                                          #是否使用代理
 
 New settings:
   Access Key: 6LO8046SQ3DVGVKS84LX
@@ -352,14 +352,14 @@ New settings:
   HTTP Proxy server name: 
   HTTP Proxy server port: 0
 
-Test access with supplied credentials? [Y/n] Y
+Test access with supplied credentials? [Y/n] Y                   #是否进行测试验证
 Please wait, attempting to list all buckets...
 Success. Your access key and secret key worked fine :-)
 
 Now verifying that encryption works...
 Not configured. Never mind.
 
-Save settings? [y/N] y
+Save settings? [y/N] y                                           #是否保存
 Configuration saved to '/home/test/.s3cfg'
 ```
 
