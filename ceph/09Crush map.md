@@ -234,9 +234,9 @@ host node65 {
         id -3           # do not change unnecessarily
         id -4 class hdd         # do not change unnecessarily
         # weight 0.195
-        alg straw2                               # 指定bucket选择的时候使用的crush算法
-        hash 0  # rjenkins1                      # 指定hash的算法
-        item osd.0 weight 0.098
+        alg straw2                               # crush 算法，管理OSD角色
+        hash 0  # rjenkins1                      # 使用是哪个hash算法，0表示选择rjenkins1 这种hash算法
+        item osd.0 weight 0.098                  # osd0权重比例，crush会自动根据磁盘空间计算，不同的磁盘空间权重不一样
         item osd.2 weight 0.098
 }
 host node66 {
@@ -326,15 +326,28 @@ root piglet {
 
 ```
 # rules
-rule replicated_rule {                         # rule的名称
+rule replicated_rule {                         # 副本池的默认配置
         id 0                                   # rule ID
         type replicated                        # replicated代表适用于副本池，erasure代表适用于EC池
-        min_size 1                             # 副本数最小值
-        max_size 10                            # 副本数最大值
-        step take default                      # 选择一个root bucket，做下一步的输入
-        step chooseleaf firstn 0 type host     # 选择host级别到一个osd
-        step emit                              # 提交
+        min_size 1                             # 默认最小副本数
+        max_size 10                            # 默认最大副本数
+        step take default                      # 基于default定义的主机分配OSD
+        step chooseleaf firstn 0 type host     # 选择主机，故障域类型为主机
+        step emit                              # 弹出配置即返回给客户端
 }
+
+rule erasure-code {                            # 纠删码池的默认配置
+        id 1
+        type erasure
+        min_size 3
+        max_size 5
+        step set_chooseleaf_tries 5
+        step set_choose_tries 100
+        step take default
+        step chooseleaf indep 0 type host
+        step emit
+}
+
 rule pig-rep {
         id 1
         type replicated
@@ -344,6 +357,7 @@ rule pig-rep {
         step chooseleaf firstn 0 type rack
         step emit
 }
+
 rule my-ec3 {
         id 2
         type erasure
@@ -355,6 +369,7 @@ rule my-ec3 {
         step chooseleaf indep 0 type rack
         step emit
 }
+
 rule ssd_primary {
         ruleset 1
         type replicated
