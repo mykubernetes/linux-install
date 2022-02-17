@@ -1,4 +1,4 @@
-RadosGW对象存储简介
+# RadosGW对象存储简介
 
 RadosGW是对象存储（OSS,Object Storage Service)的一种实现方式，RADOS网关也成为Ceph对象网关、RadosGW、RGW，是一种服务，使客户端能够利用标准对象存储API来访问Ceph集群，它支持AWS S3和Swift API,在ceph 0.8 版本之后使用 Civetweb (https://github.com/civetweb/civetweb) 的web服务器来响应api请求，客户端使用http/https协议通过RESTful API与RGW通信，而RGW则通过librados与ceph集群通信，RGW客户端通过s3或者swift api使用RGW用户进行身份验证，然后RGW网关代表用户利用cephx与ceph存储进行身份验证。
 
