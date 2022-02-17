@@ -84,6 +84,8 @@ pg_num: 32                             # 默认的pg数量
 
 6、自定义端口
 
+https://docs.ceph.com/en/latest/radosgw/frontends/
+
 - radosgw 服务器（node01、node02）的配置文件要和deploy服务器的一致，可以ceph-deploy 服务器修改然后统一推送，或者单独修改每个 radosgw 服务器的配置为同一配置  
 ```
 # cat ceph.conf 
