@@ -209,17 +209,17 @@ device 8 osd.8 class hdd
 - 存储桶由物理位置（例如，行，机架，机箱，主机等）的分层聚合及其分配的权重组成。它们促进节点和叶子的层次结构，其中节点桶表示物理位置，叶片桶代表ceph-osd守护进程及其底层物理设备。
 ```
 # types                   # 树形下的多种类型
-type 0 osd                # osd守护进程，一般一个osd对应一个磁盘
-type 1 host               # 一个包含一个或多个osds的主机名，表示是一个主机。
-type 2 chassis            # 系列
-type 3 rack               # 一个包含一个或多个主机的计算机机柜
-type 4 row                # 第几排机柜
-type 5 pdu                # 
-type 6 pod                # 
-type 7 room               # 一个房间包含机柜和排，主机
-type 8 datacenter         # 一个数据中心包含多个房间
-type 9 region             # 一个区域包含多个数据中心
-type 10 root              # 根
+type 0 osd                # osd守护进程，对应到一个磁盘社保
+type 1 host               # 一个主机。
+type 2 chassis            # 刀片服务器机箱
+type 3 rack               # 包含若干个服务器的机柜/机架
+type 4 row                # 包含若干个机柜的一排机柜
+type 5 pdu                # 机柜的接入电源插座
+type 6 pod                # 一个机房中的若干个小机房
+type 7 room               # 包含这若干机柜的房间，一个数据中心有好多这样的房间组成
+type 8 datacenter         # 一个数据中心或IDS
+type 9 region             # 一个区域,比如AWS 宁夏中卫数据中心
+type 10 root              # bucket分层的最顶部，根
 ```
 
 通过以下方式获取集群的 Crush 简单的层次结构
