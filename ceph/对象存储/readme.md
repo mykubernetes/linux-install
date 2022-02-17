@@ -36,6 +36,15 @@ ceph使用bucket作为存储桶（存储空间），实现对象数据的存储�
 
 存储空间内部的对象数目没有限制。
 
+# bucket 命名规范
+
+https://docs.amazonaws.cn/AmazonS3/latest/userguide/bucketnamingrules.html
+
+- 只能包括小写字母，数字和短横线（-）
+- 必须以小写字母或者数字开头和结尾
+- 长度必须在3-63字节之间
+- 存储桶名称不能使用IP地址格式
+- Bucket名称必须全局唯一
 
 
 
