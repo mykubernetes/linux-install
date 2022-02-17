@@ -329,7 +329,7 @@ DNS-style bucket+hostname:port template for accessing a bucket [%(bucket)s.s3.am
 Encryption password is used to protect your files from reading
 by unauthorized persons while in transfer to S3
 Encryption password:                                             #是否需要加密
-Path to GPG program [/usr/bin/gpg]: 
+Path to GPG program [/usr/bin/gpg]:                              #gpg命令路径，用于认证管理
 
 When using secure HTTPS protocol all communication with Amazon S3
 servers is protected from 3rd party eavesdropping. This method is
@@ -340,7 +340,7 @@ On some networks all internet access must go through a HTTP proxy.
 Try setting it here if you can't connect to S3 directly
 HTTP Proxy server name:                                          #是否使用代理
 
-New settings:
+New settings:                                                    #最终配置
   Access Key: 6LO8046SQ3DVGVKS84LX
   Secret Key: iiVFHXC6qc4iTnKVcKDVJaOLeIpl39EbQ2OwueRV
   Default Region: US
@@ -352,15 +352,15 @@ New settings:
   HTTP Proxy server name: 
   HTTP Proxy server port: 0
 
-Test access with supplied credentials? [Y/n] Y                   #是否进行测试验证
+Test access with supplied credentials? [Y/n] Y                   #是否对最终配置进行测试验证
 Please wait, attempting to list all buckets...
 Success. Your access key and secret key worked fine :-)
 
 Now verifying that encryption works...
 Not configured. Never mind.
 
-Save settings? [y/N] y                                           #是否保存
-Configuration saved to '/home/test/.s3cfg'
+Save settings? [y/N] y                                           #是否保存以上配置
+Configuration saved to '/home/test/.s3cfg'                       #配置文件保存路径
 ```
 
 5、创建bucket验证权限
