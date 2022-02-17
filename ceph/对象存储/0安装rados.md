@@ -37,7 +37,33 @@ ceph        608      1  0 06:43 ?        00:00:27 /usr/bin/radosgw -f --cluster 
 # netstat -tnlupn |grep 7480
 ```
 
-4、访问radosgw服务
+4、radosgw存储池类型
+```
+# ceph osd pool ls
+device_health_metrics
+cephfs-metadata
+cephfs-data
+.rgw.root
+default.rgw.log
+default.rgw.control
+default.rgw.meta
+default.rgw.buckets.index
+default.rgw.buckets.data
+
+# ceph osd pool get default.rgw.buckets.data crush_rule
+crush_rule: replicated_rule            # 默认是副本池
+
+# ceph osd pool get default.rgw.buckets.data size
+size: 3                                # 默认的副本数
+
+# ceph osd pool get default.rgw.buckets.data pgp_num
+pgp_num: 32                            # 默认的pgp数量
+
+# ceph osd pool get default.rgw.buckets.data pg_num
+pg_num: 32                             # 默认的pg数量
+```
+
+5、访问radosgw服务
 ```
 # curl http://10.0.0.104:7480
 <?xml version="1.0" encoding="UTF-8"?><ListAllMyBucketsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Owner><ID>anonymous</ID><DisplayName></DisplayName></Owner><Buckets></Buckets></ListAllMyBucketsResult>
@@ -47,7 +73,7 @@ ceph        608      1  0 06:43 ?        00:00:27 /usr/bin/radosgw -f --cluster 
 ```
 - 浏览器访问： http://192.168.20.176:7480  
 
-5、自定义端口
+6、自定义端口
 
 - radosgw 服务器（node01、node02）的配置文件要和deploy服务器的一致，可以ceph-deploy 服务器修改然后统一推送，或者单独修改每个 radosgw 服务器的配置为同一配置  
 ```
