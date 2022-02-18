@@ -135,3 +135,6 @@ SSHPASS=12345 rsync --rsh='sshpass -e ssh -l test' host.example.com:path
 ```
 nohup sshpass -p 'passwd' rsync -avP --delete --exclude-from='/exclude.list' -e 'ssh -p 19222' root@192.168.57.178:/home/ /home &
 ```
+
+参考：
+- https://blog.csdn.net/weixin_43719988/article/details/120218846?spm=1001.2014.3001.5501
