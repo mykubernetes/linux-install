@@ -966,6 +966,7 @@ test@ceph-deploy:~/ceph-cluster$ ceph -s
 ```
 
 ### 4.2.4 验证 radosgw 存储池
+```
 #deploy节点
 test@ceph-deploy:~/ceph-cluster$ ceph osd pool ls
 device_health_metrics
