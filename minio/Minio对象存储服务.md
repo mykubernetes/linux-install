@@ -595,7 +595,7 @@ mc: <DEBUG> Response Time:  3.660869ms
 [2021-09-13 18:04:48 CST]     0B nide/
 ```
 
---json参数启用JSON格式的输出。
+`--json`参数启用JSON格式的输出。
 
 示例：列出minio的所有存储桶。
 ```
