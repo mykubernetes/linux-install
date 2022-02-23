@@ -105,18 +105,18 @@ Histogram（直方图）
 
 Histogram 在一段时间范围内对数据进行采样（通常是请求持续时间或响应大小等），并将其计入可配置的存储桶（bucket）中，后续可通过指定区间筛选样本，也可以统计样本总数，最后一般将数据展示为直方图。
 
-Histogram 类型的样本会提供三种指标（假设指标名称为 <basename>）：
+Histogram 类型的样本会提供三种指标（假设指标名称为 `<basename>`）：
 
-- 样本的值分布在 bucket 中的数量，命名为 <basename>_bucket{le="<上边界>"}。解释的更通俗易懂一点，这个值表示指标值小于等于上边界的所有样本数量。
+- 样本的值分布在 bucket 中的数量，命名为 `<basename>`_bucket{le="`<上边界>`"}。解释的更通俗易懂一点，这个值表示指标值小于等于上边界的所有样本数量。
 
 ```
-// 在总共2次请求当中。http 请求响应时间 <=0.005 秒 的请求次数为0
+// 在总共2次请求当中。http 请求响应时间 `<=0.005` 秒 的请求次数为0
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="0.005",} 0.0
 
-// 在总共2次请求当中。http 请求响应时间 <=0.01 秒 的请求次数为0
+// 在总共2次请求当中。http 请求响应时间 `<=0.01` 秒 的请求次数为0
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="0.01",} 0.0
 
-// 在总共2次请求当中。http 请求响应时间 <=0.025 秒 的请求次数为0
+// 在总共2次请求当中。http 请求响应时间 `<=0.025` 秒 的请求次数为0
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="0.025",} 0.0
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="0.05",} 0.0
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="0.075",} 0.0
@@ -129,7 +129,7 @@ io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="5.0",} 0.0
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="7.5",} 2.0
 
-// 在总共2次请求当中。http 请求响应时间 <=10 秒 的请求次数为 2
+// 在总共2次请求当中。http 请求响应时间 `<=10` 秒 的请求次数为 2
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="10.0",} 2.0
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="+Inf",} 2.0
 ```
@@ -157,7 +157,7 @@ bucket 可以理解为是对数据指标值域的一个划分，划分的依据�
 与 Histogram 类型类似，用于表示一段时间内的数据采样结果（通常是请求持续时间或响应大小等），但它直接存储了分位数（通过客户端计算，然后展示出来），而不是通过区间来计算。
 Summary 类型的样本也会提供三种指标（假设指标名称为 ）：
 
-- 样本值的分位数分布情况，命名为 <basename>{quantile="<φ>"}。
+- 样本值的分位数分布情况，命名为 <basename>{quantile="`<φ>`"}。
 
 ```
 // 含义：这 12 次 http 请求中有 50% 的请求响应时间是 3.052404983s
@@ -229,7 +229,6 @@ $ node_cpu_seconds_total{job=~".*",method="get"}  # 合法！
 - !=：选择不相等的字符串标签
 - =~：选择匹配正则表达式的标签（或子标签）
 - !=：选择不匹配正则表达式的标签（或子标签）
-
 
 PromQl的数据类型
 ---
@@ -767,3 +766,6 @@ $ curl 'http://localhost:9090/api/v1/query_range?query=up&start=2015-07-01T20:10
    }
 }
 ```
+  
+参考：
+- https://blog.csdn.net/yy756127197/category_9570378.html
