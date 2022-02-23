@@ -4,6 +4,7 @@
 | github | https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md |
 | 博客 | https://haicoder.net/elasticsearch/elasticsearch-tutorial.html |
 | 博客 | https://wiki.eryajf.net/pages/2351.html |
+| 博客 | https://blog.csdn.net/yy756127197/category_7360475.html?spm=1001.2014.3001.5482 |
 
 # 使用curl命令操作elasticsearch
 
