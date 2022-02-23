@@ -6,7 +6,7 @@
 | 博客 | https://blog.51cto.com/michaelkang/p_2 |
 | 博客 | http://zqhxuyuan.github.io/2015/10/15/Cassandra-Daily/#%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C |
 | 博客 | https://blog.csdn.net/Aria_Miazzy/article/details/107499636?spm=1001.2014.3001.5501 |
-
+| 博客 | https://blog.csdn.net/yy756127197/category_7360475.html?spm=1001.2014.3001.5482 |
 1、Cassandra概述
 
 > Cassandra是一套开源分布式NoSQL数据库系统。它最初由Facebook开发，用于储存收件箱等简单格式数据，集[Google](https://baike.baidu.com/item/Google)[BigTable](https://baike.baidu.com/item/BigTable)的数据模型与[Amazon](https://baike.baidu.com/item/Amazon) Dynamo的完全分布式的架构于一身Facebook于2008将 Cassandra 开源，此后，由于Cassandra良好的[可扩展性](https://baike.baidu.com/item/可扩展性/8669999)，被[Digg](https://baike.baidu.com/item/Digg)、[Twitter](https://baike.baidu.com/item/Twitter)等知名[Web 2.0](https://baike.baidu.com/item/Web 2.0)网站所采纳，成为了一种流行的分布式结构化数据存储方案。
