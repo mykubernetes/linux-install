@@ -6,6 +6,8 @@ github网址： https://github.com/minio/minio/blob/master/docs/zh_CN/distribute
 
 https://yuweidong.blog.csdn.net/article/details/82385101
 
+https://mp.weixin.qq.com/s?__biz=MzI2MTQzNjQ5Ng==&mid=2247491870&idx=2&sn=581f6405d4c9750b522a04417bf9a1ae&chksm=ea58c421dd2f4d377600470931c133c50c06d89b915698b7c3ba5ea7a78ad306483ba6692b46&mpshare=1&scene=24&srcid=121058N7KOS6kzbEN8zMNcrV&sharer_sharetime=1639101288703&sharer_shareid=130da8cc0333fa403f8f62c7873e0f92#rd
+
 kubernetes部署
 ```
 kubectl apply -f https://raw.githubusercontent.com/minio/minio-operator/master/minio-operator.yaml
