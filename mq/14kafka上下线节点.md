@@ -15,6 +15,16 @@
 } 
 ```
 
+可以添加多个topic
+```
+{
+ "topics": [
+ {"topic": "first"},{"topic": "senond"},
+ ],
+ "version": 1
+} 
+```
+
 （2）生成一个负载均衡的计划。
 ```
 # bin/kafka-reassign-partitions.sh --bootstrap-server hadoop102:9092 --topics-to-move-json-file topics-to-move.json --broker-list "0,1,2,3" --generate
