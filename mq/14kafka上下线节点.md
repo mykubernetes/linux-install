@@ -94,7 +94,7 @@ Clearing broker-level throttles on brokers 0,1,2,3
 Clearing topic-level throttles on topic first
 ```
 
-## 2）执行停止命令
+## 2、执行停止命令
 ```
 # bin/kafka-server-stop.sh
 ```
