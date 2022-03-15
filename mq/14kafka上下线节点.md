@@ -53,6 +53,7 @@ Proposed partition reassignment configuration
 Reassignment of partition first-0 is complete.
 Reassignment of partition first-1 is complete.
 Reassignment of partition first-2 is complete.
+
 Clearing broker-level throttles on brokers 0,1,2,3
 Clearing topic-level throttles on topic first
 ```
@@ -100,6 +101,7 @@ Status of partition reassignment:
 Reassignment of partition first-0 is complete.
 Reassignment of partition first-1 is complete.
 Reassignment of partition first-2 is complete.
+
 Clearing broker-level throttles on brokers 0,1,2,3
 Clearing topic-level throttles on topic first
 ```
