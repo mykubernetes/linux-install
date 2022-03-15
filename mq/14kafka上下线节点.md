@@ -39,7 +39,7 @@ Proposed partition reassignment configuration
 
 （5）验证副本存储计划。
 ```
-[atguigu@hadoop102 kafka]$ bin/kafka-reassign-partitions.sh --bootstrap-server hadoop102:9092 --reassignment-json-file increase-replication-factor.json --verify Status of partition reassignment:
+# bin/kafka-reassign-partitions.sh --bootstrap-server hadoop102:9092 --reassignment-json-file increase-replication-factor.json --verify Status of partition reassignment:
 Reassignment of partition first-0 is complete.
 Reassignment of partition first-1 is complete.
 Reassignment of partition first-2 is complete.
