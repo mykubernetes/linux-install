@@ -4,8 +4,11 @@ https://www.rabbitmq.com/
 配置文件地址  
 http://www.rabbitmq.com/configure.html#configuration-file
 
-常用命令
-===
+Rabbitmq API  
+https://rawcdn.githack.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_9/priv/www/api/index.html
+
+# 常用命令
+
 
 用户相关
 ---
