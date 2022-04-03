@@ -254,11 +254,13 @@ rabbitmq-server -detached
 ```
 节点rabbitmq2执行操作
 rabbitmqctl stop_app
+rabbitmqctl reset
 rabbitmqctl join_cluster rabbit@rabbitmq1
 rabbitmqctl start_app
 
 节点rabbitmq3执行操作
 rabbitmqctl stop_app
+rabbitmqctl reset
 rabbitmqctl join_cluster rabbit@rabbitmq1
 rabbitmqctl start_app
 
