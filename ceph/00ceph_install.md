@@ -301,6 +301,12 @@ done
 如果不使用快速和慢速设备的混合，则不需要为block.db（或block.wal）创建单独的逻辑卷。Bluestore将在空间内自动管理这些内容block。
 
 
+9.4 设置SOD服务自启动
+```
+systemctl enable ceph-osd@0 ceph-osd@1 ceph-osd@2
+systemctl enable ceph-osd@3 ceph-osd@4 ceph-osd@5
+systemctl enable ceph-osd@6 ceph-osd@7 ceph-osd@8
+```
 
 
 > 10、查看集群状态
