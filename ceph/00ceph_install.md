@@ -308,6 +308,51 @@ systemctl enable ceph-osd@3 ceph-osd@4 ceph-osd@5
 systemctl enable ceph-osd@6 ceph-osd@7 ceph-osd@8
 ```
 
+9.5 测试上传与下载数据
+```
+#创建pool
+ceph osd pool create zhang 16 16
+pool 'zhang' created
+
+#查看创建的pool
+ceph osd pool ls
+zhang
+
+
+#当前的 ceph 环境还没还没有部署使用块存储和文件系统使用 ceph，也没有使用对象存储的客户端，但是 ceph 的 rados 命令可以实现访问 ceph 对象存储的功能
+
+#上传文件
+sudo rados put log /var/log/messages --pool=zhang
+messages文件上传到 zhang 并指定对象 id 为 log
+
+#列出文件
+rados ls --pool=zhang
+log
+
+#文件信息查看
+#ceph osd map 命令可以获取到存储池中数据对象的具体位置信息
+ceph osd map zhang log
+osdmap e41 pool 'zhang' (1) object 'log' -> pg 1.27e9d53e (1.e) -> up ([4,2,8], p4) acting ([4,2,8], p4)
+表示文件放在了存储池为 1 的 27e9d53e 的 PG 上，在线的 OSD 编号 4,2,8，主 OSD 为 4，活动的 OSD 4,2,8，表示数据放在了 3 个副本，是 ceph 的 crush 算法计算出三份数据保存在哪些 OSD
+
+#下载文件
+sudo rados get log --pool=zhang /opt/1.txt
+tail /opt/1.txt
+Jun  4 11:01:01 centos7 systemd: Started Session 18 of user root.
+Jun  4 12:01:01 centos7 systemd: Started Session 19 of user root.
+Jun  4 13:01:01 centos7 systemd: Started Session 20 of user root.
+
+#修改文件
+sudo rados put log /etc/passwd --pool=zhang
+sudo rados get log --pool=zhang /opt/1.txt
+tail /opt/1.txt
+polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+
+#删除文件
+sudo rados rm log --pool=zhang
+rados ls --pool=zhang
+```
+
 
 > 10、查看集群状态
 ```
