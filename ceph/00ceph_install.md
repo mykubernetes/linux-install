@@ -253,12 +253,44 @@ done
 
 #### 使用bluestore
 
+```
+# 单块磁盘
+  > 机械硬盘或者SSD
+    > block: rocks DB数据即元数据
+    > block-wal: 数据库的wal日志
+    > data: 即ceph保存的对象数据
+
+# 两块磁盘
+  > SSD:
+    > block: rocks DB数据即元数据
+    > block-wal: 数据库的wal日志
+  > 机械硬盘
+    > data: 即ceph保存的对象数据
+
+# 多块磁盘
+  > NVME:
+    > block: rocks DB数据即元数据
+  > SSD:
+    > block-wal: 数据库的wal日志
+  > 机械硬盘
+    > data: 即ceph保存的对象数据
+
+# ceph-deploy osd create {node} --data /path/to/data --block-db /path/to/db-device
+# ceph-deploy osd create {node} --data /path/to/data --block-wal /path/to/wal-device
+# ceph-deploy osd create {node} --data /path/to/data --block-db /path/to/db-device --block-wal /path/to/wal-device
+```
+
 创建OSD
 ```
 # ceph-deploy osd create --bluestore storage1 --data /dev/sdc --block-db cache/db-lv-0 --block-wal cache/wal-lv-0
 # ceph-deploy osd create --bluestore storage2 --data /dev/sdc --block-db cache/db-lv-0 --block-wal cache/wal-lv-0
 # ceph-deploy osd create --bluestore storage3 --data /dev/sdc --block-db cache/db-lv-0 --block-wal cache/wal-lv-0
 ```
+- --data: ceph保存的对象数据
+- --block-db: rocks DB 数据即元数据
+- --block-wal: 数据库的wal日志
+
+
 
 9.3 wal & db 的大小问题
 
