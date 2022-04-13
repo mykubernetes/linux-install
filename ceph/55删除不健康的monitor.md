@@ -44,7 +44,13 @@ ceph -c {config_file} osd pool set {pool_name} min_size 2
 - --extract-monmap 将mon的map输出到指定目录
 - --inject-monmap 将导出的mon_map写入到本地的monmap中
 
+查看mon_data的数据目录位置
+```
+ceph daemon {mon_name} config get mon_data
+```
+
 
 参考：
 - https://blog.csdn.net/wuxianweizai/article/details/78925479
 - https://blog.csdn.net/wuxianweizai/article/details/79689437?spm=1001.2014.3001.5502
+- https://www.cnblogs.com/blogzjt/p/11985498.html
