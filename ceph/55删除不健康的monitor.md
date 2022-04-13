@@ -1,5 +1,6 @@
 # 从不健康的集群中删除故障的mon
 
+2台mon节点宕机情况下的故障解决办法，并且包含osd节点，恢复过程
 ```
 # 1、停止当前节点的mon
 pkill ceph-mon
@@ -26,7 +27,16 @@ monmaptool --print {mappath}
 ceph-mon -c {config_file} -i {mon-id} --mon_data {mon_datapath} -inject-monmap {monpath}
 
 # 9、启动当前节点的mon服务器
-ceph-mon -c {config_file} -i {mon-id} --mon_data {mon_datapath} 
+ceph-mon -c {config_file} -i {mon-id} --mon_data {mon_datapath}
+
+# 10、查看集群是否运行正常
+ceph -c {config_file} -s
+
+# 11、阻止数据迁移
+ceph -c {config_file} osd set noout
+
+# 12、设置最小副本数
+ceph -c {config_file} osd pool set {pool_name} min_size 2
 ```
 - -c ceph使用的配置文件
 - -i mon名
