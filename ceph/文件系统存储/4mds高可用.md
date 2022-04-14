@@ -6,10 +6,10 @@ Ceph mds(etadata service)作为 ceph 的访问入口，需要实现高性能及�
 
 设置每个 Rank 的备份 MDS，也就是如果此 Rank 当前的 MDS 出现问题马上切换到另个 MDS。 设置备份的方法有很多，常用选项如下。
 ```
-mds_standby_replay #值为 true 或 false，true 表示开启 replay 模式，这种模式下主 MDS 内的数量将实时与从 MDS 同步，如果主宕机，从可以快速的切换。如果为 false 只有宕机的时候才去同步数据，这样会有一段时间的中断。
-mds_standby_for_name #设置当前 MDS 进程只用于备份于指定名称的 MDS。
-mds_standby_for_rank #设置当前 MDS 进程只用于备份于哪个 Rank，通常为 Rank 编号。另外在存在之个 CephFS 文件系统中，还可以使用 mds_standby_for_fscid 参数来为指定不同的文件系统。
-mds_standby_for_fscid #指定 CephFS 文件系统 ID，需要联合 mds_standby_for_rank 生效，如果设置 mds_standby_for_rank，那么就是用于指定文件系统的指定 Rank，如果没有设置，就是指定文件系统的所有 Rank。
+mds_standby_replay       #值为 true 或 false，true 表示开启 replay 模式，这种模式下主 MDS 内的数量将实时与从 MDS 同步，如果主宕机，从可以快速的切换。如果为 false 只有宕机的时候才去同步数据，这样会有一段时间的中断。
+mds_standby_for_name     #设置当前 MDS 进程只用于备份于指定名称的 MDS。
+mds_standby_for_rank     #设置当前 MDS 进程只用于备份于哪个 Rank，通常为 Rank 编号。另外在存在之个 CephFS 文件系统中，还可以使用 mds_standby_for_fscid 参数来为指定不同的文件系统。
+mds_standby_for_fscid    #指定 CephFS 文件系统 ID，需要联合 mds_standby_for_rank 生效，如果设置 mds_standby_for_rank，那么就是用于指定文件系统的指定 Rank，如果没有设置，就是指定文件系统的所有 Rank。
 ```
 
 ## 1 当前mds服务器状态
