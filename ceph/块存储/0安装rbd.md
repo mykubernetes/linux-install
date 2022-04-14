@@ -722,15 +722,15 @@ data-img2  8 GiB            2
 | rbd feature enable rbd/test layering | 启动快照 |
 | rbd feature disable rbd/test layering | 禁用快照 |
 | rbd snap create rbd/rbd1@snap1 | 创建快照 |
-| rbd snap ls rbd/rbd1 | 列出快照 |
-| rbd snap limit set --limit 1 | 限制快照数量 |
-| rbd snap limit clear rbd/rbd1 | 移除限制 |
+| rbd snap list rbd/rbd1 (或者rdb snap ls) | 列出快照 |
+| rbd snap limit set --limit 1 | 设置一个镜像的快照上限 |
+| rbd snap limit clear rbd/rbd1 | 清除镜像的快照数量限制 |
 | rbd snap rename rbd/rbd1@snap1 rbd/rbd1@snap2 | 重命名快照 |
-| rbd snap rm rbd/rbd1@snap1 | 删除快照 |
-| rbd snap purge rbd/rbd1 | 清除所有快照 |
+| rbd snap remove rbd/rbd1@snap1 （或者rbd snap rm） | 删除一个快照 |
+| rbd snap purge rbd/rbd1 | 删除所有未保护的快照 |
 | rbd snap rollback rbd/rbd1 | 还原快照 |
-| rbd snap protect rbd/rbd1@snap1 | 保护快照 |
-| rbd snap unprotect rbd/rbd1@snap1 | 取消保护 |
+| rbd snap protect rbd/rbd1@snap1 | 保护快照，不被删除 |
+| rbd snap unprotect rbd/rbd1@snap1 | 允许一个快照被删除(取消快照保护) |
 
 1、创建一个测试文件到挂载目录
 ```
