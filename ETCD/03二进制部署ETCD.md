@@ -166,24 +166,25 @@ Documentation=https://github.com/coreos
   
 [Service]  
 Type=notify  
-WorkingDirectory=/var/lib/etcd  
-ExecStart=/usr/local/bin/etcd \  
+WorkingDirectory=/var/lib/etcd                   # 数据保存目录
+ExecStart=/usr/local/bin/etcd \                  # 二进制文件路径
 --data-dir=/var/lib/etcd \  
---name=master1 \  
+--name=master1 \                                 # 当前node 名称
 --cert-file=/etc/etcd/pki/server.pem \  
 --key-file=/etc/etcd/pki/server-key.pem \  
 --trusted-ca-file=/etc/etcd/pki/ca.pem \  
 --peer-cert-file=/etc/etcd/pki/peer.pem \  
 --peer-key-file=/etc/etcd/pki/peer-key.pem \  
 --peer-trusted-ca-file=/etc/etcd/pki/ca.pem \  
---listen-peer-urls=https://192.168.255.131:2380 \  
---initial-advertise-peer-urls=https://192.168.255.131:2380 \  
---listen-client-urls=https://192.168.255.131:2379,http://127.0.0.1:2379 \  
---advertise-client-urls=https://192.168.255.131:2379 \  
---initial-cluster-token=etcd-cluster-0 \  
---initial-cluster=master1=https://192.168.255.131:2380,master2=https://192.168.255.132:2380,master3=https://192.168.255.133:2380 \  
---initial-cluster-state=new \  
+--listen-peer-urls=https://192.168.255.131:2380 \                      # 通告自己的集群端口
+--initial-advertise-peer-urls=https://192.168.255.131:2380 \           # 集群之间通讯端口
+--listen-client-urls=https://192.168.255.131:2379,http://127.0.0.1:2379 \              # 客户端访问地址
+--advertise-client-urls=https://192.168.255.131:2379 \                 # 通告自己的客户端端口
+--initial-cluster-token=etcd-cluster-0 \                               # 创建集群使用的token,一个集群内的节点保持一致
+--initial-cluster=master1=https://192.168.255.131:2380,master2=https://192.168.255.132:2380,master3=https://192.168.255.133:2380 \       #集群所有的节点信息
+--initial-cluster-state=new \                     # 新建集群的时候值为new，如果是已经存在的集群为existing
 --heartbeat-interval=250 \  
+--data-dir=/var/lib/etcd \                        # 数据目录路径
 --election-timeout=2000  
 Restart=on-failure  
 RestartSec=5  
