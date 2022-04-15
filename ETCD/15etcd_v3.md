@@ -385,3 +385,150 @@ root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl del  /name
 1
 root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl get  /name
 ```
+
+# 八、etcd数据备份与还原
+
+## 8.1 wal介绍
+
+wal是write ahead log的缩写，顾名思义，也就是在执行真正的写操作之前先写一个日志，预写日志。
+
+wal:存放预写式日志，最大的作用是记录了整个数据变化的全部历程。在etcd中,所有数据的修改在提交前，都要先写入wal中。
+
+## 8.2 etcd 数据备份
+
+8.2.1 查看etcd版本信息
+```
+root@k8s-etcd-01:~# etcdctl version
+etcdctl version: 3.5.0
+API version: 3.5
+```
+
+8.2.2 查看etcd v3版本备份帮助
+```
+root@k8s-etcd-01:~# etcdctl snapshot save --help
+NAME:
+	snapshot save - Stores an etcd node backend snapshot to a given file
+
+USAGE:
+	etcdctl snapshot save <filename> [flags]
+
+OPTIONS:
+  -h, --help[=false]	help for save
+
+GLOBAL OPTIONS:
+      --cacert=""				verify certificates of TLS-enabled secure servers using this CA bundle
+      --cert=""					identify secure client using this TLS certificate file
+      --command-timeout=5s			timeout for short running command (excluding dial timeout)
+      --debug[=false]				enable client-side debug logging
+      --dial-timeout=2s				dial timeout for client connections
+  -d, --discovery-srv=""			domain name to query for SRV records describing cluster endpoints
+      --discovery-srv-name=""			service name to query when using DNS discovery
+      --endpoints=[127.0.0.1:2379]		gRPC endpoints
+      --hex[=false]				print byte strings as hex encoded strings
+      --insecure-discovery[=true]		accept insecure SRV records describing cluster endpoints
+      --insecure-skip-tls-verify[=false]	skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
+      --insecure-transport[=true]		disable transport security for client connections
+      --keepalive-time=2s			keepalive time for client connections
+      --keepalive-timeout=6s			keepalive timeout for client connections
+      --key=""					identify secure client using this TLS key file
+      --password=""				password for authentication (if this option is used, --user option shouldn't include password)
+      --user=""					username[:password] for authentication (prompt if password is not supplied)
+  -w, --write-out="simple"			set the output format (fields, json, protobuf, simple, table)
+```
+
+8.2.3 etcd v3版本数据手动备份
+```
+root@k8s-etcd-01:~# etcdctl snapshot save snapshot.db
+{"level":"info","ts":1636787145.641446,"caller":"snapshot/v3_snapshot.go:68","msg":"created temporary db file","path":"snapshot.db.part"}
+{"level":"info","ts":1636787145.6563053,"logger":"client","caller":"v3/maintenance.go:211","msg":"opened snapshot stream; downloading"}
+{"level":"info","ts":1636787145.6563435,"caller":"snapshot/v3_snapshot.go:76","msg":"fetching snapshot","endpoint":"127.0.0.1:2379"}
+{"level":"info","ts":1636787145.6818144,"logger":"client","caller":"v3/maintenance.go:219","msg":"completed snapshot read; closing"}
+{"level":"info","ts":1636787145.7401688,"caller":"snapshot/v3_snapshot.go:91","msg":"fetched snapshot","endpoint":"127.0.0.1:2379","size":"3.9 MB","took":"now"}
+{"level":"info","ts":1636787145.7402475,"caller":"snapshot/v3_snapshot.go:100","msg":"saved","path":"snapshot.db"}
+Snapshot saved at snapshot.db
+```
+
+8.2.4 etcd v3版本查看备份文件
+```
+root@k8s-etcd-01:~# etcdctl snapshot status snapshot.db
+4a52e822, 79010, 2343, 19 MB
+```
+
+8.2.5 etcd v3版本数据自动备份
+```
+#!/bin/bash
+
+source /etc/profile
+DATE=`date +%Y-%m-%d_%H_%M_%S`
+ETCDCTL_API=3 /usr/bin/etcdctl snaphost save /data/etcd-backup-dri/etcd-snapshot-${DATE}.db
+```
+
+## 8.3 etcd v3版本数据恢复
+
+8.3.1 etcd v3版本数据恢复帮助
+```
+root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl  snapshot restore --help
+NAME:
+	snapshot restore - Restores an etcd member snapshot to an etcd directory
+
+USAGE:
+	etcdctl snapshot restore <filename> [options] [flags]
+
+DESCRIPTION:
+	Moved to `etcdctl snapshot restore ...`
+
+OPTIONS:
+      --data-dir=""						Path to the data directory
+  -h, --help[=false]						help for restore
+      --initial-advertise-peer-urls="http://localhost:2380"	List of this member's peer URLs to advertise to the rest of the cluster
+      --initial-cluster="default=http://localhost:2380"		Initial cluster configuration for restore bootstrap
+      --initial-cluster-token="etcd-cluster"			Initial cluster token for the etcd cluster during restore bootstrap
+      --name="default"						Human-readable name for this member
+      --skip-hash-check[=false]					Ignore snapshot integrity hash value (required if copied from data directory)
+      --wal-dir=""						Path to the WAL directory (use --data-dir if none given)
+
+GLOBAL OPTIONS:
+      --cacert=""				verify certificates of TLS-enabled secure servers using this CA bundle
+      --cert=""					identify secure client using this TLS certificate file
+      --command-timeout=5s			timeout for short running command (excluding dial timeout)
+      --debug[=false]				enable client-side debug logging
+      --dial-timeout=2s				dial timeout for client connections
+  -d, --discovery-srv=""			domain name to query for SRV records describing cluster endpoints
+      --discovery-srv-name=""			service name to query when using DNS discovery
+      --endpoints=[127.0.0.1:2379]		gRPC endpoints
+      --hex[=false]				print byte strings as hex encoded strings
+      --insecure-discovery[=true]		accept insecure SRV records describing cluster endpoints
+      --insecure-skip-tls-verify[=false]	skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
+      --insecure-transport[=true]		disable transport security for client connections
+      --keepalive-time=2s			keepalive time for client connections
+      --keepalive-timeout=6s			keepalive timeout for client connections
+      --key=""					identify secure client using this TLS key file
+      --password=""				password for authentication (if this option is used, --user option shouldn't include password)
+      --user=""					username[:password] for authentication (prompt if password is not supplied)
+  -w, --write-out="simple"			set the output format (fields, json, protobuf, simple, table)
+```
+
+8.3.2 停止etcd服务
+```
+root@k8s-etcd-01:~# systemctl stop etcd
+```
+
+8.3.3 删除etcd存储数据目录
+```
+root@k8s-etcd-01:~# ls -l /var/lib/etcd/
+total 4
+drwx------ 4 root root 4096 Nov 13 14:42 member
+
+root@k8s-etcd-01:~# rm -rf /var/lib/etcd
+```
+
+8.3.4 etcd v3版本数据恢复
+```
+root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl  snapshot restore snapshot.db --data-dir=/var/lib/etcd
+Deprecated: Use `etcdutl snapshot restore` instead.
+
+2021-11-13T15:19:07+08:00	info	snapshot/v3_snapshot.go:251	restoring snapshot	{"path": "snapshot.db", "wal-dir": "/var/lib/etcd/member/wal", "data-dir": "/var/lib/etcd", "snap-dir": "/var/lib/etcd/member/snap", "stack": "go.etcd.io/etcd/etcdutl/v3/snapshot.(*v3Manager).Restore\n\t/tmp/etcd-release-3.5.0/etcd/release/etcd/etcdutl/snapshot/v3_snapshot.go:257\ngo.etcd.io/etcd/etcdutl/v3/etcdutl.SnapshotRestoreCommandFunc\n\t/tmp/etcd-release-3.5.0/etcd/release/etcd/etcdutl/etcdutl/snapshot_command.go:147\ngo.etcd.io/etcd/etcdctl/v3/ctlv3/command.snapshotRestoreCommandFunc\n\t/tmp/etcd-release-3.5.0/etcd/release/etcd/etcdctl/ctlv3/command/snapshot_command.go:128\ngithub.com/spf13/cobra.(*Command).execute\n\t/home/remote/sbatsche/.gvm/pkgsets/go1.16.3/global/pkg/mod/github.com/spf13/cobra@v1.1.3/command.go:856\ngithub.com/spf13/cobra.(*Command).ExecuteC\n\t/home/remote/sbatsche/.gvm/pkgsets/go1.16.3/global/pkg/mod/github.com/spf13/cobra@v1.1.3/command.go:960\ngithub.com/spf13/cobra.(*Command).Execute\n\t/home/remote/sbatsche/.gvm/pkgsets/go1.16.3/global/pkg/mod/github.com/spf13/cobra@v1.1.3/command.go:897\ngo.etcd.io/etcd/etcdctl/v3/ctlv3.Start\n\t/tmp/etcd-release-3.5.0/etcd/release/etcd/etcdctl/ctlv3/ctl.go:107\ngo.etcd.io/etcd/etcdctl/v3/ctlv3.MustStart\n\t/tmp/etcd-release-3.5.0/etcd/release/etcd/etcdctl/ctlv3/ctl.go:111\nmain.main\n\t/tmp/etcd-release-3.5.0/etcd/release/etcd/etcdctl/main.go:59\nruntime.main\n\t/home/remote/sbatsche/.gvm/gos/go1.16.3/src/runtime/proc.go:225"}
+2021-11-13T15:19:07+08:00	info	membership/store.go:119	Trimming membership information from the backend...
+2021-11-13T15:19:07+08:00	info	membership/cluster.go:393	added member	{"cluster-id": "cdf818194e3a8c32", "local-member-id": "0", "added-peer-id": "8e9e05c52164694d", "added-peer-peer-urls": ["http://localhost:2380"]}
+2021-11-13T15:19:07+08:00	info	snapshot/v3_snapshot.go:272	restored snapshot	{"path": "snapshot.db", "wal-dir": "/var/lib/etcd/member/wal", "data-dir": "/var/lib/etcd", "snap-dir": "/var/lib/etcd/member/snap"}
+```
