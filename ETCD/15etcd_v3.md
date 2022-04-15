@@ -353,3 +353,35 @@ PUT
 /name/wgs
 wgs-03
 ```
+
+
+# 七、etcd增删改查
+
+1、添加数据
+```
+root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl put /name "wgs"
+OK
+```
+
+2、查询数据
+```
+root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl get  /name 
+/name
+wgs
+```
+
+3、修改数据
+```
+root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl put  /name "wgs_update"
+OK
+root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl get  /name 
+/name
+wgs_update
+```
+
+4、删除数据
+```
+root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl del  /name 
+1
+root@k8s-etcd-01:~# ETCDCTL_API=3 etcdctl get  /name
+```
