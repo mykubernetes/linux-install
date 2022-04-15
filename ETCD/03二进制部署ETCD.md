@@ -168,7 +168,7 @@ Documentation=https://github.com/coreos
 Type=notify  
 WorkingDirectory=/var/lib/etcd                   # 数据保存目录
 ExecStart=/usr/local/bin/etcd \                  # 二进制文件路径
---data-dir=/var/lib/etcd \  
+--data-dir=/var/lib/etcd \                       # 数据目录路径
 --name=master1 \                                 # 当前node 名称
 --cert-file=/etc/etcd/pki/server.pem \  
 --key-file=/etc/etcd/pki/server-key.pem \  
@@ -184,7 +184,6 @@ ExecStart=/usr/local/bin/etcd \                  # 二进制文件路径
 --initial-cluster=master1=https://192.168.255.131:2380,master2=https://192.168.255.132:2380,master3=https://192.168.255.133:2380 \       #集群所有的节点信息
 --initial-cluster-state=new \                     # 新建集群的时候值为new，如果是已经存在的集群为existing
 --heartbeat-interval=250 \  
---data-dir=/var/lib/etcd \                        # 数据目录路径
 --election-timeout=2000  
 Restart=on-failure  
 RestartSec=5  
