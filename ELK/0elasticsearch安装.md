@@ -2,6 +2,8 @@ ELK
 ====
 官网：https://www.elastic.co/cn/  
 
+Elasticsearch 和Logstash JAVA 版本支持:https://www.elastic.co/cn/support/matrix#matrix_jvm
+
 | ES | 关系型数据库（比如Mysql） |
 | :------: | :--------: |
 | Index | Database |
