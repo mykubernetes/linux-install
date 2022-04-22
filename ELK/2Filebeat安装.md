@@ -62,6 +62,11 @@ output.kafka:
   compression: gzip
   max_message_bytes: 10000000
 logging.level: debug
+
+# 发送到文件一般只测试使用
+output.file
+  path: "/tmp/"
+  filename: "test-filebeat.log"
 ```  
 
 3、启动filebeat  
