@@ -55,7 +55,7 @@ output.kafka:
   hosts: ["172.16.213.51:9092", "172.16.213.75:9092", "172.16.213.109:9092"]
   version: "0.10"
   topic: '%{[fields][log_topic]}'
-  partition.round_robin:
+  partition.round_robin:                   #优化参数，如果kafka节点宕机的情况下，只写到能够连接的服务器（true只写入可达的，falses所有节点都需要写入）
     reachable_only: true
   worker: 2
   required_acks: 1
