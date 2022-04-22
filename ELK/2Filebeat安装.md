@@ -54,13 +54,13 @@ output.kafka:
   enabled: true
   hosts: ["172.16.213.51:9092", "172.16.213.75:9092", "172.16.213.109:9092"]
   version: "0.10"
-  topic: '%{[fields][log_topic]}'
+  topic: '%{[fields][log_topic]}'          #直接写topic名即可，可不使用变量
   partition.round_robin:                   #优化参数，如果kafka节点宕机的情况下，只写到能够连接的服务器（true只写入可达的，falses所有节点都需要写入）
     reachable_only: true
   worker: 2
-  required_acks: 1
-  compression: gzip
-  max_message_bytes: 10000000
+  required_acks: 1                         #是否要求kafka数据写入完成后返回ack确认，代表消息写入完成
+  compression: gzip                        #是否压缩
+  max_message_bytes: 10000000              #一个消息最大的字节数
 logging.level: debug
 
 # 发送到文件一般只测试使用
