@@ -22,6 +22,8 @@ filebeat.prospectors:
     - /var/log/*.log
   exclude_lines: ["^DBG","^$"]              #不收集的行                       
   document_type: system-log-node01          #和elasticsearch一样打标签
+# fields:                                   #和elasticsearch一样打标签,7版本
+#   project: system-log-node01 
 
 # 收集tomat日志
 - input_type: log
