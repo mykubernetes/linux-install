@@ -410,19 +410,19 @@ node_filesystem_avail_bytes{} / node_filesystem_size_bytes{} * 100
 ---
 通过使用聚合操作符，我们可以获取一个即时向量并聚合它的元素，从而得到一个新的即时向量，通常包含更少的元素。像这样的即时向量的每次聚合都以我们在垂直聚合中描述的方式工作.
 
-|操作符   |描述   | 必须|
-| ------------ | ------------ | -----------|
-|sum   |元素的和   |
-|min   |选择最小的元素   |
-|max   |选择最大的元素   |
-|avg   |计算元素的平均值   |
-|stddev |计算元素的标准差   |
-|stdvar   |计算元素的标准方差   |
-|count   |计算元素的数量   |
-|count_values   |计算具有相同值的元素的数目   |
-|bottomk   |k以下的元素   |请求使用一个(K)作为标尺|
-|topk   |k以上的元素   |请求使用一个(K)作为标尺 |
-|quantile   |计算元素的分位数   |Requires the quantile (0 ≤ φ ≤ 1) definition as a scalar |
+| 操作符 | 描述 | 必须 |
+| ------ | ----| -----|
+| sum | 求和和 |
+| min | 最小值 |
+| max | 最大值 |
+| avg | 平均值 |
+| stddev | 标准差 |
+| stdvar | 标准差异 |
+| count | 计数 |
+| count_values | 对value进行计数 |
+|bottomk | 样本值最小的k个元素 | 请求使用一个(K)作为标尺|
+|topk | 样本值最大的 k个元素 | 请求使用一个(K)作为标尺 |
+|quantile | 分布统计 |Requires the quantile (0 ≤ φ ≤ 1) definition as a scalar |
 
 ```
 1、使用以下查询的样本数据
