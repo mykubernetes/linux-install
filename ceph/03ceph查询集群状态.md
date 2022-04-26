@@ -83,17 +83,23 @@ POOLS:
 
 | 集群标志 | 集群标志描述 |
 |---------|-------------|
+| nearfull | 磁盘快满了 |
+| full | 标记集群已满，将拒绝任何数据写入，但可读 |
+| paused | 暂停所有读 |
+| pausewr | 暂停所有读写 |
+| pauserec | 暂停恢复 |
 | noup | OSD启动时，会将自己在MON上标识为UP状态，设置该标志位，则OSD不会被自动标识为up状态 |
 | nodown | OSD停止时，MON会将OSD标识为down状态，设置该标志位，则MON不会将停止的OSD标识为down状态，设置noup和nodown可以防止网络抖动 |
 | noout | 设置该标志位，则mon不会从crush映射中删除任何OSD。对OSD作维护时，可设置该标志位，以防止CRUSH在OSD停止时自动重平衡数据。OSD重新启动时，需要清除该flag |
 | noin | 设置该标志位，可以防止数据被自动分配到OSD上 |
-| norecover | 设置该flag，禁止任何集群恢复操作。在执行维护和停机时，可设置该flag |
-| nobackfill | 禁止数据回填 |
-| noscrub | 禁止清理操作。清理PG会在短期内影响OSD的操作。在低带宽集群中，清理期间如果OSD的速度过慢，则会被标记为down。可以该标记来防止这种情况发生 |
-| nodeep-scrub | 禁止深度清理 |
-| norebalance | 禁止重平衡数据。在执行集群维护或者停机时，可以使用该flag |
-| pause | 设置该标志位，则集群停止读写，但不影响osd自检 |
-| full | 标记集群已满，将拒绝任何数据写入，但可读 |
+| nobackfill | 禁止OSD进行数据回填 |
+| norebalance | 禁止OSD回填，除非pg降级 |
+| norecover | 禁止OSD恢复和回填 |
+| noscrub | 设置OSD不进行数据清洗。清洗PG会在短期内影响OSD的操作。在低带宽集群中，清理期间如果OSD的速度过慢，则会被标记为down。可以该标记来防止这种情况发生 |
+| nodeep-scrub | 设置OSD不进行数据的深度清洗 |
+| notieragent | 禁止tiering agent |
+| sortbitwise | 使用hobject_t按位排序 |
+| require_jewel_osds | 这个标记从J版开始有，标志当前OSD的版本，升级的时候有用 |
 
 # 集群标志操作
 
