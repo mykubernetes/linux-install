@@ -54,3 +54,4 @@ ceph daemon {mon_name} config get mon_data
 - https://blog.csdn.net/wuxianweizai/article/details/78925479
 - https://blog.csdn.net/wuxianweizai/article/details/79689437?spm=1001.2014.3001.5502
 - https://www.cnblogs.com/blogzjt/p/11985498.html
+- https://www.bookstack.cn/read/zxj_ceph/monmap-troubleshooting
