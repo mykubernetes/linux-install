@@ -1065,8 +1065,17 @@ ceph-mon -i <id> --inject-monmap ./monmap
 - leader monitor发现OSD故障时，它会更新map，递增epoch，并使用Paxos更新协议来通知其他monitor，同时撤销租约，并发布新的租约，以使monitor以分发最新的OSD map
 
 ## 3.2 管理 osd map
+
+- osd上pg的分布决定了数据分布的均匀与否，所以能直观的看到pg到osd的上分布是很有必要
+
 ```
-# 将osd map导出为一个二进制文件
+# ceph pg ls-by-osd.{osd_id}
+# for i in `ceph osd  ls`; do ceph pg ls-by-osd osd.$i |awk '{print $1}' >> /tmp/aaa ;done       #NOTE: 每次osd输出，第一行有一个pg_stat,需要去掉之后，就可以获取pg总数是ceph -s中 pg个数*副本数
+```
+
+
+```
+# 获取map
 #  ceph osd getmap -o ./osdmap
 got osdmap epoch 281
 
@@ -1115,13 +1124,39 @@ osd.7 up   in  weight 1 up_from 187 up_thru 266 down_at 184 last_clean_interval 
 osd.8 up   in  weight 1 up_from 151 up_thru 265 down_at 145 last_clean_interval [54,150) 172.25.250.12:6800/59200 172.25.250.12:6801/7059200 172.25.250.12:6802/7059200 172.25.250.12:6805/7059200 exists,up bb73edf8-ca97-40c3-a727-d5fde1a9d1d9
 
 
-
-# 从 OSD 图提取出 CRUSH 图并写入 mapfile
-# osdmaptool --export-crush crushbinfile binfile
-
-# 从 mapfile 载入 CRUSH 图并把它嵌入 OSD 图
-# osdmaptool --import-crush crushbinfile binfile
+获取crushmap
+# osdmaptool osdmap --export-crush crushmap                        # 或者 ceph osd getcrushmap -o crushmap　
+osdmaptool: osdmap file 'osdmap'
+osdmaptool: exported crush map to crushmap
 
 
-osdmaptool --test-map-pg pgid binfile
+获取某个pool在pg上的分布情况
+# osdmaptool osdmap --import-crush crushmap --test-map-pgs --pool {pool_id}
+
+# osdmaptool osdmap --import-crush crushmap --test-map-pgs --pool 16
+osdmaptool: osdmap file 'osdmap'
+osdmaptool: imported 864 byte crush map from crushmap
+pool 16 pg_num 32
+#osd    count    first    primary    c wt    wt
+osd.1    14    4    4    0.149994    1
+osd.2    5    1    1    0.149994    1
+osd.3    7    4    4    0.149994    1
+osd.4    6    1    1    0.149994    1
+osd.5    6    3    3    0.149994    1
+osd.6    5    3    3    0.149994    1
+osd.7    9    8    8    0.149994    1
+osd.8    6    4    4    0.149994    1
+osd.9    6    4    4    0.149994    1
+ in 9
+ avg 7 stddev 2.68742 (0.383917x) (expected 2.51416 0.359165x))
+ min osd.2 5
+ max osd.1 14
+size 0    0
+size 1    0
+size 2    32
+size 3    0
+osdmaptool: writing epoch 2383 to osdmap
+
+# 可以看出单个pool的pg分布在osd上不是均匀的，我们可以迭代所有的pool来比较；并且通过以下命令来修改：
+# ceph osd crush reweight osd.id  {value}
 ```
