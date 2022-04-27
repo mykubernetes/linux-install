@@ -1137,16 +1137,16 @@ osdmaptool: exported crush map to crushmap
 osdmaptool: osdmap file 'osdmap'
 osdmaptool: imported 864 byte crush map from crushmap
 pool 16 pg_num 32
-#osd    count    first    primary    c wt    wt
-osd.1    14    4    4    0.149994    1
-osd.2    5    1    1    0.149994    1
-osd.3    7    4    4    0.149994    1
-osd.4    6    1    1    0.149994    1
-osd.5    6    3    3    0.149994    1
-osd.6    5    3    3    0.149994    1
-osd.7    9    8    8    0.149994    1
-osd.8    6    4    4    0.149994    1
-osd.9    6    4    4    0.149994    1
+#osd    count    first    primary    c wt        wt
+osd.1   14       4        4          0.149994    1
+osd.2   5        1        1          0.149994    1
+osd.3   7        4        4          0.149994    1
+osd.4   6        1        1          0.149994    1
+osd.5   6        3        3          0.149994    1
+osd.6   5        3        3          0.149994    1
+osd.7   9        8        8          0.149994    1
+osd.8   6        4        4          0.149994    1
+osd.9   6        4        4          0.149994    1
  in 9
  avg 7 stddev 2.68742 (0.383917x) (expected 2.51416 0.359165x))
  min osd.2 5
@@ -1156,7 +1156,4 @@ size 1    0
 size 2    32
 size 3    0
 osdmaptool: writing epoch 2383 to osdmap
-
-# 可以看出单个pool的pg分布在osd上不是均匀的，我们可以迭代所有的pool来比较；并且通过以下命令来修改：
-# ceph osd crush reweight osd.id  {value}
 ```
