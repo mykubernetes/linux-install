@@ -957,13 +957,11 @@ Standby daemons:
 
 # 二、 管理monitor map
 
-## .1 多Momitor的同步机制
+## 2.1 多Momitor的同步机制
 
 在生产环境建议最少三节点monitor，以确保cluster map的高可用性和冗余性
-
-monitor使用paxos算法作为集群状态上达成一致的机制。paxos是一种分布式一致性算法。每当monitor修改map时，它会通过paxos发送更新到其他monitor。Ceph只有在大多数monitor就更新达成一致时提交map的新版本
-
-cluster map的更新操作需要Paxos确认，但是读操作不经由Paxos，而是直接访问本地的kv存储
+- monitor使用paxos算法作为集群状态上达成一致的机制。paxos是一种分布式一致性算法。每当monitor修改map时，它会通过paxos发送更新到其他monitor。Ceph只有在大多数monitor就更新达成一致时提交map的新版本
+- cluster map的更新操作需要Paxos确认，但是读操作不经由Paxos，而是直接访问本地的kv存储
 
 ## 2.2 Monitor的选举机制
 
@@ -1059,24 +1057,20 @@ ceph-mon -i <id> --inject-monmap ./monmap
 # 三、 管理osd map
 
 ## 3.1 OSD map生命周期
-
-每当OSD加入或离开集群时，Ceph都会更新OSD map
-
-OSD不使用leader来管理OSD map，它们会在自身之间传播map。OSD会利用OSD map epoch标记它们交换的每一条信息，当OSD检测到自己已落后时，它会使用其对等OSD执行map更新
-
-在大型集群中OSD map更新会非常频繁，节点会执行递增map更新
-
-Ceph也会利用epoch来标记OSD和client之间的消息。当client连接到OSD时OSD会检查epoch。如果发现epoch不匹配，则OSD会以正确的epoch响应，以便客户端可以更新其OSD map
-
-OSD定期向monitor报告自己的状态，OSD之间会交换心跳，以便检测对等点的故障，并报告给monitor
-
-leader monitor发现OSD故障时，它会更新map，递增epoch，并使用Paxos更新协议来通知其他monitor，同时撤销租约，并发布新的租约，以使monitor以分发最新的OSD map
+- 每当OSD加入或离开集群时，Ceph都会更新OSD map
+- OSD不使用leader来管理OSD map，它们会在自身之间传播map。OSD会利用OSD map epoch标记它们交换的每一条信息，当OSD检测到自己已落后时，它会使用其对等OSD执行map更新
+- 在大型集群中OSD map更新会非常频繁，节点会执行递增map更新
+- Ceph也会利用epoch来标记OSD和client之间的消息。当client连接到OSD时OSD会检查epoch。如果发现epoch不匹配，则OSD会以正确的epoch响应，以便客户端可以更新其OSD map
+- OSD定期向monitor报告自己的状态，OSD之间会交换心跳，以便检测对等点的故障，并报告给monitor
+- leader monitor发现OSD故障时，它会更新map，递增epoch，并使用Paxos更新协议来通知其他monitor，同时撤销租约，并发布新的租约，以使monitor以分发最新的OSD map
 
 ## 3.2 管理 osd map
 ```
+# 将osd map导出为一个二进制文件
 #  ceph osd getmap -o ./osdmap
 got osdmap epoch 281
 
+# 打印导出的二进制文件的内容
 # osdmaptool --print ./osdmap
 osdmaptool: osdmap file './osdmap'
 epoch 281
@@ -1119,4 +1113,15 @@ osd.5 up   in  weight 1 up_from 261 up_thru 275 down_at 257 last_clean_interval 
 osd.6 up   in  weight 1 up_from 54 up_thru 273 down_at 52 last_clean_interval [21,51) 172.25.250.11:6808/185841 172.25.250.11:6809/185841 172.25.250.11:6810/185841 172.25.250.11:6811/185841 exists,up debe7f4e-656b-48e2-a0b2-bdd8613afcc4
 osd.7 up   in  weight 1 up_from 187 up_thru 266 down_at 184 last_clean_interval [54,186) 172.25.250.13:6801/60271 172.25.250.13:6806/1060271 172.25.250.13:6808/1060271 172.25.250.13:6812/1060271 exists,up 8c403679-7530-48d0-812b-72050ad43aae
 osd.8 up   in  weight 1 up_from 151 up_thru 265 down_at 145 last_clean_interval [54,150) 172.25.250.12:6800/59200 172.25.250.12:6801/7059200 172.25.250.12:6802/7059200 172.25.250.12:6805/7059200 exists,up bb73edf8-ca97-40c3-a727-d5fde1a9d1d9
+
+
+
+# 从 OSD 图提取出 CRUSH 图并写入 mapfile
+# osdmaptool --export-crush crushbinfile binfile
+
+# 从 mapfile 载入 CRUSH 图并把它嵌入 OSD 图
+# osdmaptool --import-crush crushbinfile binfile
+
+
+osdmaptool --test-map-pg pgid binfile
 ```
