@@ -15,10 +15,33 @@
 官方提供ansible部署:http://docs.ceph.com/ceph-ansible/master/
 
 
-
 # 一、安装前准备
 
-> 1、配置 yum源
+> 1、阿里云ceph源地址 https://mirrors.aliyun.com/ceph/
+```
+rpm-giant/	-	2015-09-16 02:58
+rpm-hammer/	-	2016-06-22 02:21
+rpm-infernalis/	-	2016-01-07 02:19
+rpm-jewel/	-	2017-03-07 20:49
+rpm-kraken/	-	2016-10-13 20:29
+rpm-luminous/	-	2020-01-31 23:20
+rpm-mimic/	-	2018-05-04 23:51
+rpm-nautilus/	-	2020-02-01 05:06
+rpm-octopus/	-	2022-03-01 20:36
+rpm-pacific/	-	2021-12-08 07:59
+rpm-quincy/	-	2022-04-20 08:51
+rpm-testing/	-	2014-08-26 00:10
+tarballs/	-	2022-04-20 08:41
+testing-octopus/	-	2020-03-25 03:20
+timestamp	11.0 B	2022-04-26 15:00
+```
+
+ceph的yum源安装在noarch路径下ceph-release安装包，直接下载安装即可
+```
+https://mirrors.aliyun.com/ceph/rpm-octopus/el7/noarch/ceph-release-1-1.el7.noarch.rpm
+```
+
+> 2、配置 yum源
 ``` 
 # cat /etc/yum.repos.d/ceph.repo 
 [ceph]
