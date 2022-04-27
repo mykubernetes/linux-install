@@ -1157,3 +1157,5 @@ size 2    32
 size 3    0
 osdmaptool: writing epoch 2383 to osdmap
 ```
+参考：
+- https://blog.csdn.net/zd147896325/article/details/111032003
