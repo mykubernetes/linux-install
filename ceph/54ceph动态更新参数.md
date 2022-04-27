@@ -1,6 +1,16 @@
 # Ceph动态调整参数有两种方式：
 
-## 一、daemon子命令：
+## 一、查看运行配置
+```
+命令格式：
+# ceph daemon {daemon-type}.{id} config show 
+
+命令举例：
+# ceph daemon osd.0 config show 
+```
+
+
+## 二、daemon子命令：
 - 使用`daemon`进行设置的方式就是一个个的去设置，这样可以比较好的反馈，此方法是需要在设置的角色所在的主机上进行设置。
 ```
 ceph daemon {daemon-type}.{id} config set {name}={value}         # ceph daemon <mon/osd/mds>.<id> config set <参数名> <参数值>
@@ -9,7 +19,7 @@ ceph daemon {daemon-type}.{id} config set {name}={value}         # ceph daemon <
 ceph daemon osd.1 config set osd_heartbeat_grace 60
 ```
 
-## 二、tell子命令格式：
+## 三、tell子命令格式：
 - 使用 tell 的方式适合对整个集群进行设置，使用 * 号进行匹配，就可以对整个集群的角色进行设置。而出现节点异常无法设置时候，只会在命令行当中进行报错，不太便于查找。
 ```
 ceph tell {daemon-type}.{daemon id or *} injectargs --{name}={value} [--{name}={value}]               # ceph tell <mon/osd/mds>.1 injectargs '--<参数名> <参数值> --<参数名> <参数值>'
@@ -21,7 +31,7 @@ ceph tell osd.1 injectargs '--osd_heartbeat_grace 60'
 - daemon id：该对象的名称，osd通常为0、1等，mon为ceph -s显示的名称，这里可以输入*表示全部。
 - injectargs：表示参数注入，后面必须跟一个参数，也可以跟多个
 
-### 2.1 tell子命令还有两个比较好用的地方：
+#### tell子命令还有两个比较好用的地方：
 
 1、单条命令可以改变所有的实例的某个参数值：
 ```
