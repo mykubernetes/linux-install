@@ -72,14 +72,14 @@ priority=1
 # yum -y install epel-release
 ```
 
-> 2、配置NTP
+> 3、配置NTP
 ```
 yum -y install ntpdate ntp
 ntpdate  ntp.aliyun.com
 systemctl restart ntpd  && systemctl enable ntpd
 ```  
 
-> 3、创建部署用户和ssh免密码登录
+> 4、创建部署用户和ssh免密码登录
 ```
 useradd ceph
 echo 123456 | passwd --stdin ceph
@@ -87,7 +87,7 @@ echo "ceph ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph
 chmod 0440 /etc/sudoers.d/ceph
 ```
 
-> 4、配置防火墙，或者关闭
+> 5、配置防火墙，或者关闭
 ```
 #firewall-cmd --zone=public --add-port=6789/tcp --permanent
 #firewall-cmd --zone=public --add-port=6800-7100/tcp --permanent
@@ -95,13 +95,13 @@ chmod 0440 /etc/sudoers.d/ceph
 #firewall-cmd --zone=public --list-all
 ```
 
-> 5、关闭 selinux
+> 6、关闭 selinux
 ```
 sed -i "/^SELINUX/s/enforcing/disabled/" /etc/selinux/config
 setenforce 0
 ```
 
-> 6、配置主机名解析，使用  /etc/hosts,或者dns
+> 7、配置主机名解析，使用  /etc/hosts,或者dns
 ```
 cat >>/etc/hosts<<EOF
 192.168.101.66   node01
@@ -110,7 +110,7 @@ cat >>/etc/hosts<<EOF
 EOF
 ```
 
-> 7、配置sudo不需要tty
+> 8、配置sudo不需要tty
 
 手动修改配置文件,注释Defaults requiretty  
 ```
