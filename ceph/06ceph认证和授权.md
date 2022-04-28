@@ -330,6 +330,15 @@ ceph 的秘钥环是一个保存了 secrets、keys、certificates 并且能够�
 {client、mon、mds、osd}.name
 ```
 
+访问Ceph集群时，客户端会于本地查找密钥环:
+- 默认情况下，Ceph会使用以下四个密钥环名称预设密钥环
+  - /etc/ceph/cluster-name.user-name.keyring：保存单个用户的keyring
+  - /etc/ceph/cluster.keyring：保存多个用户的keyring
+  - /etc/ceph/keyring
+  - /etc/ceph/keyring.bin
+- cluster-name是为集群名称，user-name是为用户标识（TYPE.ID）
+- client.admin用户的在名为ceph的集群上的密钥环文件名为ceph.client.admin.keyring
+
 ### 1.7.1 通过秘钥环文件备份与恢复用户
 
 使用 ceph auth add 等命令添加的用户还需要额外使用 ceph-authtool 命令为其创建用户秘钥环文件
