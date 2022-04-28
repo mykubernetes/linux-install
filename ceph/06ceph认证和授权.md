@@ -110,7 +110,7 @@ mds 'allow'
 ### 1.6 列出指定用户
 
 ```
-# ceph auth ls                         #列出所以用户
+# ceph auth ls                         #列出所有用户
 # ceph auth get osd.10                 #获取用户信息
 [osd.10]
     key = AQDNBilhkPDRKRAABW8mMaGrYMwYHVVVjtOU0g==
@@ -189,6 +189,13 @@ osd.11
 #### 1.6.2.1添加用户
 
 添加用户的规范方法：它会创建用户、生成密钥，并添加所有指定的能力
+
+添加用户命令：
+- ceph auth add：规范方法，它能够创建用户、生成密钥并添加指定的caps 
+- ceph auth get-or-create：简便方法，创建用户并返回密钥文件格式的密钥信息，或者在用户存在时返回用户名及密钥文件格式的密钥信息
+- ceph auth get-or-create-key：简便方法，创建用户并返回密钥信息，或者在用户存在时返回密钥信息
+
+注意：典型的用户至少对 Ceph monitor 具有读取功能，并对 Ceph OSD 具有读取和写入功能；另外，用户的 OSD 权限通常应该限制为只能访问特定的存储池，否则，他将具有访问集群中所有存储池的权限
 
 ```
 # ceph auth -h
