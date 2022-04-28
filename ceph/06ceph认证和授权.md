@@ -330,6 +330,21 @@ ceph 的秘钥环是一个保存了 secrets、keys、certificates 并且能够�
 {client、mon、mds、osd}.name
 ```
 
+ceph-authtool命令可直接创建用户、授予caps并创建keyring
+```
+ceph-authtool keyringfile [-C | --create-keyring] [-n | --name entityname] [--gen- key] [-a | --add-key base64_key] [--cap | --caps capfile]
+```
+选项:
+- -l, --list 列出密钥环内的所有密钥及其能力
+- -p, --print 打印指定条目的已编码密钥，它适合作为 `mount -o secret=` 的参数
+- -C, --create-keyring 创建新密钥环，覆盖已有密钥环文件
+- --gen-key 为指定实体名生成新私钥
+- --add-key 把已编码密钥加进密钥环
+- --cap subsystem capability 设置指定子系统的能力
+- --caps capsfile 在所有子系统内设置与给定密钥相关的所有能力  
+**注意**：此种方式添加的用户仅存在于keyring文件中，管理员还需要额外将其添加至Ceph集群上
+  - 命令： ceph auth add TYPE.ID -i /PATH/TO/keyring
+
 访问Ceph集群时，客户端会于本地查找密钥环:
 - 默认情况下，Ceph会使用以下四个密钥环名称预设密钥环
   - /etc/ceph/cluster-name.user-name.keyring：保存单个用户的keyring
@@ -456,4 +471,20 @@ test@ceph-deploy:~/ceph-cluster$ ceph-authtool -l ./ceph.client.user.keyring
     key = AQB6WiphsylPERAALnVZ0wMPapQ0lb3ehDdrVA==
     caps mon = "allow r"
     caps osd = "allow * pool=mypool"
+```
+
+### 1.7.3 查看密钥环文件
+```
+# ceph-authtool -l cluster.keyring
+[client.admin]
+  key = AQA2M3NfHRWaLhAAcyHxQ5NSG01/+Zlz4yH9pQ==
+  caps mds = "allow *"
+  caps mgr = "allow *"
+  caps mon = "allow *"
+  caps osd = "allow *"
+[client.kube]
+  key = AQAIkbJfsZ+pBBAA2a19ZBFQ7cYEKGWZGl+C/w==
+  caps mon = "allow r"
+  caps osd = "allow * pool=kube"
+[root@ceph-node01 ceph-deploy]#
 ```
