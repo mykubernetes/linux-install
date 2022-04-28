@@ -488,3 +488,28 @@ test@ceph-deploy:~/ceph-cluster$ ceph-authtool -l ./ceph.client.user.keyring
   caps osd = "allow * pool=kube"
 [root@ceph-node01 ceph-deploy]#
 ```
+
+### 1.7.4  创建用户并生成密钥环文件
+```
+ceph-authtool -n client.ringo --cap osd 'allow rwx' --cap mon 'allow rwx' /etc/ceph/ceph.keyring
+ceph-authtool -C /etc/ceph/ceph.keyring -n client.ringo --cap osd 'allow rwx' --cap mon 'allow rwx' --gen-key
+```
+
+### 1.7.5 修改用户授权
+```
+ceph-authtool /etc/ceph/ceph.keyring -n client.ringo --cap osd 'allow rwx' --cap mon 'allow rwx
+```
+
+### 1.7.6 从密钥环文件导入一个用户：
+```
+ceph auth import -i /path/to/keyring
+```
+
+**注意事项**
+
+当 auth 配置为 cephx 时：
+- 必须要密钥环文件来访问 Ceph 集群
+- MON 启动是需要 /var/lib/ceph/mon/ceph-node1/ceph-mon.keyring 密钥环文件进行认证
+- MON keyring 的内容被修改也不影响 MON 的启动，但会影响共享密钥认证
+- OSD 启动需要正确的 keyring，否则无法启动，正确的 keyring 会被存在 MON 数据库中
+- Client 访问集群和 OSD 一样，需要正确的 keyring 与存在 MON 数据库中对应的 keyring 相匹配
