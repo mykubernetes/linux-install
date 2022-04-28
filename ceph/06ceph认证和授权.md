@@ -74,24 +74,25 @@ ceph 基于使能/能力(Capabilities，简称 caps )来描述用户可针对 MO
 - profile bootstrap-mds: #授予用户引导元数据服务器的权限。授权部署工具权限，使其在引导元数据服务器时有权添加密钥。
 
 ### MON 能力：
-包括 r/w/x 和 allow profile cap(ceph 的运行图)
 
-> ```
-> 例如：
-> mon 'allow rwx' 
-> mon 'allow profile osd
-> ```
+> 包括 r/w/x 和 allow profile cap (ceph 的运行图)
+
+```
+例如：
+mon 'allow rwx' 
+mon 'allow profile osd
+```
 
 ### OSD 能力:
 
-> `包括 r、w、x、class-read、class-write(类读取)）和 profile osd(类写入)，另外 OSD 能力还允许进行存储池和名称空间设置。`
+> `包括 r、w、x、class-read(类读取)、class-write(类写入)和 profile osd(剖析osd的工作特性或统计数据)，另外 OSD 能力还允许进行存储池和名称空间设置。`
 ```
 osd 'allow rwx' or osd 'allow class-read, allow rwx pool=rbd'
 ``` 
 
 ### MDS 能力：
 
-> `仅支持allow ,只需要 allow 或空都表示允许。 mds 'allow'`
+> 仅支持allow ,只需要 allow 或空都表示允许。 mds 'allow'
 ```
 mds 'allow'
 ```  
