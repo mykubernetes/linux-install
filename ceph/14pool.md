@@ -466,7 +466,7 @@ ceph osd pool get [pool name] size                     #获取存储池对象副
 ceph osd pool get [pool name] min_size                 #存储池最小副本数
 ceph osd pool get [pool name] pg_num                   #查看当前pg数量
 ceph osd pool get [pool name] pgp_num                  #查看当前pgp数量,计算数据归置时要使用的PG的有效数量
-ceph osd pool get [pool name] crush_rule               #设置crush算法规则，默认为副本池(replicated_rule)
+ceph osd pool get [pool name] crush_ruleset            #设置crush算法规则，默认为副本池(replicated_rule)
 ceph osd pool get [pool name] nodelete                 #控制是否可以删除。默认可以
 ceph osd pool get [pool name] nopgchange               #控制是否可更新存储池的pg num 和pgp num
 ceph osd pool set [pool name] pg_num 64                #修改制定pool的pg数量
@@ -481,11 +481,54 @@ ceph osd pool set [pool name] nodeep-scrub true        #修改制定pool的深�
 ceph osd pool get [pool name] scrub_min_interval       #查看存储池的最小整理时间间隔，默认值为0，可以通过配置文件中的osd_scrub_min_interval参数指定间隔时间。
 ceph osd pool get [pool name] scrub_max_interval       #查看存储池的最大整理时间间隔，默认值为0，可以通过配置文件中的osd_scrub_max_interval参数指定。
 ceph osd pool get [pool name] deep_scrub_interval      #查看存储池的深层整理时间间隔，默认值为0，可以通过配置文件中的osd_deep_scrub_interval参数指定。
-ceph osd pool mksnap [pool name] [snap name]           #创建存储池快照
-ceph osd pool rnsnap [pool name] [snap name]           #删除存储池快照
 rados df                                               #显示存储池的用量信息
+ceph osd pool mksnap [pool name] [snap name]           #创建存储池快照
 rados -p [pool name] mksnap [snap name]                #创建存储池快照
 rados -p [pool name] lssnap                            #列出存储池快照
-radps rollback  -p [pool name] [object name] [snap name]       #通过快照还原某个文件
+radps -p [pool name] rollback [snap name]              #回滚存储池至指定的快照
+radps rollback -p [pool name] [object name] [snap name]       #通过快照还原某个文件
+ceph osd pool rmsnap [pool name] [snap name]           #删除存储池快照
 rados -p [pool name ] rmsnap [snap name]               #删除存储池快照
 ```
+
+# 五、数据压缩
+
+BlueStore存储引擎提供即时数据压缩，以节省磁盘空间
+
+1、启用压缩
+```
+ceph osd pool set <pool-name> compression_mode aggressive • 压缩模式：none、aggressive、passive和force，默认值为none；
+```
+- none：不压缩
+- passive：若提示COMPRESSIBLE，则压缩
+- aggressive：除非提示INCOMPRESSIBLE，否则就压缩；
+- force：始终压缩
+
+2、压缩算法
+```
+ceph osd pool set <pool-name> compression_algorithm snappy
+```
+- 压缩算法有none、zlib、lz4、zstd和snappy等几种，默认为snappy；
+- zstd有较好的压缩比，但比较消耗CPU；
+- lz4和snappy对CPU占用比例较低；
+- 不建议使用zlib；
+
+3、其它可用的压缩参数
+- compression_required_ratio：指定压缩比，取值格式为双精度浮点型，其值为SIZE_COMPRESSED/SIZE_ORIGINAL，即压缩后的大小与原始内容大小的比值，默认为.875
+- compression_max_blob_size：压缩对象的最大体积，无符号整数型数值，默认为0
+- compression_min_blob_size：压缩对象的最小体积，无符号整数型数值，默认为0
+
+4、全局压缩选项
+
+可在ceph配置文件中设置压缩属性，它将对所有的存储池生效
+
+可设置的相关参数如下:
+- bluestore_compression_algorithm
+- bluestore_compression_mode
+- bluestore_compression_required_ratio
+- bluestore_compression_min_blob_size
+- bluestore_compression_max_blob_size
+- bluestore_compression_min_blob_size_ssd
+- bluestore_compression_max_blob_size_ssd
+- bluestore_compression_min_blob_size_hdd
+- bluestore_compression_max_blob_size_hdd
