@@ -454,3 +454,38 @@ mon_allow_pool_delete = true
 # 删除pool
 # ceph osd pool delete poolname poolname --yes-i-really-really-mean-it
 ```
+
+# 四、pool常见命令
+```
+ceph osd pool create <poolname> pg_num pgp_num {replicated|erasure} #创建存储池
+ceph osd pool ls [detail]                              #列出存储池
+ceph osd pool lspools                                  #列出存储池
+ceph osd pool stats [pool name]                        #获取存储池的时间信息
+ceph osd pool old-name new-name                        #重命名存储池
+ceph osd pool get [pool name] size                     #获取存储池对象副本数默认为一主两备3副本
+ceph osd pool get [pool name] min_size                 #存储池最小副本数
+ceph osd pool get [pool name] pg_num                   #查看当前pg数量
+ceph osd pool get [pool name] pgp_num                  #查看当前pgp数量,计算数据归置时要使用的PG的有效数量
+ceph osd pool get [pool name] crush_rule               #设置crush算法规则，默认为副本池(replicated_rule)
+ceph osd pool get [pool name] nodelete                 #控制是否可以删除。默认可以
+ceph osd pool get [pool name] nopgchange               #控制是否可更新存储池的pg num 和pgp num
+ceph osd pool set [pool name] pg_num 64                #修改制定pool的pg数量
+ceph osd pool get [pool name] nosizechange             #控制是否可以更改存储池的大小，默认允许修改
+ceph osd pool get-quota [pool name]                    #获取存储池配额信息
+ceph osd pool set-quota [pool name] max_bytes 21474836480      #设置存储池最大空间，单位字节
+ceph osd pool set-quota [pool name] max_objects 1000           #设置存储池最大对象数量
+ceph osd pool get [pool name] noscrub                  #查看当前是否关闭轻量扫描数据，默认值为false，不关闭，开启
+ceph osd pool set [pool name] noscrub true             #修改制定的pool轻量扫描为true，不执行轻量扫描
+ceph osd pool get [pool name] nodeep-scrub             #查看当前是否关闭深度扫描数据，默认值为false，不关闭，开启
+ceph osd pool set [pool name] nodeep-scrub true        #修改制定pool的深度扫描测量为true,即不执行深度扫描
+ceph osd pool get [pool name] scrub_min_interval       #查看存储池的最小整理时间间隔，默认值为0，可以通过配置文件中的osd_scrub_min_interval参数指定间隔时间。
+ceph osd pool get [pool name] scrub_max_interval       #查看存储池的最大整理时间间隔，默认值为0，可以通过配置文件中的osd_scrub_max_interval参数指定。
+ceph osd pool get [pool name] deep_scrub_interval      #查看存储池的深层整理时间间隔，默认值为0，可以通过配置文件中的osd_deep_scrub_interval参数指定。
+ceph osd pool mksnap [pool name] [snap name]           #创建存储池快照
+ceph osd pool rnsnap [pool name] [snap name]           #删除存储池快照
+rados df                                               #显示存储池的用量信息
+rados -p [pool name] mksnap [snap name]                #创建存储池快照
+rados -p [pool name] lssnap                            #列出存储池快照
+radps rollback  -p [pool name] [object name] [snap name]       #通过快照还原某个文件
+rados -p [pool name ] rmsnap [snap name]               #删除存储池快照
+```
