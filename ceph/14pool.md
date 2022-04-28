@@ -497,8 +497,9 @@ BlueStore存储引擎提供即时数据压缩，以节省磁盘空间
 
 1、启用压缩
 ```
-ceph osd pool set <pool-name> compression_mode aggressive • 压缩模式：none、aggressive、passive和force，默认值为none；
+ceph osd pool set <pool-name> compression_mode aggressive 
 ```
+压缩模式：none、aggressive、passive和force，默认值为none
 - none：不压缩
 - passive：若提示COMPRESSIBLE，则压缩
 - aggressive：除非提示INCOMPRESSIBLE，否则就压缩；
@@ -508,10 +509,10 @@ ceph osd pool set <pool-name> compression_mode aggressive • 压缩模式：non
 ```
 ceph osd pool set <pool-name> compression_algorithm snappy
 ```
-- 压缩算法有none、zlib、lz4、zstd和snappy等几种，默认为snappy；
-- zstd有较好的压缩比，但比较消耗CPU；
-- lz4和snappy对CPU占用比例较低；
-- 不建议使用zlib；
+压缩算法有none、zlib、lz4、zstd和snappy等几种，默认为snappy
+- zstd有较好的压缩比，但比较消耗CPU
+- lz4和snappy对CPU占用比例较低
+- 不建议使用zlib
 
 3、其它可用的压缩参数
 - compression_required_ratio：指定压缩比，取值格式为双精度浮点型，其值为SIZE_COMPRESSED/SIZE_ORIGINAL，即压缩后的大小与原始内容大小的比值，默认为.875
