@@ -107,11 +107,74 @@ osd 'allow rwx' or osd 'allow class-read, allow rwx pool=rbd'
 mds 'allow'
 ```  
 
-### 1.6 列出指定用户
+## 1.6 ceph用户管理
+用户管理功能可让 Ceph 集群管理员能够直接在 Ceph 集群中创建、更新和删除用户。在 Ceph 集群中创建或删除用户时，可能需要将密钥分发到客户端，以便将密钥添加到密钥环文件中/etc/ceph/ceph.client.admin.keyring，此文件中可以包含一个或者多个用户认证信息，凡是拥有此文件的节点，将具备访问 ceph 的权限，而且可以使用其中任何一个账户的权限
 
+列出用户:
+- 命令：ceph auth list
+- 用户标识：TYPE.ID，因此，osd.0表示OSD类型的用户，用户ID为0
+
+检索特定用户:
+- 命令：ceph auth get TYPE.ID或者ceph auth
+
+添加用户命令：
+- ceph auth add：规范方法，它能够创建用户、生成密钥并添加指定的caps 
+- ceph auth get-or-create：简便方法，创建用户并返回密钥文件格式的密钥信息，或者在用户存在时返回用户名及密钥文件格式的密钥信息
+- ceph auth get-or-create-key：简便方法，创建用户并返回密钥信息，或者在用户存在时返回密钥信息
+
+注意：典型的用户至少对 Ceph monitor 具有读取功能，并对 Ceph OSD 具有读取和写入功能；另外，用户的 OSD 权限通常应该限制为只能访问特定的存储池，否则，他将具有访问集群中所有存储池的权限
+
+列出用户的密钥
+- 命令：ceph auth print-key TYPE.ID
+
+导入用户
+- 命令：ceph auth import
+- 需要指定密钥环
+
+修改用户caps
+- 命令：ceph auth caps
+- 会覆盖用户现有的caps，因此建立事先使用ceph auth get TYPE.ID命令查看用户的caps
+- 若是为添加caps，则需要先指定现有的caps
+- 命令格式：
+  - `ceph auth caps TYPE.ID daemon 'allow [r|w|x|*|...] [pool=pool-name] [namespace=namespace-name]' ...`
+
+删除用户
+- 命令：ceph auth del
+
+
+### 1.6.1 列出所有用户
 ```
-# ceph auth ls                         #列出所有用户
-# ceph auth get osd.10                 #获取用户信息
+# ceph auth ls
+mds.ceph-mgr1
+    key: AQA5UyhhXsY/MBAAgv/L+/cKMPx4fy+V2Cm+vg==
+    caps: [mds] allow
+    caps: [mon] allow profile mds
+    caps: [osd] allow rwx
+osd.0
+    key: AQAswSBh2jDUERAA+jfMZKocn+OjdFYZf7lrbg==
+    caps: [mgr] allow profile osd
+    caps: [mon] allow profile osd
+    caps: [osd] allow *
+osd.1
+    key: AQBjwSBhhYroNRAAO5+aqRxoaYGiMnI8FZegZw==
+    caps: [mgr] allow profile osd
+    caps: [mon] allow profile osd
+    caps: [osd] allow *
+osd.10
+    key: AQDNBilhkPDRKRAABW8mMaGrYMwYHVVVjtOU0g==
+    caps: [mgr] allow profile osd
+    caps: [mon] allow profile osd
+    caps: [osd] allow *
+osd.11
+    key: AQDfBilhKPzvGBAAVx7+GDBZlXkdRdLQM/qypw==
+    caps: [mgr] allow profile osd
+    caps: [mon] allow profile osd
+    caps: [osd] allow *
+```
+
+### 1.6.2 列出指定用户
+```
+# ceph auth get osd.10
 [osd.10]
     key = AQDNBilhkPDRKRAABW8mMaGrYMwYHVVVjtOU0g==
     caps mgr = "allow profile osd"
@@ -149,54 +212,12 @@ exported keyring for client.admin
 ceph auth export osd.1 -o aaa.key
 ```
 
-## 1.6 ceph用户管理
-用户管理功能可让 Ceph 集群管理员能够直接在 Ceph 集群中创建、更新和删除用户。在 Ceph 集群中创建或删除用户时，可能需要将密钥分发到客户端，以便将密钥添加到密钥环文件中/etc/ceph/ceph.client.admin.keyring，此文件中可以包含一个或者多个用户认证信息，凡是拥有此文件的节点，将具备访问 ceph 的权限，而且可以使用其中任何一个账户的权限
-
-### 1.6.1 列出用户
-```
-test@ceph-deploy:~/ceph-cluster$ ceph auth ls
-mds.ceph-mgr1
-    key: AQA5UyhhXsY/MBAAgv/L+/cKMPx4fy+V2Cm+vg==
-    caps: [mds] allow
-    caps: [mon] allow profile mds
-    caps: [osd] allow rwx
-osd.0
-    key: AQAswSBh2jDUERAA+jfMZKocn+OjdFYZf7lrbg==
-    caps: [mgr] allow profile osd
-    caps: [mon] allow profile osd
-    caps: [osd] allow *
-osd.1
-    key: AQBjwSBhhYroNRAAO5+aqRxoaYGiMnI8FZegZw==
-    caps: [mgr] allow profile osd
-    caps: [mon] allow profile osd
-    caps: [osd] allow *
-osd.10
-    key: AQDNBilhkPDRKRAABW8mMaGrYMwYHVVVjtOU0g==
-    caps: [mgr] allow profile osd
-    caps: [mon] allow profile osd
-    caps: [osd] allow *
-osd.11
-    key: AQDfBilhKPzvGBAAVx7+GDBZlXkdRdLQM/qypw==
-    caps: [mgr] allow profile osd
-    caps: [mon] allow profile osd
-    caps: [osd] allow *
-```
-
-### 1.6.2 用户管理
+### 1.6.3 用户管理
 
 添加一个用户会创建用户名、密钥，以及包含在命令中用于创建该用户的所有能力,用户可使用其密钥向Ceph存储集群进行身份验证。用户的能力授予该用户在 Cephmonitor (mon)、Ceph OSD (osd) 或Ceph 元数据服务器 (mds) 上进行读取、写入或执行的能力
 
-#### 1.6.2.1添加用户
-
+#### 1.6.3.1添加用户
 添加用户的规范方法：它会创建用户、生成密钥，并添加所有指定的能力
-
-添加用户命令：
-- ceph auth add：规范方法，它能够创建用户、生成密钥并添加指定的caps 
-- ceph auth get-or-create：简便方法，创建用户并返回密钥文件格式的密钥信息，或者在用户存在时返回用户名及密钥文件格式的密钥信息
-- ceph auth get-or-create-key：简便方法，创建用户并返回密钥信息，或者在用户存在时返回密钥信息
-
-注意：典型的用户至少对 Ceph monitor 具有读取功能，并对 Ceph OSD 具有读取和写入功能；另外，用户的 OSD 权限通常应该限制为只能访问特定的存储池，否则，他将具有访问集群中所有存储池的权限
-
 ```
 # ceph auth -h
 auth add <entity> [<caps>...]
@@ -215,7 +236,7 @@ auth add <entity> [<caps>...]
 exported keyring for client.tom
 ```
 
-#### 1.6.2.2 ceph auth get-or-create
+#### 1.6.3.2 ceph auth get-or-create
 
 ceph auth get-or-create 此命令是创建用户较为常见的方式之一，它会返回包含用户名和密钥的密钥文，如果该用户已存在，此命令只以密钥文件格式返回用户名和密钥，还可以使用 -o 指定文件名选项将输出保存到某个文件
 
@@ -243,7 +264,7 @@ exported keyring for client.test
 # ceph auth get-or-create client.rbd -o /etc/ceph/ceph.client.rbd.keyring        # ceph集群名.client.rbd用户名.keyring格式保存
 ```
 
-#### 1.6.2.3 ceph auth get-or-create-key
+#### 1.6.3.3 ceph auth get-or-create-key
 
 此命令是创建用户并仅返回用户密钥，对于只需要密钥的客户端（例如 libvirt），此命令非常有用。如果该用户已存在，此命令只返回密钥。您可以使用 -o 文件名选项将输出保存到某个文件。
 
@@ -257,7 +278,7 @@ exported keyring for client.test
 AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==
 ```
 
-#### 1.6.2.4 ceph auth print-key
+#### 1.6.3.4 ceph auth print-key
 
 ```
 #获取单个指定用户的key
@@ -265,7 +286,7 @@ test@ceph-deploy:~/ceph-cluster$ ceph auth print-key client.test
 AQAYVyphyzZdGxAAYZlScsmbAf3mK9zyuaod6g==test
 ```
 
-#### 1.6.2.5 修改用户能力
+#### 1.6.3.5 修改用户能力
 
 使用 ceph auth caps 命令可以指定用户以及更改该用户的能力，设置新能力会完全覆盖当前的能力，因此要加上之前的用户已经拥有的能和新的能力，如果看当前能力，可以运行 cephauth get USERTYPE.USERID
 
@@ -294,7 +315,7 @@ exported keyring for client.test
 # ceph auth caps client.rbd mon 'allow r' osd 'allow rwx pool=rbd' -o /etc/ceph/ceph.client.rbd.keyring
 ```
 
-#### 1.6.2.6 删除用户
+#### 1.6.3.6 删除用户
 
 要删除用户使用 ceph auth del TYPE.ID，其中 TYPE 是 client、osd、mon 或 mds 之一，ID 是用户名或守护进程的 ID
 
