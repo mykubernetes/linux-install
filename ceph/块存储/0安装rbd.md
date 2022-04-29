@@ -71,7 +71,7 @@ rbd_default_features = 69
 | rbd info [pool-name/]image-name | 检索RBD镜像详情 |
 | rbd status [pool-name/]image-name | 检查rbd镜像状态 |
 | rbd du [pool-name/]image-name | 检索RBD镜像的调配磁盘使用量和实际磁盘使用量 |
-| rbd resize [pool-name/]image-name --size nM|G|T  | 调整RBD镜像大小 |
+| rbd resize [pool-name/]image-name --size nM、G、T  | 调整RBD镜像大小 |
 | rbd rm --pool [pool_name]--image [img_name] | 删除RBD映像 |
 | rbd cp [pool-name/]src-image-name [pool-name] tgt-image-name | 复制RBD镜像 |
 | rbd mv [pool-name/]src-image-name [pool-name] tgt-image-name | 重命名RBD镜像 |
