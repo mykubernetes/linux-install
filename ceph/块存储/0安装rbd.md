@@ -64,13 +64,14 @@ rbd_default_features = 69
 # RBD常用命令
 | 命令 | 功能 |
 | ------ | ------ |
-| rbd create --szie n [pool-name/]image-name | 创建RBD |
-| rbd [--pool pool-name] ls  | 列出RBD |
+| rbd create [img_name] --size nM|G|T --pool [pool_name] --image-format 2 --image-feature layering | 创建RBD |
+| rbd ls -p  [pool_name] -l  | 列出RBD |
+| rbd ls [pool_name] | 查看RBD镜像 |
 | rbd info [pool-name/]image-name | 检索RBD镜像详情 |
 | rbd status [pool-name/]image-name | 检查rbd镜像状态 |
 | rbd du [pool-name/]image-name | 检索RBD镜像的调配磁盘使用量和实际磁盘使用量 |
-| rbd resize  | 调整RBD镜像大小 |
-| rbd rm | 删除RBD映像 |
+| rbd resize [pool-name/]image-name --size nM|G|T  | 调整RBD镜像大小 |
+| rbd rm --pool [pool_name]--image [img_name] | 删除RBD映像 |
 | rbd cp [pool-name/]src-image-name [pool-name] tgt-image-name | 复制RBD镜像 |
 | rbd mv [pool-name/]src-image-name [pool-name] tgt-image-name | 重命名RBD镜像 |
 | rbd trash mv [pool-name/]image-name | 将RBD镜像移动到回收站 |
@@ -79,9 +80,8 @@ rbd_default_features = 69
 | rbd trash ls [pool-name] | 列出回收站中所有镜像 |
 | rbd diff  | 可以统计 rbd 使用量 |
 | rbd map  | 映射块设备 |
-| rbd showmapped  | 查看已映射块设备 |
+| rbd showmapped | 查看已映射块设备 |
 | rbd unmap | 取消映射 |
-| rbd remove  | 删除块设备 |
 
 # 一、服务器端配置认证
 
