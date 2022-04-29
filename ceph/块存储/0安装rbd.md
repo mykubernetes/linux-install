@@ -62,7 +62,8 @@ rbd_default_features = 69
 ```
 
 # RBD常用命令
-| 命令 | 功能 |
+
+| 服务器端命令 | 功能 |
 | ------ | ------ |
 | rbd create [img_name] --size nM|G|T --pool [pool_name] --image-format 2 --image-feature layering | 创建RBD |
 | rbd ls -p  [pool_name] -l  | 列出RBD |
@@ -79,9 +80,12 @@ rbd_default_features = 69
 | rbd trash restore [pool-name/]image-name | 从回收站恢复RBD镜像 |
 | rbd trash ls [pool-name] | 列出回收站中所有镜像 |
 | rbd diff  | 可以统计 rbd 使用量 |
-| rbd map  | 映射块设备 |
-| rbd showmapped | 查看已映射块设备 |
-| rbd unmap | 取消映射 |
+
+| 客户端命令 | 功能 |
+| --------- | ----- |
+| `rbd map [--pool <pool>] [--image <image>] [--id <user-name>] [--keyring </path/to/keyring>]` | 映射块设备 |
+| `rbd showmapped` | 查看已映射块设备 |
+| `rbd unmap [--pool <pool>] [--image <image>] <image-or-device-spec>` | 取消映射 |
 
 # 一、服务器端配置认证
 
