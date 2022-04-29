@@ -27,8 +27,8 @@ $ radosgw-admin user create --uid=radosgw --display-name="radosgw" -k /var/lib/c
 # s3cmd --configure
 Enter new values or accept defaults in brackets with Enter.
 ...
-Access Key: N5UJH6WDNT2FH5WUMHIC
-Secret Key: ja0kAxtM0kSvhl2qY4Ruww4omZPvd72ulktguOYU
+Access Key: N5UJH6WDNT2FH5WUMHIC                              # 输入ak
+Secret Key: ja0kAxtM0kSvhl2qY4Ruww4omZPvd72ulktguOYU          # 输入sk
 Default Region [US]:
 Use "s3.amazonaws.com" for S3 Endpoint and not modify it to the target A
 mazon S3.
@@ -38,32 +38,32 @@ if the target S3 system supports dns based buckets.
 DNS-style bucket+hostname:port template for accessing a bucket [%(bucket)s.s3.amazonaws.com]:
 Encryption password is used to protect your files from reading
 by unauthorized persons while in transfer to S3
-Encryption password:
+Encryption password:                                          # 保持默认
 Path to GPG program [/usr/bin/gpg]:
+
 When using secure HTTPS protocol all communication with Amazon S3
 servers is protected from 3rd party eavesdropping. This method is
 slower than plain HTTP, and can only be proxied with Python 2.7 or newer
-Use HTTPS protocol [Yes]: no
+Use HTTPS protocol [Yes]: no                                  # 是否开启HTTPS
+
 On some networks all internet access must go through a HTTP proxy.
 Try setting it here if you can't connect to S3 directly
-HTTP Proxy server name:
+HTTP Proxy server name:                                       # 这里不用写，因为没有代理
+
 New settings:
-Access Key: N5UJH6WDNT2FH5WUMHIC                           #输入ak
-Secret Key: ja0kAxtM0kSvhl2qY4Ruww4omZPvd72ulktguOYU       #输入sk
-Default Region: US
-S3 Endpoint: s3.amazonaws.com
-DNS-style bucket+hostname:port template for accessing a bucket: %(bucket)s.s3.amazonaws.com
-Encryption password:
-# 保持默认
-Path to GPG program: /usr/bin/gpg
-# 是否开启HTTPS
-Use HTTPS protocol: False                                 #根据提示输入False或者no
-# 这里不用写，因为没有代理
-HTTP Proxy server name:
-HTTP Proxy server port: 0
-Test access with supplied credentials? [Y/n] n            #输入n
-# 保存设置
-Save settings? [y/N] y                                    #输入y
+  Access Key: N5UJH6WDNT2FH5WUMHIC
+  Secret Key: ja0kAxtM0kSvhl2qY4Ruww4omZPvd72ulktguOYU
+  Default Region: US
+  S3 Endpoint: s3.amazonaws.com
+  DNS-style bucket+hostname:port template for accessing a bucket: %(bucket)s.s3.amazonaws.com
+  Encryption password:
+  Path to GPG program: /usr/bin/gpg
+  Use HTTPS protocol: False                                
+  HTTP Proxy server name:
+  HTTP Proxy server port: 0
+
+Test access with supplied credentials? [Y/n] n               # 配置是否正确
+Save settings? [y/N] y                                       # 保存设置
 Configuration saved to '/root/.s3cfg'
 ```  
 
