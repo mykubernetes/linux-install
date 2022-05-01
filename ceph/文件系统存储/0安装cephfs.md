@@ -237,7 +237,9 @@ priority=1
 ``` 
 
 2)从服务器把 key文件拷贝到客户端  
-``` scp ceph.client.cephfs.keyring root@c720153:/etc/ceph/ ```  
+```
+scp ceph.client.cephfs.keyring root@c720153:/etc/ceph/
+```  
 
 3)挂载  
 命令挂载  
@@ -256,7 +258,7 @@ mon_host = node01,node02,node03
 
 # vi /etc/fstab
 ...
-none /mnt/cephfs fuse.ceph ceph.id=cephfs,_netdev,defaults 0 0
+none /mnt/cephfs fuse.ceph ceph.id=cephfs,ceph.conf=/etc/ceph/ceph.conf,_netdev,defaults 0 0
 ```  
 注：因为 keyring文件包含了用户名，前提是，必须要有ceph.conf文件，指明 mon地址。
 
