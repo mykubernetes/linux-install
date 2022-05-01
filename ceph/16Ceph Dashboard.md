@@ -77,7 +77,7 @@ LISTEN         0              128                    [::1]:6010                 
 
 4、设置 dashboard 账户及密码
 ```
-通过密码文件设置用户名密码
+#通过密码文件创建账号密码
 # sudo touch pass.txt
 # echo "123456" > pass.txt
 
@@ -88,12 +88,12 @@ LISTEN         0              128                    [::1]:6010                 
 ******************************************************************
 Username and password updated
 
-通过命令设置用户名密码
-# ceph dashboard set-login-credentials <username> <password>
+直接通过命令行创建账号密码
+ceph dashboard set-login-credentials <username> <password>
 ceph dashboard set-login-credentials admin 123456
 
 # 或者直接创建一个dashboard登录用户名密码
-# ceph dashboard ac-user-create admin 123456 administrator
+# ceph dashboard ac-user-create admin 123456 administrator 
 ```
 
 5、dashboard 访问验证
