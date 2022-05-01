@@ -23,9 +23,11 @@
 # ceph config set mgr mgr/dashboard/ssl false
 
 #指定 dashboard 监听地址
+ceph config set mgr mgr/dashboard/$mgr_name/server_addr $IP
 # ceph config set mgr mgr/dashboard/ceph-mgr1/server_addr 10.0.0.104
 
 #指定 dashboard 监听端口
+ceph config set mgr mgr/dashboard/$mgr_name/server_port $PORT
 # ceph config set mgr mgr/dashboard/ceph-mgr1/server_port 9009
 
 #验证集群状态
@@ -75,6 +77,7 @@ LISTEN         0              128                    [::1]:6010                 
 
 4、设置 dashboard 账户及密码
 ```
+通过密码文件设置用户名密码
 # sudo touch pass.txt
 # echo "123456" > pass.txt
 
@@ -85,8 +88,12 @@ LISTEN         0              128                    [::1]:6010                 
 ******************************************************************
 Username and password updated
 
+通过命令设置用户名密码
+# ceph dashboard set-login-credentials <username> <password>
+ceph dashboard set-login-credentials admin 123456
+
 # 或者直接创建一个dashboard登录用户名密码
-# ceph dashboard ac-user-create admin 123456 administrator 
+# ceph dashboard ac-user-create admin 123456 administrator
 ```
 
 5、dashboard 访问验证
