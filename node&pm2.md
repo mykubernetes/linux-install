@@ -1,5 +1,5 @@
-安装node和pm2
----
+# 一、安装node和pm2
+
 1、下载node安装包
 ```
 wget https://npm.taobao.org/mirrors/node/latest-v12.x/node-v12.4.0-linux-x64.tar.gz
@@ -44,8 +44,8 @@ node hellnode.js        #node.js语言编写脚本
 console.log("hello node");
 ```
 
-npm使用,包管理器
----
+# 二、npm使用,包管理器
+
 ```
 node --version                               # 查看node版本
 npm -v                                       # 查看npm 版本,检查npm 是否正确安装
@@ -103,72 +103,84 @@ npm uninstall express                       # 删除指定的模块
 npm remove express                          # 删除指定模块
 ```
 
-cnpm安装
+# 三、cnpm安装
 --
 - 使用淘宝模块使用cnpm,淘宝模块每隔10分钟同步意思官方模块,使用官方模块使用npm
 ```
 npm install -g cnpm --registry=https://registry.npm.taobao.org
 ```
 
-pm2常用命令记录
----
+# 四、pm2常用命令记录
 ```
-# pm2 start app.js # 启动app.js应用程序
-
+# pm2 start app.js                # 启动app.js应用程序
 # pm2 start app.js -i 4           # cluster mode 模式启动4个app.js的应用实例, 4个应用程序会自动进行负载均衡
-
 # pm2 start app.js --name="api"   # 启动应用程序并命名为 "api"
-
 # pm2 start app.js --watch        # 当文件变化时自动重启应用
-
 # pm2 start script.sh             # 启动 bash 脚本
-
 # pm2 list                        # 列表 PM2 启动的所有的应用程序
-
 # pm2 monit                       # 显示每个应用程序的CPU和内存占用情况
-
 # pm2 show [app-name]             # 显示应用程序的所有信息
-
 # pm2 logs                        # 显示所有应用程序的日志
-
 # pm2 logs [app-name]             # 显示指定应用程序的日志
-
 # pm2 flush                       # 清空所有日志文件
-
 # pm2 stop all                    # 停止所有的应用程序
-
 # pm2 stop 0                      # 停止 id为 0的指定应用程序
-
 # pm2 restart all                 # 重启所有应用
-
 # pm2 reload all                  # 重启 cluster mode下的所有应用
-
 # pm2 gracefulReload all          # Graceful reload all apps in cluster mode
-
 # pm2 delete all                  # 关闭并删除所有应用
-
 # pm2 delete 0                    # 删除指定应用 id 0
-
 # pm2 scale api 10                # 把名字叫api的应用扩展到10个实例
-
 # pm2 reset [app-name]            # 重置重启数量
-
 # pm2 startup                     # 创建开机自启动命令
-
 # pm2 save                        # 保存当前应用列表
-
 # pm2 resurrect                   # 重新加载保存的应用列表
-
 # pm2 update                      # Save processes, kill PM2 and restore processes
-
 # pm2 generate                    # Generate a sample json configuration file
 ```
 - pm2文档地址：http://pm2.keymetrics.io/docs/usage/quick-start/
 
 
+# 五、npm 切换源
 
-nvm
----
+1、安装nrm
+```
+$ npm install -g nrm
+```
+
+2、列出可选的源
+```
+$ nrm ls
+*  npm ---- https://registry.npmjs.org
+    cnpm --- http://r.cnpmjs.org/
+    taobao -http://registry.npm.taobao.org/
+    eu ----- http://registry.npmjs.eu/
+    au -----  http://registry.npmjs.org.au/
+    sl ----- http://npm.strongloop.com/
+    nj -----  https://registry.nodejitsu.com/
+```
+带*的是当前使用的源，上面的输出表明当前源是官方源。
+
+3、切换到taobao
+```
+ $ nrm use taobao
+        Registry has beensetto: http://registry.npm.taobao.org/
+```
+测试所有源的响应时间：
+```
+$ nrm test                                                                                                                                
+   npm---- 891ms
+   cnpm--- 1213ms
+* taobao -460ms 
+   eu----- 3859ms
+   au----- 1073ms
+   sl----- 4150ms
+   nj----- 8008ms
+```
+注意，为了取得较准确的结果，可以考虑多次测试取平均值。
+
+
+# 六、nvm
 - nvm是的github中的一个开源项目, 可以很方便的在linux中安装和切换node的各个版本.nvm项目链接
 
 https://github.com/nvm-sh/nvm
