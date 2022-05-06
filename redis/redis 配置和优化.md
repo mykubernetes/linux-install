@@ -20,6 +20,7 @@ rdbcompression yes                 #持久化到RDB文件时，是否压缩，"y
 rdbchecksum yes                    #是否对备份文件开启RC64校验，默认是开启
 dbfilename dump.rdb                #快照文件名
 dir ./                             #快照文件保存路径，示例：dir "/apps/redis/data"
+rdb-del-sync-files no              #在没有开启数据库持久化的情况下删除复制中使用的RDB文件，redis6.0以后才有的配置。
 
 #主从复制相关
 # replicaof <masterip> <masterport>   #指定复制的master主机地址和端口，5.0版之前的指令为slaveof 
