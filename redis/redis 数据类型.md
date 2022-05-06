@@ -479,3 +479,359 @@ OK
 127.0.0.1:6379> EXISTS list1
 (integer) 0
 ```
+
+## 3、集合 set
+
+Set 是 String 类型的无序集合，集合中的成员是唯一的，这就意味着集合中不能出现重复的数据，可以在两个不同的集合中对数据进行对比并取值，常用于取值判断，统计，交集等场景
+
+集合特点:
+- 无序
+- 无重复
+- 集合间操作
+
+### 3.1 生成集合key
+```
+127.0.0.1:6379> SADD set1 v1
+(integer) 1
+127.0.0.1:6379> SADD set2 v2 v4
+(integer) 2
+127.0.0.1:6379> TYPE set1
+set
+127.0.0.1:6379> TYPE set2
+set
+```
+
+### 3.2 追加数值
+```
+#追加时，只能追加不存在的数据，不能追加已经存在的数值
+127.0.0.1:6379> SADD set1 v2 v3 v4
+(integer) 3
+127.0.0.1:6379> SADD set1 v2         #已存在的value,无法再次添加
+(integer) 0
+127.0.0.1:6379> TYPE set1
+set
+127.0.0.1:6379> TYPE set2
+set
+```
+
+### 3.3 查看集合的所有数据
+```
+127.0.0.1:6379> SMEMBERS set1
+1) "v4"
+2) "v1"
+3) "v3"
+4) "v2"
+
+127.0.0.1:6379> SMEMBERS set2
+1) "v4"
+2) "v2"
+```
+
+### 3.4 删除集合中的元素
+```
+127.0.0.1:6379> sadd goods mobile laptop car 
+(integer) 3
+127.0.0.1:6379> srem goods car
+(integer) 1
+127.0.0.1:6379> SMEMBERS goods
+1) "mobile"
+2) "laptop"
+127.0.0.1:6379>
+```
+
+### 3.5 获取集合的交集
+- 交集：已属于A且属于B的元素称为A与B的交（集）
+```
+127.0.0.1:6379> SINTER set1 set2
+1) "v4"
+2) "v2"
+```
+
+### 3.6 获取集合的并集
+- 并集：已属于A或属于B的元素为称为A与B的并（集）
+```
+127.0.0.1:6379> SUNION set1 set2
+1) "v2"
+2) "v4"
+3) "v1"
+4) "v3"
+```
+
+### 3.7 获取集合的差集
+- 差集：已属于A而不属于B的元素称为A与B的差（集）
+```
+127.0.0.1:6379> SDIFF set1 set2
+1) "v1"
+2) "v3"
+```
+
+## 4、有序集合 sorted set
+Redis 有序集合和集合一样也是string类型元素的集合,且不允许重复的成员，不同的是每个元素都会关联一个double(双精度浮点型)类型的分数，redis正是通过该分数来为集合中的成员进行从小到大的排序，有序集合的成员是唯一的,但分数(score)却可以重复，集合是通过哈希表实现的，所以添加，删除，查找的复杂度都是O(1)， 集合中最大的成员数为 2^32 - 1 (4294967295, 每个集合可存储40多亿个成员)，经常用于排行榜的场景
+
+有序集合特点：
+- 有序
+- 无重复元素
+- 每个元素是由score和value组成
+- score 可以重复
+- value 不可以重复
+
+### 4.1 生成有序集合
+```
+127.0.0.1:6379> ZADD zset1 1 v1     #分数为1
+(integer) 1
+127.0.0.1:6379> ZADD zset1 2 v2
+(integer) 1
+127.0.0.1:6379> ZADD zset1 2 v3     #分数可重复，元素值不可以重复
+(integer) 1
+127.0.0.1:6379> ZADD zset1 3 v4
+(integer) 1
+127.0.0.1:6379> TYPE zset1
+zset
+127.0.0.1:6379> TYPE zset2
+zset
+
+#一次生成多个数据：
+127.0.0.1:6379> ZADD zset2 1 v1 2 v2 3 v3 4 v4 5 v5
+(integer) 5
+```
+
+### 4.2 有序集合实现排行榜
+```
+127.0.0.1:6379> ZADD paihangbang 90 nezha 199 zhanlang 60 zhuluoji 30 gangtiexia
+(integer) 4
+127.0.0.1:6379> ZRANGE paihangbang 0 -1  #正序排序后显示集合内所有的key,score从小到大显示
+1) "gangtiexia"
+2) "zhuluoji"
+3) "nezha"
+4) "zhanlang"
+127.0.0.1:6379> ZREVRANGE paihangbang 0 -1 #倒序排序后显示集合内所有的key,score从大到小显示
+1) "zhanlang"
+2) "nezha"
+3) "zhuluoji"
+4) "gangtiexia"
+127.0.0.1:6379> ZRANGE paihangbang 0 -1 WITHSCORES  #正序显示指定集合内所有key和得分情况
+1) "gangtiexia"
+2) "30"
+3) "zhuluoji"
+4) "60"
+5) "nezha"
+6) "90"
+7) "zhanlang"
+8) "199"
+127.0.0.1:6379> ZREVRANGE paihangbang 0 -1 WITHSCORES  #倒序显示指定集合内所有key和得分情况
+1) "zhanlang"
+2) "199"
+3) "nezha"
+4) "90"
+5) "zhuluoji"
+6) "60"
+7) "gangtiexia"
+8) "30"
+127.0.0.1:6379> 
+```
+
+### 4.3 获取集合的个数
+```
+127.0.0.1:6379> ZCARD paihangbang
+(integer) 4
+127.0.0.1:6379> ZCARD zset1
+(integer) 4
+127.0.0.1:6379> ZCARD zset2
+(integer) 4
+```
+
+### 4.4 基于索引返回数值
+```
+127.0.0.1:6379> ZRANGE paihangbang 0 2
+1) "gangtiexia"
+2) "zhuluoji"
+3) "nezha"
+127.0.0.1:6379> ZRANGE paihangbang 0 10  #超出范围不报错
+1) "gangtiexia"
+2) "zhuluoji"
+3) "nezha"
+4) "zhanlang"
+127.0.0.1:6379> ZRANGE zset1 1 3
+1) "v2"
+2) "v3"
+3) "v4"
+127.0.0.1:6379> ZRANGE zset1 0 2
+1) "v1"
+2) "v2"
+3) "v3"
+127.0.0.1:6379> ZRANGE zset1 2 2
+1) "v3"
+```
+
+### 4.5 返回某个数值的索引(排名)
+```
+127.0.0.1:6379> ZADD paihangbang 90 nezha 199 zhanlang 60 zhuluoji 30 gangtiexia
+(integer) 4
+127.0.0.1:6379> ZRANK paihangbang zhanlang
+(integer) 3          #第4个
+127.0.0.1:6379> ZRANK paihangbang zhuluoji
+(integer) 1          #第2个
+```
+
+### 4.6 获取分数
+```
+127.0.0.1:6379> zscore paihangbang gangtiexia
+"30"
+```
+
+### 4.7 删除元素
+```
+127.0.0.1:6379> ZADD paihangbang 90 nezha 199 zhanlang 60 zhuluoji 30 gangtiexia
+(integer) 4
+127.0.0.1:6379> ZRANGE paihangbang 0 -1
+1) "gangtiexia"
+2) "zhuluoji"
+3) "nezha"
+4) "zhanlang"
+127.0.0.1:6379> ZREM paihangbang zhuluoji zhanlang
+(integer) 2
+127.0.0.1:6379> ZRANGE paihangbang 0 -1
+1) "gangtiexia"
+2) "nezha"
+```
+
+## 5 哈希 hash
+
+hash 是一个string类型的字段(field)和值(value)的映射表，Redis 中每个 hash 可以存储 2^32 -1 键值对，类似于字典，存放了多个k/v 对，hash特别适合用于存储对象场景
+
+### 5.1 生成 hash key
+
+格式：
+```
+HSET hash field value
+时间复杂度： O(1)
+将哈希表 hash 中域 field 的值设置为 value 。
+
+如果给定的哈希表并不存在， 那么一个新的哈希表将被创建并执行 HSET 操作。
+如果域 field 已经存在于哈希表中， 那么它的旧值将被新值 value 覆盖。
+```
+
+范例: 
+```
+127.0.0.1:6379> HSET 9527 name zhouxingxing age 20
+(integer) 2
+127.0.0.1:6379> TYPE 9527
+hash
+
+#查看所有字段的值
+127.0.0.1:6379> hgetall 9527
+1) "name"
+2) "zhouxingxing"
+3) "age"
+4) "20"
+
+#增加字段
+127.0.0.1:6379> HSET 9527 gender male
+(integer) 1
+127.0.0.1:6379> hgetall 9527
+1) "name"
+2) "zhouxingxing"
+3) "age"
+4) "20"
+5) "gender"
+6) "male"
+```
+
+### 5.2 获取hash key的对应字段的值
+```
+127.0.0.1:6379> HGET 9527 name
+"zhouxingxing"
+127.0.0.1:6379> HGET 9527 age
+"20"
+
+127.0.0.1:6379> HMGET 9527 name age     #获取多个值
+1) "zhouxingxing"
+2) "20"
+127.0.0.1:6379>
+```
+
+### 5.3 删除一个hash key 的对应字段
+```
+127.0.0.1:6379> HDEL 9527 age
+(integer) 1
+127.0.0.1:6379> HGET 9527 age
+(nil)
+
+127.0.0.1:6379> hgetall 9527
+1) "name"
+2) "zhouxingxing"
+
+127.0.0.1:6379> HGET 9527 name
+"zhouxingxing"
+```
+
+### 5.4 批量设置hash key的多个field和value
+```
+127.0.0.1:6379> HMSET 9527 name zhouxingxing age 50 city hongkong
+OK
+
+127.0.0.1:6379> HGETALL 9527
+1) "name"
+2) "zhouxingxing"
+3) "age"
+4) "50"
+5) "city"
+6) "hongkong"
+```
+
+### 5.5 获取hash中指定字段的值
+```
+127.0.0.1:6379> HMSET 9527 name zhouxingxing age 50 city hongkong
+OK
+
+127.0.0.1:6379> HMGET 9527 name age 
+1) "zhouxingxing"
+2) "50"
+127.0.0.1:6379> 
+```
+
+### 5.6 获取hash中的所有字段名field
+```
+127.0.0.1:6379> HMSET 9527 name zhouxingxing age 50 city hongkong     #重新设置
+OK
+127.0.0.1:6379> HKEYS 9527
+1) "name"
+2) "age"
+3) "city"
+```
+
+### 5.7 获取hash key对应所有field的value
+```
+127.0.0.1:6379> HMSET 9527 name zhouxingxing age 50 city hongkong
+OK
+
+127.0.0.1:6379> HVALS 9527
+1) "zhouxingxing"
+2) "50"
+3) "hongkong"
+```
+
+### 5.8 获取指定hash key 的所有field及value
+```
+127.0.0.1:6379> HGETALL 9527
+1) "name"
+2) "zhouxingxing"
+3) "age"
+4) "50"
+5) "city"
+6) "hongkong"
+127.0.0.1:6379>
+```
+
+### 5.9 删除 hash
+```
+127.0.0.1:6379> DEL 9527
+(integer) 1
+
+127.0.0.1:6379> HMGET 9527 name city
+1) (nil)
+2) (nil)
+
+127.0.0.1:6379> EXISTS 9527
+(integer) 0
+```
