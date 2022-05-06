@@ -1,3 +1,4 @@
+# redis 主要配置项
 ```
 bind 0.0.0.0                       #监听地址，可以用空格隔开后多个监听IP
 protected-mode yes                 #redis3.2之后加入的新特性，在没有设置bind IP和密码的时候,redis只允许访问127.0.0.1:6379，可以远程连接，但当访问将提示警告信息并拒绝远程访问
@@ -80,5 +81,122 @@ cluster-replica-no-failover no      #如果为yes,此选项阻止在主服务器
 #Slow log 是 Redis 用来记录超过指定执行时间的日志系统，执行时间不包括与客户端交谈，发送回复等I/O操作，而是实际执行命令所需的时间（在该阶段线程被阻塞并且不能同时为其它请求提供服务）,由于slow log 保存在内存里面，读写速度非常快，因此可放心地使用，不必担心因为开启 slow log 而影响Redis 的速度
 slowlog-log-slower-than 10000       #以微秒为单位的慢日志记录，为负数会禁用慢日志，为0会记录每个命令操作。默认值为10ms,一般一条命令执行都在微秒级,生产建议设为1ms-10ms之间
 slowlog-max-len 128                 #最多记录多少条慢日志的保存队列长度，达到此长度后，记录新命令会将最旧的命令从命令队列中删除，以此滚动删除,即,先进先出,队列固定长度,默认128,值偏小,生产建议设为1000以上
+```
 
+# CONFIG 动态修改配置
+- config 命令用于查看当前redis配置、以及不重启redis服务实现动态更改redis配置等
+
+**注意：** 不是所有配置都可以动态修改,且此方式无法持久保存
+
+```
+CONFIG SET parameter value
+时间复杂度：O(1)CONFIG SET 命令可以动态地调整 Redis 服务器的配置(configuration)而无须重启。
+
+可以使用它修改配置参数，或者改变 Redis 的持久化(Persistence)方式。CONFIG SET 可以修改的配置参数可以使用命令 CONFIG GET * 来列出，所有被 CONFIG SET 修改的配置参数都会立即生效。
+
+CONFIG GET parameter
+时间复杂度： O(N)，其中 N 为命令返回的配置选项数量。CONFIG GET 命令用于取得运行中的 Redis 服务器的配置参数(configuration parameters)，在Redis 2.4 版本中， 有部分参数没有办法用 CONFIG GET 访问，但是在最新的 Redis 2.6 版本中，所有配置参数都已经可以用 CONFIG GET 访问了。
+
+CONFIG GET 接受单个参数 parameter 作为搜索关键字，查找所有匹配的配置参数，其中参数和值以“键值对”(key-value pairs)的方式排列。比如执行 CONFIG GET s* 命令，服务器就会返回所有以 s 开头的配置参数及参数的值：
+```
+
+1、设置连接密码
+```
+#设置连接密码
+127.0.0.1:6379> CONFIG SET requirepass 123456
+OK
+
+#查看连接密码
+127.0.0.1:6379> CONFIG GET requirepass  
+1) "requirepass"
+2) "123456"
+```
+
+2、获取当前配置
+```
+#奇数行为键，偶数行为值
+127.0.0.1:6379> CONFIG GET *
+ 1) "dbfilename"
+ 2) "dump.rdb"
+ 3) "requirepass"
+ 4) ""
+ 5) "masterauth"
+ 6) ""
+ 7) "cluster-announce-ip"
+ 8) ""
+ 9) "unixsocket"
+10) ""
+11) "logfile"
+12) "/var/log/redis/redis.log"
+13) "pidfile"
+14) "/var/run/redis_6379.pid"
+15) "slave-announce-ip"
+16) ""
+17) "replica-announce-ip"
+18) ""
+19) "maxmemory"
+20) "0"
+......
+
+#查看bind 
+127.0.0.1:6379> CONFIG GET bind
+1) "bind"
+2) "0.0.0.0"
+
+#有些设置无法修改
+127.0.0.1:6379> CONFIG SET bind 127.0.0.1
+(error) ERR Unsupported CONFIG parameter: bind
+```
+
+3、更改最大内存
+```
+127.0.0.1:6379> CONFIG SET maxmemory 8589934592
+OK
+
+127.0.0.1:6379> CONFIG GET maxmemory
+1) "maxmemory"
+2) "8589934592"
+```
+
+# 慢查询
+```
+[root@centos8 ~]#vim /etc/redis.conf
+slowlog-log-slower-than 1    #指定为超过1us即为慢的指令
+slowlog-max-len 1024         #指定保存1024条慢记录
+
+127.0.0.1:6379> SLOWLOG LEN  #查看慢日志的记录条数
+(integer) 14
+
+127.0.0.1:6379> SLOWLOG GET [n] #查看慢日志的n条记录
+1) 1) (integer) 14
+2) (integer) 1544690617
+3) (integer) 4
+4) 1) "slowlog"
+
+127.0.0.1:6379> SLOWLOG GET 3
+1) 1) (integer) 7
+   2) (integer) 1602901545
+   3) (integer) 26
+   4) 1) "SLOWLOG"
+      2) "get"
+   5) "127.0.0.1:38258"
+   6) ""
+2) 1) (integer) 6
+   2) (integer) 1602901540
+   3) (integer) 22
+   4) 1) "SLOWLOG"
+      2) "get"
+      3) "2"
+   5) "127.0.0.1:38258"
+   6) ""
+3) 1) (integer) 5
+   2) (integer) 1602901497
+   3) (integer) 22
+   4) 1) "SLOWLOG"
+      2) "GET"
+   5) "127.0.0.1:38258"
+   6) ""
+
+127.0.0.1:6379> SLOWLOG RESET #清空慢日志
+OK
 ```
