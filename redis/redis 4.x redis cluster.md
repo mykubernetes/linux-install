@@ -55,8 +55,7 @@ cb20d58870fe05de8462787cf9947239f4bc5629 10.0.0.38:6379@16379 master - 016025153
 (error) CLUSTERDOWN Hash slot not served
 
 #查看当前状态
-[root@centos8 ~]#redis-cli -h 10.0.0.8 -a 123456 --no-auth-warning cluster 
-info
+[root@centos8 ~]#redis-cli -h 10.0.0.8 -a 123456 --no-auth-warning cluster info
 cluster_state:fail
 cluster_slots_assigned:0
 cluster_slots_ok:0
