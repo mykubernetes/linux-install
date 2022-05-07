@@ -464,3 +464,211 @@ OK
 [root@centos8 ~]#redis-cli -h 10.0.0.28 -a 123456 --no-auth-warning get linux
 "love"
 ```
+
+# python脚本实现RedisCluster集群写入
+ 
+官网: https://github.com/Grokzen/redis-py-cluster
+ 
+范例: 
+```
+[root@redis-node1 ~]#dnf -y install python3
+[root@redis-node1 ~]#pip3 install redis-py-cluster
+[root@redis-node1 ~]#vim redis_cluster_test.py
+[root@redis-node1 ~]#cat ./redis_cluster_test.py 
+#!/usr/bin/env python3
+from rediscluster  import RedisCluster
+startup_nodes = [
+   {"host":"10.0.0.8", "port":6379},
+   {"host":"10.0.0.18", "port":6379},
+   {"host":"10.0.0.28", "port":6379},
+   {"host":"10.0.0.38", "port":6379},
+   {"host":"10.0.0.48", "port":6379},
+   {"host":"10.0.0.58", "port":6379}
+]
+redis_conn= RedisCluster(startup_nodes=startup_nodes,password='123456', 
+decode_responses=True)
+for i in range(0, 10000):
+    redis_conn.set('key'+str(i),'value'+str(i))
+    print('key'+str(i)+':',redis_conn.get('key'+str(i)))
+
+[root@redis-node1 ~]#chmod +x redis_cluster_test.py
+[root@redis-node1 ~]#./redis_cluster_test.py
+......
+key9998: value9998
+key9999: value9999
+
+#验证数据
+[root@redis-node1 ~]#redis-cli -a 123456 -h 10.0.0.8
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.8:6379> DBSIZE
+(integer) 3331
+10.0.0.8:6379> GET key1
+(error) MOVED 9189 10.0.0.18:6379
+10.0.0.8:6379> GET key2
+"value2"
+10.0.0.8:6379> GET key3
+"value3"
+10.0.0.8:6379> KEYS *
+......
+3329) "key7832"
+3330) "key2325"
+3331) "key2880"
+10.0.0.8:6379>
+
+[root@redis-node1 ~]#redis-cli -a 123456 -h 10.0.0.18 DBSIZE
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+(integer) 3340
+[root@redis-node1 ~]#redis-cli -a 123456 -h 10.0.0.18 GET key1
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+"value1"
+[root@redis-node1 ~]#redis-cli -a 123456 -h 10.0.0.28 DBSIZE
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+(integer) 3329
+[root@redis-node1 ~]#redis-cli -a 123456 -h 10.0.0.18 GET key5
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+"value5"
+```
+
+# 模拟master故障，对应的slave节点自动提升为新master
+```
+#模拟node2节点出故障,需要相应的数秒故障转移时间
+[root@redis-node2 ~]#tail -f /var/log/redis/redis.log  
+[root@redis-node2 ~]#redis-cli -a 123456
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+127.0.0.1:6379> shutdown
+not connected> exit
+
+[root@redis-node2 ~]#ss -ntl
+State       Recv-Q       Send-Q Local Address:Port Peer Address:Port        
+LISTEN       0             128           0.0.0.0:22         0.0.0.0:*           
+LISTEN       0             100         127.0.0.1:25         0.0.0.0:*           
+LISTEN       0             128             [::]:22           [::]:*           
+LISTEN       0             100             [::1]:25           [::]:*   
+
+[root@redis-node2 ~]# redis-cli -a 123456 --cluster info 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+Could not connect to Redis at 10.0.0.18:6379: Connection refused
+10.0.0.8:6379 (cb028b83...) -> 3331 keys | 5461 slots | 1 slaves.
+10.0.0.48:6379 (d04e524d...) -> 3340 keys | 5462 slots | 0 slaves. #10.0.0.48为新的master
+10.0.0.28:6379 (d34da866...) -> 3329 keys | 5461 slots | 1 slaves.
+[OK] 10000 keys in 3 masters.
+0.61 keys per slot on average.
+
+[root@redis-node2 ~]# redis-cli -a 123456 --cluster check 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+Could not connect to Redis at 10.0.0.18:6379: Connection refused
+10.0.0.8:6379 (cb028b83...) -> 3331 keys | 5461 slots | 1 slaves.
+10.0.0.48:6379 (d04e524d...) -> 3340 keys | 5462 slots | 0 slaves.
+10.0.0.28:6379 (d34da866...) -> 3329 keys | 5461 slots | 1 slaves.
+[OK] 10000 keys in 3 masters.
+0.61 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[0-5460] (5461 slots) master
+   1 additional replica(s)
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[5461-10922] (5462 slots) master
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[10923-16383] (5461 slots) master[root@redis-node2 ~]#redis-cli -a 123456 -h 10.0.0.48
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.48:6379> INFO replication
+# Replication
+role:master
+connected_slaves:0
+master_replid:0000698bc2c6452d8bfba68246350662ae41d8fd
+master_replid2:b9066d3cbf0c5fecc7f4d1d5cb2433999783fa3f
+master_repl_offset:2912424
+second_repl_offset:2912425
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1863849
+repl_backlog_histlen:1048576
+10.0.0.48:6379> 
+
+#恢复故障节点node2
+[root@redis-node2 ~]#systemctl start redis
+
+#查看自动生成的配置文件，可以查看node2自动成为slave节点
+[root@redis-node2 ~]#cat /var/lib/redis/nodes-6379.conf
+99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379@16379 myself,slave d04e524daec4d8e22bdada7f21a9487c2d3e1057 0 1582352081847 2 connected
+f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379@16379 slave cb028b83f9dc463d732f6e76ca6bbcd469d948a7 1582352081868 1582352081847 4 connected
+cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379@16379 master -1582352081868 1582352081847 1 connected 0-5460
+9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379@16379 slave d34da8666a6f587283a1c2fca5d13691407f9462 1582352081869 1582352081847 3 connected
+d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379@16379 master -1582352081869 1582352081847 7 connected 5461-10922
+d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379@16379 master -1582352081869 1582352081847 3 connected 10923-16383
+vars currentEpoch 7 lastVoteEpoch 0
+
+[root@redis-node2 ~]#redis-cli -a 123456 -h 10.0.0.48
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.48:6379> INFO replication
+# Replication
+role:master
+connected_slaves:1
+slave0:ip=10.0.0.18,port=6379,state=online,offset=2912564,lag=1
+master_replid:0000698bc2c6452d8bfba68246350662ae41d8fd
+master_replid2:b9066d3cbf0c5fecc7f4d1d5cb2433999783fa3f
+master_repl_offset:2912564
+second_repl_offset:2912425
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1863989
+repl_backlog_histlen:1048576
+10.0.0.48:6379>
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+[root@redis-node2 ~]#redis-cli -a 123456 -h 10.0.0.48
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.48:6379> INFO replication
+# Replication
+role:master
+connected_slaves:0
+master_replid:0000698bc2c6452d8bfba68246350662ae41d8fd
+master_replid2:b9066d3cbf0c5fecc7f4d1d5cb2433999783fa3f
+master_repl_offset:2912424
+second_repl_offset:2912425
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1863849
+repl_backlog_histlen:1048576
+10.0.0.48:6379> 
+
+#恢复故障节点node2
+[root@redis-node2 ~]#systemctl start redis
+
+#查看自动生成的配置文件，可以查看node2自动成为slave节点
+[root@redis-node2 ~]#cat /var/lib/redis/nodes-6379.conf
+99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379@16379 myself,slave d04e524daec4d8e22bdada7f21a9487c2d3e1057 0 1582352081847 2 connected
+f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379@16379 slave cb028b83f9dc463d732f6e76ca6bbcd469d948a7 1582352081868 1582352081847 4 connected
+cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379@16379 master -1582352081868 1582352081847 1 connected 0-5460
+9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379@16379 slave d34da8666a6f587283a1c2fca5d13691407f9462 1582352081869 1582352081847 3 connected
+d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379@16379 master -1582352081869 1582352081847 7 connected 5461-10922
+d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379@16379 master -1582352081869 1582352081847 3 connected 10923-16383
+vars currentEpoch 7 lastVoteEpoch 0
+
+[root@redis-node2 ~]#redis-cli -a 123456 -h 10.0.0.48
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.48:6379> INFO replication
+# Replication
+role:master
+connected_slaves:1
+slave0:ip=10.0.0.18,port=6379,state=online,offset=2912564,lag=1
+master_replid:0000698bc2c6452d8bfba68246350662ae41d8fd
+master_replid2:b9066d3cbf0c5fecc7f4d1d5cb2433999783fa3f
+master_repl_offset:2912564
+second_repl_offset:2912425
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1863989
+repl_backlog_histlen:1048576
+10.0.0.48:6379>
+```
