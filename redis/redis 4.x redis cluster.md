@@ -96,8 +96,7 @@ end=$4
 pass=123456
 for slot in `seq ${start} ${end}`;do
     echo slot:$slot
-   redis-cli -h ${host} -p $port -a ${pass} --no-auth-warning cluster addslots 
-${slot}
+    redis-cli -h ${host} -p $port -a ${pass} --no-auth-warning cluster addslots ${slot}
 done
 
 #为三个master分配槽位,共16364/3=5,461.333333333333,平均每个master分配5,461个槽位
@@ -144,8 +143,7 @@ OK
 "mage"
 
 #当所有的三个master分配完槽位后,可以看到下面信息
-[root@centos8 ~]#redis-cli -h 10.0.0.8 -a 123456 --no-auth-warning cluster 
-nodes
+[root@centos8 ~]#redis-cli -h 10.0.0.8 -a 123456 --no-auth-warning cluster nodes
 a177c5cbc2407ebb6230ea7e2a7de914bf8c2dab 10.0.0.8:6379@16379 myself,master - 01602516633000 3 connected 0-5461
 97c5dcc3f33c2fc75c7fdded25d05d2930a312c0 10.0.0.18:6379@16379 master - 01602516635862 1 connected 5462-10922
 cb20d58870fe05de8462787cf9947239f4bc5629 10.0.0.38:6379@16379 master - 01602516635000 0 connected
