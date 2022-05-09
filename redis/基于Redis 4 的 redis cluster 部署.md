@@ -1,4 +1,6 @@
-# 1、准备redis Cluster 基本配置
+# 一、基于Redis 4 的 redis cluster 部署
+
+## 1、准备redis Cluster 基本配置
 - 1. 每个redis 节点采用相同的硬件配置、相同的密码、相同的redis版本
 - 2. 所有redis服务器必须没有任何数据
 - 3. 准备三台CentOS 7 主机，已编译安装好redis，各启动两个redis实例，分别使用6379和6380端口，从而模拟实现6台redis实例
@@ -204,7 +206,7 @@ root  71553  31781  0 22:15 pts/0 00:00:00 grep --color=auto redis
 5 directories, 16 files
 ```
 
-# 2、准备redis-trib.rb工具
+## 2、准备redis-trib.rb工具
 Redis 3和 4版本需要使用到集群管理工具redis-trib.rb，这个工具是redis官方推出的管理redis集群的工具，集成在redis的源码src目录下，是基于redis提供的集群命令封装成简单、便捷、实用的操作工具，redis-trib.rb是redis作者用ruby开发完成的，centos 7 系统yum安装的ruby存在版本较低问题，如下：
 ```
 [root@redis-node1 ~]#find / -name redis-trib.rb
@@ -267,7 +269,7 @@ Done installing documentation for redis after 1 seconds
 [root@redis-node1 ~]#gem install -l redis-4.1.3.gem #安装redis模块
 ```
 
-# 3、redis-trib.rb 命令用法
+## 3、redis-trib.rb 命令用法
 ```
 [root@redis-node1 ~]#redis-trib.rb
 Usage: redis-trib <command> <options> <arguments ...>
@@ -305,7 +307,7 @@ import host:port                           #导入外部redis服务器的数据�
 help          (show this help)
 ```
 
-# 4、修改密码 redis 登录密码
+## 4、修改密码 redis 登录密码
 ```
 #修改redis-trib.rb连接redis的密码
 [root@redis ~]#vim /usr/local/lib/ruby/gems/2.5.0/gems/redis-4.1.3/lib/redis/client.rb
@@ -328,7 +330,7 @@ help          (show this help)
         }
 ```
 
-# 5、创建redis cluster集群
+## 5、创建redis cluster集群
 ```
 #确保三台主机6个实例都启动状态
 [root@redis-node1 ~]#systemctl is-active redis redis6380
@@ -405,7 +407,7 @@ OK
 OK
 ```
 
-# 6、查看 redis cluster 集群状态
+## 6、查看 redis cluster 集群状态
 
 - 自动生成配置文件记录master/slave对应关系
 ```
@@ -521,7 +523,7 @@ repl_backlog_first_byte_offset:1
 repl_backlog_histlen:224
 ```
 
-# 7、python脚本实现RedisCluster集群写入
+## 7、python脚本实现RedisCluster集群写入
 ```
 [root@redis-node1 ~]#yum -y install python3
 [root@redis-node1 ~]#pip3 install redis-py-cluster
@@ -584,7 +586,7 @@ Warning: Using a password with '-a' option on the command line interface may not
 [root@redis-node1 ~]#
 ```
 
-# 8、模拟 master 故障，对应的slave节点自动提升为新master
+## 8、模拟 master 故障，对应的slave节点自动提升为新master
 ```
 [root@redis-node1 ~]#systemctl stop redis
 
@@ -660,6 +662,774 @@ M: dddabb4e19235ec02ae96ab2ce67e295ce0274d7 10.0.0.17:6379
 [OK] All 16384 slots covered.
 ```
 
+# 二、Redis cluster集群节点维护
+
+redis 集群运行之后，难免由于硬件故障、网络规划、业务增长等原因对已有集群进行相应的调整， 比如: 增加Redis node节点、减少节点、节点迁移、更换服务器等。增加节点和删除节点会涉及到已有的槽位重新分配及数据迁移。
+
+## 1、集群维护之动态扩容
+
+实战案例：
+
+因公司业务发展迅猛，现有的三主三从的redis cluster架构可能无法满足现有业务的并发写入需求，因此公司紧急采购两台服务器10.0.0.68，10.0.0.78，需要将其动态添加到集群当中，但不能影响业务使用和数据丢失。
+
+注意: 生产环境一般建议master节点为奇数个,比如:3,5,7,以防止脑裂现象
+
+### 1)添加节点准备
+
+增加Redis node节点，需要与之前的Redis node版本相同、配置一致，然后分别再启动两台Redis node，应为一主一从。
+```
+#配置node7节点
+[root@redis-node7 ~]#dnf -y install redis
+[root@redis-node7 ~]#sed -i.bak -e 's/bind 127.0.0.1/bind 0.0.0.0/' \
+                    -e '/masterauth/a masterauth 123456' \
+                    -e '/# requirepass/a requirepass 123456' \
+                    -e '/# cluster-enabled yes/a cluster-enabled yes' \
+                    -e '/# cluster-config-file nodes-6379.conf/a cluster-config-file nodes-6379.conf' \
+                    -e '/cluster-require-full-coverage yes/c cluster-require-full-coverage no' /etc/redis.conf
+[root@redis-node7 ~]#systemctl enable --now redis
+
+#配置node8节点
+[root@redis-node8 ~]#dnf -y install redis
+[root@redis-node8 ~]#sed -i.bak -e 's/bind 127.0.0.1/bind 0.0.0.0/' \
+                     -e '/masterauth/a masterauth 123456' \
+                     -e '/# requirepass/a requirepass 123456' \
+                     -e '/# cluster-enabled yes/a cluster-enabled yes' \
+                     -e '/# cluster-config-file nodes-6379.conf/a cluster-config-file nodes-6379.conf' \
+                     -e '/cluster-require-full-coverage yes/c cluster-require-full-coverage no' /etc/redis.conf
+[root@redis-node8 ~]#systemctl enable --now redis
+```
+
+### 2)添加新的master节点到集群
+
+使用以下命令添加新节点，要添加的新redis节点IP和端口添加到的已有的集群中任意节点的IP:端口
+```
+add-node new_host:new_port existing_host:existing_port [--slave --master-id <arg>]
+
+#说明：
+new_host:new_port                   #为新添加的主机的IP和端口
+existing_host:existing_port         #为已有的集群中任意节点的IP和端口
+```
+
+#### Redis 3/4 添加方式：
+```
+#把新的Redis 节点10.0.0.37添加到当前Redis集群当中。
+[root@redis-node1 ~]#redis-trib.rb add-node 10.0.0.37:6379 10.0.0.7:6379
+
+[root@redis-node1 ~]#redis-trib.rb info 10.0.0.7:6379
+10.0.0.7:6379 (29a83275...) -> 3331 keys | 5461 slots | 1 slaves.
+10.0.0.37:6379 (12ca273a...) -> 0 keys | 0 slots | 0 slaves.
+10.0.0.27:6379 (90b20613...) -> 3329 keys | 5461 slots | 1 slaves.
+10.0.0.17:6379 (fb34c3a7...) -> 3340 keys | 5462 slots | 1 slaves.
+[OK] 10000 keys in 4 masters.
+0.61 keys per slot on average.
+```
+
+#### Redis 5 添加方式：
+```
+#将一台新的主机10.0.0.68加入集群,以下示例中10.0.0.58可以是任意存在的集群节点
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster add-node 10.0.0.68:6379 <当前任意集群节点>:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+>>> Adding node 10.0.0.68:6379 to cluster 10.0.0.58:6379
+>>> Performing Cluster Check (using node 10.0.0.58:6379)
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[5461-10922] (5462 slots) master
+   1 additional replica(s)
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[10923-16383] (5461 slots) master
+   1 additional replica(s)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[0-5460] (5461 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Send CLUSTER MEET to node 10.0.0.68:6379 to make it join the cluster.
+[OK] New node added correctly.
+#观察到该节点已经加入成功，但此节点上没有slot位,也无从节点，而且新的节点是master
+
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster info 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.8:6379 (cb028b83...) -> 6672 keys | 5461 slots | 1 slaves.
+10.0.0.68:6379 (d6e2eca6...) -> 0 keys | 0 slots | 0 slaves.
+10.0.0.48:6379 (d04e524d...) -> 6679 keys | 5462 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 6649 keys | 5461 slots | 1 slaves.
+[OK] 20000 keys in 5 masters.
+1.22 keys per slot on average.
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster check 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface 
+may not be safe.
+10.0.0.8:6379 (cb028b83...) -> 6672 keys | 5461 slots | 1 slaves.
+10.0.0.68:6379 (d6e2eca6...) -> 0 keys | 0 slots | 0 slaves.
+10.0.0.48:6379 (d04e524d...) -> 6679 keys | 5462 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 6649 keys | 5461 slots | 1 slaves.
+[OK] 20000 keys in 5 masters.
+1.22 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[0-5460] (5461 slots) master
+   1 additional replica(s)
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots: (0 slots) master
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[5461-10922] (5462 slots) master
+   1 additional replica(s)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[10923-16383] (5461 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+[root@redis-node1 ~]#cat /var/lib/redis/nodes-6379.conf 
+d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379@16379 master - 01582356107260 8 connected
+9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379@16379 slave d34da8666a6f587283a1c2fca5d13691407f9462 0 1582356110286 6 connected
+f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379@16379 slave cb028b83f9dc463d732f6e76ca6bbcd469d948a7 0 1582356108268 4 connected
+d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379@16379 master - 01582356105000 7 connected 5461-10922
+99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379@16379 slave d04e524daec4d8e22bdada7f21a9487c2d3e1057 0 1582356108000 7 connected
+d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379@16379 master - 01582356107000 3 connected 10923-16383
+cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379@16379 myself,master - 01582356106000 1 connected 0-5460
+vars currentEpoch 8 lastVoteEpoch 7
+
+#和上面显示结果一样
+[root@redis-node1 ~]#redis-cli -a 123456 CLUSTER NODES
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379@16379 master - 01582356313200 8 connected
+9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379@16379 slave d34da8666a6f587283a1c2fca5d13691407f9462 0 1582356311000 6 connected
+f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379@16379 slave cb028b83f9dc463d732f6e76ca6bbcd469d948a7 0 1582356314208 4 connected
+d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379@16379 master - 01582356311182 7 connected 5461-10922
+99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379@16379 slave d04e524daec4d8e22bdada7f21a9487c2d3e1057 0 1582356312000 7 connected
+d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379@16379 master - 01582356312190 3 connected 10923-16383
+cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379@16379 myself,master - 01582356310000 1 connected 0-5460
+
+#查看集群状态
+[root@redis-node1 ~]#redis-cli -a 123456 CLUSTER INFO
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+cluster_state:ok
+cluster_slots_assigned:16384
+cluster_slots_ok:16384
+cluster_slots_pfail:0
+cluster_slots_fail:0
+cluster_known_nodes:7
+cluster_size:3
+cluster_current_epoch:8
+cluster_my_epoch:1
+cluster_stats_messages_ping_sent:17442
+cluster_stats_messages_pong_sent:13318
+cluster_stats_messages_fail_sent:4
+cluster_stats_messages_auth-ack_sent:1
+cluster_stats_messages_sent:30765
+cluster_stats_messages_ping_received:13311
+cluster_stats_messages_pong_received:13367
+cluster_stats_messages_meet_received:7
+cluster_stats_messages_fail_received:1
+cluster_stats_messages_auth-req_received:1
+cluster_stats_messages_received:26687
+[root@redis-node1 ~]#
+```
+
+### 3)在新的master上重新分配槽位
+
+新的node节点加到集群之后,默认是master节点，但是没有slots，需要重新分配添加主机之后需要对添加至集群种的新主机重新分片,否则其没有分片也就无法写入数据。
+
+注意: 重新分配槽位需要清空数据,所以需要先备份数据,扩展后再恢复数据
+
+#### Redis 3/4:
+```
+[root@redis-node1 ~]# redis-trib.rb check 10.0.0.67:6379 #当前状态
+[root@redis-node1 ~]# redis-trib.rb reshard <任意节点>:6379 #重新分片
+[root@redis-node1 ~]# redis-trib.rb fix 10.0.0.67:6379 #如果迁移失败使用此命令修复集群
+```
+
+#### Redis 5：
+```
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster reshard <当前任意集群节点>:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+>>> Performing Cluster Check (using node 10.0.0.68:6379)
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots: (0 slots) master
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[10923-16383] (5461 slots) master
+   1 additional replica(s)
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[5461-10922] (5462 slots) master
+   1 additional replica(s)
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[0-5460] (5461 slots) master
+   1 additional replica(s)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+M: f67f1c02c742cd48d3f48d8c362f9f1b9aa31549 10.0.0.78:6379
+   slots: (0 slots) master
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+How many slots do you want to move (from 1 to 16384)?4096                 #新分配多少个槽位=16384/master个数
+What is the receiving node ID? d6e2eca6b338b717923f64866bd31d42e52edc98   #新的master的ID
+Please enter all the source node IDs.
+ Type 'all' to use all the nodes as source nodes for the hash slots.
+ Type 'done' once you entered all the source nodes IDs.
+Source node #1: all                                                       #将哪些源主机的槽位分配给新的节点，all是自动在所有的redis node选择划分，如果是从redis cluster删除某个主机可以使用此方式将指定主机上的槽位全部移动到别的redis主机
+......
+Do you want to proceed with the proposed reshard plan (yes/no)?  yes       #确认分配
+......
+Moving slot 12280 from 10.0.0.28:6379 to 10.0.0.68:6379: .
+Moving slot 12281 from 10.0.0.28:6379 to 10.0.0.68:6379: .
+Moving slot 12282 from 10.0.0.28:6379 to 10.0.0.68:6379: 
+Moving slot 12283 from 10.0.0.28:6379 to 10.0.0.68:6379: ..
+Moving slot 12284 from 10.0.0.28:6379 to 10.0.0.68:6379: 
+Moving slot 12285 from 10.0.0.28:6379 to 10.0.0.68:6379: .
+Moving slot 12286 from 10.0.0.28:6379 to 10.0.0.68:6379: 
+Moving slot 12287 from 10.0.0.28:6379 to 10.0.0.68:6379: ..
+[root@redis-node1 ~]#
+
+#确定slot分配成功
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster check 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.8:6379 (cb028b83...) -> 5019 keys | 4096 slots | 1 slaves.
+10.0.0.68:6379 (d6e2eca6...) -> 4948 keys | 4096 slots | 0 slaves.
+10.0.0.48:6379 (d04e524d...) -> 5033 keys | 4096 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 5000 keys | 4096 slots | 1 slaves.
+[OK] 20000 keys in 5 masters.
+1.22 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[1365-5460] (4096 slots) master
+   1 additional replica(s)
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots:[0-1364],[5461-6826],[10923-12287] (4096 slots) master           #可看到4096个slots
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[6827-10922] (4096 slots) master
+   1 additional replica(s)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[12288-16383] (4096 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+```
+
+### 4)为新的master添加新的slave节点
+
+需要再向当前的Redis集群中添加一个Redis单机服务器10.0.0.78，用于解决当前10.0.0.68单机的潜在宕机问题，即实现响应的高可用功能，有两种式：
+
+#### 方法1：在新加节点到集群时，直接将之设置为slave
+
+##### Redis 3/4 添加方式：
+```
+redis-trib.rb   add-node --slave --master-id 750cab050bc81f2655ed53900fd43d2e64423333 10.0.0.77:6379 <任意集群节点>:6379
+```
+
+##### Redis 5 添加方式：
+```
+redis-cli -a 123456 --cluster add-node 10.0.0.78:6379 <任意集群节点>:6379 --cluster-slave --cluster-master-id d6e2eca6b338b717923f64866bd31d42e52edc98
+```
+
+范例: 
+```
+#查看当前状态
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster check 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.8:6379 (cb028b83...) -> 5019 keys | 4096 slots | 1 slaves.
+10.0.0.68:6379 (d6e2eca6...) -> 4948 keys | 4096 slots | 0 slaves.
+10.0.0.48:6379 (d04e524d...) -> 5033 keys | 4096 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 5000 keys | 4096 slots | 1 slaves.
+[OK] 20000 keys in 4 masters.
+1.22 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[1365-5460] (4096 slots) master
+   1 additional replica(s)
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots:[0-1364],[5461-6826],[10923-12287] (4096 slots) master
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[6827-10922] (4096 slots) master
+   1 additional replica(s)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[12288-16383] (4096 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+#直接加为slave节点
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster add-node 10.0.0.78:6379 10.0.0.8:6379 --cluster-slave --cluster-master-id d6e2eca6b338b717923f64866bd31d42e52edc98
+
+#验证是否成功
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster check 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.8:6379 (cb028b83...) -> 5019 keys | 4096 slots | 1 slaves.
+10.0.0.68:6379 (d6e2eca6...) -> 4948 keys | 4096 slots | 1 slaves.
+10.0.0.48:6379 (d04e524d...) -> 5033 keys | 4096 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 5000 keys | 4096 slots | 1 slaves.
+[OK] 20000 keys in 4 masters.
+1.22 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[1365-5460] (4096 slots) master
+   1 additional replica(s)
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots:[0-1364],[5461-6826],[10923-12287] (4096 slots) master
+   1 additional replica(s)
+S: 36840d7eea5835ba540d9b64ec018aa3f8de6747 10.0.0.78:6379
+   slots: (0 slots) slave
+   replicates d6e2eca6b338b717923f64866bd31d42e52edc98
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[6827-10922] (4096 slots) master
+   1 additional replica(s)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[12288-16383] (4096 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+[root@centos8 ~]#redis-cli -a 123456 -h 10.0.0.8 --no-auth-warning cluster info
+cluster_state:ok
+cluster_slots_assigned:16384
+cluster_slots_ok:16384
+cluster_slots_pfail:0
+cluster_slots_fail:0
+cluster_known_nodes:8                              #8个节点
+cluster_size:4                                     #4组主从
+cluster_current_epoch:11
+cluster_my_epoch:10
+cluster_stats_messages_ping_sent:1810
+cluster_stats_messages_pong_sent:1423
+cluster_stats_messages_auth-req_sent:5
+cluster_stats_messages_update_sent:14
+cluster_stats_messages_sent:3252
+cluster_stats_messages_ping_received:1417
+cluster_stats_messages_pong_received:1368
+cluster_stats_messages_meet_received:2
+cluster_stats_messages_fail_received:2
+cluster_stats_messages_auth-ack_received:2
+cluster_stats_messages_update_received:4
+cluster_stats_messages_received:2795
+```
+
+#### 方法2：先将新节点加入集群，再修改为slave
+
+##### 为新的master添加slave节点
+
+###### Redis 3/4 版本：
+```
+[root@redis-node1 ~]#redis-trib.rb add-node 10.0.0.78:6379 10.0.0.8:6379
+```
+
+###### Redis 5 版本：
+```
+#把10.0.0.78:6379添加到集群中：
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster add-node 10.0.0.78:6379 10.0.0.8:6379
+```
+
+##### 更改新节点更改状态为slave：
+需要手动将其指定为某个master的slave，否则其默认角色为master。
+```
+[root@redis-node1 ~]#redis-cli -h 10.0.0.78 -p 6379 -a 123456                  #登录到新添加节点
+10.0.0.78:6380> CLUSTER NODES                                                  #查看当前集群节点，找到目标master 的ID
+10.0.0.78:6380> CLUSTER REPLICATE 886338acd50c3015be68a760502b239f4509881c     #将其设置slave，命令格式为cluster replicate MASTERID
+10.0.0.78:6380> CLUSTER NODES                                                  #再次查看集群节点状态，验证节点是否已经更改为指定master 的slave
+```
+
+## 2、集群维护之动态缩容
+
+实战案例：
+
+由于10.0.0.8服务器使用年限已经超过三年，已经超过厂商质保期而且硬盘出现异常报警，经运维部架构师提交方案并同开发同事开会商议，决定将现有Redis集群的8台主服务器中的master 10.0.0.8和对应的slave 10.0.0.38 临时下线，三台服务器的并发写入性能足够支出未来1-2年的业务需求
+
+删除节点过程：
+
+添加节点的时候是先添加node节点到集群，然后分配槽位，删除节点的操作与添加节点的操作正好相反，是先将被删除的Redis node上的槽位迁移到集群中的其他Redis node节点上，然后再将其删除，如果一个Redis node节点上的槽位没有被完全迁移，删除该node的时候会提示有数据且无法删除。
 
 
+### 1）迁移master 的槽位至其他master
 
+注意: 被迁移Redis master源服务器必须保证没有数据，否则迁移报错并会被强制中断。
+
+#### Redis 3/4 版本
+```
+[root@redis-node1 ~]# redis-trib.rb reshard 10.0.0.8:6379
+[root@redis-node1 ~]# redis-trib.rb fix 10.0.0.8:6379           #如果迁移失败使用此命令修复集群
+```
+
+#### Redis 5版本
+```
+#查看当前状态
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster check 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.8:6379 (cb028b83...) -> 5019 keys | 4096 slots | 1 slaves.
+10.0.0.68:6379 (d6e2eca6...) -> 4948 keys | 4096 slots | 1 slaves.
+10.0.0.48:6379 (d04e524d...) -> 5033 keys | 4096 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 5000 keys | 4096 slots | 1 slaves.
+[OK] 20000 keys in 4 masters.
+1.22 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[1365-5460] (4096 slots) master
+   1 additional replica(s)
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots:[0-1364],[5461-6826],[10923-12287] (4096 slots) master
+   1 additional replica(s)
+S: 36840d7eea5835ba540d9b64ec018aa3f8de6747 10.0.0.78:6379
+   slots: (0 slots) slave
+   replicates d6e2eca6b338b717923f64866bd31d42e52edc98
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[6827-10922] (4096 slots) master
+   1 additional replica(s)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[12288-16383] (4096 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+#连接到任意集群节点，#最后1365个slot从10.0.0.8移动到第一个master节点10.0.0.28上
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster reshard 10.0.0.18:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+>>> Performing Cluster Check (using node 10.0.0.18:6379)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+S: 36840d7eea5835ba540d9b64ec018aa3f8de6747 10.0.0.78:6379
+   slots: (0 slots) slave
+   replicates d6e2eca6b338b717923f64866bd31d42e52edc98
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots:[1365-5460] (4096 slots) master
+   1 additional replica(s)
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots:[0-1364],[5461-6826],[10923-12287] (4096 slots) master
+   1 additional replica(s)
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[6827-10922] (4096 slots) master
+   1 additional replica(s)
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[12288-16383] (4096 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+How many slots do you want to move (from 1 to 16384)? 1356                #共4096/3分别给其它三个master节点
+What is the receiving node ID? d34da8666a6f587283a1c2fca5d13691407f9462   #master 10.0.0.28
+Please enter all the source node IDs.
+ Type 'all' to use all the nodes as source nodes for the hash slots.
+ Type 'done' once you entered all the source nodes IDs.
+Source node #1: cb028b83f9dc463d732f6e76ca6bbcd469d948a7                  #输入要删除10.0.0.8节点ID
+Source node #2: done
+Ready to move 1356 slots.
+ Source nodes:
+   M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+       slots:[1365-5460] (4096 slots) master
+       1 additional replica(s)
+ Destination node:
+   M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+       slots:[12288-16383] (4096 slots) master
+       1 additional replica(s)
+ Resharding plan:
+   Moving slot 1365 from cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+......
+ Moving slot 2719 from cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+   Moving slot 2720 from cb028b83f9dc463d732f6e76ca6bbcd469d948a7
+Do you want to proceed with the proposed reshard plan (yes/no)? yes       #确定
+......
+Moving slot 2718 from 10.0.0.8:6379 to 10.0.0.28:6379: ..
+Moving slot 2719 from 10.0.0.8:6379 to 10.0.0.28:6379: .
+Moving slot 2720 from 10.0.0.8:6379 to 10.0.0.28:6379: ..
+
+#非交互式方式
+#再将1365个slot从10.0.0.8移动到第二个master节点10.0.0.48上
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster reshard 10.0.0.18:6379 --cluster-slots 1365 --cluster-from cb028b83f9dc463d732f6e76ca6bbcd469d948a7 --cluster-to d04e524daec4d8e22bdada7f21a9487c2d3e1057 --cluster-yes
+
+#最后的slot从10.0.0.8移动到第三个master节点10.0.0.68上
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster reshard 10.0.0.18:6379 --cluster-slots 1375 --cluster-from cb028b83f9dc463d732f6e76ca6bbcd469d948a7 --cluster-to d6e2eca6b338b717923f64866bd31d42e52edc98 --cluster-yes
+
+#确认10.0.0.8的所有slot都移走了，上面的slave也自动删除，成为其它master的slave 
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster check 10.0.0.8:6379
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.8:6379 (cb028b83...) -> 0 keys | 0 slots | 0 slaves.
+10.0.0.68:6379 (d6e2eca6...) -> 6631 keys | 5471 slots | 2 slaves.
+10.0.0.48:6379 (d04e524d...) -> 6694 keys | 5461 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 6675 keys | 5452 slots | 1 slaves.
+[OK] 20000 keys in 4 masters.
+1.22 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+M: cb028b83f9dc463d732f6e76ca6bbcd469d948a7 10.0.0.8:6379
+   slots: (0 slots) master
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots:[0-1364],[4086-6826],[10923-12287] (5471 slots) master
+   2 additional replica(s)
+S: 36840d7eea5835ba540d9b64ec018aa3f8de6747 10.0.0.78:6379
+   slots: (0 slots) slave
+   replicates d6e2eca6b338b717923f64866bd31d42e52edc98
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates d6e2eca6b338b717923f64866bd31d42e52edc98
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[2721-4085],[6827-10922] (5461 slots) master
+   1 additional replica(s)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[1365-2720],[12288-16383] (5452 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+#原有的10.0.0.38自动成为10.0.0.68的slave
+[root@redis-node1 ~]#redis-cli -a 123456 -h 10.0.0.68 INFO replication
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+# Replication
+role:master
+connected_slaves:2
+slave0:ip=10.0.0.78,port=6379,state=online,offset=129390,lag=0
+slave1:ip=10.0.0.38,port=6379,state=online,offset=129390,lag=0
+master_replid:43e3e107a0acb1fd5a97240fc4b2bd8fc85b113f
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:129404
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1
+repl_backlog_histlen:129404
+
+[root@centos8 ~]#redis-cli -a 123456 -h 10.0.0.8 --no-auth-warning cluster info
+cluster_state:ok
+cluster_slots_assigned:16384
+cluster_slots_ok:16384
+cluster_slots_pfail:0
+cluster_slots_fail:0
+cluster_known_nodes:8          #集群中8个节点
+cluster_size:3                 #少了一个主从的slot
+cluster_current_epoch:16
+cluster_my_epoch:13
+cluster_stats_messages_ping_sent:3165
+cluster_stats_messages_pong_sent:2489
+cluster_stats_messages_fail_sent:6
+cluster_stats_messages_auth-req_sent:5
+cluster_stats_messages_auth-ack_sent:1
+cluster_stats_messages_update_sent:27
+cluster_stats_messages_sent:5693
+cluster_stats_messages_ping_received:2483
+cluster_stats_messages_pong_received:2400
+cluster_stats_messages_meet_received:2
+cluster_stats_messages_fail_received:2
+cluster_stats_messages_auth-req_received:1
+cluster_stats_messages_auth-ack_received:2
+cluster_stats_messages_update_received:4
+cluster_stats_messages_received:4894
+```
+
+### 2）从集群删除服务器
+
+虽然槽位已经迁移完成，但是服务器IP信息还在集群当中，因此还需要将IP信息从集群删除
+
+注意: 删除服务器前,必须清除主机上面的槽位,否则会删除主机失败
+
+#### Redis 3/4：
+```
+[root@s~]#redis-trib.rb del-node 10.0.0.8:6379 dfffc371085859f2858730e1f350e9167e287073
+>>> Removing node dfffc371085859f2858730e1f350e9167e287073 from cluster 192.168.7.102:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> SHUTDOWN the node.
+```
+
+#### Redis 5：
+```
+[root@s~]#redis-trib.rb del-node 10.0.0.8:6379 dfffc371085859f2858730e1f350e9167e287073
+>>> Removing node dfffc371085859f2858730e1f350e9167e287073 from cluster 192.168.7.102:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> SHUTDOWN the node.
+```
+
+#### 删除多余的slave节点验证结果
+```
+#验证删除成功
+[root@redis-node1 ~]#ss -ntl
+State       Recv-Q       Send-Q   Local Address:Port     Peer Address:Port
+LISTEN       0             128            0.0.0.0:22             0.0.0.0:*
+LISTEN       0             128               [::]:22                [::]:*
+
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster check 10.0.0.18:6379 
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.68:6379 (d6e2eca6...) -> 6631 keys | 5471 slots | 2 slaves.
+10.0.0.48:6379 (d04e524d...) -> 6694 keys | 5461 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 6675 keys | 5452 slots | 1 slaves.
+[OK] 20000 keys in 3 masters.
+1.22 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.18:6379)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+S: f9adcfb8f5a037b257af35fa548a26ffbadc852d 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates d6e2eca6b338b717923f64866bd31d42e52edc98
+S: 36840d7eea5835ba540d9b64ec018aa3f8de6747 10.0.0.78:6379
+   slots: (0 slots) slave
+   replicates d6e2eca6b338b717923f64866bd31d42e52edc98
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots:[0-1364],[4086-6826],[10923-12287] (5471 slots) master
+   2 additional replica(s)
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[2721-4085],[6827-10922] (5461 slots) master
+   1 additional replica(s)
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[1365-2720],[12288-16383] (5452 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+#删除多余的slave从节点
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster del-node 10.0.0.18:6379 f9adcfb8f5a037b257af35fa548a26ffbadc852d
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+>>> Removing node f9adcfb8f5a037b257af35fa548a26ffbadc852d from cluster 10.0.0.18:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> SHUTDOWN the node.
+
+#删除集群文件
+[root@redis-node4 ~]#rm -f /var/lib/redis/nodes-6379.conf 
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster check 10.0.0.18:6379 
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.68:6379 (d6e2eca6...) -> 6631 keys | 5471 slots | 1 slaves.
+10.0.0.48:6379 (d04e524d...) -> 6694 keys | 5461 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 6675 keys | 5452 slots | 1 slaves.
+[OK] 20000 keys in 3 masters.
+1.22 keys per slot on average.
+>>> Performing Cluster Check (using node 10.0.0.18:6379)
+S: 99720241248ff0e4c6fa65c2385e92468b3b5993 10.0.0.18:6379
+   slots: (0 slots) slave
+   replicates d04e524daec4d8e22bdada7f21a9487c2d3e1057
+S: 36840d7eea5835ba540d9b64ec018aa3f8de6747 10.0.0.78:6379
+   slots: (0 slots) slave
+   replicates d6e2eca6b338b717923f64866bd31d42e52edc98
+M: d6e2eca6b338b717923f64866bd31d42e52edc98 10.0.0.68:6379
+   slots:[0-1364],[4086-6826],[10923-12287] (5471 slots) master
+   1 additional replica(s)
+S: 9875b50925b4e4f29598e6072e5937f90df9fc71 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates d34da8666a6f587283a1c2fca5d13691407f9462
+M: d04e524daec4d8e22bdada7f21a9487c2d3e1057 10.0.0.48:6379
+   slots:[2721-4085],[6827-10922] (5461 slots) master
+   1 additional replica(s)
+M: d34da8666a6f587283a1c2fca5d13691407f9462 10.0.0.28:6379
+   slots:[1365-2720],[12288-16383] (5452 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+[root@redis-node1 ~]#redis-cli -a 123456 --cluster info 10.0.0.18:6379 
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+10.0.0.68:6379 (d6e2eca6...) -> 6631 keys | 5471 slots | 1 slaves.
+10.0.0.48:6379 (d04e524d...) -> 6694 keys | 5461 slots | 1 slaves.
+10.0.0.28:6379 (d34da866...) -> 6675 keys | 5452 slots | 1 slaves.
+[OK] 20000 keys in 3 masters.
+1.22 keys per slot on average.
+
+#查看集群信息
+[root@redis-node1 ~]#redis-cli -a 123456 -h 10.0.0.18 CLUSTER INFO
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+cluster_state:ok
+cluster_slots_assigned:16384
+cluster_slots_ok:16384
+cluster_slots_pfail:0
+cluster_slots_fail:0
+cluster_known_nodes:6                      #只有6个节点
+cluster_size:3
+cluster_current_epoch:11
+cluster_my_epoch:10
+cluster_stats_messages_ping_sent:12147
+cluster_stats_messages_pong_sent:12274
+cluster_stats_messages_update_sent:14
+cluster_stats_messages_sent:24435
+cluster_stats_messages_ping_received:12271
+cluster_stats_messages_pong_received:12147
+cluster_stats_messages_meet_received:3
+cluster_stats_messages_update_received:28
+cluster_stats_messages_received:24449
+```
