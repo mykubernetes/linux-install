@@ -1585,7 +1585,7 @@ Migrating testkey3 to 10.0.0.18:6379: OK
 3) "testkey2"
 ```
 
-### 4)集群偏斜
+### 4、集群偏斜
 
 redis cluster 多个节点运行一段时间后,可能会出现倾斜现象,某个节点数据偏多,内存消耗更大,或者接受用户请求访问更多
 
@@ -1655,7 +1655,7 @@ Biggest string found 'testkey1' has 10 bytes
 0 streams with 0 entries (00.00% of keys, avg size 0.00)
 ```
 
-#  redis cluster 的局限性
+### 5、redis cluster 的局限性
 - 大多数时客户端性能会”降低”
 - 命令无法跨节点使用:mget、keys、scan、flush、sinter等
 - 客户端维护更复杂:SDK和应用本身消耗(例如更多的连接池)
