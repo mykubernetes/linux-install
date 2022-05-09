@@ -1433,3 +1433,239 @@ cluster_stats_messages_meet_received:3
 cluster_stats_messages_update_received:28
 cluster_stats_messages_received:24449
 ```
+
+## 3、集群维护之导入现有Redis数据至集群
+
+官方提供了离线迁移数据到集群的工具,有些公司开发了离线迁移工具
+- 官方工具: redis-cli --cluster import
+- 第三方在线迁移工具: 模拟slave 节点实现, 比如: 唯品会 redis-migrate-tool , 豌豆荚 redis-port
+
+实战案例：
+公司将redis cluster部署完成之后，需要将之前的数据导入之Redis cluster集群，但是由于Redis cluster使用的分片保存key的机制，因此使用传统的AOF文件或RDB快照无法满足需求，因此需要使用集群数据导入命令完成。
+
+注意: 导入数据需要redis cluster不能与被导入的数据有重复的key名称，否则导入不成功或中断。
+
+### 1)基础环境准备
+
+导入数据之前需要关闭各redis 服务器的密码，包括集群中的各node和源Redis server，避免认证带来的环境不一致从而无法导入，可以加参数--cluster-replace 强制替换Redis cluster已有的key。
+```
+#在所有节点包括master和slave节点上关闭各Redis密码认证
+[root@redis ~]# redis-cli -h 10.0.0.18 -p 6379 -a 123456 --no-auth-warning CONFIG SET requirepass ""
+OK
+```
+
+### 2)执行数据导入
+
+将源Redis server的数据直接导入之 redis cluster,此方式慎用!
+
+Redis 3/4：
+```
+[root@redis ~]# redis-trib.rb import --from <外部Redis node-IP:PORT> --replace <集群服务器IP:PORT>
+```
+
+Redis 5：
+```
+[root@redis ~]#redis-cli --cluster import <集群服务器IP:PORT> --cluster-from <外部Redis node-IP:PORT> --cluster-copy --cluster-replace
+
+#只使用cluster-copy，则要导入集群中的key不能存在
+#如果集群中已有同样的key，如果需要替换，可以cluster-copy和cluster-replace联用，这样集群中的key就会被替换为外部数据
+```
+
+范例：将非集群节点的数据导入redis cluster 
+```
+#在非集群节点10.0.0.78生成数据
+[root@centos8 ~]#hostname -I
+10.0.0.78 
+
+[root@centos8 ~]#cat redis_test.sh 
+#!/bin/bash
+#
+#********************************************************************
+#Author: wangxiaochun
+#QQ: 29308620
+#Date: 2020-02-03
+#FileName： redis.sh
+#URL: http://www.wangxiaochun.com
+#Description： The test script
+#Copyright (C): 2020 All rights reserved
+#********************************************************************
+NUM=10
+PASS=123456
+for i in `seq $NUM`;do
+   redis-cli -h 127.0.0.1 -a "$PASS"  --no-auth-warning  set testkey${i} testvalue${i}
+   echo "testkey${i} testvalue${i} 写入完成"
+done
+echo "$NUM个key写入到Redis完成"  
+
+[root@centos8 ~]#bash redis_test.sh
+OK
+testkey1 testvalue1 写入完成
+OK
+testkey2 testvalue2 写入完成
+OK
+testkey3 testvalue3 写入完成
+OK
+testkey4 testvalue4 写入完成
+OK
+testkey5 testvalue5 写入完成
+OK
+testkey6 testvalue6 写入完成
+OK
+testkey7 testvalue7 写入完成
+OK
+testkey8 testvalue8 写入完成
+OK
+testkey9 testvalue9 写入完成
+OK
+testkey10 testvalue10 写入完成
+10个key写入到Redis完成
+
+#取消需要导入的主机的密码
+[root@centos8 ~]#redis-cli -h 10.0.0.78 -p 6379 -a 123456 --no-auth-warning CONFIG SET requirepass ""
+
+#取消所有集群服务器的密码
+[root@centos8 ~]#redis-cli -h 10.0.0.8 -p 6379 -a 123456 --no-auth-warning CONFIG SET requirepass ""
+[root@centos8 ~]#redis-cli -h 10.0.0.18 -p 6379 -a 123456 --no-auth-warning CONFIG SET requirepass ""
+[root@centos8 ~]#redis-cli -h 10.0.0.28 -p 6379 -a 123456 --no-auth-warning CONFIG SET requirepass ""
+[root@centos8 ~]#redis-cli -h 10.0.0.38 -p 6379 -a 123456 --no-auth-warning CONFIG SET requirepass ""
+[root@centos8 ~]#redis-cli -h 10.0.0.48 -p 6379 -a 123456 --no-auth-warning CONFIG SET requirepass ""
+[root@centos8 ~]#redis-cli -h 10.0.0.58 -p 6379 -a 123456 --no-auth-warning CONFIG SET requirepass ""
+
+#导入数据至集群
+[root@centos8 ~]#redis-cli --cluster import 10.0.0.8:6379 --cluster-from 10.0.0.78:6379 --cluster-copy --cluster-replace
+>>> Importing data from 10.0.0.78:6379 to cluster 10.0.0.8:6379
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+M: a177c5cbc2407ebb6230ea7e2a7de914bf8c2dab 10.0.0.8:6379
+   slots:[0-5461] (5462 slots) master
+   1 additional replica(s)
+M: 4f146b1ac51549469036a272c60ea97f065ef832 10.0.0.28:6379
+   slots:[10923-16383] (5461 slots) master
+   1 additional replica(s)
+S: 779a24884dbe1ceb848a685c669ec5326e6c8944 10.0.0.48:6379
+   slots: (0 slots) slave
+   replicates 97c5dcc3f33c2fc75c7fdded25d05d2930a312c0
+M: 97c5dcc3f33c2fc75c7fdded25d05d2930a312c0 10.0.0.18:6379
+   slots:[5462-10922] (5461 slots) master
+   1 additional replica(s)
+S: 07231a50043d010426c83f3b0788e6b92e62050f 10.0.0.58:6379
+   slots: (0 slots) slave
+   replicates 4f146b1ac51549469036a272c60ea97f065ef832
+S: cb20d58870fe05de8462787cf9947239f4bc5629 10.0.0.38:6379
+   slots: (0 slots) slave
+   replicates a177c5cbc2407ebb6230ea7e2a7de914bf8c2dab
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+*** Importing 10 keys from DB 0
+Migrating testkey4 to 10.0.0.18:6379: OK
+Migrating testkey8 to 10.0.0.18:6379: OK
+Migrating testkey6 to 10.0.0.28:6379: OK
+Migrating testkey1 to 10.0.0.8:6379: OK
+Migrating testkey5 to 10.0.0.8:6379: OK
+Migrating testkey10 to 10.0.0.28:6379: OK
+Migrating testkey7 to 10.0.0.18:6379: OK
+Migrating testkey9 to 10.0.0.8:6379: OK
+Migrating testkey2 to 10.0.0.28:6379: OK
+Migrating testkey3 to 10.0.0.18:6379: OK
+
+#验证数据
+[root@centos8 ~]#redis-cli -h 10.0.0.8 keys '*'
+1) "testkey5"
+2) "testkey1"
+3) "testkey9"
+[root@centos8 ~]#redis-cli -h 10.0.0.18 keys '*'
+1) "testkey8"
+2) "testkey4"
+3) "testkey3"
+4) "testkey7"
+[root@centos8 ~]#redis-cli -h 10.0.0.28 keys '*'
+1) "testkey6"
+2) "testkey10"
+3) "testkey2"
+```
+
+### 4)集群偏斜
+
+redis cluster 多个节点运行一段时间后,可能会出现倾斜现象,某个节点数据偏多,内存消耗更大,或者接受用户请求访问更多
+
+发生倾斜的原因可能如下:
+- 节点和槽分配不均
+- 不同槽对应键值数量差异较大
+- 包含bigkey,建议少用
+- 内存相关配置不一致
+- 热点数据不均衡 : 一致性不高时,可以使用本缓存和MQ
+
+获取指定槽位中对应键key值的个数
+```
+#redis-cli cluster countkeysinslot {slot的值}
+```
+
+范例: 获取指定slot对应的key个数
+```
+[root@centos8 ~]#redis-cli -a 123456 cluster countkeysinslot 1
+(integer) 0
+[root@centos8 ~]#redis-cli -a 123456 cluster countkeysinslot 2
+(integer) 0
+[root@centos8 ~]#redis-cli -a 123456 cluster countkeysinslot 3
+(integer) 1
+```
+
+执行自动的槽位重新平衡分布,但会影响客户端的访问,此方法慎用
+```
+#redis-cli --cluster rebalance <集群节点IP:PORT>
+```
+
+范例: 执行自动的槽位重新平衡分布
+```
+[root@centos8 ~]#redis-cli -a 123456 --cluster rebalance 10.0.0.8:6379
+>>> Performing Cluster Check (using node 10.0.0.8:6379)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+```
+
+获取bigkey ,建议在slave节点执行
+```
+#redis-cli --bigkeys
+```
+
+范例: 查找 bigkey
+```
+[root@centos8 ~]#redis-cli -a 123456 --bigkeys
+# Scanning the entire keyspace to find biggest keys as well as
+# average sizes per key type. You can use -i 0.1 to sleep 0.1 sec
+# per 100 SCAN commands (not usually needed).
+[00.00%] Biggest string found so far 'key8811' with 9 bytes
+[26.42%] Biggest string found so far 'testkey1' with 10 bytes
+-------- summary -------
+
+Sampled 3335 keys in the keyspace!
+Total key length in bytes is 22979 (avg len 6.89)
+
+Biggest string found 'testkey1' has 10 bytes
+
+3335 strings with 29649 bytes (100.00% of keys, avg size 8.89)
+0 lists with 0 items (00.00% of keys, avg size 0.00)
+0 sets with 0 members (00.00% of keys, avg size 0.00)
+0 hashs with 0 fields (00.00% of keys, avg size 0.00)
+0 zsets with 0 members (00.00% of keys, avg size 0.00)
+0 streams with 0 entries (00.00% of keys, avg size 0.00)
+```
+
+#  redis cluster 的局限性
+- 大多数时客户端性能会”降低”
+- 命令无法跨节点使用:mget、keys、scan、flush、sinter等
+- 客户端维护更复杂:SDK和应用本身消耗(例如更多的连接池)
+- 不支持多个数据库︰集群模式下只有一个db 0
+- 复制只支持一层∶不支持树形复制结构,不支持级联复制
+- Key事务和Lua支持有限∶操作的key必须在一个节点,Lua和事务无法跨节点使用
+
+范例: 跨slot的局限性
+```
+[root@centos8 ~]#redis-cli -a 123456 mget key1 key2 key3
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+(error) CROSSSLOT Keys in request don't hash to the same slot
+```
