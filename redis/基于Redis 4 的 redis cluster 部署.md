@@ -1479,16 +1479,6 @@ Redis 5：
 
 [root@centos8 ~]#cat redis_test.sh 
 #!/bin/bash
-#
-#********************************************************************
-#Author: wangxiaochun
-#QQ: 29308620
-#Date: 2020-02-03
-#FileName： redis.sh
-#URL: http://www.wangxiaochun.com
-#Description： The test script
-#Copyright (C): 2020 All rights reserved
-#********************************************************************
 NUM=10
 PASS=123456
 for i in `seq $NUM`;do
