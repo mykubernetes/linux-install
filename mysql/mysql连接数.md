@@ -62,13 +62,14 @@ show status like 'Threads%'
 +-------------------+-------+
 | Threads_created   | 59376 |
 +-------------------+-------+
-| Threads_running   | 3    |
+| Threads_running   | 3     |
 +-------------------+-------+
 1 row in set (0.00 sec)
 ```
-- Threads_connected #获得当前连接数
-- Threads_running #获得当前正在运行的连接数
-
+- Thread_cached:被缓存的线程的个数
+- Thread_running：处于激活状态的线程的个数
+- Thread_connected：当前连接的线程的个数
+- Thread_created：总共被创建的线程的个数
 
 ```
 mysql> show processlist;
