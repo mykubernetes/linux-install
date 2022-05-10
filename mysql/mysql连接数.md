@@ -2,18 +2,29 @@
 
 # Mysql 链接数过大或经常链接超时的排错方法
 
-1、mysql -uroot进入mysql 查看设定的最大链接数
+1、允许的最大连接数
 ```
 mysql> show variables like "%max_connections%";
-±----------------±------+
-| Variable_name  | Value|
-±----------------±------+
-| max_connections|  151 |
-±----------------±------+
+±----------------±--------+
+| Variable_name  | Value  |
+±----------------±--------+
+| max_connections|  10000 |
+±----------------±--------+
 1 row in set (0.00 sec)
 ```
 
-2、查看使用的量，实时统计
+2、当前连接数
+```
+show global status like 'Threads_connected';
+±------------------±-------+
+| Variable_name    | Value |
+±------------------±-------+
+| Threads_connected|  9045 |
+±------------------±-------+
+1 row in set (0.00 sec)
+```
+
+3、获得最大一次的连接数
 ```
 mysql> show global status like 'Max_used_connections';
 +----------------------+-------+
@@ -24,35 +35,53 @@ mysql> show global status like 'Max_used_connections';
 1 row in set (0.00 sec)
 ```
 
-3、修改最大链接数，重启后失效
+4、修改最大链接数，重启后失效
 ```
 mysql> set global max_connections = 1000;
 ```
 
-4、要查出那个ip或那个微服务占用太多资源，用mysql客户端进入information_schema数据库查看
+5、要查出那个ip或那个微服务占用太多资源，用mysql客户端进入information_schema数据库查看
 ```
 select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
 ```
 
-5、依照服务名查看使用状况
+6、依照服务名查看使用状况
 ```
 select count(*),db from information_schema.processlist group by db
-```
-
-查看当前最大连接数
-```
-show global status like 'Threads_connected';
 ```
 
 查看当前连接数
 ```
 show status like 'Threads%'
++-------------------+-------+
+| Variable_name     | Value |
++-------------------+-------+
+| Threads_cached    | 2     |
++-------------------+-------+
+| Threads_connected | 9049  |
++-------------------+-------+
+| Threads_created   | 59376 |
++-------------------+-------+
+| Threads_running   | 3    |
++-------------------+-------+
+1 row in set (0.00 sec)
 ```
+- Threads_connected #获得当前连接数
+- Threads_running #获得当前正在运行的连接数
+
 
 ```
-show processlist
+mysql> show processlist;
++----+------+-----------+-------+---------+------+-------+------------------+
+| Id | User | Host      | db    | Command | Time | State | Info             |
++----+------+-----------+-------+---------+------+-------+------------------+
+|  2 | root | localhost | mysql | Sleep   |    4 |       | NULL             |
+|  3 | root | localhost | test  | Query   |    0 | init  | show processlist |
++----+------+-----------+-------+---------+------+-------+------------------+
+rows in set (0.00 sec)
 
-show full processlist
+
+mysql> show full processlist
 ```
 
 尽量去用select查询
@@ -87,22 +116,16 @@ select user,count(*) as num from  information_schema.processlist group by usero
 select count(*) as num,info from  information_schema.processlist where info isnot null group by info order by num;
 ```
 
-查询mysql服务器最大连接数、当前数据库连接数和running数show global variables like ‘max_connections‘;
+查询mysql服务器最大连接数、当前数据库连接数和running数show global variables like 'max_connections';
 ```
-show global status like ‘Threads%‘;
+show global status like 'Threads%';
 ```
 
 查询用户最大连接数
 ```
-show grants for ‘mysql_bi‘;
+show grants for 'mysql_bi';
 ```
 
-
-
-杀掉慢查询进程，可以针对用户，执行时间去操作
-```
-select concat(‘KILL ‘,id,‘;‘) frominformation_schema.processlist where user=‘用户名称‘ and time>100into outfile ‘/tmp/aa.txt‘;
-source/tmp/aa.txt 
-```
-
-https://www.codercto.com/a/108302.html
+参考：
+- https://www.codercto.com/a/108302.html
+- https://blog.csdn.net/qq_36652619/article/details/88289668
