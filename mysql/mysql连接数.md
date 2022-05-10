@@ -41,9 +41,14 @@ mysql> set global max_connections = 1000;
 select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
 ```
 
-6、依照服务名查看使用状况
+6、依照服务名和用户查看使用状况
 ```
-select count(*),db from information_schema.processlist group by db
+# 依照服务名查看使用状况
+select db,count(*) from information_schema.processlist group by db;
+
+# 依照用户名查看用户使用状况
+select user,count(*) from information_schema.processlist group by user;
+select * from information_schema.processlist where user='xxx';
 ```
 
 7、查看当前mysql线程服务信息
@@ -81,12 +86,6 @@ rows in set (0.00 sec)
 mysql> show full processlist
 ```
 
-
-```
-select db,count(*) from information_schema.processlist group by db;
-select user,count(*) from information_schema.processlist group by user;
-select * from information_schema.processlist where user='xxx';
-```
 
 
 正在running的线程
