@@ -1,7 +1,3 @@
-查询mysql进程，因为数据库的sleep连接很多（一般都会在几千个左右），不建议直接show processlist或者show full Processlist
-
-# Mysql 链接数过大或经常链接超时的排错方法
-
 1、允许的最大连接数
 ```
 mysql> show variables like "%max_connections%";
@@ -85,7 +81,13 @@ rows in set (0.00 sec)
 mysql> show full processlist
 ```
 
-尽量去用select查询
+
+```
+select db,count(*) from information_schema.processlist group by db;
+select user,count(*) from information_schema.processlist group by user;
+select * from information_schema.processlist where user='xxx';
+```
+
 
 正在running的线程
 ```
