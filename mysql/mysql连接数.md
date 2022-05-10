@@ -91,3 +91,5 @@ show grants for ‘mysql_bi‘;
 select concat(‘KILL ‘,id,‘;‘) frominformation_schema.processlist where user=‘用户名称‘ and time>100into outfile ‘/tmp/aa.txt‘;
 source/tmp/aa.txt 
 ```
+
+https://www.codercto.com/a/108302.html
