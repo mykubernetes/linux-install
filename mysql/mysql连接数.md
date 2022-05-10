@@ -4,17 +4,29 @@
 
 1、mysql -uroot进入mysql 查看设定的最大链接数
 ```
-show variables like 'max_connections';
+mysql> show variables like "%max_connections%";
+±----------------±------+
+| Variable_name  | Value|
+±----------------±------+
+| max_connections|  151 |
+±----------------±------+
+1 row in set (0.00 sec)
 ```
 
 2、查看使用的量，实时统计
 ```
-show global status like 'max_used_connections';
+mysql> show global status like 'Max_used_connections';
++----------------------+-------+
+| Variable_name        | Value |
++----------------------+-------+
+| Max_used_connections | 11    |
++----------------------+-------+
+1 row in set (0.00 sec)
 ```
 
 3、修改最大链接数，重启后失效
 ```
-set GLOBAL max_connections=10000;
+mysql> set global max_connections = 1000;
 ```
 
 4、要查出那个ip或那个微服务占用太多资源，用mysql客户端进入information_schema数据库查看
@@ -37,10 +49,11 @@ show global status like 'Threads_connected';
 show status like 'Threads%'
 ```
 
+```
+show processlist
 
-
-
-
+show full processlist
+```
 
 尽量去用select查询
 
