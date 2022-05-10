@@ -50,7 +50,7 @@ select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.proc
 select count(*),db from information_schema.processlist group by db
 ```
 
-查看当前连接数
+7、查看当前mysql线程服务信息
 ```
 show status like 'Threads%'
 +-------------------+-------+
@@ -64,7 +64,7 @@ show status like 'Threads%'
 +-------------------+-------+
 | Threads_running   | 3     |
 +-------------------+-------+
-1 row in set (0.00 sec)
+4 row in set (0.00 sec)
 ```
 - Thread_cached:被缓存的线程的个数
 - Thread_running：处于激活状态的线程的个数
