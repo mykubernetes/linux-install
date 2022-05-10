@@ -1,8 +1,30 @@
 查询mysql进程，因为数据库的sleep连接很多（一般都会在几千个左右），不建议直接show processlist或者show full Processlist
 
-查看当前级别最大连接数
+# Mysql 链接数过大或经常链接超时的排错方法
+
+1、mysql -uroot进入mysql 查看设定的最大链接数
 ```
 show variables like 'max_connections';
+```
+
+2、查看使用的量，实时统计
+```
+show global status like 'max_used_connections';
+```
+
+3、修改最大链接数，重启后失效
+```
+set GLOBAL max_connections=10000;
+```
+
+4、要查出那个ip或那个微服务占用太多资源，用mysql客户端进入information_schema数据库查看
+```
+select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
+```
+
+5、依照服务名查看使用状况
+```
+select count(*),db from information_schema.processlist group by db
 ```
 
 查看当前最大连接数
