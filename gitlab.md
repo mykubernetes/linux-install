@@ -91,17 +91,17 @@ user["git_user_email"] = "shit@qq.com"                     # 指定接收邮件�
 gitlab-ctl reconfigure # 重载配置文件
 ```
 
-gitlab相关的目录
+### 2.4 gitlab相关的目录
 ```
 /etc/gitlab       # 配置文件目录
 /run/gitlab       # 运行pid目录
 /opt/gitlab       # 安装目录
 /var/opt/gitlab   # 数据目录，存储gitlab数据目录
-var/log/gitlab    # 日志目录
+/var/log/gitlab    # 日志目录
 ```
 
 
-### 2.4 Gitlab常用命令
+### 2.5 Gitlab常用命令
 ```
 gitlab-ctl start         # 启动所有 gitlab 组件
 gitlab-ctl stop          # 停止所有 gitlab 组件
