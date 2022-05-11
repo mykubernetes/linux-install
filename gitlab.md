@@ -103,6 +103,8 @@ gitlab-ctl reconfigure # 重载配置文件
 
 ### 2.5 Gitlab常用命令
 ```
+gitlab-rake              # 数据备份恢复等数据操作
+
 gitlab-ctl start         # 启动所有 gitlab 组件
 gitlab-ctl stop          # 停止所有 gitlab 组件
 gitlab-ctl restart       # 重启所有 gitlab 组件
@@ -112,6 +114,7 @@ gitlab-ctl reconfigure   # 启动服务
 gitlab-ctl show-config   # 验证配置文件
 
 gitlab-ctl tail          # 查看日志
+gitlab-ctl tail nginx    # 查看nginx日志
 
 gitlab-rake gitlab:check SANITIZE=true --trace    # 检查gitlab
 ```
