@@ -121,6 +121,8 @@ gitlab-rake gitlab:check SANITIZE=true --trace    # 检查gitlab
 
 ## 数据备份恢复
 
+### 备份
+
 1、停止gitlab 数据服务
 ```
 # gitlab-ctl stop unicorn
@@ -144,15 +146,18 @@ ok: down: sidekiq: 0s, normally up
 /etc/gitlab/gitlab-secrets.json   #key文件
 ```
 
+```
+# ll /var/opt/gitlab/backups/
+total 172
+-rw-r--r-- 1 git git 174080 Nov 27 16:12 1574842330_2021_11_27_13.11.3_gitlab_backup.tar
+```
+
 4、设置数据保存路径及保存时间
 ```
 # vim /etc/gitlab/gitlab.rb
-
-# 备份保存的位置，这里是默认位置，可修改成指定的位置
-gitlab_rails['backup_path'] = "/var/opt/gitlab/backups"
-
-# 设置备份保存的时间，超过此时间的日志将会被新覆盖
-gitlab_rails['backup_keep_time'] = 604800  # 这里是默认设置，保存7天
+gitlab_rails['backup_path'] = "/var/opt/gitlab/backups"      # 备份保存的位置，这里是默认位置，可修改成指定的位置
+gitlab_rails['backup_archive_permissions'] = 0644		         # 备份文件的默认权限
+gitlab_rails['backup_keep_time'] = 604800                    # 设置备份保存的时间，超过此时间的日志将会被新覆盖,默认保存7天
 
 # 特别注意：
 #     如果自定义了备份保存位置，则要修改备份目录的权限，比如：
@@ -168,7 +173,20 @@ gitlab-ctl reconfigure
 gitlab-ctl restart
 ```
 
-5、设置定时任务
+5、备份到云存储
+```
+涉及的配置项如下：
+   393  # gitlab_rails['backup_upload_connection'] = {
+   394  #   'provider' => 'AWS',
+   395  #   'region' => 'eu-west-1',
+   396  #   'aws_access_key_id' => 'AKIAKIAKI',
+   397  #   'aws_secret_access_key' => 'secret123'
+   398  # }
+   399  # gitlab_rails['backup_upload_remote_directory'] = 'my.s3.bucket'
+   400  # gitlab_rails['backup_multipart_chunk_size'] = 104857600
+```
+
+6、设置定时任务
 ```
 # 每天凌晨2点定时创建备份
 # 将一下内容写入到定时任务中 crontab -e
@@ -178,12 +196,13 @@ gitlab-ctl restart
 #     本地保留3到7天，在异地备份永久保存
 ```
 
-6、备份时间的识别
+7、备份时间的识别
 ```
 # 备份后的文件类似这样的形式：1494170842_gitlab_backup.tar，可以根据前面的时间戳确认备份生成的时间
 data  -d  @1494170842
 ```
 
+### 还原
 
 参考：
 - https://www.cnblogs.com/hgzero/p/14088215.html
