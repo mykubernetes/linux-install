@@ -119,10 +119,70 @@ gitlab-ctl tail nginx    # 查看nginx日志
 gitlab-rake gitlab:check SANITIZE=true --trace    # 检查gitlab
 ```
 
+## 数据备份恢复
 
+1、停止gitlab 数据服务
+```
+# gitlab-ctl stop unicorn
+ok: down: unicorn: ls, normally up
 
+# gitlab-ctl stop sidekiq
+ok: down: sidekiq: 0s, normally up
+```
 
+2、手动备份数据
+```
+# gitlab-rake gitlab:backup:create    #在任意目录即可备份当前gitlab数据
+# gitlab-ctl start                    #备份完成后启动gitlab
+```
 
+3、查看恢复的文件
+```
+/var/opt/gitlab/backups/          #gitlab数据备份目录，需要使用命令备份
+/var/opt/gitlab/nginx/conf        #nginx配置文件
+/etc/gitlab/gitlab.rb             #gitlab配置文件
+/etc/gitlab/gitlab-secrets.json   #key文件
+```
+
+4、设置数据保存路径及保存时间
+```
+# vim /etc/gitlab/gitlab.rb
+
+# 备份保存的位置，这里是默认位置，可修改成指定的位置
+gitlab_rails['backup_path'] = "/var/opt/gitlab/backups"
+
+# 设置备份保存的时间，超过此时间的日志将会被新覆盖
+gitlab_rails['backup_keep_time'] = 604800  # 这里是默认设置，保存7天
+
+# 特别注意：
+#     如果自定义了备份保存位置，则要修改备份目录的权限，比如：
+#     chown -R git.git /data/backup/gitlab
+```
+
+配置完成后要重启以使配置生效
+```
+# 重读配置文件
+gitlab-ctl reconfigure  
+
+# 重启gitlab
+gitlab-ctl restart
+```
+
+5、设置定时任务
+```
+# 每天凌晨2点定时创建备份
+# 将一下内容写入到定时任务中 crontab -e
+0 2 * * * /usr/bin/gitlab-rake gitlab:backup:create
+
+# 备份策略建议：
+#     本地保留3到7天，在异地备份永久保存
+```
+
+6、备份时间的识别
+```
+# 备份后的文件类似这样的形式：1494170842_gitlab_backup.tar，可以根据前面的时间戳确认备份生成的时间
+data  -d  @1494170842
+```
 
 
 参考：
