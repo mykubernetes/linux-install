@@ -1,4 +1,4 @@
-# Jenkins插件下载慢的解决办法(使用nginx反向代理)
+# 一、Jenkins插件下载慢的解决办法(使用nginx反向代理)
 
 即使更换清华源的update-center.json，依然很卡，那是因为清华源也是指向了官方地址。
 
@@ -49,5 +49,22 @@ location /download/plugins
  }
 ```
 
+# 如果现实jenkins已离线，将一下文件中的更新检查地址改成国内清华大学地址，然后重启jenkins即可：
+- https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
+
+```
+# cat /var/lib/jenkins/hudson.model.UpdateCenter.xml
+<?xml version='1.1' encoding='UTF-8'?>
+<sites>
+    <site>
+        <id>default</id>
+        <url> https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json </url>
+    </site>
+</sites>
+```
+
+
 参考：
 - https://blog.csdn.net/qq_34556414/category_10494189.html
+
+
