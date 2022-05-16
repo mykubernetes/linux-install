@@ -48,3 +48,6 @@ location /download/plugins
         }
  }
 ```
+
+参考：
+- https://blog.csdn.net/qq_34556414/category_10494189.html
