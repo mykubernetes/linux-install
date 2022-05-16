@@ -5,15 +5,15 @@
 最好的办法就是使用nginx代理updates.jenkins-ci.org
 
 步骤分为两步:
-- 将updates.jenkins-ci.org映射到本地环回地址127.0.0.1
-- 使用nginx代理updates.jenkins-ci.org的镜像网站到清华源
+- 将updates.jenkins.io映射到本地环回地址127.0.0.1
+- 使用nginx代理updates.jenkins.io的镜像网站到清华源
 
-第一步：将updates.jenkins.org映射到本地环回地址
+第一步：将updates.jenkins.io映射到本地环回地址
 
 查看域名路径 https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json 查看url的域名填写到host文件
 ```
 vim  /etc/hosts
-127.0.0.1 updates.jenkins-ci.org 
+127.0.0.1 updates.jenkins.io
 ```
 - 这样所有的请求就映射到了本地的环回地址127.0.0.1
 
@@ -37,7 +37,7 @@ location /download/plugins
 ```
   server {
      listen       80;
-     server_name  updates.jenkins-ci.org ;
+     server_name  updates.jenkins.io ;
  
         location /download/plugins
         {
