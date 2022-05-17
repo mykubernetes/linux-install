@@ -65,6 +65,35 @@ location /download/plugins
 </sites>
 ```
 
+# pipline
+
+## 语法
+- Stage:阶段，一个pipline可以划分为若干个stage,每个stage都是一个操作步骤，比如clone代码、代码编译、代码测试和代码部署，阶段是一个逻辑分组，可以跨多个node执行。
+- Node:节点，每个node都是一个jenkins节点，可以是jenkins master也可以是 jenkins agent，node是执行step具体服务器。
+- Step:步骤，step是jenkins pipline最基本的操作单元，从在服务器创建目录到构建容器镜像，由各类jenkins插件提供实现，一个stage中可以又多个step，例如：sh "make"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 参考：
 - https://blog.csdn.net/qq_34556414/category_10494189.html
