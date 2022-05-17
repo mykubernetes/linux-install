@@ -99,33 +99,33 @@ ssh magedu@172.31.3.106 "/etc/init.d/tomcat start"
 
 2、通过pipline构建工程--脚本式
 ```
-node {
+node("jenkins-slave1") {             //运行的slave节点，不知道则运行在master节点
     stage("clone 代码"){
-        sh "cd /var/lib/jenkins/workspace/pipline-linux40-app1-develop && rm -rf ./*"
-        git branch: 'develop', credentialsId: '0792719f-b4fe-412a-a511-e8ecf60dd760', url: 'git@172.31.0.101:magedu/app1.git'
-        echo "代码 clone完成"
+      sh "cd /var/lib/jenkins/workspace/pipline-linux40-app1-develop && rm -rf ./*"
+      git branch: 'develop', credentialsId: '0792719f-b4fe-412a-a511-e8ecf60dd760', url: 'git@172.31.0.101:magedu/app1.git'
+      echo "代码 clone完成"
     }
     stage("代码构建"){
-        sh "cd /var/lib/jenkins/workspace/pipline-linux40-app1-develop && tar czvf linux40.tar.gz ./*"
+      sh "cd /var/lib/jenkins/workspace/pipline-linux40-app1-develop && tar czvf linux40.tar.gz ./*"
     }
    stage("停止服务"){
-		sh 'ssh www@172.31.0.106 "/etc/init.d/tomcat stop && rm -rf /data/tomcat/tomcat_webapps/linux40/*"'
-		sh 'ssh www@172.31.0.107 "/etc/init.d/tomcat stop && rm -rf /data/tomcat/tomcat_webapps/linux40/*"'
+      sh 'ssh www@172.31.0.106 "/etc/init.d/tomcat stop && rm -rf /data/tomcat/tomcat_webapps/linux40/*"'
+      sh 'ssh www@172.31.0.107 "/etc/init.d/tomcat stop && rm -rf /data/tomcat/tomcat_webapps/linux40/*"'
    }
    
     stage("代码copy"){
-		sh "cd /var/lib/jenkins/workspace/pipline-linux40-app1-develop && scp linux40.tar.gz  www@172.31.0.106:/data/tomcat/tomcat_appdir/"
-		sh "cd /var/lib/jenkins/workspace/pipline-linux40-app1-develop && scp linux40.tar.gz  www@172.31.0.107:/data/tomcat/tomcat_appdir/"
+      sh "cd /var/lib/jenkins/workspace/pipline-linux40-app1-develop && scp linux40.tar.gz  www@172.31.0.106:/data/tomcat/tomcat_appdir/"
+      sh "cd /var/lib/jenkins/workspace/pipline-linux40-app1-develop && scp linux40.tar.gz  www@172.31.0.107:/data/tomcat/tomcat_appdir/"
     }
 	
 	
    stage("代码部署"){
-    	sh 'ssh www@172.31.0.106 "cd  /data/tomcat/tomcat_appdir/ && tar xvf linux40.tar.gz -C /data/tomcat/tomcat_webapps/linux40/"'
-		sh 'ssh www@172.31.0.107 "cd  /data/tomcat/tomcat_appdir/ && tar xvf linux40.tar.gz -C /data/tomcat/tomcat_webapps/linux40/"'
+     sh 'ssh www@172.31.0.106 "cd  /data/tomcat/tomcat_appdir/ && tar xvf linux40.tar.gz -C /data/tomcat/tomcat_webapps/linux40/"'
+     sh 'ssh www@172.31.0.107 "cd  /data/tomcat/tomcat_appdir/ && tar xvf linux40.tar.gz -C /data/tomcat/tomcat_webapps/linux40/"'
    }
     stage("启动服务"){
-		sh 'ssh www@172.31.0.106 "/etc/init.d/tomcat start"'
-		sh 'ssh www@172.31.0.107 "/etc/init.d/tomcat start"'
+     sh 'ssh www@172.31.0.106 "/etc/init.d/tomcat start"'
+     sh 'ssh www@172.31.0.107 "/etc/init.d/tomcat start"'
    }
    
 }
