@@ -184,8 +184,168 @@ pipeline{
 }
 ```
 
+4、生产案例
+```
+#!/bin/bash
+DATE=`date +%Y-%m-%d_%H-%M-%S`
+METHOD=$1
+BRANCH=$2
+GROUP_LIST=$3
+
+function IP_list(){
+  if [[ ${GROUP_LIST} == "GROUP1" ]];then
+     Server_IP="172.31.5.105"
+     echo ${Server_IP}
+     ssh root@172.31.5.108 ""echo disable  server web_port/172.31.5.105" | socat stdio /var/lib/haproxy/haproxy.sock"
+     ssh root@172.31.5.109 ""echo disable  server web_port/172.31.5.105" | socat stdio /var/lib/haproxy/haproxy.sock"
+  elif [[ ${GROUP_LIST} == "GROUP2" ]];then
+     Server_IP="172.31.5.106 172.31.5.107"
+     echo ${Server_IP}
+     ssh root@172.31.5.108 ""echo enable  server web_port/172.31.5.105" | socat stdio /var/lib/haproxy/haproxy.sock"
+     ssh root@172.31.5.109 ""echo enable  server web_port/172.31.5.105" | socat stdio /var/lib/haproxy/haproxy.sock"
+  elif [[ ${GROUP_LIST} == "GROUP3" ]];then
+     Server_IP="172.31.5.105 172.31.5.106 172.31.5.107"
+     echo ${Server_IP}
+  fi
+}
+
+function clone_code(){
+  echo "即将开始从clone ${BRANCH}分支的代码"
+  cd /data/git/magedu && rm -rf web1 && git clone -b  ${BRANCH} git@172.31.5.101:magedu/web1.git
+  echo "${BRANCH}分支代码cllone完成，即开始编译"
+  #tar czvf myapp.tar.gz ./index.html
+  #echo "代码编译完成，即将开始分发部署包"
+}
+
+function scanner_code(){
+  cd /data/git/magedu/web1 && /apps/sonarscanner/bin/sonar-scanner
+  echo "代码扫描完成,请打开sonarqube查看扫描结果"
+}
+
+function code_maven(){
+  echo  "cd /data/git/magedu/web1 && mvn clean package -Dmaven.test.skip=true"
+  echo "代码编译完成"
+}
 
 
+function make_zip(){
+  cd /data/git/magedu/web1 && zip -r code.zip ./index.html
+  echo "代码打包完成"
+}
+
+
+
+down_node(){
+  for node in ${Server_IP};do
+    ssh root@172.31.5.108 "echo "disable server  web_port/${node}" | socat stdio /var/lib/haproxy/haproxy.sock"
+    echo "${node} 从负载均衡172.31.5.108下线成功"
+    ssh root@172.31.5.109 "echo "disable server  web_port/${node}" | socat stdio /var/lib/haproxy/haproxy.sock"
+    echo "${node} 从负载均衡172.31.5.109下线成功"
+  done
+}
+
+function scp_zipfile(){
+  for node in ${Server_IP};do
+    scp /data/git/magedu/web1/code.zip  magedu@${node}:/data/tomcat/tomcat_appdir/code-${DATE}.zip
+    ssh magedu@${node} "unzip /data/tomcat/tomcat_appdir/code-${DATE}.zip  -d /data/tomcat/tomcat_webdir/code-${DATE} && rm -rf  /data/tomcat/tomcat_webapps/myapp && ln -sv  /data/tomcat/tomcat_webdir/code-${DATE} /data/tomcat/tomcat_webapps/myapp"
+  done
+}
+
+function stop_tomcat(){
+  for node in ${Server_IP};do
+    ssh magedu@${node}   "/etc/init.d/tomcat stop"
+  done
+}
+
+function start_tomcat(){
+  for node in ${Server_IP};do
+    ssh magedu@${node}   "/etc/init.d/tomcat start"
+    #sleep 5
+  done
+}
+
+function web_test(){
+  sleep 10
+  for node in ${Server_IP};do
+    NUM=`curl -s  -I -m 10 -o /dev/null  -w %{http_code}  http://${node}:8080/myapp/index.html`
+    if [[ ${NUM} -eq 200 ]];then
+       echo "${node} myapp URL 测试通过,即将添加到负载"
+       add_node ${node}
+    else
+       echo "${node} 测试失败,请检查该服务器是否成功启动tomcat"
+    fi
+  done
+}
+
+function add_node(){
+   node=$1
+    echo ${node},"----->"
+    if [[ ${GROUP_LIST} == "GROUP3" ]];then
+      ssh root@172.31.5.108 ""echo enable  server web_port/172.31.5.105" | socat stdio /var/lib/haproxy/haproxy.sock"
+      ssh root@172.31.5.109 ""echo enable  server web_port/172.31.5.105" | socat stdio /var/lib/haproxy/haproxy.sock"	 
+    fi
+    ##########################################
+    if [ ${node} == "172.31.5.105" ];then
+       echo "灰度部署环境服务器-->172.31.5.105 部署完毕,请进行代码测试!"
+    else
+      ssh root@172.31.5.108 ""echo enable  server web_port/${node}" | socat stdio /var/lib/haproxy/haproxy.sock"
+      ssh root@172.31.5.109 ""echo enable  server web_port/${node}" | socat stdio /var/lib/haproxy/haproxy.sock"
+    fi
+}
+
+function rollback_last_version(){
+  for node in ${Server_IP};do
+   echo $node
+   NOW_VERSION=`ssh magedu@${node} ""/bin/ls -l  -rt /data/tomcat/tomcat_webapps/ | awk -F"->" '{print $2}'  | tail -n1""`
+   NOW_VERSION=`basename ${NOW_VERSION}`
+   echo $NOW_VERSION,"NOW_VERSION"
+    NAME=`ssh  magedu@${node}  ""ls  -l  -rt  /data/tomcat/tomcat_webdir/ | grep -B 1 ${NOW_VERSION} | head -n1 | awk '{print $9}'""`
+   echo $NAME,""NAME
+   ssh magedu@${node} "rm -rf /data/tomcat/tomcat_webapps/myapp && ln -sv  /data/tomcat/tomcat_webdir/${NAME} /data/tomcat/tomcat_webapps/myapp"
+  done 
+}
+
+function delete_history_version(){
+  for node in ${Server_IP};do
+    ssh magedu@${node} "rm -rf /data/tomcat/tomcat_appdir/*"
+    NUM=`ssh magedu@${node}  ""/bin/ls -l -d   -rt /data/tomcat/tomcat_webdir/code-* | wc -l""`
+    echo "${node} --> ${NUM}"
+      if [ ${NUM} -gt 5 ];then
+         NAME=`ssh magedu@${node} ""/bin/ls -l -d   -rt /data/tomcat/tomcat_webdir/code-* | head -n1 | awk '{print $9}'""`
+         ssh magedu@${node} "rm -rf ${NAME}"
+        echo "${node} 删除历史版本${NAME}成功!"
+      fi
+  done 
+}
+
+main(){
+   case $1  in
+      deploy)
+        IP_list;        
+        clone_code;
+        scanner_code;
+        make_zip;
+        down_node;
+        stop_tomcat;
+        scp_zipfile;
+        start_tomcat;
+        web_test;
+        delete_history_version;
+         ;;
+      rollback_last_version)
+        IP_list;
+        #echo ${Server_IP}
+        down_node;
+        stop_tomcat;
+        rollback_last_version;
+        start_tomcat;
+        web_test;
+         ;;
+    esac
+}
+
+main $1 $2 $3
+```
 
 
 
