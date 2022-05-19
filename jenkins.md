@@ -511,6 +511,8 @@ fi
 - readyReplicas: 就绪的replica数
 - availableReplicas: 可用的replica数
 
+https://blog.csdn.net/weixin_30919429/article/details/97452984
+
 
 参考：
 - https://blog.csdn.net/qq_34556414/category_10494189.html
