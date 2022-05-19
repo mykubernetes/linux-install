@@ -506,6 +506,11 @@ if [ ${success} -ne 1 ];then
   exit 1
 fi
 ```
+- replicas: 当前设置的副本数
+- updatedReplicas: 更新的副本数
+- readyReplicas: 当前就绪的副本数
+- availableReplicas: 当前可以的副本数
+
 
 参考：
 - https://blog.csdn.net/qq_34556414/category_10494189.html
