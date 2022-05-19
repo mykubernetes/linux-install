@@ -471,24 +471,14 @@ EXPOSE 8080 8009
 CMD ["/apps/tomcat/bin/run_tomcat.sh"]
 ```
 
-
-
 build-command.sh
 ```
 #!/bin/bash
 TAG=$1
-docker build -t harbor.magedu.net/linux43/tomcat:{$TAG} .
+docker build -t harbor.magedu.net/linux43/tomcat-app1:{$TAG} .
 
-docker push harbor.magedu.net/linux/tomcat:${TAG}
+docker push harbor.magedu.net/linux/tomcat-app1:${TAG}
 ```
-
-
-
-
-
-
-
-
 
 参考：
 - https://blog.csdn.net/qq_34556414/category_10494189.html
