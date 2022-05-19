@@ -480,6 +480,33 @@ docker build -t harbor.magedu.net/linux43/tomcat-app1:{$TAG} .
 docker push harbor.magedu.net/linux/tomcat-app1:${TAG}
 ```
 
+# 健康检查
+```
+# 健康检查
+success=0
+count=60                     # 检查60次
+IFS=","                      # 用逗号做数组分割符
+sleep 5                      # 镜像跟新完后等待一段时间进行检查
+while [ ${count} -gt 0 ]
+do
+   replicas=$(kubectl get deploy linux43-tomcat-app1-deployment -o go-template='{{.status.replicas}},{{.status.updatedReplicas}},{{.status.readyReplicas}},{{.status.availableReplicas}}')
+   echo "replicas: ${replicas}"
+   arr=(${replicas})
+   if [ "${arr[0]}" == "${arr[1]}" -a "${arr[1]}" == "${arr[2]} -a "${arr[2]}" == "${arr[3]}" ];then
+     echo "health chack success!"
+	 success=1
+	 break
+   fi
+  (( count--))
+  sleep 2
+done
+  
+if [ ${success} -ne 1 ];then
+  echo "health check failed"
+  exit 1
+fi
+```
+
 参考：
 - https://blog.csdn.net/qq_34556414/category_10494189.html
 - https://blog.csdn.net/qq_22049773/category_9138183.html
