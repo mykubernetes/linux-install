@@ -480,7 +480,7 @@ docker build -t harbor.magedu.net/linux43/tomcat-app1:{$TAG} .
 docker push harbor.magedu.net/linux/tomcat-app1:${TAG}
 ```
 
-# 健康检查
+健康检查
 ```
 # 健康检查
 success=0
@@ -506,10 +506,10 @@ if [ ${success} -ne 1 ];then
   exit 1
 fi
 ```
-- replicas: 当前设置的副本数
-- updatedReplicas: 更新的副本数
-- readyReplicas: 当前就绪的副本数
-- availableReplicas: 当前可以的副本数
+- replicas: 当前replica数
+- updatedReplicas: 最新的replica数
+- readyReplicas: 就绪的replica数
+- availableReplicas: 可用的replica数
 
 
 参考：
