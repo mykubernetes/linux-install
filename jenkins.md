@@ -184,7 +184,7 @@ pipeline{
 }
 ```
 
-4、生产案例
+4、基于tomcat的部署
 ```
 #!/bin/bash
 DATE=`date +%Y-%m-%d_%H-%M-%S`
@@ -347,8 +347,113 @@ main(){
 main $1 $2 $3
 ```
 
+5、基于k8s的部署
+```
+#!/bin/bash
+#记录脚本开始执行时间
+starttime=`date +'%Y-%m-%d %H:%M:%S'`
+
+#变量
+SHELL_DIR="/root/scripts"
+SHELL_NAME="$0"
+K8S_CONTROLLER1="172.31.7.101"
+K8S_CONTROLLER2="172.31.7.102"
+DATE=`date +%Y-%m-%d_%H_%M_%S`
+METHOD=$1
+Branch=$2
+
+if test -z $Branch;then
+  Branch=develop
+fi
 
 
+function Code_Clone(){
+  Git_URL="git@172.31.5.101:magedu/app1.git"
+  DIR_NAME=`echo ${Git_URL} |awk -F "/" '{print $2}' | awk -F "." '{print $1}'`
+  DATA_DIR="/data/gitdata/magedu"
+  Git_Dir="${DATA_DIR}/${DIR_NAME}"
+  cd ${DATA_DIR} &&  echo "即将清空上一版本代码并获取当前分支最新代码" && sleep 1 && rm -rf ${DIR_NAME}
+  echo "即将开始从分支${Branch} 获取代码" && sleep 1
+  git clone -b ${Branch} ${Git_URL} 
+  echo "分支${Branch} 克隆完成，即将进行代码编译!" && sleep 1
+  #cd ${Git_Dir} && mvn clean package
+  #echo "代码编译完成，即将开始将IP地址等信息替换为测试环境"
+  #####################################################
+  sleep 1
+  cd ${Git_Dir}
+  tar czf ${DIR_NAME}.tar.gz  ./*
+}
+
+#将打包好的压缩文件拷贝到k8s 控制端服务器
+function Copy_File(){
+  echo "压缩文件打包完成，即将拷贝到k8s 控制端服务器${K8S_CONTROLLER1}" && sleep 1
+  scp ${Git_Dir}/${DIR_NAME}.tar.gz root@${K8S_CONTROLLER1}:/opt/k8s-data/dockerfile/linux43/tomcat-app1/
+  echo "压缩文件拷贝完成,服务器${K8S_CONTROLLER1}即将开始制作Docker 镜像!" && sleep 1
+}
+
+#到控制端执行脚本制作并上传镜像
+function Make_Image(){
+  echo "开始制作Docker镜像并上传到Harbor服务器" && sleep 1
+  ssh root@${K8S_CONTROLLER1} "cd /opt/k8s-data/dockerfile/linux43/tomcat-app1  && bash build-command.sh ${DATE}"
+  echo "Docker镜像制作完成并已经上传到harbor服务器" && sleep 1
+}
+
+#到控制端更新k8s yaml文件中的镜像版本号,从而保持yaml文件中的镜像版本号和k8s中版本号一致
+function Update_k8s_yaml(){
+  echo "即将更新k8s yaml文件中镜像版本" && sleep 1
+  ssh root@${K8S_CONTROLLER1} "cd /opt/k8s-data/yaml/linux43/tomcat-app1  && sed -i 's/image: harbor.magedu.*/image: harbor.magedu.net\/linux43\/tomcat-app1:${DATE}/g' tomcat-app1.yaml"
+  echo "k8s yaml文件镜像版本更新完成,即将开始更新容器中镜像版本" && sleep 1
+}
+
+#到控制端更新k8s中容器的版本号,有两种更新办法，一是指定镜像版本更新，二是apply执行修改过的yaml文件
+function Update_k8s_container(){
+  #第一种方法
+   ssh root@${K8S_CONTROLLER1} "kubectl set image deployment/linux43-tomcat-app1-deployment  linux43-tomcat-app1-container=harbor.magedu.net/linux43/tomcat-app1:${DATE} -n linux43"
+  #第二种方法,推荐使用第一种
+  #ssh root@${K8S_CONTROLLER1} "cd /opt/k8s-data/yaml/linux43/tomcat-app1 && kubectl  apply -f tomcat-app1.yaml --record=true" 
+  echo "k8s 镜像更新完成" && sleep 1
+  echo "当前业务镜像版本: harbor.magedu.net/linux43/tomcat-app1:${DATE}"
+  #计算脚本累计执行时间，如果不需要的话可以去掉下面四行
+  endtime=`date +'%Y-%m-%d %H:%M:%S'`
+  start_seconds=$(date --date="$starttime" +%s);		
+  end_seconds=$(date --date="$endtime" +%s);
+  echo "本次业务镜像更新总计耗时："$((end_seconds-start_seconds))"s"
+}
+
+#基于k8s 内置版本管理回滚到上一个版本
+function rollback_last_version(){
+  echo "即将回滚之上一个版本"
+  ssh root@${K8S_CONTROLLER1}  "kubectl rollout undo deployment/linux43-tomcat-app1-deployment  -n linux43"
+  sleep 1
+  echo "已执行回滚至上一个版本"
+}
+
+#使用帮助
+usage(){
+  echo "部署使用方法为 ${SHELL_DIR}/${SHELL_NAME} deploy "
+  echo "回滚到上一版本使用方法为 ${SHELL_DIR}/${SHELL_NAME} rollback_last_version"
+}
+
+#主函数
+main(){
+  case ${METHOD}  in
+  deploy)
+    Code_Clone;
+    Copy_File;
+    Make_Image; 
+    Update_k8s_yaml;
+    Update_k8s_container;
+  ;;
+  rollback_last_version)
+    rollback_last_version;
+  ;;
+  *)
+    usage;
+  esac;
+}
+
+main $1 $2
+```
 
 
 
