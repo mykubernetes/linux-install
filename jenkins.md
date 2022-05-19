@@ -455,6 +455,25 @@ main(){
 main $1 $2
 ```
 
+dockerfile
+```
+#Tomcat Web Image
+FROM harbor.magedu.net/pub-images/tomcat-base:v8.5.43
+
+ADD run_tomcat.sh /apps/tomcat/bin/run_tomcat.sh
+#RUN chmod 755 /apps/tomcat/bin/run_tomcat.sh
+ADD app1.tar.gz /apps/tomcat/webapps/
+
+RUN chown tomcat.tomcat /apps/ -R
+
+EXPOSE 8080 8009
+
+CMD ["/apps/tomcat/bin/run_tomcat.sh"]
+```
+
+
+
+build-command.sh
 ```
 #!/bin/bash
 TAG=$1
