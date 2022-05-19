@@ -455,6 +455,13 @@ main(){
 main $1 $2
 ```
 
+```
+#!/bin/bash
+TAG=$1
+docker build -t harbor.magedu.net/linux43/tomcat:{$TAG} .
+
+docker push harbor.magedu.net/linux/tomcat:${TAG}
+```
 
 
 
