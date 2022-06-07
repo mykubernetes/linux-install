@@ -42,3 +42,10 @@ RUN_AS_USER=root
 [19:12:42 root@nexus ~]#cat /apps/nexus/sonatype-work/nexus3/admin.password
 d9ee323f-506a-486d-876c-37bc1e2f6dcf
 ```
+
+验证默认仓库
+```
+Hosted：本地仓库，通常我们会部署自己的构件到这一类型的仓库，比如公司的第三方库
+Proxy：代理仓库，它们被用来代理远程的公共仓库，如 maven 中央仓库(官方仓库)。
+Group：仓库组，用来合并多个 hosted/proxy 仓库，当你的项目希望在多个repository 使用资源时就不需要多次引用了，只需要引用一个 group 即可。
+```
