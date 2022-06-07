@@ -1,5 +1,8 @@
-# Jenkins pipeline声明式与脚本式语法
+# 一、什么是流水线
 
+jenkins有2中流水线分为声明式流水线与脚本化流水线,脚本化流水线是jenkins旧版本使用的流水线脚本，新版本Jenkins推荐使用声明式流水线。文档只介绍声明流水线。
+
+# Jenkins pipeline声明式与脚本式语法
 - https://www.jenkins.io/zh/doc/book/pipeline/jenkinsfile/
 
 ## 1. 声明式Pipeline
