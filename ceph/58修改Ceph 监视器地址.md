@@ -127,3 +127,6 @@ mon_host = 192.168.xxx.xxm,192.168.xxx.xxn,192.168.xxx.xxl
 [root@ceph-xxx-xxn ~]# /etc/init.d/ceph restart osd
 [root@ceph-xxx-xxn ~]# /etc/init.d/ceph restart osd
 ```
+
+参考：
+- https://blog.csdn.net/lzw06061139/category_6187085.html?spm=1001.2014.3001.5482
