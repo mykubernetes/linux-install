@@ -117,6 +117,19 @@ ansible all -m authorized_key -a "user=root key='{{ lookup('file', '/root/.ssh/i
 
 # ansible test -m authorized_key -a "user=root key='{{ lookup('file', '/root/.ssh/id_rsa.pub')}}'"
 ```
+
+```
+---
+- hosts: test
+  gather_facts: false
+  tasks:
+  - name: deliver authorized_keys
+    authorized_key:
+        user: root                                                                      # 远端服务器上的用户
+        key: "{{ lookup('file', '/etc/ansible/roles/authorized_keys') }}"               # 从本地authorized_keys文件读取公钥内容
+        state: present               # present 添加指定key到authorized_keys文件中 # absent 从authorized_keys文件中移除指定key [Default: present]
+        exclusive: no                                                                   # 是否移除authorized_keys文件中其它非指定key
+```
 - https://docs.ansible.com/ansible/2.3/authorized_key_module.html
 
 
