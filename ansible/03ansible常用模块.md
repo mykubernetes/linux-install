@@ -82,6 +82,16 @@
 
 ## 5)ansible批量设置免密登录
 
+| 参数 | 参数说明 |
+|------|--------|
+| user=root | 将密钥推送到远程主机的哪个用户下 |
+| key='{{ lookup('file', '/root/.ssh/id_rsa.pub')}}' | 指定要推送的密钥文件所在的路径 |
+| path='/root/.ssh/authorized_keys' [Default: (homedir)+/.ssh/authorized_keys] | 将密钥推送到远程主机的哪个目录下并重命名 |
+| manage_dir=no | 指定模块是否应该管理 authorized key 文件所在的目录。如果设置为 yes，模块会创建目录，以及设置一个已存在目录的拥有者和权限。如果通过 path 选项，重新指定了一个 authorized key 文件所在目录，那么应该将该选项设置为 no |
+| exclusive [default: no] | 是否移除 authorized_keys 文件中其它非指定 key |
+| state (Choices: present, absent) [Default: present] | present 添加指定 key 到 authorized_keys 文件中；absent 从 authorized_keys 文件中移除指定 key |
+
+示例一:
 ```
 # ssh-keygen -t rsa 
 # ssh-copy-id 192.168.0.1          #本机ip
@@ -90,7 +100,25 @@
 #验证
 ssh 192.168.0.2            #其他机器ip
 ```
+
+示例二:
+```
+ansible all -m authorized_key -a "user=root key='{{ lookup('file', '/root/.ssh/id_rsa.pub')}}' path='/root/.ssh/authorized_keys' manage_dir=no"
+```
+
+示例三:
+
+如果密码不同，则需要将密码定义到/etc/ansible/hosts中
+```
+# cat /etc/ansible/hosts
+[test]
+10.10.10.1 ansible_connection=ssh ansible_ssh_user=root ansible_ssh_pass="123456"
+10.10.10.2 ansible_connection=ssh ansible_ssh_user=root ansible_ssh_pass="abcdef"
+
+# ansible test -m authorized_key -a "user=root key='{{ lookup('file', '/root/.ssh/id_rsa.pub')}}'"
+```
 - https://docs.ansible.com/ansible/2.3/authorized_key_module.html
+
 
 # 常用模块
 
