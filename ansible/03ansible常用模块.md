@@ -81,6 +81,7 @@
 ```
 
 ## 5)ansible批量设置免密登录
+
 ```
 # ssh-keygen -t rsa 
 # ssh-copy-id 192.168.0.1          #本机ip
@@ -89,6 +90,7 @@
 #验证
 ssh 192.168.0.2            #其他机器ip
 ```
+- https://docs.ansible.com/ansible/2.3/authorized_key_module.html
 
 # 常用模块
 
