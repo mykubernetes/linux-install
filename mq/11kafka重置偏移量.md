@@ -16,6 +16,14 @@ test_find       3          3               3               0          consumer2-
 test_find       1          3               3               0          consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer-1
 test_find       2          3               3               0          consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer-1
 ```
+- TOPIC：该group里消费的topic名称
+- PARTITION：分区编号
+- CURRENT-OFFSET：该分区当前消费到的offset
+- LOG-END-OFFSET：该分区当前latest offset
+- LAG：消费滞后区间，为LOG-END-OFFSET-CURRENT-OFFSET，具体大小需要看应用消费速度和生产者速度，一般过大则可能出现消费跟不上，需要引起应用注意
+- CONSUMER-ID：server端给该分区分配的consumer编号
+- HOST：消费者所在主机
+- CLIENT-ID：消费者id，一般由应用指定
 
 非活跃
 ```
