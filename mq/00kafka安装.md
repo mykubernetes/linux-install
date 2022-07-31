@@ -320,7 +320,7 @@ bin/kafka-topics.sh --create \
 
 3、查看当前服务器中的所有topic  
 ```
-# bin/kafka-topics.sh --list --zookeeper node001:2181
+# bin/kafka-topics.sh --list --bootstrap-server localhost:9092
 test
 ```
 
@@ -362,9 +362,30 @@ test
 - --zookeeper 0.9之前的版本使用
 - --bootstrap-server 0.9之后的版本使用
 
+
+查看消费者组列表
+```
+kafka-consumer-groups.sh --bootstrap-server 127.0.0.1:9092 --list
+```
+
+查看消费者组消费信息
+```
+kafka-consumer-groups.sh --bootstrap-server 127.0.0.1:9092 --group apmq --describe
+```
+
+设置偏移量
+```
+设置为最初偏移量
+bin/kafka-consumer-groups.sh --bootstrap-server node21:9092,node22:9092,node23:9092 --group test-consumer-group --topic test --reset-offsets --to-earliest –execute
+设置任意偏移量
+bin/kafka-consumer-groups.sh --bootstrap-server node21:9092,node22:9092,node23:9092 --group test-consumer-group --topic test --reset-offsets --to-offset 3 –execute
+设置最近偏移量
+bin/kafka-consumer-groups.sh --bootstrap-server node21:9092,node22:9092,node23:9092 --group test-consumer-group --topic test --reset-offsets --to-latest --execute
+```
+
 6、修改topics
 ```
-# kafka-topics.sh --zookeeper node001:2181 --alter --topic test --partitions 40
+# kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic test --partitions 40
 WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
 Adding partitions succeeded!
 ```
@@ -394,14 +415,13 @@ Adding partitions succeeded!
 # bin/kafka-configs.sh --describe --bootstrap-server localhost:9092 --version
 ```
 
-
 5）修改topic
 ```
-# kafka-topics.sh --zookeeper localhost:2181 --create --topic test --partitions 2 --replication-factor 1
-# kafka-topics.sh --zookeeper localhost:2181 --alter --topic test --config max.message.bytes=1048576
-# kafka-topics.sh --zookeeper localhost:2181 --describe --topic test
-# kafka-topics.sh --zookeeper localhost:2181 --alter --topic test --config segment.bytes=10485760
-# kafka-topics.sh --zookeeper localhost:2181 --alter --delete-config max.message.bytes --topic test
+# kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test --partitions 2 --replication-factor 1
+# kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic test --config max.message.bytes=1048576
+# kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test
+# kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic test --config segment.bytes=10485760
+# kafka-topics.sh --bootstrap-server localhost:9092 --alter --delete-config max.message.bytes --topic test
 ```
 
 7、删除topic
