@@ -2,6 +2,7 @@
 |-----|------|
 | 官网 | https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html |
 | github | https://github.com/chenryn/ELKstack-guide-cn/blob/master/SUMMARY.md |
+| ELKstack 中文指南 | https://elkguide.elasticsearch.cn/beats/metric.html |
 | 博客 | https://haicoder.net/elasticsearch/elasticsearch-tutorial.html |
 | 博客 | https://wiki.eryajf.net/pages/2351.html |
 | 博客 | https://blog.csdn.net/yy756127197/category_7360475.html?spm=1001.2014.3001.5482 |
