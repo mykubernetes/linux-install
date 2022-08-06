@@ -2,6 +2,10 @@
 
 kafka-topics.sh 脚本主要负责 topic 相关的操作。它的具体实现是通过 kafka-run-class 来调用 TopicCommand 类，并根据参数执行指定的功能。
 
+## Topic 级别配置属性
+
+- 当如下所示的属性配置到 Topic 上时，将会覆盖 server.properties 上对应的属性。
+ 
 | 属性名 | 值类型 | 默认值 | 有效值 | 服务器默认属性 | 描述 |
 |--------|-------|--------|--------|----------------|------|
 | cleanup.policy | list | delete | delete、compact | log.cleanup.policy | 过期或达到上限日志的清理策略。delete：删除，compact：压缩 |
