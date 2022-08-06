@@ -7,6 +7,7 @@
 | 博客 | https://blog.csdn.net/yy756127197/category_7360475.html?spm=1001.2014.3001.5482 |
 | 博客 | https://blog.csdn.net/boling_cavalry/category_9283993.html?spm=1001.2014.3001.5482 |
 | Logstash Filter Grok插件 | https://grokdebug.herokuapp.com/ |
+| 告警 | https://blog.csdn.net/mnasd/article/details/123033989 |
 
 # 使用curl命令操作elasticsearch
 
