@@ -61,7 +61,7 @@ bin/kafka-topics.sh --list --bootstrap-server node1:9092,node2:9092,node3:9092
 查看指定 Topic 明细
 ```
 bin/kafka-topics.sh --describe --bootstrap-server node1:9092,node2:9092,node3:9092 --topic topicName
-Topic:topicName PartitionCount:3 ReplicationFactor:2 Configs:
+Topic: topicName PartitionCount:3 ReplicationFactor:2 Configs:
 Topic: topicName Partition: 0 Leader: 0 Replicas: 0,1 Isr: 0,1
 Topic: topicName Partition: 1 Leader: 1 Replicas: 1,2 Isr: 1,2
 Topic: topicName Partition: 2 Leader: 2 Replicas: 2,0 Isr: 2,0
