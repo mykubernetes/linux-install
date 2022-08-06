@@ -74,3 +74,5 @@ jps -m remote.domain:2002
 3002 /opt/jdk1.7.0/demo/jfc/Java2D/Java2Demo.JAR
 3102 sun.tools.jstatd.jstatd -p 2002
 ```
+
+- https://blog.csdn.net/qq_29116427/article/details/105912457
