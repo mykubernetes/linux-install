@@ -47,3 +47,15 @@ ES如果采用单节点部署，不用考虑什么节点角色，默认就好。
 
 ### 仅投票节点（voting_only ）
 在master node的选举过程中参与投票，但是不会作为候选人被选为master node
+
+# ES节点属性
+
+使用自定义节点属性作为_感知属性_，使 es 能够在分配分片时考虑您的物理硬件配置。如果es知道哪些节点位于同一物理服务器上、同一机架或同一区域中，它可以分发主分片及其副本分片，以最大限度地降低在发生故障时丢失所有分片副本的风险。
+```
+node.attr.rack_id: rack_one
+```
+
+告诉 Elasticsearch 在分配分片时，通过设置每个符合主节点条件的配置文件来考虑一个或多个感知属性。
+```
+cluster.routing.allocation.awareness.attributes: rack_id
+```
