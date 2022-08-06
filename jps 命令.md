@@ -1,4 +1,4 @@
-JDK 中的[ jps 命令 ]（https://docs.oracle.com/en/java/javase/11/tools/jps.html#GUID-6EB65B96-F9DD-4356-B825-6146E9EEC81E）沿用了同样的概念：它将打印所有正在运行的 Java 进程的相关信息。
+JDK 中的 [jps 命令](https://docs.oracle.com/en/java/javase/11/tools/jps.html#GUID-6EB65B96-F9DD-4356-B825-6146E9EEC81E) 沿用了同样的概念：它将打印所有正在运行的 Java 进程的相关信息。
 
 # 一、概要
 
