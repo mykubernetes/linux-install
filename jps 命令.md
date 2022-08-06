@@ -53,7 +53,7 @@ lvmid [ [ classname | JARfilename | "Unknown"] [ arg* ] [ jvmarg* ] ]
 
 # 五、示例
 
-- 列出本地主机上已检测的虚拟机：
+- 列出本地主机上已检测的虚拟机：
 ```
 jps
 18027 Java2Demo.JAR
