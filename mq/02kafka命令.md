@@ -23,7 +23,8 @@ kafka-topics.sh 脚本主要负责 topic 相关的操作。它的具体实现是
 TopicCommand.createTopic() 方法负责创建 Topic，其核心逻辑是确定新建 Topic 中有多少个分区及每个分区中的副本如何分配，既支持使用 replica-assignment 参数手动分配，也支持使用 partitions 参数和 replication-factor 参数指定分区个数和副本个数进行自动分配。之后该方法会将副本分配结果写入到 ZooKeeper 中。
 
 - 形式一
-  使用`replica-assignment`参数手动指定 Topic Partition Replica 与 Kafka Broker 之间的存储映射关系。
+
+使用`replica-assignment`参数手动指定 Topic Partition Replica 与 Kafka Broker 之间的存储映射关系。
 ```
 bin/kafka-topics.sh --create --bootstrap-server node1:9092,node2:9092,node3:9092 --topic topicName --replica-assignment 0:1,1:2,2:0
 ```
@@ -32,7 +33,8 @@ bin/kafka-topics.sh --create --bootstrap-server node1:9092,node2:9092,node3:9092
 > 此形式在最新的 2.3 版本中会报 Aborted due to timeout 异常，建议使用形式二。
 
 - 形式二
-  使用 partitions 和 replication-factor 参数自动分配存储映射关系。
+
+使用`partitions`和`replication-factor`参数自动分配存储映射关系。
 ```
 bin/kafka-topics.sh --create --bootstrap-server node1:9092,node2:9092,node3:9092 --topic topicName --partitions 3 --replication-factor 2
 ```
@@ -40,7 +42,7 @@ bin/kafka-topics.sh --create --bootstrap-server node1:9092,node2:9092,node3:9092
 
 > 注意：Topic 名称中一定不要同时出现下划线 (’_’) 和小数点 (’.’)。WARNING: Due to limitations in metric names, topics with a period (’.’) or underscore(’_’) could collide. To avoid issues ot os best to use either, but not both.
 
-创建 Topic 时也可指定参数：
+- 创建 Topic 时也可指定参数：
 ```
 bin/kafka-topics.sh --create --bootstrap-server node1:9092,node2:9092,node3:9092 --topic topicName --partitions 3 --replication-factor 2 --config cleanup.policy=compact --config retention.ms=500
 ```
@@ -52,13 +54,13 @@ ERROR org.apache.kafka.common.errors.InvalidReplicationFactorException: Replicat
 
 ## 2、查看 Topic
 
-查看 Topic 列表
+- 查看 Topic 列表
 ```
 bin/kafka-topics.sh --list --bootstrap-server node1:9092,node2:9092,node3:9092
 ```
 查询出来的结果仅有 Topic 的名称信息。
 
-查看指定 Topic 明细
+- 查看指定 Topic 明细
 ```
 bin/kafka-topics.sh --describe --bootstrap-server node1:9092,node2:9092,node3:9092 --topic topicName
 Topic: topicName PartitionCount:3 ReplicationFactor:2 Configs:
@@ -88,7 +90,7 @@ bin/kafka-topics.sh --delete --bootstrap-server node1:9092,node2:9092,node3:9092
 
 ## 4、修改 Topic
 
-增加分区数
+- 增加分区数
 ```
 bin/kafka-topics.sh --alter --bootstrap-server node1:9092,node2:9092,node3:9092 --topic topicName --partitions 3
 ```
@@ -99,11 +101,12 @@ org.apache.kafka.common.errors.InvalidPartitionsException: The number of partiti
 ```
 不能用来修改副本个数。(请使用 kafka-reassign-partitions.sh 脚本增加副本数)
 
-增加配置
+- 增加配置
 ```
 bin/kafka-topics.sh --alter --bootstrap-server node1:9092,node2:9092,node3:9092 --topic topicName --config flush.messages=1
 ```
-删除配置
+
+- 删除配置
 ```
 bin/kafka-topics.sh --alter --bootstrap-server node1:9092,node2:9092,node3:9092 --topic topicName --delete-config flush.messages
 ```
