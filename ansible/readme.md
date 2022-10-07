@@ -9,3 +9,4 @@
 | yedit模块 | https://github.com/kwoodson/ansible-role-yedit |
 | 看云 | https://www.kancloud.cn/willseecloud/ansible/2103992 |
 | ansible | https://www.cnblogs.com/longtds/tag/ansible/ |
+| ansible jinja2详解 | https://blog.csdn.net/xixihahalelehehe/article/details/113863994 |
