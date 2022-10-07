@@ -1,6 +1,6 @@
 下载当前最新release版本redis 源码包：http://download.redis.io/releases/
 
-1、编译安装
+# 1、编译安装
 
 官方的安装方法：
 ```
@@ -41,7 +41,14 @@ https://redis.io/download
 [root@centos7 redis-5.0.7]#cp redis.conf /apps/redis/etc/
 ```
 
-2、前台启动 redis
+bin下文件说明：
+- redis-server redis服务器启动命令
+- redis-cli redis命令行客户端
+- redis-benchmark redis性能测试工具
+- redis-check-aof AOF文件修复工具
+- redis-check-rdb RDB文件检索工具（快照持久化文件）
+
+# 2、前台启动 redis
 
 redis-server 是 redis 服务器程序
 ```
@@ -124,7 +131,7 @@ root       4484   4455  0 11:09 pts/1    00:00:00 grep --color=auto redis
 127.0.0.1:6380> 
 ```
 
-3、解决启动时的三个警告提示
+# 3、解决启动时的三个警告提示
 
 1）tcp-backlog
 ```
@@ -213,7 +220,7 @@ echo never > /sys/kernel/mm/transparent_hugepage/enabled
 27646:M 16 Feb 2020 21:26:52.692 * Ready to accept connections
 ```
 
-4、创建 redis 用户和数据目录
+# 4、创建 redis 用户和数据目录
 ```
 [root@centos7 ~]#useradd -r -s /sbin/nologin redis
 
@@ -221,7 +228,7 @@ echo never > /sys/kernel/mm/transparent_hugepage/enabled
 [root@centos7 ~]#chown -R redis.redis /apps/redis/  
 ```
 
-5、编辑 redis 服务启动文件
+# 5、编辑 redis 服务启动文件
 ```
 #复制CentOS8安装生成的redis.service文件，进行修改
 [root@centos7 ~]#scp 10.0.0.8:/lib/systemd/system/redis.service /lib/systemd/system/
@@ -245,11 +252,13 @@ RuntimeDirectoryMode=0755
 WantedBy=multi-user.target
 ```
 
-6、验证 redis 启动
+# 6、验证 redis 启动
 ```
-[root@centos7 ~]#systemctl daemon-reload 
-[root@centos7 ~]#systemctl start redis
-[root@centos7 ~]#systemctl status redis
+[root@centos7 ~]# systemctl daemon-reload
+[root@centos7 ~]# systemctl enable redis.service
+[root@centos7 ~]# systemctl start redis
+
+[root@centos7 ~]# systemctl status redis
 ● redis.service - Redis persistent key-value database
    Loaded: loaded (/usr/lib/systemd/system/redis.service; enabled; vendor preset: 
 disabled)
@@ -278,4 +287,14 @@ LISTEN     0      511           127.0.0.1:6379                             *:*
 LISTEN     0      128                     *:22                             *:*   
 LISTEN     0      100                 [::1]:25                          [::]:*   
 LISTEN     0      128                  [::]:22                          [::]:* 
+```
+
+# 7、服务操作命令
+```
+systemctl start redis.service    #启动redis服务
+systemctl stop redis.service     #停止redis服务
+systemctl restart redis.service  #重新启动服务
+systemctl status redis.service   #查看服务当前状态
+systemctl enable redis.service   #设置开机自启动
+systemctl disable redis.service  #停止开机自启动
 ```
