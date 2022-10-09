@@ -146,7 +146,14 @@ vim ../config/server.properties
 
 # 四、Zookeeper 开启 SASL 认证
 
-## 1、修改 zoo.cfg，添加如下配置
+## 1、为啥需要开启zookeeper认证
+
+kafka使用zookeeper来存储元数据，其中包括了ACL。默认的情况下，任何可以访问网络的人，都可以访问zookeeper，这意味着任何人可以：
+- 通过修改配置ACL来升级特权
+- 通过恶意修改zookeeper的元数据，来使得kafka集群收到污染，崩溃
+- 开启认证后，可以阻止恶意修改，同事不妨碍正常访问zookeeper服务
+
+## 2、修改 zoo.cfg，添加如下配置
 ```
 # 开启认证功能，注意是 阿拉伯数字的 1，而不是英文字母 L。
 authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
@@ -157,7 +164,7 @@ zookeeper.sasl.client=true
 jaasLoginRenew=3600000
 ```
 
-## 2、新增 zk_server_jaas.conf
+## 3、新增 zk_server_jaas.conf
 ```
 cd ../conf
 
@@ -175,7 +182,7 @@ Server字段用于指定服务端登录配置。通过org.apache.org.apache.kafk
 
 定义了两个用户，username 和paasword 是 zk集群之间的认证密码，user_kafka = “kafka"定义了一个用户"kafka”，密码是"kafka-zookeeper-pwd"， 通过“ user_ "为前缀后接用户名方式创建连接代理的用户名和密码。
 
-## 3、将 kafka 认证的包导入 zk 中
+## 4、将 kafka 认证的包导入 zk 中
 
 从上面的配置可以看出，Zookeeper的认证机制是使用插件 “org.apache.kafka.common.security.plain.PlainLoginModule”，所以需要导入Kafka相关jar包，kafka-clients相关jar包，在kafka服务下的lib目录中可以找到，根据kafka不同版本，相关jar包版本会有所变化。
 ```
@@ -183,7 +190,7 @@ cp /opt/module/kafka_2.11-2.2.2/libs/kafka-clients-2.2.2.jar /opt/module/apache-
 cp /opt/module/kafka_2.11-2.2.2/libs/lz4-java-1.5.0.jar /opt/module/apache-zookeeper-3.6.2-bin/lib/
 ```
 
-## 4、修改 zkEnv.sh 添加环境变量
+## 5、修改 zkEnv.sh 添加环境变量
 ```
 cd /opt/module/apache-zookeeper-3.6.2-bin/bin/
 vim zkEnv.sh
@@ -191,7 +198,7 @@ vim zkEnv.sh
 export SERVER_JVMFLAGS=" -Djava.security.auth.login.config=/opt/module/apache-zookeeper-3.6.2-bin/conf/zk_server_jaas.conf"
 ```
 
-## 5、重启 zk
+## 6、重启 zk
 ```
 /opt/module/apache-zookeeper-3.6.2-bin/bin/zkServer.sh stop
 /opt/module/apache-zookeeper-3.6.2-bin/bin/zkServer.sh start
