@@ -324,3 +324,111 @@ EOF
 # 开一个linux新窗口 启动消费者
 ./kafka-console-consumer.sh --bootstrap-server hostname:9092 --from-beginning --topic topic-test -consumer.config ../config/consumer.properties
 ````
+
+# 六、配置 ACL
+
+[ZK ACL](https://www.cnblogs.com/dalianpai/p/12748144.html)
+
+[Apache Kafka](https://kafka.apache.org/22/documentation.html#security_authz)
+
+## 1、配置 Zookeeper ACL
+
+首先我们来看一下官网的这一段话
+```
+If you are running a version of Kafka that does not support security or simply with security disabled, and you want to make the cluster secure, then you need to execute the following steps to enable ZooKeeper authentication with minimal disruption to your operations:
+
+Perform a rolling restart setting the JAAS login file, which enables brokers to authenticate. At the end of the rolling restart, brokers are able to manipulate znodes with strict ACLs, but they will not create znodes with those ACLs
+Perform a second rolling restart of brokers, this time setting the configuration parameter zookeeper.set.acl to true, which enables the use of secure ACLs when creating znodes
+Execute the ZkSecurityMigrator tool. To execute the tool, there is this script: ./bin/zookeeper-security-migration.sh with zookeeper.acl set to secure. This tool traverses the corresponding sub-trees changing the ACLs of the znodes
+```
+所以，我们要开启 Zookeeper 的 ACL 身份认证功能，执行一下的步骤即可
+
+### 1、配置 jaas 文件，使得 kafka broker 需要认证操作 zk 中的节点。这个我们在之前开启 SASL 已经配置完成了。
+
+### 2、在 kafka 配置文件（server.properties）中添加如下的配置
+```
+# 配置 kafka 使用 zookeeper 的 ACL
+zookeeper.set.acl=true
+```
+
+### 3、执行如下脚本，将 zookeeper.acl 设置为 secure。此工具会遍历相应的子节点，更改 znode 的 ACL。
+```
+./zookeeper-security-migration.sh --zookeeper.acl=secure --zookeeper.connect=localhost:2181/kafka
+```
+在执行前，我们可以通过 zk 客户端来查看一下 kafka 节点的 ACL
+```
+/opt/module/apache-zookeeper-3.6.2-bin/bin/zkCli.sh
+ [zk: localhost:2181(CONNECTED) 3] getAcl /kafka
+ 'world,'anyone
+ : cdrwa
+ [zk: localhost:2181(CONNECTED) 4]
+ 
+ # 可以看到是默认的权限，然后我们执行上述脚本，再次查看发现节点ACL已经发生改变，表示经过 sasl 认证的kafka 用户具有 cdrwa 权限，其他所有用户都只有 r 权限。
+ [zk: localhost:2181(CONNECTED) 5] getAcl /kafka
+ 'sasl,'kafka
+ : cdrwa
+ 'world,'anyone
+ : r
+ [zk: localhost:2181(CONNECTED) 6]
+```
+
+经过我的测试，我发现如果在 zookeeper.set.acl=true 配置完成后，zk 中没有 kafka 的节点信息，那么启动 kafka 后，zk 中生成的节点信息，自动就修改了 ACL。
+
+## 2、配置 Kafka ACL
+在开始之前，我们简单学习下Kafka ACL的格式。根据官网的介绍，Kafka中一条ACL的格式如下：“Principal P is [Allowed/Denied] Operation O From Host H On Resource R”。它们的含义如下：
+
+- principal：表示一个Kafka user
+- operation：表示一个具体的操作类型，有效值: Read(读), Write(写), Create(创建), Delete(删除), Alter(修改),Describe(描述), ClusterAction(集群操作), All(所有)
+- Host：表示连向Kafka集群的client的IP地址，如果是‘*’则表示所有IP。注意：当前Kafka不支持主机名，只能指定IP地址
+- Resource：表示一种Kafka资源类型。当前共有5种类型：TOPIC、CLUSTER、GROUP、transactional-id、delegation-token
+
+在之前的配置中，我们配置 kafkaClient 都是使用的超级用户，跳过了 ACL，现在我们将用户修改回来。
+```
+vim /opt/module/kafka_2.11-2.2.2/config/sasl.properties
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka_client" password="kafka-server-pwd";
+    
+vim ../config/kafka_server_jaas.conf
+KafkaClient {
+   org.apache.kafka.common.security.plain.PlainLoginModule required
+   username="kafka_client"
+   password="kafka-server-pwd";
+};
+```
+
+配置好了之后，我们重启服务，再次启动生产者和消费者，此时我们会发现，我们当前没有权限操作 topic 了
+```
+[root@hostname bin]# ./kafka-console-consumer.sh --bootstrap-server hostname:9092 --topic topic-test -consumer.config ../config/consumer.properties
+[2022-07-07 12:16:27,284] WARN [Consumer clientId=consumer-1, groupId=test-consumer-group] Error while fetching metadata with correlation id 2 : {topic-test=TOPIC_AUTHORIZATION_FAILED} (org.apache.kafka.clients.NetworkClient)
+[2022-07-07 12:16:27,285] ERROR Error processing message, terminating consumer process:  (kafka.tools.ConsoleConsumer$)
+org.apache.kafka.common.errors.TopicAuthorizationException: Not authorized to access topics: [topic-test]
+Processed a total of 0 messages
+[root@hostname bin]#
+```
+
+我们可以通过，如下命令来查看 topic 的权限信息
+```
+# 查看所有权限
+./kafka-acls.sh --authorizer-properties zookeeper.connect=hostname:2181/kafka --list 
+# 查看单个
+./kafka-acls.sh --authorizer-properties zookeeper.connect=hostname:2181/kafka --list --topic topic-test
+```
+
+然后可以通过如下命令来对topic进行acl
+```
+# 给用户kafka_client topic topic-test 的 producer 权限
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=hostname:2181/kafka --topic "topic-test" --add --allow-principal User:kafka_client --producer
+    
+# 给用户kafka_client 所有消费者组的 topic topic-test 的 consumer 权限
+bin/kafka-acls.sh --authorizer-properties zookeeper.connect=hostname:2181/kafka --topic "topic-test" --add --allow-principal User:kafka_client --consumer --group "*"
+```
+
+配置好了之后，kafka_client 用户对 topic-test topic 就有了正常的生产消费权限，如下
+```
+[root@hostname bin]# ./kafka-acls.sh --authorizer-properties zookeeper.connect=hostname:2181/kafka --list
+Current ACLs for resource `Topic:LITERAL:topic-test`:
+        User:kafka_client has Allow permission for operations: Write from hosts: *
+        User:kafka_client has Allow permission for operations: Describe from hosts: *
+        User:kafka_client has Allow permission for operations: Create from hosts: *
+        User:kafka_client has Allow permission for operations: Read from hosts: *
+```
+ACL 还有很多中限制，就看大家的实际需求去配置就行。
