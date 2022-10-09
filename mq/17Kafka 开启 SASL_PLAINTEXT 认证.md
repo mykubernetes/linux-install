@@ -319,10 +319,10 @@ EOF
 配置好了之后，启动命令如下
 ```
 # 启动生产者
-./kafka-console-producer.sh --broker-list hostname:9092 --topic topic-test -producer.config ../config/producer.properties
+./kafka-console-producer.sh --broker-list hostname:9092 --topic topic-test --producer.config ../config/producer.properties
 
 # 开一个linux新窗口 启动消费者
-./kafka-console-consumer.sh --bootstrap-server hostname:9092 --from-beginning --topic topic-test -consumer.config ../config/consumer.properties
+./kafka-console-consumer.sh --bootstrap-server hostname:9092 --from-beginning --topic topic-test --consumer.config ../config/consumer.properties
 ````
 
 # 六、配置 ACL
