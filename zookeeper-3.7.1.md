@@ -15,8 +15,7 @@ syncLimit=5                                           # 集群中的follower服�
 # example sakes.
 # dataDir：数据文件目录
 dataDir=/data/zk/data                                 # Zookeeper保存数据的目录，默认情况下，Zookeeper将写数据的日志文件也保存在这个目录里。
-# dataLogDir：日志文件目录，Zookeeper保存日志文件的目录。
-dataLogDir=/data/zk/logs
+dataLogDir=/data/zk/logs                              # dataLogDir：日志文件目录，Zookeeper保存日志文件的目录。
 # the port at which the clients will connect
 clientPort=2181                                       # clientPort：客户端连接端口，通过这个端口可以连接zookeeper服务
 # the maximum number of client connections.
