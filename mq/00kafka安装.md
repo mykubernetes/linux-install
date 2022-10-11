@@ -262,7 +262,8 @@ kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partit
 # cd config/
 # vim server.properties
 broker.id=0                              #broker的全局唯一编号，不能重复
-listeners=PLAINTEXT://:9092              #监听所有地址
+listeners=PLAINTEXT://node01:9092        #监听所有地址
+advertised.listeners=PLAINTEXT://node01:9092   #producer、consumer连接地址
 port=9092                                #用来监听链接的端口，producer或consumer将在此端口建立连接
 delete.topic.enable=true                 #删除topic功能使能
 num.network.threads=8                    #处理网络请求的线程数量,设置为CPU核心数
