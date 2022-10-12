@@ -86,4 +86,5 @@ PUT _all/_settings
 您可以在丢失的分片开始恢复后立即重置超时。
 
 参考：
-https://www.jianshu.com/p/a81ca31bb316
+- https://www.jianshu.com/p/a81ca31bb316
+- https://segmentfault.com/a/1190000037730202
