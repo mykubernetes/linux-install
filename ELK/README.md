@@ -28,6 +28,20 @@ ES  内置的REST 接口
 | `/index/_refresh` | 刷新索引（使新增加内容对搜索可见，不保证数据被写入磁盘） |
 | `/index/_flush` | 刷新索引（会触发Lucene提交数据） |
 
+
+集群运维常用命令
+
+| 命令 | API命令说明 |
+|------|-------------|
+| `GET /_cluster/health` | 查看集群健康状态等信息 |
+| `GET /_cat/pending_tasks` | 查看集群任务堆积情况 |
+| `GET /_cluster/state/<metrics>/<target>` | 查看集群详细的元数据信息 |
+| `GET /_cluster/stats` | 查看集群各维度的统计信息，包括节点CPU、JVM等使用率情况 |
+| `GET _cluster/allocation/explain` | 查看集群分片分配详情 |
+| `POST /_cluster/reroute` | 更改分片分配策略 |
+| `GET /_cluster/settings` | 查看集群层面settings设置信息 |
+| `GET /_tasks` | 查看集群中正在执行的task信息 |
+
 一、使用_cat系列
 ---
 _cat系列提供了一系列查询elasticsearch集群状态的接口。  
