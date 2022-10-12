@@ -597,3 +597,4 @@ ES集群出现Unassigned shards问题
 - https://blog.csdn.net/yangbosos/article/details/88903846
 - http://www.jwsblog.com/archives/59.html
 - https://cloud.tencent.com/developer/article/1910980
+- https://blog.csdn.net/wlei0618/article/details/125095872
