@@ -4,17 +4,17 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.
 
 ## 1、ES默认会根据data节点磁盘使用空间情况分配新shards，或将节点上已有shards迁移到其它节点上；
 
-- cluster.routing.allocation.disk.watermark.low：意味着ES不会为磁盘使用率超过此值的节点分配新shards，支持动态调整，默认85%或；
+- **cluster.routing.allocation.disk.watermark.low**：意味着ES不会为磁盘使用率超过此值的节点分配新shards，支持动态调整，默认85%或；
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"cluster.routing.allocation.disk.watermark.low":"85%"}}'
 ```
 
-- cluster.routing.allocation.disk.watermark.high：意味着ES会为磁盘使用率超过此值的节点迁出shards或重分配shards，支持动态调整，默认90%；
+- **cluster.routing.allocation.disk.watermark.high**：意味着ES会为磁盘使用率超过此值的节点迁出shards或重分配shards，支持动态调整，默认90%；
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"cluster.routing.allocation.disk.watermark.high":"90%"}}'
 ```
 
-- cluster.routing.allocation.disk.watermark.flood_stage：意味着ES会对磁盘使用率超过此值的节点上的所有索引设置只读（index.blocks.read_only_allow_delete），拒绝新数据写入，支持动态调整，默认95%。
+- **cluster.routing.allocation.disk.watermark.flood_stage**：意味着ES会对磁盘使用率超过此值的节点上的所有索引设置只读（index.blocks.read_only_allow_delete），拒绝新数据写入，支持动态调整，默认95%。
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"cluster.routing.allocation.disk.watermark.flood_stage":"95%"}}'
 ```
@@ -48,39 +48,39 @@ curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/s
 
 ## 2、分片恢复
 
-- cluster.routing.allocation.node_concurrent_incoming_recoveries：分片恢复过程中单节点允许多少并发分片传入数，默认2；
+- **cluster.routing.allocation.node_concurrent_incoming_recoveries**：分片恢复过程中单节点允许多少并发分片传入数，默认2；
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"cluster.routing.allocation.node_concurrent_incoming_recoveries":"2"}}'
 ```
 
-- cluster.routing.allocation.node_concurrent_outgoing_recoveries：分片恢复过程中单节点允许多少并发分片传出数，默认2；
+- **cluster.routing.allocation.node_concurrent_outgoing_recoveries**：分片恢复过程中单节点允许多少并发分片传出数，默认2；
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"cluster.routing.allocation.node_concurrent_outgoing_recoveries":"2"}}'
 ```
 
-- cluster.routing.allocation.node_concurrent_recoveries：同时设置分片传入与传出的并发数；
+- **cluster.routing.allocation.node_concurrent_recoveries**：同时设置分片传入与传出的并发数；
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"cluster.routing.allocation.node_concurrent_recoveries":"4"}}'
 ```
 
-- indices.recovery.max_bytes_per_sec：设置恢复过程中节点间每秒传输速率，默认40mb，如果主机网卡及磁盘IO配置高，可以适当调高此值，以提高分片恢复速率；
+- **indices.recovery.max_bytes_per_sec**：设置恢复过程中节点间每秒传输速率，默认40mb，如果主机网卡及磁盘IO配置高，可以适当调高此值，以提高分片恢复速率；
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"indices.recovery.max_bytes_per_sec":"40mb"}}'
 ```
 
-- cluster.routing.allocation.node_initial_primaries_recoveries: ES7.9 设置分片恢复速率；
+- **cluster.routing.allocation.node_initial_primaries_recoveries**: ES7.9 设置分片恢复速率；
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"cluster.routing.allocation.node_initial_primaries_recoveries":"10"}}'
 ```
 
 ## 3、控制分片分配到单个data节点的数量
 
-- index.routing.allocation.total_shards_per_node：控制indices的分片分配到单个节点的分片数；
+- **index.routing.allocation.total_shards_per_node**：控制indices的分片分配到单个节点的分片数；
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/indices_test/_settings -d '{"index.routing.allocation.total_shards_per_node":"3"}'
 ```
 
-- cluster.routing.allocation.total_shards_per_node：控制集群中所有分片分配到单个节点的分片数，不常用。
+- **cluster.routing.allocation.total_shards_per_node**：控制集群中所有分片分配到单个节点的分片数，不常用。
 ```
 PUT _cluster/settings
 {
@@ -90,7 +90,7 @@ PUT _cluster/settings
 }
 ```
 
-- cluster.max_shards_per_node：控制集群中每个data节点上的分片数量，默认1000
+- **cluster.max_shards_per_node**：控制集群中每个data节点上的分片数量，默认1000
 ```
 PUT _cluster/settings 
 { 
@@ -99,7 +99,7 @@ PUT _cluster/settings
 }
 ```
 
-- action.search.shard_count.limit：控制一次查询覆盖的shards数量
+- **action.search.shard_count.limit**：控制一次查询覆盖的shards数量
 ```
 {
     "persistent" : {
@@ -147,10 +147,10 @@ GET _cluster/allocation/explain?pretty
 https://www.elastic.co/guide/en/elasticsearch/reference/master/modules-cluster.html#cluster-shard-allocation-filtering
 
 ## 1、cluster.routing.rebalance.enable：控制集群shards rebalance参数，默认all，需要快速重启节点的情况下建议将值设置为none；
-- all：允许集群中所有shards进行rebalance；
-- none：不允许集群中所有indices的shards进行rebalance；
-- primaries：只允许集群中主shards进行rebalance；
-- replicas：只允许集群中副本shards进行rebalance；
+- **all**：允许集群中所有shards进行rebalance；
+- **none**：不允许集群中所有indices的shards进行rebalance；
+- **primaries**：只允许集群中主shards进行rebalance；
+- **replicas**：只允许集群中副本shards进行rebalance；
 
 ```
 curl -H 'Content-Type:application/json' -XPUT   http://127.0.0.1:9200/_cluster/settings -d '{"transient" : {"cluster.routing.rebalance.enable":"all"}}'
