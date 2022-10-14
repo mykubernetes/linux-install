@@ -109,3 +109,6 @@ PUT _cluster/settings
   }
 }
 ```
+
+冷热集群参考：
+- https://blog.csdn.net/laoyang360/article/details/102539888
