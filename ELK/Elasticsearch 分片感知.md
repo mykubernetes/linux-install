@@ -24,14 +24,6 @@ PUT <index_name>
   }
 }
 ```
-
-### 2.2 在索引创建之后执行
-```
-PUT <index_name>/_settings
-{
-  index.routing.allocation.include.{attribute}": "{value}"
-}
-```
 除了使用自定义的属性来实现外，还可以使用节点自带的属性:
 - `_name`：匹配节点名称
 - `_host_ip`: 匹配节点主机IP地址
@@ -40,8 +32,14 @@ PUT <index_name>/_settings
 - `_host`：匹配主机名hostname
 - `_id`：匹配节点ID
 - `_tier`：匹配节点的数据层角色
-
-### 2.3 还可以通过以下配置指定
+- 
+### 2.2 在索引创建之后执行
+```
+PUT <index_name>/_settings
+{
+  index.routing.allocation.include.{attribute}": "{value}"
+}
+```
 - index.routing.allocation.include.{attribute}" #表示索引可以分配在包含多个值中的其中一个节点上。
 - index.routing.allocation.require.{attribute}" #表示索引要分配在包含索引指定的系欸但是（通常一般设置一个值）。
 - index.routing.allocation.exclude.{attribute}" #表示索引只能分配在不包含所有指定节点上。
