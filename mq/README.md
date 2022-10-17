@@ -45,4 +45,8 @@ Kafka 在 ZooKeeper 中动态维护了一个 ISR（In-sync Replica），即保�
 ---
 这里我们并不打算介绍 ZooKeeper 的相关知识，只是简要介绍 ZooKeeper 在 Kafka 中的作用。 Kafka 利用 ZooKeeper 保存相应元数据信息， Kafka 元数据信息包括如代理节点信息、 Kafka集群信息、旧版消费者信息及其消费偏移量信息、主题信息、分区状态信息、分区副本分配方案信息、动态配置信息等。 Kafka 在启动或运行过程当中会在 ZooKeeper 上创建相应节点来保存元数据信息， Kafka 通过监听机制在这些节点注册相应监听器来监听节点元数据的变化，从而由 ZooKeeper 负责管理维护 Kafka 集群，同时通过 ZooKeeper 我们能够很方便地对 Kafka 集群进行水平扩展及数据迁移。
 
-https://cloud.tencent.com/developer/article/1846819
+
+
+参考：
+- https://www.cnblogs.com/yinging/p/16512821.html
+- https://cloud.tencent.com/developer/article/1846819
