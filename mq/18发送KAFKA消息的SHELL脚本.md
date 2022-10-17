@@ -1,7 +1,7 @@
 # 脚本内容
 
 下面是脚本sendmessage.sh的内容，带有详细注释：
-```
+```shell
 #!/bin/sh
 
 #响应Ctrl+C中断
