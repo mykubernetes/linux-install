@@ -339,3 +339,6 @@ dragondisk:支持windows、Mac,下载地址 http://www.dragondisk.com/
 
 Explorer for Amazon S3:分收费和免费版，只支持windows  
 下载地址： http://www.cloudberrylab.com/free-amazon-s3-explorer-cloudfront-IAM.aspx  
+
+参考：
+- https://blog.csdn.net/zhangbaoxiang/article/details/112775577
