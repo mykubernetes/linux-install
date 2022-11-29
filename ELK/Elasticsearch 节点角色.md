@@ -236,3 +236,6 @@ path.data:  /var/elasticsearch/data
 - 3、介绍了master节点和data节点负责的功能：
   - master节点负责轻量级集群范围的操作，比如创建或删除索引，跟踪集群中节点位置以及分片分配。
   - data节点负责存储数据，并处理数据相关操作，如 CRUD、搜索和聚合。
+
+参考:
+- http://t.zoukankan.com/caoweixiong-p-11988457.html
