@@ -1,20 +1,20 @@
- - 1.show databases; 查看数据库名
- - 2.show tables; 查看表名(前提要进入一个库中)
- - 3.show create database xx; 查看建库语句
- - 4.show create table xx; 查看建表语句
- - 5.show processlist; 查看所有用户连接情况
- - 6.show charset; 查看支持的字符集
- - 7.show collation; 查看所有支持的校对规则
- - 8.show grants for xx; 查看用户的权限信息
- - 9.show variables like '%xx%' 查看参数信息(查看变量)(like为模糊查询)
- - 10.show engines; 看所有支持的存储引擎类型（就像linux的文件系统一样）
- - 11.show index from xxx 查看表的索引信息（首先先创建一个索引测试）
- - 12.show engine innodb status\G 查看innoDB引擎详细状态信息（\G将查询到的横向表格纵向输出，方便阅读）
- - 13.show binary logs 查看二进制日志的列表信息(首先要开启二进制日志功能,在my.cnf中加入log-bin=mysql-bin然后重启服务)
- - 14.show binlog events in '二进制日志文件' 查看二进制日志的事件信息
- - 15.show master status ; 查看mysql当前使用二进制日志信息
- - 16.show slave status\G 查看从库状态信息(用在主从复制那一块)
- - 17.show relaylog events in '中继日志文件' 查看中继日志的事件信息
+ - 1、show databases; 查看数据库名
+ - 2、show tables; 查看表名(前提要进入一个库中)
+ - 3、show create database xx; 查看建库语句
+ - 4、show create table xx; 查看建表语句
+ - 5、show processlist; 查看所有用户连接情况
+ - 6、show charset; 查看支持的字符集
+ - 7、show collation; 查看所有支持的校对规则
+ - 8、show grants for xx; 查看用户的权限信息
+ - 9、show variables like '%xx%' 查看参数信息(查看变量)(like为模糊查询)
+ - 10、show engines; 看所有支持的存储引擎类型（就像linux的文件系统一样）
+ - 11、show index from xxx 查看表的索引信息（首先先创建一个索引测试）
+ - 12、show engine innodb status\G 查看innoDB引擎详细状态信息（\G将查询到的横向表格纵向输出，方便阅读）
+ - 13、show binary logs 查看二进制日志的列表信息(首先要开启二进制日志功能,在my.cnf中加入log-bin=mysql-bin然后重启服务)
+ - 14、show binlog events in '二进制日志文件' 查看二进制日志的事件信息
+ - 15、show master status ; 查看mysql当前使用二进制日志信息
+ - 16、show slave status\G 查看从库状态信息(用在主从复制那一块)
+ - 17、show relaylog events in '中继日志文件' 查看中继日志的事件信息
 
 1.show databases; 查看数据库名
 ```
