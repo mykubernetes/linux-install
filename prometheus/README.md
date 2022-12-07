@@ -1,6 +1,6 @@
 https://github.com/mykubernetes/prometheus-1
 
-https://www.ileiming.com/%E8%BF%90%E7%BB%B4%E7%9B%91%E6%8E%A7/prometheus/prometheus%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0%E4%BB%8B%E7%BB%8D.html
+https://blog.csdn.net/qq_42883074/article/details/114965134
 
 https://blog.csdn.net/han949417140/article/details/112462319
 
