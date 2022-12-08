@@ -139,14 +139,15 @@ io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET
 io_namespace_http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="+Inf",} 2.0
 ```
 
-- 所有样本值的大小总和，命名为 <basename>_sum。
+- 所有样本值的大小总和，命名为 `<basename>_sum`。
 
 ```
 // 实际含义： 发生的2次 http 请求总的响应时间为 13.107670803000001 秒
 io_namespace_http_requests_latency_seconds_histogram_sum{path="/",method="GET",code="200",} 13.107670803000001
 ```
 
-- 样本总数，命名为 <basename>_count。值和 <basename>_bucket{le="+Inf"} 相同。
+- 样本总数，命名为 `<basename>_count`。值和 `<basename>_bucket{le="+Inf"}`相同。
+
 
 ```
 // 实际含义： 当前一共发生了 2 次 http 请求
@@ -162,7 +163,7 @@ bucket 可以理解为是对数据指标值域的一个划分，划分的依据�
 与 Histogram 类型类似，用于表示一段时间内的数据采样结果（通常是请求持续时间或响应大小等），但它直接存储了分位数（通过客户端计算，然后展示出来），而不是通过区间来计算。
 Summary 类型的样本也会提供三种指标（假设指标名称为 ）：
 
-- 样本值的分位数分布情况，命名为 <basename>{quantile="`<φ>`"}。
+- 样本值的分位数分布情况，命名为 `<basename>{quantile="`<φ>`"}`。
 
 ```
 // 含义：这 12 次 http 请求中有 50% 的请求响应时间是 3.052404983s
@@ -171,13 +172,13 @@ Summary 类型的样本也会提供三种指标（假设指标名称为 ）：
 io_namespace_http_requests_latency_seconds_summary{path="/",method="GET",code="200",quantile="0.9",} 8.003261666
 ```
 
-- 所有样本值的大小总和，命名为 <basename>_sum。
+- 所有样本值的大小总和，命名为 `<basename>_sum`。
 ```
 // 含义：这12次 http 请求的总响应时间为 51.029495508s
   io_namespace_http_requests_latency_seconds_summary_sum{path="/",method="GET",code="200",} 51.029495508
 ```
 
-- 样本总数，命名为 <basename>_count。
+- 样本总数，命名为`<basename>_count`。
 
 ```
 // 含义：当前一共发生了 12 次 http 请求
@@ -185,8 +186,8 @@ io_namespace_http_requests_latency_seconds_summary_count{path="/",method="GET",c
 ```
 
 现在可以总结一下 Histogram 与 Summary 的异同：
-- 它们都包含了 <basename>_sum 和 <basename>_count 指标
-- Histogram 需要通过 <basename>_bucket 来计算分位数，而 Summary 则直接存储了分位数的值。
+- 它们都包含了 `<basename>_sum` 和 `<basename>_count` 指标
+- Histogram 需要通过 `<basename>_bucket` 来计算分位数，而 Summary 则直接存储了分位数的值。
 
 关于 Summary 与 Histogram 的详细用法，请参考 histograms and summaries。
 
@@ -504,7 +505,7 @@ quantile(0.5, http_requests_total)
 |1   |^   |Evaluated right to left, for example, 1 ^ 2 ^ 3 is evaluated as 1 ^ (2 ^ 3)   |
 |2  |*, /, %   |Evaluated left to right, for example, 1 / 2 * 3 is evaluated as (1 / 2) * 3   |
 |3   |+, -   |Evaluated left to right   |
-|4   |==, !=, <=, <, >=, >  |Evaluated left to right   |
+|4   |`==, !=, <=, <, >=, >  |Evaluated left to right`   |
 |5   |and , unless   |Evaluated left to right   |
 |6   |or   |Evaluated left to right   |
 
@@ -515,47 +516,48 @@ https://prometheus.io/docs/prometheus/latest/querying/functions/
 
 PromQL对于各种用例(比如math)有近50个不同的函数;排序;计数器、gauge和直方图操作;标签转换;随着时间的推移聚合;类型转换;最后是日期和时间函数。
 
-| 内置函数 |
-|-------|
-| abs() |
-| absent() |
-| absent_over_time() |
-| ceil() |
-| changes()	|
-| clamp_max()	|
-| clamp_min()	|
-| day_of_month() |
-| day_of_week()	|
-| days_in_month()	|
-| delta()	|
-| deriv()	|
-| exp()	|
-| floor()	|
-| histogram_quantile() |
-| holt_winters() |
-| hour() |
-| idelta() |
-| increase() |
-| irate()	|
-| label_join() |
-| label_replace()	|
-| ln() |
-| log2() |
-| log10()	|
-| minute() |
-| month()	|
-| predict_linear() |
-| rate() |
-| resets() |
-| round() |
-| scalar() |
-| sort() |
-| sort_desc()	|
-| sqrt() |
-| time() |
-| timestamp() |
-| vector() |
-| year() |
+```
+abs()                 #绝对值，返回输入向量的所有样本的绝对值。
+absent()              #取布尔值
+ceil()                #向上取整
+changes()             #显示变更次数
+clamp_max()           #当大于最大值时，则为最大值
+clamp_min()           #当小于最小值时，则为最小值
+day_of_month()        #月内的第几天，返回被给定 UTC 时间所在月的第几天。返回值范围：1~31。
+day_of_week()         #周内的第几天，返回被给定 UTC 时间所在周的第几天。返回值范围：0~6，0 表示星期天。
+days_in_month()       #月内共多少天，返回当月一共有多少天。返回值范围：28~31。
+delta()               #计算区间向量里最大最小的差值
+deriv()               #计算时间序列的导数
+exp()                 #样本值的e的指数值
+floor()               #向下取整
+histogram_quantile()  #百分位计算
+holt_winters()        #平滑因子
+hour()                #一天内的第几个小时，返回被给定UTC时间的当前第几个小时，时间范围：0~23。
+idelta()              #时间范围最后两个指标的差
+increase()            #计算区间向量里最后一个值和第一个值的差值
+irate()               #计算区间向量内最新和最后的瞬时向量的增长率
+label_join()          #新增标签
+label_replace()       #替换标签
+ln()                  #自然对数
+log2()                #二进制对数
+log10()               #十进制对数
+minute()              #当前小时里的第多少分钟,返回给定 UTC 时间当前小时的第多少分钟。结果范围：0~59。
+month()               #第几个月，返回给定 UTC 时间当前属于第几个月，结果范围：0~12。
+predict_linear()      #基于一段时间内的增长值来预测多久后会溢出
+rate()                #计算区间向量里的平均增长率
+resets()              #时间范围内数值重置次数
+round()               #四舍五入取整
+scalar()              #转为标量
+sort()                #升序排序
+sort_desc()           #降序排序
+sqrt()                #平方根
+time()                #时间戳，返回从 1970-01-01 到现在的秒数。注意：它不是直接返回当前时间，而是时间戳
+timestamp()           #样本的时间戳，返回向量v中的每个样本的时间戳（从 1970-01-01 到现在的秒数）
+vector()              #转为向量
+year()                #哪一年，返回被给定 UTC 时间的当前年份。
+<aggregation>_over_time()   #聚合时间序列计算
+```
+
 
 1、absent()函数的作用是:获取一个瞬时向量作为参数，并返回以下内容:
 - 如果传递给它的向量参数具有样本数据，则返回空向量；
