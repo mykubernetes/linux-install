@@ -1,5 +1,3 @@
-https://github.com/mykubernetes/prometheus-1
-
 https://blog.csdn.net/han949417140/article/details/112462319
 
 https://www.jianshu.com/p/c21d399c140a?utm_campaign=haruki&utm_content=note&utm_medium=reader_share&utm_source=weixin
