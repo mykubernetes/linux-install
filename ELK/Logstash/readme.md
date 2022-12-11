@@ -3,3 +3,5 @@
 [grok表达式：](https://github.com/logstash-plugins/logstash-patterns-core/blob/master/patterns/ecs-v1/grok-patterns)
 
 https://blog.csdn.net/qq_29595629/article/details/114289054
+
+http://www.noobyard.com/article/p-tbtgkdyf-dh.html
