@@ -248,5 +248,351 @@ filter{
 }
 ```
 
+# grok调试案例
+
+## 实例一：
+```
+日志记录
+55.3.244.1 GET /index.html 15824 0.043
+ 
+grok表达式
+%{IP:ip}\s*%{WORD:method}\s*%{URIPATHPARAM:url}\s*%{NUMBER:data}\s*%{NUMBER:duration}
+```
+
+日志的切分规则：ip地址 、method，请求路径、位数，消耗时间五部分
+```
+IP ===>55.3.244.1
+WORD===>GET
+URIPATHPARAM====>/index.html
+NUMBER===>15824
+NUMBER===>0.043
+```
+
+输出完整结果
+```
+{
+  "ip": [
+    [
+      "55.3.244.1"
+    ]
+  ],
+  "method": [
+    [
+      "GET"
+    ]
+  ],
+  "url": [
+    [
+      "/index.html"
+    ]
+  ],
+  "data": [
+    [
+      "15824"
+    ]
+  ],
+  "duration": [
+    [
+      "0.043"
+    ]
+  ]
+}
+```
+
+## 实例二：
+
+```
+日志记录
+[2020-08-22 12:25:51.441] [TSC_IHU] [ERROR] [c.e.c.t.i.t.s.IhuTsaUplinkServiceImpl] Activation/Bind uplink, query UserSession by Token failure!
+ 
+ 
+grok 表达式
+\[%{TIMESTAMP_ISO8601:time}\]\s*%{DATA:thread}\s*\[%{LOGLEVEL:level}\]\s*%{GREEDYDATA:data}
+```
+日志切分规则：
+- 日期（2020-08-22 12:25:51.441）
+- 线程名称（TSC_IHU）
+- 日志等级（ERROR）内容（[c.e.c.t.i.t.s.IhuTsaUplinkServiceImpl] Activation/Bind uplink, query UserSession by Token failure!）
+
+```
+TIMESTAMP_ISO8601===》匹配日期（到毫秒的）
+ 
+DATA===》TSC_IHU
+ 
+LOGLEVEL===》匹配日志等级ERROR
+ 
+GREEDYDATA===》匹配内容
+```
+
+输出完整结果
+```
+{
+  "time": [
+    [
+      "2020-08-22 12:25:51.441"
+    ]
+  ],
+  "thread": [
+    [
+      "[TSC_IHU]"
+    ]
+  ],
+  "level": [
+    [
+      "ERROR"
+    ]
+  ],
+  "data": [
+    [
+      "[c.e.c.t.i.t.s.IhuTsaUplinkServiceImpl] Activation/Bind uplink, query UserSession by Token failure!"
+    ]
+  ]
+}
+```
+
+## 实例三
+
+```
+测试日志
+2020-09-12 14:16:36.320+08:00 INFO 930856f7-c78f-4f12-a0f1-83a2610b2dfc DispatcherConnector ip-192-168-114-244 [Mqtt-Device-1883-worker-18-1] com.ericsson.sep.dispatcher.api.transformer.v1.MessageTransformer {"TraceID":"930856f7-c78f-4f12-a0f1-83a2610b2dfc","clientId":"5120916600003466K4GA1059","username":"LB37622Z3KX609880"}
+
+grok表达式
+%{TIMESTAMP_ISO8601:access_time}\s*%{LOGLEVEL:level}\s*%{UUID:uuid}\s*%{WORD:word}\s*%{HOSTNAME:hostname}\s*\[%{DATA:work}\]\s*(?<api>([\S+]*))\s*(?<TraceID>([\S+]*))\s*%{GREEDYDATA:message_data}
+```
+
+日志切分规则：
+- 日期（2020-09-12 14:16:36.320+08:00）
+- 日志等级（INFO）
+- UUID（930856f7-c78f-4f12-a0f1-83a2610b2dfc）
+- 字符串（DispatcherConnector ）
+- 主机名称（ip-192-168-114-244）
+- 线程（[Mqtt-Device-1883-worker-18-1）
+- 请求api(com.ericsson.sep.dispatcher.api.transformer.v1.MessageTransformer)
+- 内容（{"TraceID":"930856f7-c78f-4f12-a0f1-83a2610b2dfc","clientId":"5120916600003466K4GA1059","username":"LB37622Z3KX609880"}
+）
+
+```
+TIMESTAMP_ISO8601===》匹配日期（到毫秒的）
+LOGLEVEL===》匹配日志等级ERROR
+UUID ===》匹配随机ID
+WORD===>匹配任意字符串
+HOSTNAME===》匹配主机名
+DATA===》匹配线程
+GREEDYDATA===》匹配内容
+ 
+其中
+(?<api>([\S+]*)) ====>匹配com.ericsson.sep.dispatcher.api.transformer.v1.MessageTransformer
+(?<TraceID>([\S+]*))===》匹配{"TraceID":"930856f7-c78f-4f12-a0f1-83a2610b2dfc","clientId":"5120916600003466K4GA1059","username":"LB37622Z3KX609880"}
+```
+
+输出完整结果
+```
+{
+  "access_time": [
+    [
+      "2020-09-12 14:16:36.320+08:00"
+    ]
+  ],
+  "level": [
+    [
+      "INFO"
+    ]
+  ],
+  "uuid": [
+    [
+      "930856f7-c78f-4f12-a0f1-83a2610b2dfc"
+    ]
+  ],
+  "word": [
+    [
+      "DispatcherConnector"
+    ]
+  ],
+  "hostname": [
+    [
+      "ip-192-168-114-244"
+    ]
+  ],
+  "work": [
+    [
+      "Mqtt-Device-1883-worker-18-1"
+    ]
+  ],
+  "api": [
+    [
+      "com.ericsson.sep.dispatcher.api.transformer.v1.MessageTransformer"
+    ]
+  ],
+  "TraceID": [
+    [
+      "{"TraceID":"930856f7-c78f-4f12-a0f1-83a2610b2dfc","clientId":"5120916600003466K4GA1059","username":"LB37622Z3KX609880"}"
+    ]
+  ],
+  "message_data": [
+    [
+      ""
+    ]
+  ]
+}
+```
+
+## 实例四：
+
+```
+[12/Sep/2020:14:10:58 +0800] "GET /backend/services/ticketRemind/query?cid=&msgType=1&pageSize=100&pageIndex=1&langCode=zh HTTP/1.1" 200 91
+ 
+ 
+grok表达式
+\[%{HTTPDATE:access_time}\]\s*%{DATA:b}%{WORD:method}\s*%{URIPATH:url}%{URIPARAM:param}\s*%{URIPROTO:uri}%{DATA:c}%{NUMBER:treaty}%{DATA:d}\s*%{NUMBER:status}\s*%{NUMBER:latency_millis}
+```
+
+输出完整结果
+```
+{
+  "access_time": [
+    [
+      "12/Sep/2020:14:10:58 +0800"
+    ]
+  ],
+  "b": [
+    [
+      """
+    ]
+  ],
+  "method": [
+    [
+      "GET"
+    ]
+  ],
+  "url": [
+    [
+      "/backend/services/ticketRemind/query"
+    ]
+  ],
+  "param": [
+    [
+      "?cid=&msgType=1&pageSize=100&pageIndex=1&langCode=zh"
+    ]
+  ],
+  "uri": [
+    [
+      "HTTP"
+    ]
+  ],
+  "c": [
+    [
+      "/"
+    ]
+  ],
+  "treaty": [
+    [
+      "1.1"
+    ]
+  ],
+  "d": [
+    [
+      """
+    ]
+  ],
+  "status": [
+    [
+      "200"
+    ]
+  ],
+  "latency_millis": [
+    [
+      "91"
+    ]
+  ]
+}
+```
+
+## 实例五：
+
+```
+测试日志
+192.168.125.138 - - [12/Sep/2020:14:10:58 +0800] "GET /backend/services/ticketRemind/query?cid=&msgType=1&pageSize=100&pageIndex=1&langCode=zh HTTP/1.1" 200 91
+ 
+ 
+grok表达式
+\s*%{IP:ip}\s*%{DATA:a}\s*\[%{HTTPDATE:access_time}\]\s*%{DATA:b}%{WORD:method}\s*%{URIPATH:url}%{URIPARAM:param}\s*%{URIPROTO:uri}%{DATA:c}%{NUMBER:treaty}%{DATA:d}\s*%{NUMBER:status}\s*%{NUMBER:latency_millis}
+```
+
+输出完整结果
+```
+{
+  "ip": [
+    [
+      "192.168.125.138"
+    ]
+  ],
+  "a": [
+    [
+      "- -"
+    ]
+  ],
+  "access_time": [
+    [
+      "12/Sep/2020:14:10:58 +0800"
+    ]
+  ],
+  "b": [
+    [
+      """
+    ]
+  ],
+  "method": [
+    [
+      "GET"
+    ]
+  ],
+  "url": [
+    [
+      "/backend/services/ticketRemind/query"
+    ]
+  ],
+  "param": [
+    [
+      "?cid=&msgType=1&pageSize=100&pageIndex=1&langCode=zh"
+    ]
+  ],
+  "uri": [
+    [
+      "HTTP"
+    ]
+  ],
+  "c": [
+    [
+      "/"
+    ]
+  ],
+  "treaty": [
+    [
+      "1.1"
+    ]
+  ],
+  "d": [
+    [
+      """
+    ]
+  ],
+  "status": [
+    [
+      "200"
+    ]
+  ],
+  "latency_millis": [
+    [
+      "91"
+    ]
+  ]
+}
+```
+
+**总结**：
+1.首先要清楚日志的切分规则，然后根据每一个切分点套用grok提供的匹配表达式即可。
+
+
+
 参考：
 - https://blog.csdn.net/feizuiku0116/article/details/124432215
