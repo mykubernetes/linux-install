@@ -45,6 +45,7 @@
 | URI | 完整的URI |  | https://windcoder.com/abc/api.php?a=1&b=2&c=3 |
 | LOGLEVEL | Log表达式 | Log表达式 | Alert、alert、ALERT、Error |
 | GREEDYDATA | 内容 | 匹配任意或多个除换行符。 | .* |
+| DATA | 内容 | 匹配第一次匹配到的任意或多个除换行符。 | `.*?` |
 
 **日期时间表达式**
 
