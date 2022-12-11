@@ -4,25 +4,183 @@
 
 ## 1、grok插件
 
-- grok插件有非常强大的功能，他能匹配一切数据，但是他的性能和对资源的损耗同样让人诟病。
+- grok是一个十分强大的logstash filter插件，他可以通过正则解析任意文本，将非结构化日志数据弄成结构化和方便查询的结构。他是目前logstash 中解析非结构化日志数据最好的方式。
+
+Grok 的语法规则是：
 ```
-filter{
+%{语法: 语义}
+```
+- **语法**: 指的就是匹配的模式，例如使用NUMBER模式可以匹配出数字，IP模式则会匹配出127.0.0.1这样的IP地址：
+
+### 1.1例如输入的内容为：
+```
+192.168.50.21 [08/Oct/2021:23:24:19 +0800] "GET / HTTP/1.1" 403 5039
+```
+那么，`%{IP:clientip}`匹配模式将获得的结果为：
+```
+clientip: 192.168.50.21
+```
+
+`%{HTTPDATE:timestamp}`匹配模式将获得的结果为：
+```
+timestamp: 08/Oct/2021:23:24:19 +0800
+```
+
+而`%{QS:referrer}`匹配模式将获得的结果为：
+```
+referrer: "GET / HTTP/1.1"
+```
+
+下面是一个组合匹配模式，它可以获取上面输入的所有内容：
+```
+%{IP:clientip}\ \[%{HTTPDATE:timestamp}\]\ %{QS:referrer}\ %{NUMBER:response}\ %{NUMBER:bytes}	
+```
+
+通过上面这个组合匹配模式，我们将输入的内容分成了五个部分，即五个字段，将输入内容分割为不同的数据字段，这对于日后解析和查询日志数据非常有用，这正是使用grok的目的。
+
+Logstash默认提供了近200个匹配模式（其实就是定义好的正则表达式）让我们来使用，可以在logstash安装目录下，例如这里是/usr/local/logstash/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-4.1.2/patterns目录里面查看，基本定义在grok-patterns文件中。
+
+```
+USERNAME [a-zA-Z0-9._-]+
+USER %{USERNAME}
+EMAILLOCALPART [a-zA-Z][a-zA-Z0-9_.+-=:]+
+EMAILADDRESS %{EMAILLOCALPART}@%{HOSTNAME}
+INT (?:[+-]?(?:[0-9]+))
+BASE10NUM (?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\.[0-9]+)?)|(?:\.[0-9]+)))
+NUMBER (?:%{BASE10NUM})
+BASE16NUM (?<![0-9A-Fa-f])(?:[+-]?(?:0x)?(?:[0-9A-Fa-f]+))
+BASE16FLOAT \b(?<![0-9A-Fa-f.])(?:[+-]?(?:0x)?(?:(?:[0-9A-Fa-f]+(?:\.[0-9A-Fa-f]*)?)|(?:\.[0-9A-Fa-f]+)))\b
  
-    grok{
-        #只说一个match属性，他的作用是从message 字段中吧时间给抠出来，并且赋值给另个一个字段logdate。
-        #首先要说明的是，所有文本数据都是在Logstash的message字段中中的，我们要在过滤器里操作的数据就是message。
-        #第二点需要明白的是grok插件是一个十分耗费资源的插件，这也是为什么我只打算讲解一个TIMESTAMP_ISO8601正则表达式的原因。
-        #第三点需要明白的是，grok有超级多的预装正则表达式，这里是没办法完全搞定的，也许你可以从这个大神的文章中找到你需要的表达式
-        #http://blog.csdn.net/liukuan73/article/details/52318243
-        #但是，我还是不建议使用它，因为他完全可以用别的插件代替，当然，对于时间这个属性来说，grok是非常便利的。
-        match => ['message','%{TIMESTAMP_ISO8601:logdate}']
+POSINT \b(?:[1-9][0-9]*)\b
+NONNEGINT \b(?:[0-9]+)\b
+WORD \b\w+\b
+NOTSPACE \S+
+SPACE \s*
+DATA .*?
+GREEDYDATA .*
+QUOTEDSTRING (?>(?<!\\)(?>"(?>\\.|[^\\"]+)+"|""|(?>'(?>\\.|[^\\']+)+')|''|(?>`(?>\\.|[^\\`]+)+`)|``))
+UUID [A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}
+# URN, allowing use of RFC 2141 section 2.3 reserved characters
+URN urn:[0-9A-Za-z][0-9A-Za-z-]{0,31}:(?:%[0-9a-fA-F]{2}|[0-9A-Za-z()+,.:=@;$_!*'/?#-])+
+# Networking
+MAC (?:%{CISCOMAC}|%{WINDOWSMAC}|%{COMMONMAC})
+CISCOMAC (?:(?:[A-Fa-f0-9]{4}\.){2}[A-Fa-f0-9]{4})
+WINDOWSMAC (?:(?:[A-Fa-f0-9]{2}-){5}[A-Fa-f0-9]{2})
+COMMONMAC (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
+IPV6 ((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?
+IPV4 (?<![0-9])(?:(?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))(?![0-9])
+IP (?:%{IPV6}|%{IPV4})
+HOSTNAME \b(?:[0-9A-Za-z][0-9A-Za-z-]{0,62})(?:\.(?:[0-9A-Za-z][0-9A-Za-z-]{0,62}))*(\.?|\b)
+IPORHOST (?:%{IP}|%{HOSTNAME})
+HOSTPORT %{IPORHOST}:%{POSINT}
+# paths
+PATH (?:%{UNIXPATH}|%{WINPATH})
+UNIXPATH (/([\w_%!$@:.,+~-]+|\\.)*)+
+TTY (?:/dev/(pts|tty([pq])?)(\w+)?/?(?:[0-9]+))
+WINPATH (?>[A-Za-z]+:|\\)(?:\\[^\\?*]*)+
+URIPROTO [A-Za-z]([A-Za-z0-9+\-.]+)+
+URIHOST %{IPORHOST}(?::%{POSINT:port})?
+# uripath comes loosely from RFC1738, but mostly from what Firefox
+# doesn't turn into %XX
+URIPATH (?:/[A-Za-z0-9$.+!*'(){},~:;=@#%&_\-]*)+
+#URIPARAM \?(?:[A-Za-z0-9]+(?:=(?:[^&]*))?(?:&(?:[A-Za-z0-9]+(?:=(?:[^&]*))?)?)*)?
+URIPARAM \?[A-Za-z0-9$.+!*'|(){},~@#%&/=:;_?\-\[\]<>]*
+URIPATHPARAM %{URIPATH}(?:%{URIPARAM})?
+URI %{URIPROTO}://(?:%{USER}(?::[^@]*)?@)?(?:%{URIHOST})?(?:%{URIPATHPARAM})?
+# Months: January, Feb, 3, 03, 12, December
+MONTH \b(?:[Jj]an(?:uary|uar)?|[Ff]eb(?:ruary|ruar)?|[Mm](?:a|ä)?r(?:ch|z)?|[Aa]pr(?:il)?|[Mm]a(?:y|i)?|[Jj]un(?:e|i)?|[Jj]ul(?:y)?|[Aa]ug(?:ust)?|[Ss]ep(?:tember)?|[Oo](?:c|k)?t(?:ober)?|[Nn]ov(?:ember)?|[Dd]e(?:c|z)(?:ember)?)\b
+MONTHNUM (?:0?[1-9]|1[0-2])
+MONTHNUM2 (?:0[1-9]|1[0-2])
+MONTHDAY (?:(?:0[1-9])|(?:[12][0-9])|(?:3[01])|[1-9])
+# Days: Monday, Tue, Thu, etc...
+DAY (?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)
+# Years?
+YEAR (?>\d\d){1,2}
+HOUR (?:2[0123]|[01]?[0-9])
+MINUTE (?:[0-5][0-9])
+# '60' is a leap second in most time standards and thus is valid.
+SECOND (?:(?:[0-5]?[0-9]|60)(?:[:.,][0-9]+)?)
+TIME (?!<[0-9])%{HOUR}:%{MINUTE}(?::%{SECOND})(?![0-9])
+# datestamp is YYYY/MM/DD-HH:MM:SS.UUUU (or something like it)
+DATE_US %{MONTHNUM}[/-]%{MONTHDAY}[/-]%{YEAR}
+DATE_EU %{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}
+ISO8601_TIMEZONE (?:Z|[+-]%{HOUR}(?::?%{MINUTE}))
+ISO8601_SECOND (?:%{SECOND}|60)
+TIMESTAMP_ISO8601 %{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE}?
+DATE %{DATE_US}|%{DATE_EU}
+DATESTAMP %{DATE}[- ]%{TIME}
+TZ (?:[APMCE][SD]T|UTC)
+DATESTAMP_RFC822 %{DAY} %{MONTH} %{MONTHDAY} %{YEAR} %{TIME} %{TZ}
+DATESTAMP_RFC2822 %{DAY}, %{MONTHDAY} %{MONTH} %{YEAR} %{TIME} %{ISO8601_TIMEZONE}
+DATESTAMP_OTHER %{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{TZ} %{YEAR}
+DATESTAMP_EVENTLOG %{YEAR}%{MONTHNUM2}%{MONTHDAY}%{HOUR}%{MINUTE}%{SECOND}
+# Syslog Dates: Month Day HH:MM:SS
+SYSLOGTIMESTAMP %{MONTH} +%{MONTHDAY} %{TIME}
+PROG [\x21-\x5a\x5c\x5e-\x7e]+
+SYSLOGPROG %{PROG:program}(?:\[%{POSINT:pid}\])?
+SYSLOGHOST %{IPORHOST}
+SYSLOGFACILITY <%{NONNEGINT:facility}.%{NONNEGINT:priority}>
+HTTPDATE %{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME} %{INT}
+# Shortcuts
+QS %{QUOTEDSTRING}
+# Log formats
+SYSLOGBASE %{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource} %{SYSLOGPROG}:
+# Log Levels
+LOGLEVEL ([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo|INFO|[Ww]arn?(?:ing)?|WARN?(?:ING)?|[Ee]rr?(?:or)?|ERR?(?:OR)?|[Cc]rit?(?:ical)?|CRIT?(?:ICAL)?|[Ff]atal|FATAL|[Ss]evere|SEVERE|EMERG(?:ENCY)?|[Ee]merg(?:ency)?)
+```
+
+参考:
+- http://blog.csdn.net/liukuan73/article/details/52318243
+
+date 过滤器配置选项
+
+| 设置 | 输入类型 | 要求 |
+| locale | string | No |
+| match | array | No |
+| tag_on_failure | array | No |
+| target | string | No |
+| timezone | string | No |
+
+**实战**
+```
+input {
+    stdin {
+    }
+}
+filter{
+     grok{
+          match => {"message" => "\ \[%{HTTPDATE:timestamp}\]"}
+     }
+     date{
+          match => ["timestamp","dd/MMM/yyyy:HH:mm:ss Z"]
+     }
+}
+output {
+    stdout {
     }
 }
 ```
 
+
+
+
 ## 2、mutate插件
 
 - mutate插件是用来处理数据的格式的，你可以选择处理你的时间格式，或者你想把一个字符串变为数字类型(当然需要合法)，同样的你也可以返回去做。可以设置的转换类型 包括： "integer"， "float" 和 "string"。
+
+- add_field 增加字段
+- remove_field 删除字段
+- rename_field 重命名字段
+- replace 修改字段的值(可以调用其他字段)
+- update 修改字段的值(不可以调用其他字段)
+- convert 字段类型转换
+- copy 复制一个字段
+- lowercase 值转小写
+- uppercase 值转大写
+- split 字段分割
+- strip 去掉末尾空格
+- gsub 正则替换，只对字符串类型有效
+
 ```
 filter {
     mutate {
@@ -79,23 +237,47 @@ filter {
 
 ## 4、date插件
 
-- 这里需要合前面的grok插件剥离出来的值logdate配合使用(当然也许你不是用grok去做)。
+- date过滤器用于解析字段中的日期，然后使用该日期或时间戳作为事件的logstash时间戳。
+- date插件是对于排序事件和回填旧数据尤其重要，它可以用来转换日志记录中的时间字段，变成LogStash::Timestamp对象，然后转存到@timestamp字段里，这在之前已经做过简单的介绍。
+
+**日期格式说明**
+
+| 时间字段 | 字母 | 表示含义 |
+|----------|------|---------|
+| 年 | yyyy | 表示全年号码。 例如：2021 |
+| 年 | yy | 表示两位数年份。 例如：2021年即为21 |
+| 月 | M | 表示1位数字月份，例如：1月份为数字1，12月份为数字12 |
+| 月 | MM | 表示两位数月份，例如：1月份为数字01，12月份为数字12 |
+| 月 | MMM | 表示缩短的月份文本，例如：1月份为Jan，12月份为Dec |
+| 月 | MMMM | 表示全月文本，例如：1月份为January，12月份为December |
+| 日 | d | 表示1位数字的几号，例如8表示某月8号 |
+| 日 | dd | 表示2位数字的几号，例如08表示某月8号 |
+| 时 | H | 表示1位数字的小时，例如1表示凌晨1点 |
+| 时 | HH | 表示2位数字的小时，例如01表示凌晨1点 |
+| 分 | m | 表示1位数字的分钟，例如5表示某点5分 |
+| 分 | mm | 表示2位数字的分钟，例如05表示某点5分 |
+| 秒 | s | 表示1位数字的秒，例如6表示某点某分6秒 |
+| 秒 | ss | 表示2位数字的秒，例如06表示某点某分6秒 |
+| 时区 | Z | 表示时区偏移，结构为HHmm，例如：+0800 |
+| 时区 | ZZ | 表示时区偏移，结构为HH:mm，例如：+08:00 |
+| 时区 | ZZZ | 表示时区身份，例如Asia/Shanghai |
+
+
 ```
-filter{
-    date{
-        #还记得grok插件剥离出来的字段logdate吗？就是在这里使用的。你可以格式化为你需要的样子，至于是什么样子。就得你自己取看啦。
-        #为什什么要格式化？
-        #对于老数据来说这非常重要，应为你需要修改@timestamp字段的值，如果你不修改，你保存进ES的时间就是系统但前时间(+0时区)
-        #单你格式化以后，就可以通过target属性来指定到@timestamp，这样你的数据的时间就会是准确的，这对以你以后图表的建设来说万分重要。
-        #最后，logdate这个字段，已经没有任何价值了，所以我们顺手可以吧这个字段从event对象中移除。
-        match=>["logdate","dd/MMM/yyyy:HH:mm:ss Z"]
-        target=>"@timestamp"
-        remove_field => 'logdate'
-        #还需要强调的是，@timestamp字段的值，你是不可以随便修改的，最好就按照你数据的某一个时间点来使用，
-        #如果是日志，就使用grok把时间抠出来，如果是数据库，就指定一个字段的值来格式化，比如说："timeat", "%{TIMESTAMP_ISO8601:logdate}"
-        #timeat就是我的数据库的一个关于时间的字段。
-        #如果没有这个字段的话，千万不要试着去修改它。
- 
+input{
+    stdin{}
+}
+filter {
+    grok {
+        match => ["message", "%{HTTPDATE:timestamp}"]
+    }
+    date {
+        match => ["timestamp", "dd/MMM/yyyy:HH:mm:ss Z"]
+    }
+}
+output{
+    stdout{
+        codec => "rubydebug"
     }
 }
 ```
