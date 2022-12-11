@@ -438,8 +438,6 @@ filter{
 }
 ```
 
-```
-
 # 十二、remove_char_key
 
 - 功能：移除key中的字符串
@@ -568,8 +566,11 @@ filter{
 ```
 
 # 十七、transform_value
-功能：改变value
-介绍：可选值：lowercase、uppercase、capitalize，将value转换为选择的模式
+
+- 功能：改变value
+- 介绍：可选值：lowercase、uppercase、capitalize，将value转换为选择的模式
+
+```
 filter{
     kv {
         source => "message"
