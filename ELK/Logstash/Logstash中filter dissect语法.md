@@ -1,5 +1,45 @@
 # dissect插件
-基于分隔符原理解析数据，解决grok解析时消耗过多cpu资源的问题。
+
+- 基于分隔符原理解析数据，解决grok解析时消耗过多cpu资源的问题。
+
+```
+filter {
+    dissect {
+        mapping => {
+            "message" => "%{ts} %{+ts} %{+ts} %{src} %{} %{prog}[%{pid}]: %{msg}"
+        }
+        convert_datatype => {
+            pid => "int"
+        }
+    }
+}
+```
+
+**语法解释：**
+
+我们看到上面使用了和 Grok 很类似的 %{} 语法来表示字段，这显然是基于习惯延续的考虑。不过示例中 %{+ts} 的加号就不一般了。dissect 除了字段外面的字符串定位功能以外，还通过几个特殊符号来处理字段提取的规则：
+- %{+key} 这个 + 表示，前面已经捕获到一个 key 字段了，而这次捕获的内容，自动添补到之前 key 字段内容的后面。
+- %{+key/2} 这个 /2 表示，在有多次捕获内容都填到 key 字段里的时候，拼接字符串的顺序谁前谁后。/2 表示排第 2 位。
+- %{?string} 这个 ? 表示，这块只是一个占位，并不会实际生成捕获字段存到 Event 里面。
+- %{?string} %{&string} 当同样捕获名称都是 string，但是一个 ? 一个 & 的时候，表示这是一个键值对。
+
+# 该插件的一些配置
+
+- 该插件支持下边这几种配置，所有的配置都包括在 dissect{ }中。
+
+| Setting | Input Type | Required | Default Value |
+|---------|------------|----------|---------------|
+| add_field | hash | No | {} |
+| add_tag | array | No | [] |
+| convert_datatype | hash | No | {} |
+| enable_metric | boolean | No | true |
+| id | string | No | |
+| mapping | hash | No | {} |
+| periodic_flush | boolean | No | false |
+| remove_field | array | No | [] |
+| remove_tag | array | No | [] |
+| tag_on_failure | arrray | No | ["_dissectfailure"] |
+
 
 同样的日志信息，dissect可以这样来写：
 ```
