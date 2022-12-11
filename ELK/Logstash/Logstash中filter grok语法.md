@@ -324,11 +324,8 @@ grok 表达式
 
 ```
 TIMESTAMP_ISO8601===》匹配日期（到毫秒的）
- 
 DATA===》TSC_IHU
- 
 LOGLEVEL===》匹配日志等级ERROR
- 
 GREEDYDATA===》匹配内容
 ```
 
