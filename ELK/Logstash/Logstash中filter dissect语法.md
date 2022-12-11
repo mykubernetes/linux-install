@@ -101,3 +101,5 @@ filter {
 - `%{&}`代表将匹配值赋到指定字段中。
 - convert_datatype 可以将指定字符串转为int或者float类型。
 
+参考：
+- https://blog.csdn.net/gamer_gyt/article/details/67816090
