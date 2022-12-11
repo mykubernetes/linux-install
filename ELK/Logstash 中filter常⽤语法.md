@@ -107,10 +107,39 @@ filter{
 filter{
     #source指定你的哪个值是json数据。
     json {
-         source => "value"
+         source => "message"
     }
     #注意：如果你的json数据是多层的，那么解析出来的数据在多层结里是一个数组，你可以使用ruby语法对他进行操作，最终把所有数据都装换为平级的。
  
+}
+```
+
+```
+{
+    "message" => "{\"name\":\"卡兹克\",\"age\":\"67\"}",
+       "name" => "卡兹克",
+        "age" => "67"
+}
+```
+
+默认情况写解析出来的结果会存放在logstash信息的最上层，可以配置target将其保存在指定的字段下
+```
+filter{
+    json {
+        source => "message"
+       # 将匹配的结果保存在test字段中
+        target => "test"
+    }
+}
+```
+
+```
+{
+       "test" => {
+        "name" => "卡兹克",
+         "age" => "67"
+    },
+    "message" => "{\"name\":\"卡兹克\",\"age\":\"67\"}"
 }
 ```
 
