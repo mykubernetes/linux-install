@@ -67,6 +67,12 @@
 | HTTPDATE | http默认日期格式 | 03/Jul/2016:00:36:53 +0800 |
 
 
+使用*GROK*模式解析*Nginx*正确访问日志，只需要*COMBINEDAPACHELOG*模式即可。
+
+| 模式 | 规则 | 说明 |
+|------|------|------|
+| COMMONAPACHELOG | %{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \[%{HTTPDATE:timestamp}\] "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})" %{NUMBER:response} (?:%{NUMBER:bytes}|-) | 解析出clientip、ident、auth、timestamp、verb、request、httpversion、response、bytes信息。 |
+| COMBINEDAPACHELOG | %{COMMONAPACHELOG} %{QS:referrer} %{QS:agent} | 解析出上一行中所有字段，另外还解析出referrer、agent字段。 |
 
 
 # 二、match：匹配
