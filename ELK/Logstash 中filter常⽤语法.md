@@ -40,6 +40,8 @@ referrer: "GET / HTTP/1.1"
 
 Logstash默认提供了近200个匹配模式（其实就是定义好的正则表达式）让我们来使用，可以在logstash安装目录下，例如这里是/usr/local/logstash/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-4.1.2/patterns目录里面查看，基本定义在grok-patterns文件中。
 
+https://github.com/logstash-plugins/logstash-patterns-core/blob/main/patterns/legacy/grok-patterns
+
 ```
 USERNAME [a-zA-Z0-9._-]+
 USER %{USERNAME}
