@@ -6,20 +6,21 @@ https://blog.csdn.net/qq_29595629/article/details/114289054
 
 **过滤器插件**
 - 过滤器插件对事件执行中间处理，过滤器一般根据事件的特征有条件地应用。
+- 下面是一些过滤器插件，有关Elastic支持插件的列表，请参阅[支持矩阵](https://www.elastic.co/cn/support/matrix)。
 
 | 插件 | 描述 | Github仓库 |
 |------|------|------------|
 | aggregate | 聚合来自单个任务的多个事件的信息 | [logstash-filter-aggregate](https://github.com/logstash-plugins/logstash-filter-aggregate) |
 | alter | 对mutate过滤器没法处理的字段执行通常更改 | [logstash-filter-alter](https://github.com/logstash-plugins/logstash-filter-alter) |
-| cidr | 根据网络块列表检查IP地址 | logstash-filter-cidr |
-| cipher | 向事件应用或移除密码 | logstash-filter-cipher |
-| clone | 重复事件 | logstash-filter-clone |
-| csv | 将逗号分隔的值数据解析为单个字段 | logstash-filter-csv |
-| date | 从字段中解析日期，用做事件的Logstash时间戳 | logstash-filter-date |
-| de_dot | 从字段名中删除点的高昂计算过滤器 | logstash-filter-de_dot |
-| dissect | 使用分隔符将非结构化事件数据提取到字段中 | logstash-filter-dissect |
-| dns | 执行标准或反向DNS查找 | logstash-filter-dns |
-| drop | 删除全部事件 | logstash-filter-drop |
+| cidr | 根据网络块列表检查IP地址 | [logstash-filter-cidr](https://github.com/logstash-plugins/logstash-filter-cidr) |
+| cipher | 向事件应用或移除密码 | [logstash-filter-cipher](https://github.com/logstash-plugins/logstash-filter-cipher) |
+| clone | 重复事件 | [logstash-filter-clone](https://github.com/logstash-plugins/logstash-filter-clone) |
+| csv | 将逗号分隔的值数据解析为单个字段 | [logstash-filter-csv](https://github.com/logstash-plugins/logstash-filter-csv) |
+| date | 从字段中解析日期，用做事件的Logstash时间戳 | [logstash-filter-date](https://github.com/logstash-plugins/logstash-filter-date) |
+| de_dot | 从字段名中删除点的高昂计算过滤器 | [logstash-filter-de_dot](https://github.com/logstash-plugins/logstash-filter-de_dot) |
+| dissect | 使用分隔符将非结构化事件数据提取到字段中 | [logstash-filter-dissect](https://github.com/logstash-plugins/) |
+| dns | 执行标准或反向DNS查找 | [logstash-filter-dns](https://github.com/logstash-plugins/logstash-filter-dns) |
+| drop | 删除全部事件 | [logstash-filter-drop](https://github.com/logstash-plugins/logstash-filter-drop) |
 | elapsed | 计算一对事件之间的通过时间 | logstash-filter-elapsed |
 | elasticsearch | 将之前Elasticsearch中的日志事件的字段复制到当前事件 | logstash-filter-elasticsearch |
 | environment | 将环境变量存储为元数据子字段 | logstash-filter-environment |
