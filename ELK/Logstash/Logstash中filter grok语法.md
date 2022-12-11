@@ -312,7 +312,8 @@ grok 表达式
 日志切分规则：
 - 日期（2020-08-22 12:25:51.441）
 - 线程名称（TSC_IHU）
-- 日志等级（ERROR）内容（[c.e.c.t.i.t.s.IhuTsaUplinkServiceImpl] Activation/Bind uplink, query UserSession by Token failure!）
+- 日志等级（ERROR）
+- 内容（[c.e.c.t.i.t.s.IhuTsaUplinkServiceImpl] Activation/Bind uplink, query UserSession by Token failure!）
 
 ```
 TIMESTAMP_ISO8601===》匹配日期（到毫秒的）
