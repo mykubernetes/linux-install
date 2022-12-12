@@ -3,6 +3,8 @@ https://blog.csdn.net/weixin_45692705/article/details/119003128?spm=1001.2014.30
 
 MySql 官方函数：https://dev.mysql.com/doc/refman/8.0/en/functions.html
 
+https://blog.csdn.net/m0_68850571/article/details/124272173
+
 # 社区版mysql安装
 
 ```
