@@ -4,6 +4,33 @@
 
 https://blog.csdn.net/qq_29595629/article/details/114289054
 
+**常用的过滤器**
+
+| 解析规则 | 对应插件 |
+|----------|---------|
+| 正则解析 | grok |
+| 数据解构 | mutate.split |
+| 增加字段 | mutate.add_field |
+| 删除字段 | mutate.remove_field |
+| 删除数据 |  |
+| 重命名字段 | mutate.rename_field |
+| 数据转换 | mutate.convert |
+| 日期规范化 | date |
+| KV解析 | kv |
+| 大小写转换 | `mutate.lowercase`,`mutate.uppercase` |
+| 字段定长提取 |  |
+| 字段字节定长提取 |  |
+| UserAgent解析规则 | grok |
+| URL Decode解析 | grok |
+| 内容替换 | `mutate.replace`,`mutate.update` |
+| 批量内容替换 |  |
+| XML解析规则 | xml |
+| Json解析规则 | json |
+| 分隔符解析 | dissect |
+| Geo解析 | geoip |
+| 表达式计算 |  |
+
+
 **过滤器插件**
 - 过滤器插件对事件执行中间处理，过滤器一般根据事件的特征有条件地应用。
 - 下面是一些过滤器插件，有关Elastic支持插件的列表，请参阅[支持矩阵](https://www.elastic.co/cn/support/matrix)。
