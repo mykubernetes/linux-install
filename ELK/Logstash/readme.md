@@ -32,7 +32,67 @@
 | 表达式计算 |  |
 
 
-**过滤器插件**
+**InPut plugins 过滤器插件**
+
+| 输入插件 | 支持内容 |
+|---------|----------|
+| azure_event_hubs | 从Azure事件中心接收事件 |
+| beats | 从Elastic Beats框架接收事件 |
+| cloudwatch | 从Amazon Web Services CloudWatch API提取事件 |
+| couchdb_changes | 从CouchDB的_changesURI 流事件 |
+| dead_letter_queue | 从Logstash的死信队列中读取事件 |
+| elasticsearch | 从Elasticsearch集群读取查询结果 |
+| exec | 将shell命令的输出捕获为事件 |
+| file | 从文件流事件 |
+| ganglia | 通过UDP读取Ganglia数据包 |
+| gelf | 从Graylog2读取GELF格式的消息作为事件 |
+| generator | 生成用于测试目的的随机日志事件 |
+| github | 从GitHub Webhook读取事件 |
+| google_cloud_storage | 从Google Cloud Storage存储桶中的文件中提取事件 |
+| google_pubsub | 消费来自Google Cloud PubSub服务的事件 |
+| graphite | 从graphite工具读取指标 |
+| heartbeat | 生成心跳事件以进行测试 |
+| http | 通过HTTP或HTTPS接收事件 |
+| http_poller | 将HTTP API的输出解码为事件 |
+| imap | 从IMAP服务器读取邮件 |
+| irc | 从IRC服务器读取事件 |
+| java_generator | 生成综合日志事件 |
+| java_stdin | 从标准输入读取事件 |
+| jdbc | 从JDBC数据创建事件 |
+| jms | 从Jms Broker读取事件 |
+| jmx | 通过JMX从远程Java应用程序检索指标 |
+| kafka | 读取来自Kafka主题的事件 |
+| kinesis | 通过AWS Kinesis流接收事件 |
+| log4j | 从Log4j SocketAppender对象通过TCP套接字读取事件 |
+| lumberjack | 使用Lumberjack协议接收事件 |
+| meetup | 将命令行工具的输出捕获为事件 |
+| pipe | 从长时间运行的命令管道流式传输事件 |
+| puppet_facter | 接收来自Puppet服务器的事件 |
+| rabbitmq | 从RabbitMQ交换中提取事件 |
+| redis | 从Redis实例读取事件 |
+| relp | 通过TCP套接字接收RELP事件 |
+| rss | 将命令行工具的输出捕获为事件 |
+| s3 | 从S3存储桶中的文件流式传输事件 |
+| s3_sns_sqs | 使用sqs从AWS S3存储桶读取日志 |
+| salesforce | 根据Salesforce SOQL查询创建事件 |
+| snmp | 使用简单网络管理协议（SNMP）轮询网络设备 |
+| snmptrap | 根据SNMP陷阱消息创建事件 |
+| sqlite | 根据SQLite数据库中的行创建事件 |
+| sqs | 从Amazon Web Services简单队列服务队列中提取事件 |
+| stdin | 从标准输入读取事件 |
+| stomp | 创建使用STOMP协议接收的事件 |
+| syslog | 读取系统日志消息作为事件 |
+| tcp | 从TCP套接字读取事件 |
+| twitter | 从Twitter Streaming API读取事件 |
+| udp | 通过UDP读取事件 |
+| unix | 通过UNIX套接字读取事件 |
+| varnishlog | 从varnish缓存共享内存日志中读取 |
+| websocket | 从网络套接字读取事件 |
+| wmi | 根据WMI查询的结果创建事件 |
+| xmpp | 通过XMPP / Jabber协议接收事件 |
+
+
+**Filter plugins 过滤器插件**
 - 过滤器插件对事件执行中间处理，过滤器一般根据事件的特征有条件地应用。
 - 下面是一些过滤器插件，有关Elastic支持插件的列表，请参阅[支持矩阵](https://www.elastic.co/cn/support/matrix)。
 
