@@ -2,7 +2,8 @@
 
 [grok表达式：](https://github.com/logstash-plugins/logstash-patterns-core/blob/master/patterns/ecs-v1/grok-patterns)
 
-https://blog.csdn.net/qq_29595629/article/details/114289054
+- https://blog.csdn.net/qq_29595629/article/details/114289054
+- https://blog.csdn.net/qq330983778/category_9875412.html?spm=1001.2014.3001.5482
 
 **常用的过滤器**
 
