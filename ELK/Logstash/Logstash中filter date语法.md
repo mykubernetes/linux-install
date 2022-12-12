@@ -12,7 +12,9 @@
 | target | 匹配成功后的内容需要设置的目标字段 | string | No |
 | timezone | 指定用于日期解析的时区规范ID | string | No |
 
-timezone: 指定用于日期解析的时区规范ID，有效的id列在[Joda.org可用时区页面](https://joda-time.sourceforge.net/timezones.html)上，这在无法从值中提取时区时非常有用，而且不是平台默认值。如果没有指定，将使用平台默认值，Canonical ID很好，因为它为你处理了夏令时，例如，America/Los_Angeles或Europe/Paris是有效的id。该字段可以是动态的，并使用%{field}语法包含事件的一部分。
+- tag_on_failure: 当没有成功匹配时，将值附加到tags字段
+- target: 将匹配的时间戳存储到给定的目标字段中，如果没有提供，默认更新事件的@timestamp字段。
+- timezone: 指定用于日期解析的时区规范ID，有效的id列在[Joda.org可用时区页面](https://joda-time.sourceforge.net/timezones.html)上，这在无法从值中提取时区时非常有用，而且不是平台默认值。如果没有指定，将使用平台默认值，Canonical ID很好，因为它为你处理了夏令时，例如，America/Los_Angeles或Europe/Paris是有效的id。该字段可以是动态的，并使用%{field}语法包含事件的一部分。
 
 
 
