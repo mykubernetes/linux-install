@@ -137,6 +137,7 @@ LOGLEVEL ([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo|
 date 过滤器配置选项
 
 | 设置 | 输入类型 | 要求 |
+|------|---------|------|
 | locale | string | No |
 | match | array | No |
 | tag_on_failure | array | No |
