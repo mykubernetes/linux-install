@@ -29,7 +29,7 @@
 | Json解析规则 | json |
 | 分隔符解析 | dissect |
 | Geo解析 | geoip |
-| 表达式计算 |  |
+| 表达式计算 | [math](https://github.com/logstash-plugins/logstash-filter-math) |
 
 **Filter plugins 过滤器插件**
 - 过滤器插件对事件执行中间处理，过滤器一般根据事件的特征有条件地应用。
