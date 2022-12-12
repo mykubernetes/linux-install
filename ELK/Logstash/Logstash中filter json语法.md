@@ -2,6 +2,13 @@
 用来解析json格式数据的过滤器，默认会解析置顶字段的json数据并将其放置在Logstash事件的最顶级中，可以配置target配置项选择存放结果位置
 如果解析的数据包含一个@timestamp字段，会将解析的数据放在顶级的@timestamp中，如果解析失败，该字段将被重命名为_@timestamp
 
+| 参数 | 作用 |
+|------|------|
+| skip_on_invalid_json | 允许跳过无效JSON的过滤器 |
+| source | 解析JSON的目标源 |
+| tag_on_failure | tags没有成功匹配时将值追加到字段 |
+| target | 定义用于放置解析数据的目标字段。 |
+
 # 二、source
 
 - 功能：选择解析字段的位置
