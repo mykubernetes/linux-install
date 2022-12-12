@@ -12,6 +12,10 @@
 | target | 匹配成功后的内容需要设置的目标字段 | string | No |
 | timezone | 指定用于日期解析的时区规范ID | string | No |
 
+timezone: 指定用于日期解析的时区规范ID，有效的id列在[Joda.org可用时区页面](https://joda-time.sourceforge.net/timezones.html)上，这在无法从值中提取时区时非常有用，而且不是平台默认值。如果没有指定，将使用平台默认值，Canonical ID很好，因为它为你处理了夏令时，例如，America/Los_Angeles或Europe/Paris是有效的id。该字段可以是动态的，并使用%{field}语法包含事件的一部分。
+
+
+
 **日期格式说明**
 
 | 时间字段 | 字母 | 表示含义 |
