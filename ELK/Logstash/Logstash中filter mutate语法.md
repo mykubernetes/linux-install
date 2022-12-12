@@ -5,20 +5,23 @@
 muatet过滤器允许用户对字段进行改变，可以重命名、替换和修改事件中的字段。
 
 # 2.操作顺序
-- coerce
-- rename
-- update
-- replace
-- convert
-- gsub
-- uppercase
-- capitalize
-- lowercase
-- strip
-- split
-- join
-- merge
-- copy
+
+| 参数 | 作用 |
+|------|-----|
+| convert | 将字段的值转换为其他类型，例如将字符串转换为整数 |
+| copy | 将现有字段复制到另一个字段。 |
+| gsub | 将正则表达式与字段值匹配，然后将所有匹配项替换为替换字符串。 |
+| join | 用分隔符连接数组。对非数组字段不执行任何操作。 |
+| lowercase | 将字符串转换为其小写形式 |
+| merge | 合并两个数组或哈希字段。字符串字段将自动转换为数组 |
+| coerce | 设置存在但为空的字段的默认值 |
+| rename | 重命名一个或多个字段 |
+| replace | 用新值替换字段的值。 |
+| split | 使用分隔符将字段拆分为数组。 |
+| strip | 从字段中删除空格。仅适用于前后空白字段。 |
+| update | 用新值更新现有字段。如果该字段不存在，则不会采取任何措施。 |
+| uppercase | 将字符串转换为对应的大写字母 |
+| capitalize | 将字符串转换为它的大写等价物 |
 
 # 二、convert
 
