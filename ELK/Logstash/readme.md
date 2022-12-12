@@ -19,12 +19,12 @@
 | 日期规范化 | date |
 | KV解析 | kv |
 | 大小写转换 | `mutate.lowercase`,`mutate.uppercase` |
-| 字段定长提取 |  |
-| 字段字节定长提取 |  |
+| 字段定长提取 | truncate |
+| 字段字节定长提取 | |
 | UserAgent解析规则 | useragent |
 | URL Decode解析 | urldecode |
 | 内容替换 | `mutate.replace`,`mutate.update` |
-| 批量内容替换 |  |
+| 批量内容替换 | translate |
 | XML解析规则 | xml |
 | Json解析规则 | json |
 | 分隔符解析 | dissect |
