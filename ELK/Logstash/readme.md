@@ -26,20 +26,20 @@ https://blog.csdn.net/qq_29595629/article/details/114289054
 | environment | 将环境变量存储为元数据子字段 | [logstash-filter-environment](https://github.com/logstash-plugins/logstash-filter-environment) |
 | extractnumbers | 从字符串中提取数字 | [logstash-filter-extractnumbers](https://github.com/logstash-plugins/logstash-filter-extractnumbers) |
 | fingerprint | 经过使用一致的哈希替换值的指纹字段 | [logstash-filter-fingerprint](https://github.com/logstash-plugins/logstash-filter-fingerprint) |
-| geoip | 添加关于IP地址的地理信息(增加地理位置数据) | [logstash-filter-geoip](https://github.com/logstash-plugins/logstash-filter-geoip) |
-| grok | 将非结构化事件数据解析为字段(正则匹配解析) | [logstash-filter-grok](https://github.com/logstash-plugins/logstash-filter-grok) |
+| geoip | 添加关于IP地址的地理信息 (增加地理位置数据) | [logstash-filter-geoip](https://github.com/logstash-plugins/logstash-filter-geoip) |
+| grok | 将非结构化事件数据解析为字段 (正则匹配解析) | [logstash-filter-grok](https://github.com/logstash-plugins/logstash-filter-grok) |
 | i18n | 从字段中删除特殊字符 | [logstash-filter-i18n](https://github.com/logstash-plugins/logstash-filter-i18n) |
 | jdbc_static	 | 用预先从远程数据库加载的数据丰富事件 | [logstash-filter-jdbc_static](https://github.com/logstash-plugins/logstash-filter-jdbc_static) |
 | jdbc_streaming | 使用数据库数据丰富事件 | [logstash-filter-jdbc_streaming](https://github.com/logstash-plugins/logstash-filter-jdbc_streaming) |
-| json | 解析JSON事件(按照json解析字段内容到指定字段中) | [logstash-filter-json](https://github.com/logstash-plugins/logstash-filter-json) |
+| json | 解析JSON事件 (按照json解析字段内容到指定字段中) | [logstash-filter-json](https://github.com/logstash-plugins/logstash-filter-json) |
 | json_encode | 将字段序列化为JSON | [logstash-filter-json_encode](https://github.com/logstash-plugins/logstash-filter-json_encode) |
 | kv | 解析键值对 | [logstash-filter-kv](https://github.com/logstash-plugins/logstash-filter-kv) |
 | metricize | 获取包含多个指标的复琐事件，并将其分解为多个事件，每一个事件都包含一个指标 | [logstash-filter-metricize](https://github.com/logstash-plugins/logstash-filter-metricize) |
 | metrics | 聚合指标 | [logstash-filter-metrics](https://github.com/logstash-plugins/logstash-filter-metrics) |
-| mutate | 在字段上执行转变(字段处理) | [logstash-filter-mutate](https://github.com/logstash-plugins/logstash-filter-mutate) |
+| mutate | 在字段上执行转变 (字段处理) | [logstash-filter-mutate](https://github.com/logstash-plugins/logstash-filter-mutate) |
 | prune | 基于要列入黑名单或白名单的字段列表来精简事件数据 | [logstash-filter-prune](https://github.com/logstash-plugins/logstash-filter-prune) |
 | range | 检查指定字段是否保持在给定的大小或长度限制内 | [logstash-filter-range](https://github.com/logstash-plugins/logstash-filter-range) |
-| ruby | 执行任意Ruby代码 | [logstash-filter-ruby](https://github.com/logstash-plugins/logstash-filter-ruby) |
+| ruby | 执行任意Ruby代码 (用ruby代码修改LogstashEvent) | [logstash-filter-ruby](https://github.com/logstash-plugins/logstash-filter-ruby) |
 | sleep | 休眠指定的时间跨度 | [logstash-filter-sleep](https://github.com/logstash-plugins/logstash-filter-sleep) |
 | split | 将多行消息分解为不一样的事件 | [logstash-filter-split](https://github.com/logstash-plugins/logstash-filter-split) |
 | syslog_pri | 解析syslog消息的PRI（priority）字段 | [logstash-filter-syslog_pri](https://github.com/logstash-plugins/logstash-filter-syslog_pri) |
