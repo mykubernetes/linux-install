@@ -13,7 +13,7 @@
 | 数据解构 | mutate.split |
 | 增加字段 | mutate.add_field |
 | 删除字段 | mutate.remove_field |
-| 删除数据 |  |
+| 删除数据 | drop |
 | 重命名字段 | mutate.rename_field |
 | 数据转换 | mutate.convert |
 | 日期规范化 | date |
