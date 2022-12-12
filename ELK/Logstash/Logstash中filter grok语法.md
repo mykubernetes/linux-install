@@ -12,6 +12,23 @@
   - SYNTAX：要匹配的模式名称
   - SEMANTIC：为匹配的文本提供的标识符
 
+# 可配置的参数
+
+| 参数 | 作用 | 参数类型 |
+|------|------|----------|
+| break_on_match | grok的首次成功匹配将导致过滤器完成。如果设置为false。grok尝试所有模式 | boolean |
+| keep_empty_captures | 如果为true，则将空捕获保留为事件字段。 | boolean |
+| match | 它定义了查找位置和模式的映射。 | hash |
+| named_captures_only | 如果为true，则仅存储来自grok的命名捕获。 | boolean |
+| overwrite | 需要覆盖的字段 | array |
+| pattern_definitions | 模式名称和模式元组的散列，定义了当前过滤器要使用的自定义模式 | hash |
+| patterns_dir | 可以使用此设置指向多个匹配目录 | array |
+| patterns_files_glob | 用于在patterns_dir指定的目录中选择模式文件 | string |
+| tag_on_failure | 解析失败时需要添加的标记 | array |
+| tag_on_timeout | 超时时需要添加的标记 | string |
+| timeout_millis | 匹配的超时时间 | number |
+| timeout_scope | 默认为"pattern"如果向提供了多个模式match，则会在每个匹配模式上应用超时，如果设置为"event"则在所有匹配中执行一次超时 | string，可选参数"pattern"和"event" |
+
 # Grok默认表达式
 
 - Logstash 内置了120种默认表达式，可以查看patterns，里面对表达式做了分组，每个文件为一组，文件内部有对应的表达式模式。下面只是部分常用的。
