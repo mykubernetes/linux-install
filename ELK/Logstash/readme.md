@@ -21,7 +21,7 @@
 | 大小写转换 | `mutate.lowercase`,`mutate.uppercase` |
 | 字段定长提取 |  |
 | 字段字节定长提取 |  |
-| UserAgent解析规则 | grok |
+| UserAgent解析规则 | useragent |
 | URL Decode解析 | grok |
 | 内容替换 | `mutate.replace`,`mutate.update` |
 | 批量内容替换 |  |
