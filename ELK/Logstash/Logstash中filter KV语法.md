@@ -2,6 +2,25 @@
 
 用于解析key=value类型的消息，可以配置任意字符串来拆分数据，不一定非要用=符号，kv对的间隔也不一定非要用空格
 
+| 参数 | 作用 |
+|------|------|
+| source | 数据的目标 |
+| target | 定义用于放置解析数据的目标字段。 |
+| allow_duplicate_values | 一个布尔选项，用于删除重复的键/值对。设置为false时，将仅保留一对唯一的键/值对。 |
+| default_keys | 指定默认键及其值的哈希值，以防万一这些键在要解析的源字段中不存在时应添加到事件中。 |
+| exclude_keys | 指定不应添加到事件的已解析键。 |
+| field_split | 用作单字符字段定界符的字符串，用于解析键值对。 |
+| include_brackets | 一个布尔值，指定是否将方括号，尖括号和括号视为“值的包装器”。 |
+| include_keys | 一个数组，指定应添加到事件的已解析键。默认情况下，将添加所有键。 |
+| prefix | 一个字符串，主要是给所有被提取出来打的key加前缀内容 |
+| recursive | 一个布尔值，指定是否向下钻取值并从中递归获取更多键-值对。额外的键值对将存储为根键的子键。 |
+| remove_char_key | 要从key中删除的字符串 |
+| remove_char_value | 要从value中删除的字符串 |
+| transform_key | 将键转换为小写，大写或大写 lowercase，uppercase，capitalize |
+| transform_value | 将值转换为小写，大写或大写 lowercase，uppercase，capitalize |
+| value_split | 非空字符串，用作单字符值定界符，用于解析键值对。 |
+
+
 # 二、allow_duplicate_values
 
 - 功能：允许重复键值对
