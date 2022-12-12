@@ -19,8 +19,8 @@
 | 日期规范化 | date |
 | KV解析 | kv |
 | 大小写转换 | `mutate.lowercase`,`mutate.uppercase` |
-| 字段定长提取 | truncate |
-| 字段字节定长提取 | |
+| 字段定长提取 |  |
+| 字段字节定长提取 | truncate |
 | UserAgent解析规则 | useragent |
 | URL Decode解析 | urldecode |
 | 内容替换 | `mutate.replace`,`mutate.update` |
