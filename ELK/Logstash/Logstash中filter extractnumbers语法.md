@@ -1,5 +1,6 @@
 # extractnumbers过滤器
 
+- extractnumbers过滤器：从字符串中提取数字
 - 注意默认情况下此过滤器为捆绑需要执行`bin/logstash-plugin install logstash-filter-extractnumbers`操作安装插件
 
 **可配置的参数**
