@@ -7,9 +7,8 @@ https://blog.csdn.net/qq_42883074/category_10860341.html
 | 官方采集组件 | https://prometheus.io/download/ | 包含prometheus、alertmanager、blackbox_exporter、consul_exporter、graphite_exporter、haproxy_exporter、memcached_exporter、mysqld_exporter、node_exporter、pushgateway、statsd_exporter等组件 |
 | 其他采集组件 | https://prometheus.io/docs/instrumenting/exporters/ | 上面不包含的组件都可以来这里查找 |
 | grafana dashboards json模板 | https://grafana.com/grafana/dashboards?search=kafka | 搜索grafana图形化展示prometheus监控数据模板 |
-| prometheus中文文档1	| https://www.prometheus.wang/exporter/use-promethues-monitor-mysql.html | |
+| prometheus中文文档1	| [book](https://www.prometheus.wang/exporter/use-promethues-monitor-mysql.html)、[github](https://github.com/yunlzheng/prometheus-book)、[gitbook]( https://yunlzheng.gitbook.io/prometheus-book/) | |
 | prometheus中文文档2 | https://prometheus.fuckcloudnative.io/di-san-zhang-prometheus/storage | |
-| prometheus-book | https://yunlzheng.gitbook.io/prometheus-book/ | |
 | prometheus实战 | https://songjiayang.gitbooks.io/prometheus/content/ | |
 | Prometheus操作指南 | https://www.bookstack.cn/read/prometheus-book/README.md | |
 | Prometheus 非官方中文手册 | https://github.com/1046102779/prometheus | |
