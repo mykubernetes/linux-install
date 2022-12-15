@@ -9,7 +9,7 @@ https://blog.csdn.net/qq_42883074/category_10860341.html
 | grafana dashboards json模板 | https://grafana.com/grafana/dashboards?search=kafka | 搜索grafana图形化展示prometheus监控数据模板 |
 | prometheus中文文档1	| [book](https://www.prometheus.wang/exporter/use-promethues-monitor-mysql.html)、[github](https://github.com/yunlzheng/prometheus-book)、[gitbook]( https://yunlzheng.gitbook.io/prometheus-book/) | |
 | prometheus中文文档2 | https://prometheus.fuckcloudnative.io/di-san-zhang-prometheus/storage | |
-| prometheus实战 | https://songjiayang.gitbooks.io/prometheus/content/ | |
+| prometheus实战 | [gitbook](https://songjiayang.gitbooks.io/prometheus/content/)、[github](https://github.com/songjiayang/prometheus_practice) | |
 | Prometheus操作指南 | https://www.bookstack.cn/read/prometheus-book/README.md | |
 | Prometheus 非官方中文手册 | https://github.com/1046102779/prometheus | |
 | PromSql | https://blog.51cto.com/u_10983441/5340278 |
