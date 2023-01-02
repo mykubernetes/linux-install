@@ -226,13 +226,26 @@ kafka-acls.sh                 kafka-consumer-groups.sh     kafka-preferred-repli
 kafka-broker-api-versions.sh  kafka-consumer-perf-test.sh  kafka-producer-perf-test.sh          kafka-server-start.sh          kafka-verifiable-consumer.sh        zookeeper-server-start.sh
 kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partitions.sh         kafka-server-stop.sh           kafka-verifiable-producer.sh        zookeeper-server-stop.sh
 ```
-- kafka-console-consumer.sh ：官方控制台消费者
-- kafka-console-producer.sh ： 官方控制台生产者
-- kafka-server-start.sh ：kafka启动脚本
-- kafka-server-stop.sh：kafka停止脚本
-- kafka-topics.sh ： topics管理脚本
-- zookeeper-server-start.sh ：zookeeper启动脚本
-- zookeeper-server-stop.sh ：zookeeper停止脚本
+- kafka-configs.sh：配置管理脚本
+- kafka-console-consumer.sh：kafka 消费者控制台
+- kafka-console-producer.sh：kafka 生产者控制台
+- kafka-consumer-groups.sh：kafka 消费者组相关信息
+- kafka-delete-records.sh：删除低水位的日志文件
+- kafka-log-dirs.sh：kafka 消息日志目录信息
+- kafka-mirror-maker.sh：不同数据中心 kafka 集群复制工具
+- kafka-preferred-replica-election.sh：触发 preferred replica 选举
+- kafka-producer-perf-test.sh：kafka 生产者性能测试脚本
+- kafka-reassign-partitions.sh：分区重分配脚本
+- kafka-replica-verification.sh：复制进度验证脚本
+- kafka-server-start.sh：启动 kafka 服务
+- kafka-server-stop.sh：停止 kafka 服务
+- kafka-topics.sh：topic 管理脚本
+- kafka-verifiable-consumer.sh：可检验的 kafka 消费者
+- kafka-verifiable-producer.sh：可检验的 kafka 生产者
+- zookeeper-server-start.sh：启动 zk 服务
+- zookeeper-server-stop.sh：停止 zk 服务
+- zookeeper-shell.sh：zk 客户端
+
 
 3、修改配置文件
 | 参数 | 说明 |
