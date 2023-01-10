@@ -127,3 +127,6 @@ auto.offset.reset largest                             #如果zookeeper上没有o
 zookeeper.session.timeout.ms  6000                    #如果其超时，将会可能触发rebalance并认为已经死去
 zookeeper.connection.timeout.ms 6000                  #确认zookeeper连接建立操作客户端能等待的最长时间
 ```
+
+参考：
+- https://blog.csdn.net/leegh1992/article/details/70142452
