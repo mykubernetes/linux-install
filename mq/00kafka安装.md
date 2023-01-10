@@ -1046,57 +1046,6 @@ bin/kafka-acls.sh --authorizer-properties zookeeper.connect=zk1:2181/kafka_test1
 ```
 
 
-
-八、消费者组案例
----
-测试同一个消费者组中的消费者，同一时刻只能有一个消费者消费。
-```
-在node001、node002上修改kafka/config/consumer.properties配置文件中的group.id属性为任意组名。
-# vi consumer.properties
-group.id=test001
-
-在node001、node002上分别启动消费者
-# bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic first --consumer.config config/consumer.properties
-# bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic first --consumer.config config/consumer.properties
-
-在node003上启动生产者
-# bin/kafka-console-producer.sh --broker-list node001:9092 --topic first
->hello world
-
-查看node001和node002的接收者。
-同一时刻只有一个消费者接收到消息。
-```
-
-列出所有 topic  中的所有consumer  组
-```
-# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
-```
-
-显示 consumer  群体中所有 consumer 的位置，以及所在⽇志的结尾。
-```
-仅显示使⽤Java consumer API（基于⾮ZooKeeper的 consumer）的 consumer 的信息
-# bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
-
-显示关于使⽤ZooKeeper的 consumer 的信息（不是那些使⽤Java consumer API的消费者)
-# bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --describe --group my-group
-```
-
-管理 Consumer Group 
-```
-# 列出所有 topic
-> bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
-test-consumer-group
-
-# 查看偏移量
-> bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group test-consumer-group
-TOPIC                         PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG       CONSUMER-ID                                      HOST
-test-foo                      0         1              3              2         consumer-1-a5d61779-4d04-4c50-a6d6-fb35d942642d  /127.0.0.1
-
-# 使⽤⽼的⾼级 consumer 并在 ZooKeeper 中存储组元数据
-> bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
-```
-
-
 Kafka  监控
 ===
 Kafka Eagle
