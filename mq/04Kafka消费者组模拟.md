@@ -310,3 +310,26 @@ test        1          17               17               0         consumer-1-3a
 test        2          18               18               0         consumer-1-3aecd259-e164-4a40-b4f7-64dfadcdfadf /127.0.0.1    consumer1
 ```
 **结论：对于同一个topic，每个消费者组group都可以拿到同样的所有数据，但是数据进入group后只能被该组中的一个消费者所消费。**
+
+
+
+# 三、将消费者组id配置到配置文件中
+
+1、在node001、node002上修改kafka/config/consumer.properties配置文件中的group.id属性为任意组名。
+```
+# vi consumer.properties
+group.id=test001
+```
+
+2、在node001、node002上分别启动消费者
+```
+# bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic first --consumer.config config/consumer.properties
+# bin/kafka-console-consumer.sh --zookeeper node001:2181 --topic first --consumer.config config/consumer.properties
+```
+
+3、在node003上启动生产者
+```
+# bin/kafka-console-producer.sh --broker-list node001:9092 --topic first
+>hello world
+```
+查看node001和node002的接收者,同一时刻只有一个消费者接收到消息。
