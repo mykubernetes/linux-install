@@ -449,10 +449,10 @@ Note: This will have no impact if delete.topic.enable is not set to true.
 8、查看topic的分区及副本
 ```
 # ./kafka-topics.sh --describe --zookeeper localhost:2181 --topic test
-Topic:test    PartitionCount:3    ReplicationFactor:3    Configs:
-    Topic: test    Partition: 0    Leader: 0    Replicas: 0,1,2    Isr: 0,2,1
-    Topic: test    Partition: 1    Leader: 1    Replicas: 1,2,0    Isr: 1,2,0
-    Topic: test    Partition: 2    Leader: 2    Replicas: 2,0,1    Isr: 2,0,1
+Topic: test    PartitionCount:3    ReplicationFactor:3    Configs:
+Topic: test    Partition: 0    Leader: 0    Replicas: 0,1,2    Isr: 0,2,1
+Topic: test    Partition: 1    Leader: 1    Replicas: 1,2,0    Isr: 1,2,0
+Topic: test    Partition: 2    Leader: 2    Replicas: 2,0,1    Isr: 2,0,1
 ```
 - 第一行，列出了topic的名称，分区数(PartitionCount),副本数(ReplicationFactor)以及其他的配置(Configs) 
 - Leader: 是在给出的所有partitons中负责读写的节点，每个节点都有可能成为leader。
