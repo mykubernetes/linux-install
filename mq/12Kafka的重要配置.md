@@ -1,5 +1,7 @@
 # broker配置
 
+- 官网查看地址：http://kafka.apache.org/082/documentation.html#brokerconfigs
+
 | 配置项 | 说明 |
 |-------|------|
 | broker.id | Kafka服务器的编号，同一个集群不同节点的编号应该唯一 |
@@ -62,6 +64,8 @@ delete.topic.enable false             #是否开启topic可以被删除的方式
 
 # producer配置
 
+- 官方查看地址：http://kafka.apache.org/082/documentation.html#producerconfigs
+
 | 配置项 | 说明 |
 |-------|------|
 | bootstrap.servers | 生产者客户端连接Kafka集群的地址和端口，多个节点用逗号分隔 |
@@ -92,6 +96,8 @@ batch.num.messages 200                                    #一次批量发送需
 ```
 
 # consumer配置
+
+- 官网查看地址:http://kafka.apache.org/082/documentation.html#consumerconfigs
 
 | 配置项 | 说明 |
 |-------|------|
