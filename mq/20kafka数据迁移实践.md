@@ -123,8 +123,9 @@ Option                                  Description
 | --disable-rack-aware | 关闭机架感知能力,在分配的时候就不参考机架的信息 |  |
 | --bootstrap-server | 如果是副本跨路径迁移必须有此参数 |  |
 
+# 一、不同broker之间的分区数据迁移
 
-# 1. 生成分配计划
+## 1. 生成分配计划
 
 编写分配脚本：
 ```
@@ -157,11 +158,11 @@ $ vim topic-reassignment.json
 {"version":1,"partitions":[{"topic":"event_request","partition":0,"replicas":[6,5]},{"topic":"event_request","partition":1,"replicas":[7,6]}]}
 ```
 
-# 2. 执行分配（execute）
+## 2. 执行分配（execute）
 
 根据step1 生成的分配计划配置json文件topic-reassignment.json，进行topic的重新分配。
 ```
-$ kafka-reassign-partitions.sh --zookeeper $ZK_CONNECT --reassignment-json-file topic-reassignment.json --execute
+$ kafka-reassign-partitions.sh --zookeeper $ZK_CONNECT --reassignment-json-file topic-reassignment.json --execute --throttle 50000000
 ```
 
 执行前的分区分布：
@@ -180,7 +181,7 @@ Topic:event_request	PartitionCount:2	ReplicationFactor:4	Configs:
 	Topic: event_request	Partition: 1	Leader: 4	Replicas: 7,6,4,5	Isr: 4,5
 ```
 
-# 3. 检查分配的状态
+## 3. 检查分配的状态
 
 查看分配的状态：正在进行
 ```
@@ -215,3 +216,41 @@ Topic:event_request	PartitionCount:2	ReplicationFactor:2	Configs:
 Topic: event_request	Partition: 0	Leader: 6	Replicas: 6,5	Isr: 6,5
 Topic: event_request	Partition: 1	Leader: 7	Replicas: 7,6	Isr: 6,7
 ```
+
+# 二、broker内部不同数据盘之间的分区数据迁移
+
+- 为什么线上Kafka机器各个磁盘间的占用不均匀，经常出现“一边倒”的情形？这是因为Kafka只保证分区数量在各个磁盘上均匀分布，但它无法知晓每个分区实际占用空间，故很有可能出现某些分区消息数量巨大导致占用大量磁盘空间的情况。
+
+在一台Broker上用多个路径存放分区
+```
+$ vim server.properties
+log.dirs=kafka-logs-5,kafka-logs-6,kafka-logs-7,kafka-logs-8
+```
+注意同一个Broker上不同路径只会存放不同的分区，而不会将一个分区的多个副本存放在同一个Broker; 不然那副本就没有意义了(容灾)
+
+准备迁移文件
+```
+{
+  "version": 1,
+  "partitions": [{
+    "topic": "test_create_topic4",
+    "partition": 2,
+    "replicas": [0],
+    "log_dirs": ["/Users/xxxxx/work/IdeaPj/source/kafka/kafka-logs-5"]
+  }, {
+    "topic": "test_create_topic4",
+    "partition": 1,
+    "replicas": [0],
+    "log_dirs": ["/Users/xxxxx/work/IdeaPj/source/kafka/kafka-logs-6"]
+  }]
+}
+```
+- 迁移的json文件有一个参数是log_dirs; 默认请求不传的话 它是"log_dirs": [“any”] （这个数组的数量要跟副本保持一致） 但是你想实现跨路径迁移,只需要在这里填入绝对路径就行了,例如下面
+
+
+执行脚本
+```
+bin/kafka-reassign-partitions.sh --zookeeper xxxxx --reassignment-json-file config/reassignment-json-file.json --execute --bootstrap-server
+xxxxx:9092 --replica-alter-log-dirs-throttle 10000
+```
+- 如果需要限流的话 加上参数`--replica-alter-log-dirs-throttle`,跟`--throttle`不一样的是`--replica-alter-log-dirs-throttle`限制的是`Broker`内不同路径的迁移流量。
