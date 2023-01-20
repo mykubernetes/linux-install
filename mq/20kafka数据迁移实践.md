@@ -254,3 +254,54 @@ bin/kafka-reassign-partitions.sh --zookeeper xxxxx --reassignment-json-file conf
 xxxxx:9092 --replica-alter-log-dirs-throttle 10000
 ```
 - 如果需要限流的话 加上参数`--replica-alter-log-dirs-throttle`,跟`--throttle`不一样的是`--replica-alter-log-dirs-throttle`限制的是`Broker`内不同路径的迁移流量。
+
+# 三、副本扩容
+
+- kafka并没有提供一个专门的脚本来支持副本的扩缩, 不像kafka-topic.sh脚本一样,是可以扩分区的; 想要对副本进行扩缩,只能是曲线救国了; 利用kafka-reassign-partitions.sh来重新分配副本
+
+--generate 获取一下当前的分配情况,得到如下json
+```
+{
+    "version": 1,
+    "partitions": [{
+        "topic": "test_create_topic1",
+        "partition": 2,
+        "replicas": [2],
+        "log_dirs": ["any"]
+    }, {
+        "topic": "test_create_topic1",
+        "partition": 1,
+        "replicas": [1],
+        "log_dirs": ["any"]
+    }, {
+        "topic": "test_create_topic1",
+        "partition": 0,
+        "replicas": [0],
+        "log_dirs": ["any"]
+    }]
+}
+```
+
+我们想把所有分区的副本都变成2,那我们只需修改"replicas": []里面的值了,这里面是Broker列表,排在第一个的是Leader; 所以我们根据自己想要的分配规则修改一下json文件就变成如下
+```
+{
+    "version": 1,
+    "partitions": [{
+        "topic": "test_create_topic1",
+        "partition": 2,
+        "replicas": [2,0],
+        "log_dirs": ["any","any"]
+    }, {
+        "topic": "test_create_topic1",
+        "partition": 1,
+        "replicas": [1,2],
+        "log_dirs": ["any","any"]
+    }, {
+        "topic": "test_create_topic1",
+        "partition": 0,
+        "replicas": [0,1],
+        "log_dirs": ["any","any"]
+    }]
+}
+```
+- 注意log_dirs里面的数量要和replicas数量匹配;或者直接把log_dirs选项删除掉; 这个log_dirs是副本跨路径迁移时候的绝对路径
