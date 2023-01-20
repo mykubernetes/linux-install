@@ -6,8 +6,8 @@
 | 建立 | pvcreate | vgcreate | lvcreate |
 | 显示 | pvdisplay\|pvs | vgdisplay\|vgs | lvdisplay\|lvs |
 | 删除 | pvremove | vgremove | lvremove |
-| 扩容 | - | vgextend | lvextend |
-| 缩小 | - | vgreduce | lvreduce |
+| 扩容 | 物理卷不能扩展 | vgextend | lvextend |
+| 缩小 | 物理卷不能缩小 | vgreduce | lvreduce |
 
 ## 创建LVM
 
@@ -58,7 +58,11 @@ $ lvs
   backup tmp    -wi-a-----  1.00g
   
 $ lvcreate -n backup -l +100%VG
+
+$ lvcreate -l 100%FREE -n lv_data01 vg_data01 分配全部空间
 ```
+- -n lv的名称
+- tmp vg的名称
 
 - 挂载逻辑卷
 ```
