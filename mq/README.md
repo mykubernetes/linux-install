@@ -50,4 +50,5 @@ Kafka 在 ZooKeeper 中动态维护了一个 ISR（In-sync Replica），即保�
 参考：
 - https://www.cnblogs.com/yinging/p/16512821.html
 - https://cloud.tencent.com/developer/article/1846819
+- https://blog.csdn.net/woshiwjma956/article/details/125655426
 
