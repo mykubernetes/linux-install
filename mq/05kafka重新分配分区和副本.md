@@ -224,6 +224,11 @@ Topic: topic0703    Partition: 2  Leader: 2    Replicas: 0,1,2 Isr: 2,0
 
 但随着时间推移，broker可能会停机，会导致leader迁移，导致机群的负载不均衡。我们期望对topic的leader进行重新负载均衡，让partition选择”preferred replica”做为leader。
 
+kafka通过三个参数来控制leader partition的负载均衡
+- auto.leader.rebalance.enable 是否开启 默认开启
+- leader.imbalance.per.broker.percentage 允许不平衡比例 默认10%
+- leader.imbalance.check.interval.seconds 检查leader负载均衡时间间隔 默认300s
+
 1、查看topic详情
 ```
 ./kafka-topics.sh --bootstrap-server localhost:9092 --describe  --topic logdata-es
