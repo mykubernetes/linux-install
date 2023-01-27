@@ -10,6 +10,18 @@
 
 数据日志有两种类型的清理方式，一种是按照日志被发布的时间来删除，另一种是按照日志文件的size来删除。有专门的配置项可以配置这个删除策略：
 
+kafka默认日志保存时间为7天日志过期之后kafka提供了两种清理策略delete和compact两种
+
+| 参数 | 描述 |
+|-----|------|
+| log.retention.hours | 最低优先级小时，默认 7 天 |
+| log.retention.minutes | 分钟 优先级高于log.retention.hours |
+| log.retention.ms | 最高优先级毫秒 |
+| log.retention.check.interval.ms | 负责设置检查周期，默认 5 分钟 |
+| log.cleanup.policy | 日志清理策略 默认delete |
+| log.retention.bytes | 基于大小：默认关闭。超过设置的所有日志总大小,，默认等于-1，表示无穷大 |
+
+
 # 按时间删除：
 
 Kafka提供了配置项让我们可以按照日志被发布的时间来删除。它们分别是：
