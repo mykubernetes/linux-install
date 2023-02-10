@@ -1,6 +1,6 @@
 # LVM(Logical Volume Manager)
 
-# 1.LVM 逻辑卷概述
+# LVM 逻辑卷概述
 
 随着企业业务的增加，文件系统负载加大，很可能导致空间不足，用传统的分区方式管理磁盘，得把现有的分区删除，然后重新规划新的存储方案，因此我们需要一种管理机制，可以帮我们动态管理存储，而 LVM 就可以提供这种功能。
 
@@ -23,22 +23,22 @@ LVM（Logical Volume Manager）是基于内核的一种逻辑卷管理器，LVM 
 | 缩小 | 物理卷不能缩小 | vgreduce | lvreduce |
 
 ```
-物理卷PV
+# 物理卷PV
 pvcreate   创建pv                例：pvcreate /dev/sda1
 pvs        查看pv信息            例：直接在命令行里输入pvs
 pvdisplay  查看pv详细信息        例：pvcreate /dev/sda1
 pvmove     将pv数据移动到其他pv  例：pvmove /dev/sda1 /dev/sda4
 pvremove   将pv删除             例：pvremove /dev/sda1
-================================================================
-卷组VG
+
+# 卷组VG
 vgcreate   创建vg              例：vgcreate vg01  /dev/sda{m,n}
 vgs        查看vg信息          例：直接在命令行里输入vgs
 vgdisplay  查看vg详细信息      例：vgdisplay vg01
 vgremove   将vg删除            例：vgremove vg01
 vgextend   扩容vg             例：vgextend vg01 /dev/sdb2 扩展vg01卷组，把/dev/sda2加进去
 vgreduce   缩减vg             例：vgreduce vg01 /dev/sdb2 缩减vg01卷组，把/dev/sda2去掉
-================================================================
-逻辑卷LV
+
+# 逻辑卷LV
 lvcreate   创建lv          
 例：lvcreate -L 100%FREE -n lv01 vg01   将vg01空间全部新建到lv01上
     lvcreate -n lv01 -L 100G vg01       指定新建lv大小100G
@@ -162,7 +162,7 @@ $ pvmove /dev/sdx /dev/sdz
 $ vgreduce centos /dev/sdx
 ```
 
-生成环境配置过程
+# 生成环境配置过程
 ```
 创建pv
 pvcreate /dev/mapper/mpatha
