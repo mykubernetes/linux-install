@@ -10,3 +10,4 @@ delete from pipeline where pipline_name like '%_trigger_%' and cast(substring_in
 - https://blog.csdn.net/Sheenky/article/details/125142451
 - https://blog.csdn.net/qq_52253798/article/details/121588253
 - https://www.cnblogs.com/thomasbc/p/15205130.html
+- https://www.cnblogs.com/hanease/p/15690141.html
