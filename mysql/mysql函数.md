@@ -8,3 +8,4 @@ delete from pipeline where pipline_name like '%_trigger_%' and cast(substring_in
 - https://www.cnblogs.com/kissdodog/p/4168721.html
 - https://zhuanlan.zhihu.com/p/360367679
 - https://blog.csdn.net/Sheenky/article/details/125142451
+- https://blog.csdn.net/qq_52253798/article/details/121588253
