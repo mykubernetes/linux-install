@@ -3,7 +3,7 @@ select pipeline_name from pipeline where pipline_name like '%_trigger_%' and cas
 
 delete from pipeline where pipline_name like '%_trigger_%' and cast(substring_index(pipeline_name),'_',-1) as signed) <= cast('1676016656' as signed)*1000
 
-## 查询中台定时批作业启动中、待启动、运行中的任务超过三十分钟的
+## 查询作业启动中、待启动、运行中的任务超过三十分钟的
 select
 	tmp.pipeline_name,
 	tmp.trigger_name,
