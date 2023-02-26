@@ -21,7 +21,7 @@ curl -XPUT 'http://localhost:9200/forum/article/1?pretty' -d '
 }'
 ```
 
-#（1）reindex in place
+# （1）reindex in place
  
 将1.x中的索引reindex最简单的方法，就是用elasticsearch migration plugin去做reindex。但是首先需要先升级到es 2.3.x或2.4.x。
 
@@ -44,7 +44,7 @@ migration plugin中提供的reindex工具会执行以下操作：
 此时，就可以有一份新的2.x的索引，可以在5.x中使用
 
 
-（2）upgrading with reindex-from-remote
+# （2）upgrading with reindex-from-remote
 
 如果在运行1.x cluster，并且想要直接迁移到5.x，而不是先迁移到2.x，那么需要进行reindex-from-remote操作
 
