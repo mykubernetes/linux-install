@@ -59,3 +59,22 @@ mysql> select concat('KILL ',id,';') from information_schema.processlist where u
 mysql> source /tmp/a.txt;
 ```
 
+# 几条常用的SQL
+
+1、按客户端 IP 分组，看哪个客户端的链接数最多
+```
+select client_ip,count(client_ip) as client_num from (select substring_index(host,':' ,1) as client_ip from information_schema.processlist ) as connect_info group by client_ip order by client_num desc;
+```
+
+2、查看正在执行的线程，并按 Time 倒排序，看看有没有执行时间特别长的线程
+```
+select * from information_schema.processlist where Command != 'Sleep' order by Time desc;
+```
+
+3、找出所有执行时间超过 5 分钟的线程，拼凑出 kill 语句，方便后面查杀 (此处 5分钟 可根据自己的需要调整SQL标红处)
+
+可复制查询结果到控制台，直接执行，杀死堵塞进程
+```
+select concat('kill ', id, ';') from information_schema.processlist where Command != 'Sleep' and Time > 300 order by Time desc;
+```
+（通过 kill 进程的id 来杀死耗时不动的进程，例如kill 569842）
