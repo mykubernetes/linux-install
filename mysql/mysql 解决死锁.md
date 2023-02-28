@@ -1,3 +1,5 @@
+官网介绍：https://dev.mysql.com/doc/refman/8.0/en/show-processlist.html
+
 1、通过 `SHOW FULL PROCESSLIST`命令查看info信息，会提示锁的语句
 
 | 序号 | 字段 | 含义 |
@@ -38,6 +40,12 @@ mysql> SHOW FULL PROCESSLIST;
 +----+------+-----------+------+---------+------+-------+------------------+
 ```
 
+show processlist 显示的查询结果来自 information_schema 中的 processlist 表，可以用下述查询代替：
+```
+mysql> select * from information_schema.processlist
+```
+
+
 2、通过`kill` 命令杀死的死锁的线程
 ```
 kill 2454;
@@ -50,3 +58,4 @@ mysql> select concat('KILL ',id,';') from information_schema.processlist where u
 
 mysql> source /tmp/a.txt;
 ```
+
