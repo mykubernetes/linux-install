@@ -7,6 +7,8 @@ mariadb 官方函数： https://mariadb.com/kb/en/function-and-operator-referenc
 
 https://blog.csdn.net/m0_68850571/article/details/124272173
 
+https://www.easck.com/list/146/0.shtml
+
 # 社区版mysql安装
 
 ```
