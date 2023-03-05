@@ -280,7 +280,8 @@ WHERE 2<=(SELECT COUNT(*)
 ```
 
 （4）NOT EXISTS关键字表示如果不存在某种条件，则返回TRUE，否则返回FALSE。
-```
+
+```sql
 # 查询公司管理者的employee_id，last_name，job_id，department_id信息
 # 方式一：自连接
 SELECT DISTINCT e1.employee_id,e1.last_name,e1.job_id,e1.department_id # 因为管理者可能管理多个员工，所以需要去重
