@@ -132,7 +132,7 @@ WHERE  job_id =(
                  WHERE  last_name = 'Haas');# 公司没有Haas这个人，子查询返回空值，最终结果也是空值，但不会报错
 ```
 
-5、非法使用子查询
+### 5、非法使用子查询
 
 ```sql
 # 报错： Subquery returns more than 1 row
