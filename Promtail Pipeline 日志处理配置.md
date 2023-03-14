@@ -988,5 +988,5 @@ drop:
 上面的 pipeline 执行后将删除掉所有超过 24 小时或者超过 8kb 的日志或者 json 的 msg 值中包含 `trace` 字样的日志。
 
 参考：
-- ![博客](http://mp.weixin.qq.com/s?__biz=MzIyMDY2MTE3Mw==&mid=2247493952&idx=1&sn=408d051615076b0f5c4330c4f5187abf&chksm=97ca3d9aa0bdb48c11bce327001b1f5e1e171ec5a3839c1037eab1808f2eb7acde34e8c2c49c&mpshare=1&scene=24&srcid=0311hObNXJnzN9pyyG3H4eko&sharer_sharetime=1678521964336&sharer_shareid=cd21316ced758259d72f6cdf856a30da#rd)
+- http://mp.weixin.qq.com/s?__biz=MzIyMDY2MTE3Mw==&mid=2247493952&idx=1&sn=408d051615076b0f5c4330c4f5187abf&chksm=97ca3d9aa0bdb48c11bce327001b1f5e1e171ec5a3839c1037eab1808f2eb7acde34e8c2c49c&mpshare=1&scene=24&srcid=0311hObNXJnzN9pyyG3H4eko&sharer_sharetime=1678521964336&sharer_shareid=cd21316ced758259d72f6cdf856a30da#rd
 - https://blog.liuliancao.com/roams/loki/
