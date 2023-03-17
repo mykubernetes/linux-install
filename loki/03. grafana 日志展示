@@ -1,0 +1,33 @@
+## grafana 部署
+
+下载包地址
+https://grafana.com/grafana/download/8.5.6?edition=enterprise
+
+```
+[root@localhost data]# tar xf grafana-enterprise-8.5.6.linux-amd64.tar.gz  -C /data/
+[root@localhost data]# cd /data/
+[root@localhost data]# mv grafana-8.5.6/ grafana
+
+cat <<EOF> /etc/supervisord.d/grafana.ini
+[program:grafana]
+
+command=/data/grafana/bin/grafana-server web
+autorestart=true
+autostart=true
+stderr_logfile=/tmp/grafana_err.log
+stdout_logfile=/tmp/grafana_out.log
+user=root
+stopsignal=INT
+startsecs=10
+startretries=3
+directory=/data/grafana
+EOF
+```
+
+启动grafana
+
+添加loki数据源
+
+通过 Explore 查看 loki 数据
+
+导入grafana loki dashboard 查看数据
