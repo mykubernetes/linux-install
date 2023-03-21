@@ -157,5 +157,17 @@ sh bin/kafka-verifiable-consumer.sh --group-id test_consumer --bootstrap-server 
 | --assignment-strategy | consumer分配分区策略，默认是org.apache.kafka.clients.consumer.RangeAssignor | |
 | --consumer.config | 指定consumer的配置文件 | |
 
+[【kafka运维】Kafka全网最全最详细运维命令合集(精品强烈建议收藏!!!)_石臻臻的杂货铺-CSDN博客](https://blog.csdn.net/u010634066/article/details/118215928?spm=1001.2014.3001.5501)
+
+[【kafka实战】分区重分配可能出现的问题和排查问题思路(生产环境实战,干货!!!非常干!!!建议收藏)](https://blog.csdn.net/u010634066/article/details/118631272?spm=1001.2014.3001.5501)
+
+[【kafka异常】kafka 常见异常处理方案(持续更新! 建议收藏)](https://blog.csdn.net/u010634066/article/details/118105676?spm=1001.2014.3001.5501)
+
+[【kafka运维】分区从分配、数据迁移、副本扩缩容 (附教学视频)](https://blog.csdn.net/u010634066/article/details/118028403?spm=1001.2014.3001.5501)
+
+[【kafka源码】ReassignPartitionsCommand源码分析(副本扩缩、数据迁移、副本重分配、副本跨路径迁移](https://blog.csdn.net/u010634066/article/details/118051963)
+
+[【kafka】点击更多…](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg4ODY1NTcxNg==&action=getalbum&album_id=1966026980307304450#wechat_redirect)
+
 参考：
 - https://blog.csdn.net/u010634066/article/details/119327126
