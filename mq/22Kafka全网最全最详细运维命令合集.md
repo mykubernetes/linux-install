@@ -314,7 +314,7 @@ bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic test --p
 | –max-memory-bytes | Long | 生产者用来缓冲等待发送到服务器的总内存 | 33554432(默认值) |
 | –max-partition-memory-bytes | Long | 为分区分配的缓冲区大小 | 16384 |
 | –message-send-max-retries | Integer | 最大的重试发送次数 | 3 |
-| –metadata-expiry-ms	Long | 强制更新元数据的时间阈值(ms) | 300000 |
+| –metadata-expiry-ms | Long | 强制更新元数据的时间阈值(ms) | 300000 |
 | –producer-property | String | 将自定义属性传递给生成器的机制 | 如：key=value |
 | –producer.config | String | 生产者配置属性文件[–producer-property]优先于此配置 配置文件完整路径 | |
 | –property | String | 自定义消息读取器 | parse.key=true/false key.separator=<key.separator>ignore.error=true/false |
@@ -516,77 +516,80 @@ bin/kafka-producer-perf-test.sh --topic test_create_topic4 --num-records 1024 --
 相关可选参数
 
 | 参数 | 描述 | 例子 |
-|------|-----|------||
-| --topic	指定消费的topic	
-| --num-records	发送多少条消息	
-| --throughput	每秒消息最大吞吐量	
-| --producer-props	生产者配置, k1=v1,k2=v2	--producer-props bootstrap.servers= localhost:9092,client.id=test_client
-| --producer.config	生产者配置文件	--producer.config config/producer.propeties
-| --print-metrics	在test结束的时候打印监控信息,默认false	--print-metrics true
-| --transactional-id	指定事务 ID，测试并发事务的性能时需要，只有在 --transaction-duration-ms > 0 时生效，默认值为 performance-producer-default-transactional-id	
-| --transaction-duration-ms	指定事务持续的最长时间，超过这段时间后就会调用 commitTransaction 来提交事务，只有指定了 > 0 的值才会开启事务，默认值为 0	
-| --record-size	一条消息的大小byte; 和 --payload-file 两个中必须指定一个，但不能同时指定	
-| --payload-file	指定消息的来源文件，只支持 UTF-8 编码的文本文件，文件的消息分隔符通过 --payload-delimeter指定,默认是用换行\nl来分割的，和 --record-size 两个中必须指定一个，但不能同时指定 ; 如果提供的消息	
-| --payload-delimeter	如果通过 --payload-file 指定了从文件中获取消息内容，那么这个参数的意义是指定文件的消息分隔符，默认值为 \n，即文件的每一行视为一条消息；如果未指定--payload-file则此参数不生效；发送消息的时候是随机送文件里面选择消息发送的;	
+|------|-----|------|
+| --topic | 指定消费的topic | |
+| --num-records | 发送多少条消息 | |
+| --throughput | 每秒消息最大吞吐量 | |
+| --producer-props | 生产者配置, k1=v1,k2=v2 | --producer-props bootstrap.servers= localhost:9092,client.id=test_client |
+| --producer.config | 生产者配置文件 | --producer.config config/producer.propeties |
+| --print-metrics | 在test结束的时候打印监控信息,默认false | --print-metrics true |
+| --transactional-id | 指定事务 ID，测试并发事务的性能时需要，只有在 --transaction-duration-ms > 0 时生效，默认值为 performance-producer-default-transactional-id | |
+| --transaction-duration-ms | 指定事务持续的最长时间，超过这段时间后就会调用 commitTransaction 来提交事务，只有指定了 > 0 的值才会开启事务，默认值为 0 | |
+| --record-size | 一条消息的大小byte; 和 --payload-file 两个中必须指定一个，但不能同时指定 | |
+| --payload-file | 指定消息的来源文件，只支持 UTF-8 编码的文本文件，文件的消息分隔符通过 --payload-delimeter指定,默认是用换行\nl来分割的，和 --record-size 两个中必须指定一个，但不能同时指定 ; 如果提供的消息 | |
+| --payload-delimeter | 如果通过 --payload-file 指定了从文件中获取消息内容，那么这个参数的意义是指定文件的消息分隔符，默认值为 \n，即文件的每一行视为一条消息；如果未指定--payload-file则此参数不生效；发送消息的时候是随机送文件里面选择消息发送的; | |
 
 # 10.消费者压力测试kafka-consumer-perf-test.sh
-消费100条消息--messages 100
 
+消费100条消息--messages 100
+```
 sh bin/kafka-consumer-perf-test.sh -topic test_create_topic4 --bootstrap-server localhost:9090 --messages 100
+```
 
 相关可选参数
 
-参数	描述	例子
---bootstrap-server		
---consumer.config	消费者配置文件	
---date-format	结果打印出来的时间格式化	默认：yyyy-MM-dd HH:mm:ss:SSS
---fetch-size	单次请求获取数据的大小	默认1048576
---topic	指定消费的topic	
---from-latest		
---group	消费组ID	
---hide-header	如果设置了,则不打印header信息	
---messages	需要消费的数量	
---num-fetch-threads	feth 数据的线程数(废弃无效)	默认：1
---print-metrics	结束的时候打印监控数据	
---show-detailed-stats	如果设置，则按照--report_interval配置的方式报告每个报告间隔的统计信息	
---threads	消费线程数;(废弃无效)	默认 10
---reporting-interval	打印进度信息的时间间隔（以毫秒为单位）	
-11.删除指定分区的消息kafka-delete-records.sh
+| 参数 | 描述 | 例子 |
+|------|-----|-------|
+| --bootstrap-server |  |  |
+| --consumer.config | 消费者配置文件 |
+| --date-format | 结果打印出来的时间格式化 | 默认：yyyy-MM-dd HH:mm:ss:SSS |
+| --fetch-size | 单次请求获取数据的大小 | 默认1048576 |
+| --topic | 指定消费的topic |  |
+| --from-latest |  |
+| --group | 消费组ID | |
+| --hide-header | 如果设置了,则不打印header信息 | |
+| --messages | 需要消费的数量 | |
+| --num-fetch-threads | feth 数据的线程数(废弃无效) | 默认：1 |
+| --print-metrics | 结束的时候打印监控数据 | |
+| --show-detailed-stats | 如果设置，则按照--report_interval配置的方式报告每个报告间隔的统计信息 |  |
+| --threads | 消费线程数;(废弃无效) | 默认 10 |
+| --reporting-interval | 打印进度信息的时间间隔（以毫秒为单位） |  |
+
+# 11.删除指定分区的消息kafka-delete-records.sh
+
 删除指定topic的某个分区的消息删除至offset为1024
 
 先配置json文件offset-json-file.json
-
+```
 {"partitions":
 [{"topic": "test1", "partition": 0,
   "offset": 1024}],
   "version":1
 }
-1
-2
-3
-4
-5
+```
+
 在执行命令
-
+```
 sh bin/kafka-delete-records.sh --bootstrap-server 172.23.250.249:9090 --offset-json-file config/offset-json-file.json
-
+```
 验证 通过 LogIKM 查看发送的消息
 
+**从这里可以看出来,配置"offset": 1024 的意思是从最开始的地方删除消息到 1024的offset; 是从最前面开始删除的**
 
-从这里可以看出来,配置"offset": 1024 的意思是从最开始的地方删除消息到 1024的offset; 是从最前面开始删除的
+# 12. 查看Broker磁盘信息kafka-log-dirs.sh
 
-12. 查看Broker磁盘信息kafka-log-dirs.sh
 查询指定topic磁盘信息--topic-list topic1,topic2
-
+```
 sh bin/kafka-log-dirs.sh --bootstrap-server xxxx:9090 --describe --topic-list test2
+```
 
 查询指定Broker磁盘信息--broker-list 0 broker1,broker2
-
+```
 sh bin/kafka-log-dirs.sh --bootstrap-server xxxxx:9090 --describe --topic-list test2 --broker-list 0
+```
 
-例如我一个3分区3副本的Topic的查出来的信息
-logDir Broker中配置的log.dir
-
+例如我一个3分区3副本的Topic的查出来的信息logDir Broker中配置的log.dir
+```
 {
 	"version": 1,
 	"brokers": [{
@@ -664,145 +667,89 @@ logDir Broker中配置的log.dir
 		}]
 	}]
 }
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
+```
+
 如果你觉得通过命令查询磁盘信息比较麻烦，你也可以通过 LogIKM 查看
 
+# 12. 消费者组管理 kafka-consumer-groups.sh
 
-12. 消费者组管理 kafka-consumer-groups.sh
 1. 查看消费者列表--list
+```
 sh bin/kafka-consumer-groups.sh --bootstrap-server xxxx:9090 --list
-
-
-先调用MetadataRequest拿到所有在线Broker列表
-再给每个Broker发送ListGroupsRequest请求获取 消费者组数据
+```
+- 先调用MetadataRequest拿到所有在线Broker列表
+- 再给每个Broker发送ListGroupsRequest请求获取 消费者组数据
 
 2. 查看消费者组详情--describe
-DescribeGroupsRequest
 
-查看消费组详情--group 或 --all-groups
+- DescribeGroupsRequest
+
+查看消费组详情`--group`或`--all-groups`
 
 查看指定消费组详情--group
+```
 sh bin/kafka-consumer-groups.sh --bootstrap-server xxxxx:9090 --describe --group test2_consumer_group
+```
 
 查看所有消费组详情--all-groups
+```
 sh bin/kafka-consumer-groups.sh --bootstrap-server xxxxx:9090 --describe --all-groups
+```
+
 查看该消费组 消费的所有Topic、及所在分区、最新消费offset、Log最新数据offset、Lag还未消费数量、消费者ID等等信息
 
 
-查询消费者成员信息--members
+**查询消费者成员信息--members**
 
 所有消费组成员信息
+```
 sh bin/kafka-consumer-groups.sh --describe --all-groups --members --bootstrap-server xxx:9090
+```
+
 指定消费组成员信息
+```
 sh bin/kafka-consumer-groups.sh --describe --members --group test2_consumer_group --bootstrap-server xxxx:9090
+```
 
-
-查询消费者状态信息--state
+**查询消费者状态信息--state**
 
 所有消费组状态信息
+```
 sh bin/kafka-consumer-groups.sh --describe --all-groups --state --bootstrap-server xxxx:9090
-指定消费组状态信息
-sh bin/kafka-consumer-groups.sh --describe --state --group test2_consumer_group --bootstrap-server xxxxx:9090
+```
 
+指定消费组状态信息
+```
+sh bin/kafka-consumer-groups.sh --describe --state --group test2_consumer_group --bootstrap-server xxxxx:9090
+```
 
 3. 删除消费者组--delete
-DeleteGroupsRequest
+- DeleteGroupsRequest
 
 删除消费组–delete
 
 删除指定消费组--group
+```
 sh bin/kafka-consumer-groups.sh --delete --group test2_consumer_group --bootstrap-server xxxx:9090
+```
+
 删除所有消费组--all-groups
+```
 sh bin/kafka-consumer-groups.sh --delete --all-groups --bootstrap-server xxxx:9090
+```
 
-PS: 想要删除消费组前提是这个消费组的所有客户端都停止消费/不在线才能够成功删除;否则会报下面异常
-
+**PS**: 想要删除消费组前提是这个消费组的所有客户端都停止消费/不在线才能够成功删除;否则会报下面异常
+```
 Error: Deletion of some consumer groups failed:
 * Group 'test2_consumer_group' could not be deleted due to: java.util.concurrent.ExecutionException: org.apache.kafka.common.errors.GroupNotEmptyException: The group is not empty.
+```
 
-1
-2
-3
 4. 重置消费组的偏移量 --reset-offsets
+
 能够执行成功的一个前提是 消费组这会是不可用状态;
 
 下面的示例使用的参数是: --dry-run ;这个参数表示预执行,会打印出来将要处理的结果;
+
 等你想真正执行的时候请换成参数--execute ;
 
 下面示例 重置模式都是 --to-earliest 重置到最早的;
@@ -812,43 +759,57 @@ Error: Deletion of some consumer groups failed:
 重置指定消费组的偏移量 --group
 
 重置指定消费组的所有Topic的偏移量--all-topic
+```
 sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --group test2_consumer_group --bootstrap-server xxxx:9090 --dry-run --all-topic
+```
+
 重置指定消费组的指定Topic的偏移量--topic
+```
 sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --group test2_consumer_group --bootstrap-server xxxx:9090 --dry-run --topic test2
+```
 
 重置所有消费组的偏移量 --all-group
 
 重置所有消费组的所有Topic的偏移量--all-topic
+```
 sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --all-group --bootstrap-server xxxx:9090 --dry-run --all-topic
-重置所有消费组中指定Topic的偏移量--topic
-sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --all-group --bootstrap-server xxxx:9090 --dry-run --topic test2
+```
 
---reset-offsets 后面需要接重置的模式
+重置所有消费组中指定Topic的偏移量--topic
+```
+sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --all-group --bootstrap-server xxxx:9090 --dry-run --topic test2
+```
+
+- --reset-offsets 后面需要接重置的模式
 
 相关重置Offset的模式
 
-参数	描述	例子
---to-earliest :	重置offset到最开始的那条offset(找到还未被删除最早的那个offset)	
---to-current:	直接重置offset到当前的offset，也就是LOE	
---to-latest：	重置到最后一个offset	
---to-datetime:	重置到指定时间的offset;格式为:YYYY-MM-DDTHH:mm:SS.sss;	--to-datetime "2021-6-26T00:00:00.000"
---to-offset	重置到指定的offset,但是通常情况下,匹配到多个分区,这里是将匹配到的所有分区都重置到这一个值; 如果 1.目标最大offset<--to-offset, 这个时候重置为目标最大offset；2.目标最小offset>--to-offset ，则重置为最小; 3.否则的话才会重置为--to-offset的目标值; 一般不用这个	--to-offset 3465 
---shift-by	按照偏移量增加或者减少多少个offset；正的为往前增加;负的往后退；当然这里也是匹配所有的;	--shift-by 100 、--shift-by -100
---from-file	根据CVS文档来重置; 这里下面单独讲解	
---from-file着重讲解一下
+| 参数 | 描述 | 例子 |
+|------|-----|------|
+| --to-earliest | 重置offset到最开始的那条offset(找到还未被删除最早的那个offset) | |
+| --to-current | 直接重置offset到当前的offset，也就是LOE | |
+| --to-latest | 重置到最后一个offset | |
+| --to-datetime | 重置到指定时间的offset;格式为:YYYY-MM-DDTHH:mm:SS.sss; | --to-datetime "2021-6-26T00:00:00.000" |
+| --to-offset | 重置到指定的offset,但是通常情况下,匹配到多个分区,这里是将匹配到的所有分区都重置到这一个值; 如果 1.目标最大offset<--to-offset, 这个时候重置为目标最大offset；2.目标最小offset>--to-offset ，则重置为最小; 3.否则的话才会重置为--to-offset的目标值; 一般不用这个 | --to-offset 3465  |
+| --shift-by | 按照偏移量增加或者减少多少个offset；正的为往前增加;负的往后退；当然这里也是匹配所有的; | --shift-by 100 、--shift-by -100 |
+| --from-file | 根据CVS文档来重置; 这里下面单独讲解 |  |
 
-上面其他的一些模式重置的都是匹配到的所有分区; 不能够每个分区重置到不同的offset；不过**--from-file**可以让我们更灵活一点;
+- --from-file着重讲解一下
 
-先配置cvs文档
+上面其他的一些模式重置的都是匹配到的所有分区; 不能够每个分区重置到不同的offset；不过 **--from-file** 可以让我们更灵活一点;
+
+1.先配置cvs文档
 格式为: Topic:分区号: 重置目标偏移量
+```
 test2,0,100
 test2,1,200
 test2,2,300
-1
-2
-3
-执行命令
+```
+
+2.执行命令
+```
 sh bin/kafka-consumer-groups.sh --reset-offsets --group test2_consumer_group --bootstrap-server xxxx:9090 --dry-run --from-file config/reset-offset.csv
+```
 
 5. 删除偏移量delete-offsets
 能够执行成功的一个前提是 消费组这会是不可用状态;
