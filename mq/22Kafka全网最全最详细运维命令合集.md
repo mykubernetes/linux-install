@@ -1,3 +1,4 @@
+https://kafka.apachecn.org/documentation.html#configuration
 
 ```
 kafka　　　　　　　　　　　　　　                   Kafka 根目录
