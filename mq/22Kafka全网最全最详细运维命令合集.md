@@ -809,6 +809,7 @@ sh bin/kafka-consumer-groups.sh --delete-offsets --group test2_consumer_group2 -
 相关可选参数
 
 | 参数 | 描述 | 例子 |
+|-----|------|------|
 | --bootstrap-server | 指定连接到的kafka服务; | –bootstrap-server localhost:9092 |
 | --list | 列出所有消费组名称 | --list |
 | --describe | 查询消费者描述信息 | --describe |
