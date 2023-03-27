@@ -673,14 +673,14 @@ sh bin/kafka-log-dirs.sh --bootstrap-server xxxxx:9090 --describe --topic-list t
 
 # 12. 消费者组管理 kafka-consumer-groups.sh
 
-1. 查看消费者列表--list
+## 12.1. 查看消费者列表--list
 ```
 sh bin/kafka-consumer-groups.sh --bootstrap-server xxxx:9090 --list
 ```
 - 先调用MetadataRequest拿到所有在线Broker列表
 - 再给每个Broker发送ListGroupsRequest请求获取 消费者组数据
 
-2. 查看消费者组详情--describe
+## 12.2. 查看消费者组详情--describe
 
 - DescribeGroupsRequest
 
@@ -723,7 +723,7 @@ sh bin/kafka-consumer-groups.sh --describe --all-groups --state --bootstrap-serv
 sh bin/kafka-consumer-groups.sh --describe --state --group test2_consumer_group --bootstrap-server xxxxx:9090
 ```
 
-3. 删除消费者组--delete
+## 12.3. 删除消费者组--delete
 - DeleteGroupsRequest
 
 删除消费组–delete
@@ -744,43 +744,29 @@ Error: Deletion of some consumer groups failed:
 * Group 'test2_consumer_group' could not be deleted due to: java.util.concurrent.ExecutionException: org.apache.kafka.common.errors.GroupNotEmptyException: The group is not empty.
 ```
 
-4. 重置消费组的偏移量 --reset-offsets
+## 12.4. 重置消费组的偏移量 --reset-offsets
 
-能够执行成功的一个前提是 消费组这会是不可用状态;
+能够执行成功的一个前提是 消费组这会是不可用状态;下面的示例使用的参数是:`--dry-run`;这个参数表示预执行,会打印出来将要处理的结果;等你想真正执行的时候请换成参数`--execute`;下面示例 重置模式都是`--to-earliest`重置到最早的;请根据需要参考下面 相关重置`Offset`的模式 换成其他模式;
 
-下面的示例使用的参数是: --dry-run ;这个参数表示预执行,会打印出来将要处理的结果;
-
-等你想真正执行的时候请换成参数--execute ;
-
-下面示例 重置模式都是 --to-earliest 重置到最早的;
-
-请根据需要参考下面 相关重置Offset的模式 换成其他模式;
-
-重置指定消费组的偏移量 --group
-
+- 重置指定消费组的偏移量 --group
+```
 重置指定消费组的所有Topic的偏移量--all-topic
-```
 sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --group test2_consumer_group --bootstrap-server xxxx:9090 --dry-run --all-topic
-```
 
 重置指定消费组的指定Topic的偏移量--topic
-```
 sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --group test2_consumer_group --bootstrap-server xxxx:9090 --dry-run --topic test2
 ```
 
-重置所有消费组的偏移量 --all-group
-
+- 重置所有消费组的偏移量 --all-group
+```
 重置所有消费组的所有Topic的偏移量--all-topic
-```
 sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --all-group --bootstrap-server xxxx:9090 --dry-run --all-topic
-```
 
 重置所有消费组中指定Topic的偏移量--topic
-```
 sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --all-group --bootstrap-server xxxx:9090 --dry-run --topic test2
 ```
 
-- --reset-offsets 后面需要接重置的模式
+- --reset-offsets 后面需要接**重置的模式**
 
 相关重置Offset的模式
 
@@ -794,7 +780,7 @@ sh bin/kafka-consumer-groups.sh --reset-offsets --to-earliest --all-group --boot
 | --shift-by | 按照偏移量增加或者减少多少个offset；正的为往前增加;负的往后退；当然这里也是匹配所有的; | --shift-by 100 、--shift-by -100 |
 | --from-file | 根据CVS文档来重置; 这里下面单独讲解 |  |
 
-- --from-file着重讲解一下
+- --from-file**着重讲解一下**
 
 上面其他的一些模式重置的都是匹配到的所有分区; 不能够每个分区重置到不同的offset；不过 **--from-file** 可以让我们更灵活一点;
 
@@ -811,181 +797,196 @@ test2,2,300
 sh bin/kafka-consumer-groups.sh --reset-offsets --group test2_consumer_group --bootstrap-server xxxx:9090 --dry-run --from-file config/reset-offset.csv
 ```
 
-5. 删除偏移量delete-offsets
+## 12.5. 删除偏移量delete-offsets
+
 能够执行成功的一个前提是 消费组这会是不可用状态;
 
 偏移量被删除了之后,Consumer Group下次启动的时候,会从头消费;
-
+```
 sh bin/kafka-consumer-groups.sh --delete-offsets --group test2_consumer_group2 --bootstrap-server XXXX:9090 --topic test2
+```
 
 相关可选参数
 
-参数	描述	例子
---bootstrap-server	指定连接到的kafka服务;	–bootstrap-server localhost:9092
---list	列出所有消费组名称	--list
---describe	查询消费者描述信息	--describe
---group	指定消费组	
---all-groups	指定所有消费组	
---members	查询消费组的成员信息	
---state	查询消费者的状态信息	
---offsets	在查询消费组描述信息的时候,这个参数会列出消息的偏移量信息; 默认就会有这个参数的;	
-dry-run	重置偏移量的时候,使用这个参数可以让你预先看到重置情况，这个时候还没有真正的执行,真正执行换成--excute;默认为dry-run	
---excute	真正的执行重置偏移量的操作;	
---to-earliest	将offset重置到最早	
-to-latest	将offset重置到最近	
-13.查看日志文件 kafka-dump-log.sh
-参数	描述	例子
---deep-iteration		
---files <String: file1, file2, ...>	必需; 读取的日志文件	–files 0000009000.log
---key-decoder-class	如果设置，则用于反序列化键。这类应实现kafka.serializer。解码器特性。自定义jar应该是在kafka/libs目录中提供	
---max-message-size	最大的数据量,默认：5242880	
---offsets-decoder	if set, log data will be parsed as offset data from the __consumer_offsets topic.	
---print-data-log	打印内容	
---transaction-log-decoder	if set, log data will be parsed as transaction metadata from the __transaction_state topic	
---value-decoder-class [String]	if set, used to deserialize the messages. This class should implement kafka. serializer.Decoder trait. Custom jar should be available in kafka/libs directory. (default: kafka.serializer. StringDecoder)	
---verify-index-only	if set, just verify the index log without printing its content.	
+| 参数 | 描述 | 例子 |
+| --bootstrap-server | 指定连接到的kafka服务; | –bootstrap-server localhost:9092 |
+| --list | 列出所有消费组名称 | --list |
+| --describe | 查询消费者描述信息 | --describe |
+| --group | 指定消费组 |  |
+| --all-groups | 指定所有消费组 |  |
+| --members | 查询消费组的成员信息 |  |
+| --state | 查询消费者的状态信息 |  |
+| --offsets | 在查询消费组描述信息的时候,这个参数会列出消息的偏移量信息; 默认就会有这个参数的; |  |
+| --dry-run | 重置偏移量的时候,使用这个参数可以让你预先看到重置情况，这个时候还没有真正的执行,真正执行换成`--excute`;默认为`dry-run` |  |
+| --excute | 真正的执行重置偏移量的操作; |  |
+| --to-earliest | 将offset重置到最早 |  |
+| --to-latest | 将offset重置到最近 |  |
+
+# 13.查看日志文件 kafka-dump-log.sh
+
+| 参数 | 描述 | 例子 |
+|-----|------|------|
+| --deep-iteration |  |
+| --files `<String: file1, file2, ...>` | 必需; 读取的日志文件 | --files 0000009000.log |
+| --key-decoder-class | 如果设置，则用于反序列化键。这类应实现kafka.serializer。解码器特性。自定义jar应该是在kafka/libs目录中提供 | |
+| --max-message-size | 最大的数据量,默认：5242880 | |
+| --offsets-decoder | `if set, log data will be parsed as offset data from the __consumer_offsets topic.` | |
+| --print-data-log | 打印内容 | |
+| --transaction-log-decoder | `if set, log data will be parsed as transaction metadata from the __transaction_state topic` | |
+| --value-decoder-class [String] | if set, used to deserialize the messages. This class should implement kafka. serializer.Decoder trait. Custom jar should be available in kafka/libs directory. (default: kafka.serializer. StringDecoder) | |
+| --verify-index-only | if set, just verify the index log without printing its content.	 | |
+
 查询Log文件
-
+```
 sh bin/kafka-dump-log.sh --files kafka-logs-0/test2-0/00000000000000000300.log
-
+```
 
 查询Log文件具体信息 --print-data-log
-
+```
 sh bin/kafka-dump-log.sh --files kafka-logs-0/test2-0/00000000000000000300.log --print-data-log
-
+```
 
 查询index文件具体信息
-
+```
 sh bin/kafka-dump-log.sh --files kafka-logs-0/test2-0/00000000000000000300.index
-
+```
 配置项为log.index.size.max.bytes； 来控制创建索引的大小;
 
 查询timeindex文件
-
+```
 sh bin/kafka-dump-log.sh --files kafka-logs-0/test2-0/00000000000000000300.timeindex
+```
 
+# 附件
 
-附件
-ConfigCommand 的一些可选配置
+- ConfigCommand 的一些可选配置
 
-Topic相关可选配置
+## Topic相关可选配置
 
-key	value	示例
-cleanup.policy	清理策略	
-compression.type	压缩类型(通常建议在produce端控制)	
-delete.retention.ms	压缩日志的保留时间	
-file.delete.delay.ms	topic删除被标记为–delete文件之后延迟多长时间删除正在的Log文件	60000
-flush.messages	持久化message限制	
-flush.ms	持久化频率	
-follower.replication.throttled.replicas	flowwer副本限流 格式：分区号:副本follower号,分区号:副本follower号	0:1,1:1
-index.interval.bytes		
-leader.replication.throttled.replicas	leader副本限流 格式：分区号:副本Leader号	0:0
-max.compaction.lag.ms		
-max.message.bytes	最大的batch的message大小	
-message.downconversion.enable	message是否向下兼容	
-message.format.version	message格式版本	
-message.timestamp.difference.max.ms		
-message.timestamp.type		
-min.cleanable.dirty.ratio		
-min.compaction.lag.ms		
-min.insync.replicas	最小的ISR	
-preallocate		
-retention.bytes	日志保留大小(通常按照时间限制)	
-retention.ms	日志保留时间	
-segment.bytes	segment的大小限制	
-segment.index.bytes		
-segment.jitter.ms		
-segment.ms	segment的切割时间	
-unclean.leader.election.enable	是否允许非同步副本选主	
-Broker相关可选配置
+| key | value | 示例 |
+|-----|-------|-----|
+| cleanup.policy | 清理策略 | |
+| compression.type | 压缩类型(通常建议在produce端控制) | |
+| delete.retention.ms | 压缩日志的保留时间 | |
+| file.delete.delay.ms | topic删除被标记为–delete文件之后延迟多长时间删除正在的Log文件 | 60000 |
+| flush.messages | 持久化message限制 |
+| flush.ms | 持久化频率 |
+| follower.replication.throttled.replicas | flowwer副本限流 格式：分区号:副本follower号,分区号:副本follower号 | 0:1,1:1 |
+| index.interval.bytes	 |  |
+| leader.replication.throttled.replicas | leader副本限流 格式：分区号:副本Leader号 | 0:0 |
+| max.compaction.lag.ms	 |  |
+| max.message.bytes | 最大的batch的message大小 |
+| message.downconversion.enable | message是否向下兼容 |
+| message.format.version | message格式版本 |
+| message.timestamp.difference.max.ms |  |
+| message.timestamp.type |  |
+| min.cleanable.dirty.ratio |  |
+| min.compaction.lag.ms |  |
+| min.insync.replicas | 最小的ISR |  |
+| preallocate |  |
+| retention.bytes | 日志保留大小(通常按照时间限制) |  |
+| retention.ms | 日志保留时间 |  |
+| segment.bytes | segment的大小限制 |  |
+| segment.index.bytes |  |
+| segment.jitter.ms |  |
+| segment.ms | segment的切割时间 |  |
+| unclean.leader.election.enable | 是否允许非同步副本选主 |
 
-key	value	示例
-advertised.listeners		
-background.threads		
-compression.type		
-follower.replication.throttled.rate		
-leader.replication.throttled.rate		
-listener.security.protocol.map		
-listeners		
-log.cleaner.backoff.ms		
-log.cleaner.dedupe.buffer.size		
-log.cleaner.delete.retention.ms		
-log.cleaner.io.buffer.load.factor		
-log.cleaner.io.buffer.size		
-log.cleaner.io.max.bytes.per.second		
-log.cleaner.max.compaction.lag.ms		
-log.cleaner.min.cleanable.ratio		
-log.cleaner.min.compaction.lag.ms		
-log.cleaner.threads		
-log.cleanup.policy		
-log.flush.interval.messages		
-log.flush.interval.ms		
-log.index.interval.bytes		
-log.index.size.max.bytes		
-log.message.downconversion.enable		
-log.message.timestamp.difference.max.ms		
-log.message.timestamp.type		
-log.preallocate		
-log.retention.bytes		
-log.retention.ms		
-log.roll.jitter.ms		
-log.roll.ms		
-log.segment.bytes		
-log.segment.delete.delay.ms		
-max.connections		
-max.connections.per.ip		
-max.connections.per.ip.overrides		
-message.max.bytes		
-metric.reporters		
-min.insync.replicas		
-num.io.threads		
-num.network.threads		
-num.recovery.threads.per.data.dir		
-num.replica.fetchers		
-principal.builder.class		
-replica.alter.log.dirs.io.max.bytes.per.second		
-sasl.enabled.mechanisms		
-sasl.jaas.config		
-sasl.kerberos.kinit.cmd		
-sasl.kerberos.min.time.before.relogin		
-sasl.kerberos.principal.to.local.rules		
-sasl.kerberos.service.name		
-sasl.kerberos.ticket.renew.jitter		
-sasl.kerberos.ticket.renew.window.factor		
-sasl.login.refresh.buffer.seconds		
-sasl.login.refresh.min.period.seconds		
-sasl.login.refresh.window.factor		
-sasl.login.refresh.window.jitter		
-sasl.mechanism.inter.broker.protocol		
-ssl.cipher.suites		
-ssl.client.auth		
-ssl.enabled.protocols		
-ssl.endpoint.identification.algorithm		
-ssl.key.password		
-ssl.keymanager.algorithm		
-ssl.keystore.location		
-ssl.keystore.password		
-ssl.keystore.type		
-ssl.protocol		
-ssl.provider		
-ssl.secure.random.implementation		
-ssl.trustmanager.algorithm		
-ssl.truststore.location		
-ssl.truststore.password		
-ssl.truststore.type		
-unclean.leader.election.enable		
+## Broker相关可选配置
+
+| key | value | 示例 |
+|-----|-------|------|
+| advertised.listeners |  |
+| background.threads |  |
+| compression.type |  |
+| follower.replication.throttled.rate |  |
+| leader.replication.throttled.rate |  |
+| listener.security.protocol.map |  |
+| listeners |  |
+| log.cleaner.backoff.ms |  |
+| log.cleaner.dedupe.buffer.size |  |
+| log.cleaner.delete.retention.ms |  |
+| log.cleaner.io.buffer.load.factor |  |
+| log.cleaner.io.buffer.size |  |
+| log.cleaner.io.max.bytes.per.second |  |
+| log.cleaner.max.compaction.lag.ms |  |
+| log.cleaner.min.cleanable.ratio |  |
+| log.cleaner.min.compaction.lag.ms |  |
+| log.cleaner.threads |  |
+| log.cleanup.policy |  |
+| log.flush.interval.messages |  |
+| log.flush.interval.ms |  |
+| log.index.interval.bytes |  |
+| log.index.size.max.bytes |  |
+| log.message.downconversion.enable |  |
+| log.message.timestamp.difference.max.ms |  |
+| log.message.timestamp.type |  |
+| log.preallocate |  |
+| log.retention.bytes |  |
+| log.retention.ms |  |
+| log.roll.jitter.ms |  |
+| log.roll.ms |  |
+| log.segment.bytes |  |
+| log.segment.delete.delay.ms |  |
+| max.connections |  |
+| max.connections.per.ip |  |
+| max.connections.per.ip.overrides |  |
+| message.max.bytes |  |
+| metric.reporters |  |
+| min.insync.replicas |  |
+| num.io.threads |  |
+| num.network.threads |  |
+| num.recovery.threads.per.data.dir |  |
+| num.replica.fetchers |  |
+| principal.builder.class |  |
+| replica.alter.log.dirs.io.max.bytes.per.second |  |
+| sasl.enabled.mechanisms |  |
+| sasl.jaas.config |  |
+| sasl.kerberos.kinit.cmd |  |
+| sasl.kerberos.min.time.before.relogin |  |
+| sasl.kerberos.principal.to.local.rules |  |
+| sasl.kerberos.service.name |  |
+| sasl.kerberos.ticket.renew.jitter |  |
+| sasl.kerberos.ticket.renew.window.factor |  |
+| sasl.login.refresh.buffer.seconds |  |
+| sasl.login.refresh.min.period.seconds |  |
+| sasl.login.refresh.window.factor |  |
+| sasl.login.refresh.window.jitter |  |
+| sasl.mechanism.inter.broker.protocol |  |
+| ssl.cipher.suites |  |
+| ssl.client.auth |  |
+| ssl.enabled.protocols |  |
+| ssl.endpoint.identification.algorithm |  |
+| ssl.key.password |  |
+| ssl.keymanager.algorithm |  |
+| ssl.keystore.location |  |
+| ssl.keystore.password |  |
+| ssl.keystore.type |  |
+| ssl.protocol |  |
+| ssl.provider |  |
+| ssl.secure.random.implementation |  |
+| ssl.trustmanager.algorithm |  |
+| ssl.truststore.location |  |
+| ssl.truststore.password |  |
+| ssl.truststore.type |  |
+| unclean.leader.election.enable |  |
+
 Users相关可选配置
 
-key	value	示例
-SCRAM-SHA-256		
-SCRAM-SHA-512		
-consumer_byte_rate	针对消费者user进行限流	
-producer_byte_rate	针对生产者进行限流	
-request_percentage	请求百分比	
-clients相关可选配置
+| key | value | 示例 |
+|-----|-------|------|
+| SCRAM-SHA-256 |  |
+| SCRAM-SHA-512 |  |
+| consumer_byte_rate | 针对消费者user进行限流 |
+| producer_byte_rate | 针对生产者进行限流 |
+| request_percentage | 请求百分比 |
 
-key	value	示例
-consumer_byte_rate		
-producer_byte_rate		
-request_percentage		
+## clients相关可选配置
+
+| key | value | 示例 |
+|-----|-------|------|
+| consumer_byte_rate |  |
+| producer_byte_rate |  |
+| request_percentage |  |
+
 以上大部分运维操作,都可以使用 LogI-Kafka-Manager 在平台上可视化操作;
