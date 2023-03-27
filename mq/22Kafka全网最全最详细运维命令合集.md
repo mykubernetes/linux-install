@@ -1,4 +1,5 @@
-https://kafka.apachecn.org/documentation.html#configuration
+- https://kafka.apachecn.org/documentation.html#configuration
+- https://cloud.tencent.com/developer/article/2168461
 
 ```
 kafka　　　　　　　　　　　　　　                   Kafka 根目录
