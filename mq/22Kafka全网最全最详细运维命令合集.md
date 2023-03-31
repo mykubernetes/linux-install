@@ -64,6 +64,8 @@ kafka　　　　　　　　　　　　　　                   Kafka 根目�
 
 # 1.TopicCommand
 
+http://kafka.apachecn.org/documentation.html#topicconfigs
+
 ## 1.1.Topic创建
 ```
 bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 3 --partitions 3 --topic test
@@ -78,8 +80,15 @@ bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-fac
 | --replication-factor | 副本数量,注意不能大于broker数量;如果不提供,则会用集群中默认配置 | --replication-factor 3 |
 | --partitions | 分区数量,当创建或者修改topic的时候,用这个来指定分区数;如果创建的时候没有提供参数,则用集群中默认值; 注意如果是修改的时候,分区比之前小会有问题 | --partitions 3 |
 | --replica-assignment | 副本分区分配方式;创建topic的时候可以自己指定副本分配情况; | --replica-assignment BrokerId-0:BrokerId-1:BrokerId-2,BrokerId-1:BrokerId-2:BrokerId-0,BrokerId-2:BrokerId-1:BrokerId-0 ; 这个意思是有三个分区和三个副本,对应分配的Broker; 逗号隔开标识分区;冒号隔开表示副本 |
-| --config `<String: name=value>` | 用来设置topic级别的配置以覆盖默认配置;只在–create 和–bootstrap-server 同时使用时候生效; 可以配置的参数列表请看文末附件 | 例如覆盖两个配置 --config retention.bytes=123455 --config retention.ms=600001 |
+| --config `<String: name=value>` | 用来设置topic级别的配置以覆盖默认配置;只在`--create`和`--bootstrap-server`同时使用时候生效; 可以配置的参数列表请看文末附件 | 例如覆盖两个配置 --config retention.bytes=123455 --config retention.ms=600001 |
 | --command-config `<String: command 文件路径>` | 用来配置客户端Admin Client启动配置,只在–bootstrap-server 同时使用时候生效; | 例如:设置请求的超时时间 --command-config config/producer.proterties; 然后在文件中配置 request.timeout.ms=300000 |
+| --topic | 主题名称 |  |
+| --alter | 修改分区，副本，配置 |  |
+| --create | 创建主题 |  |
+| --delete | 删除主题 |  |
+| --list | 列出所有的可用主题 | |
+| --describe | 列出主题的详细信息 |  |
+| --exclude-internal | 使用`--list` `--describe`命令时是否列出内部主题，默认列出内部主题 |  |
 
 ## 1.2.删除Topic
 ```
