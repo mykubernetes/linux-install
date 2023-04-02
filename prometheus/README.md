@@ -2,6 +2,8 @@ https://blog.csdn.net/han949417140/article/details/112462319
 
 https://blog.csdn.net/qq_42883074/category_10860341.html
 
+https://www.cnblogs.com/RainFate/p/16888883.html
+
 官网: https://github.com/prometheus-community
 
 | 名称 | 地址 | 说明 |
