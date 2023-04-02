@@ -95,3 +95,5 @@ CMD        [ "--config.file=/etc/prometheus/prometheus.yml", \
         read_only: true
 ```
 
+参考：
+- https://prometheus.io/docs/guides/basic-auth/#securing-prometheus-api-and-ui-endpoints-using-basic-auth
