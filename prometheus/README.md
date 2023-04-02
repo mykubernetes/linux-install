@@ -2,6 +2,8 @@ https://blog.csdn.net/han949417140/article/details/112462319
 
 https://blog.csdn.net/qq_42883074/category_10860341.html
 
+官网: https://github.com/prometheus-community
+
 | 名称 | 地址 | 说明 |
 |-----|------|-----|
 | 官方采集组件 | https://prometheus.io/download/ | 包含prometheus、alertmanager、blackbox_exporter、consul_exporter、graphite_exporter、haproxy_exporter、memcached_exporter、mysqld_exporter、node_exporter、pushgateway、statsd_exporter等组件 |
