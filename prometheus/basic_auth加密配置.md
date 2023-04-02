@@ -97,3 +97,4 @@ CMD        [ "--config.file=/etc/prometheus/prometheus.yml", \
 
 参考：
 - https://prometheus.io/docs/guides/basic-auth/#securing-prometheus-api-and-ui-endpoints-using-basic-auth
+- https://blog.csdn.net/baidu_35848778/article/details/125198561
