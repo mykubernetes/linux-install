@@ -426,3 +426,6 @@ MAILTO=root
 
 0 0 * * * root curator --config /opt/curator/config.yml /opt/curator/action.yml
 ```
+
+示例：
+- https://www.elastic.co/guide/en/elasticsearch/client/curator/current/examples.html
