@@ -45,6 +45,8 @@ ES  内置的REST 接口
 | `GET /_tasks` | 查看集群中正在执行的task信息 |
 
 一、使用_cat系列
+
+官网：https://www.elastic.co/guide/en/elasticsearch/reference/8.7/cat.html
 ---
 _cat系列提供了一系列查询elasticsearch集群状态的接口。  
 ```
@@ -138,6 +140,9 @@ epoch      timestamp cluster    status node.total node.data shards pri relo init
 ```
 
 # 二、使用_cluster系列  
+
+
+官网： https://www.elastic.co/guide/en/elasticsearch/reference/8.7/cluster.html
 
 查看集群概要信息：
 ```
