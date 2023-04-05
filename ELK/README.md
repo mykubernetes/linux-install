@@ -11,6 +11,7 @@
 | 告警 | https://blog.csdn.net/mnasd/article/details/123033989 |
 | es相关大全 | https://blog.csdn.net/ubuntutouch/category_11324750.html |
 | 博客 | https://cn-blogs.cn/ |
+| ELK STACK | http://www.dbaselife.com/project-16/ |
 
 # 使用curl命令操作elasticsearch
 
