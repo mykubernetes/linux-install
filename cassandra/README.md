@@ -60,6 +60,7 @@ best practice: 重启node前先使用nodetool flush memtable，这样可以减�
 # nodetool常用命令
 
 - https://docs.datastax.com/en/archived/cassandra/2.2/cassandra/tools/toolsNodetool.html
+- https://cassandra.apache.org/doc/latest/cassandra/tools/nodetool/nodetool.html
 
 | 命令参数 | 描述|
 |---------|-----|
