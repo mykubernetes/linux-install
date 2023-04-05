@@ -148,3 +148,7 @@ WantedBy=multi-user.target
 systemctl start elastalert2
 systemctl status elastalert2
 ```
+
+参考：
+- http://www.dbaselife.com/doc/1689/
+- https://www.fushisanlang.cn/article/ac5d36df.html
