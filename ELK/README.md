@@ -44,11 +44,11 @@ ES  内置的REST 接口
 | `GET /_cluster/settings` | 查看集群层面settings设置信息 |
 | `GET /_tasks` | 查看集群中正在执行的task信息 |
 
-一、使用_cat系列
+# 一、使用_cat系列
 
 官网：https://www.elastic.co/guide/en/elasticsearch/reference/8.7/cat.html
----
-_cat系列提供了一系列查询elasticsearch集群状态的接口。  
+
+`_cat`系列提供了一系列查询elasticsearch集群状态的接口。  
 ```
 curl -XGET localhost:9200/_cat
 获取所有_cat系列的操作
