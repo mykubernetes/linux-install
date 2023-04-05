@@ -1,6 +1,6 @@
 ElastAlert是一个开源的工具,用于从Elastisearch中检索数据,并根据匹配模式发出告警。  
 github项目地址如下:https://github.com/Yelp/elastalert  
-官方文档如下:https://elastalert.readthedocs.io/en/latest/elastalert.html  
+官方文档如下:https://elastalert.readthedocs.io/en/latest/elastalert.html  https://elastalert2.readthedocs.io/en/latest/index.html
 
 它支持多种监控模式和告警方式,具体可以查阅Github项目介绍.但是自带的ElastAlert并不支持钉钉告警,在github上有第三方的钉钉python项目。地址如下:https://github.com/xuyaoqiang/elastalert-dingtalk-plugin
 
