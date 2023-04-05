@@ -199,3 +199,5 @@ crontab -e
 # 每天中午12执行任务
 0 12 * * * /usr/local/bin/curator --config ~/.curator/curator.yml ~/.curator/action.yml
 ```
+
+[参考](https://www.feiyiblog.com/2021/09/01/elasticsearch%E5%8F%AA%E4%BF%9D%E7%95%99%E5%BD%93%E5%A4%A9%E7%9A%84%E6%95%B0%E6%8D%AE/)
