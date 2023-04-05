@@ -6,6 +6,7 @@
 | 博客 | https://blog.51cto.com/michaelkang/p_2 |
 | 博客 | http://zqhxuyuan.github.io/2015/10/15/Cassandra-Daily/#%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C |
 | 博客 | https://blog.csdn.net/Aria_Miazzy/article/details/107499636?spm=1001.2014.3001.5501 |
+| 官网 | https://cassandra.apache.org/doc/latest/ |
 
 1、Cassandra概述
 
