@@ -14,7 +14,18 @@ etcd 是 CoreOS 团队于 2013 年 6月发起的开源项目，它的目标是�
 - 快速：根据官方提供的benchmark数据，单实例支持每秒2k+读操作
 - 可靠：采用raft算法，实现分布式系统数据的可用性和一致性
 
-3、概念术语
+3、架构解析
+
+按照分层模型，etcd可分为Client层、API网络层、Raft算法层、逻辑层和存储层。这些层的功能如下:
+- Client层: Client层包括client v2和v3两个大版本APl客户端库，提供了简洁易用的API，同时支持负载均衡、节点间故障自动转移，可极大降低业务使用etcd复杂度，提升开发效率、服务可用性。
+- API网络层: API网络层主要包括client访问server和server节点之间的通信协议。一方面，client访问etcd server的API分为v2和v3两个大版本。v2API使用HTTP/1.x协议，v3 API使用gRPC协议。同时v3通过etcd grpc-gateway组件也支持 HTTP/1.x协议，便于各种语言的服务调用。另一方面， server之间通信协议，是指节点间通过Raft算法实现数据复制和Leader 选举等功能时使用的HTTP协议。
+- Raft 算法层: Raft算法层实现了Leader 选举、日志复制、ReadIndex等核心算法特性，用于保障etcd多个节点间的数据一致性、提升服务可用性等，是etcd的基石和亮点。
+功能逻辑层:  etcd核心特性实现层，如典型的KVServer模块、MVCC模块、 Auth鉴权模块、Lease租约模块、Compactor压缩模块等，其中MVCC模块主要由treelndex模块和boltdb 模块组成。
+- Store存储层: 存储层包含预写日志(WAL)模块、快照(Snapshot)模块、boltdb模块。其中WAL可保障etcd crash后数据不丢失，boltdb则保存了集群元数据和用户写入的数据。
+
+一个用户的请求发送过来，会经由 HTTP Server 转发给 Store 进行具体的事务处理，如果涉及到节点的修改，则交给 Raft 模块进行状态的变更、日志的记录，然后再同步给别的 etcd 节点以确认数据提交，最后进行数据的提交，再次同步。
+
+4、概念术语
 - Raft：etcd所采用的保证分布式系统强一致性的算法。
 - Node：一个Raft状态机实例。
 - Member：一个etcd实例。它管理着一个Node，并且可以为客户端请求提供服务。
@@ -30,7 +41,7 @@ etcd 是 CoreOS 团队于 2013 年 6月发起的开源项目，它的目标是�
 - Term：某个节点成为Leader到下一次竞选时间，称为一个Term。
 - Index：数据项编号。Raft中通过Term和Index来定位数据。
 
-4、数据读写顺序
+5、数据读写顺序
 
 为了保证数据的强一致性，etcd 集群中所有的数据流向都是一个方向，从 Leader （主节点）流向 Follower，也就是所有 Follower 的数据必须与 Leader 保持一致，如果不一致会被覆盖。
 
@@ -38,14 +49,14 @@ etcd 是 CoreOS 团队于 2013 年 6月发起的开源项目，它的目标是�
 - 读取：由于集群所有节点数据是强一致性的，读取可以从集群中随便哪个节点进行读取数据
 - 写入：etcd 集群有 leader，如果写入往 leader 写入，可以直接写入，然后然后Leader节点会把写入分发给所有 Follower，如果往 follower 写入，然后Leader节点会把写入分发给所有 Follower
 
-5、leader 选举
+6、leader 选举
 
 假设三个节点的集群，三个节点上均运行 Timer（每个 Timer 持续时间是随机的），Raft算法使用随机 Timer 来初始化 Leader 选举流程，第一个节点率先完成了 Timer，随后它就会向其他两个节点发送成为 Leader 的请求，其他节点接收到请求后会以投票回应然后第一个节点被选举为 Leader。
 
 成为 Leader 后，该节点会以固定时间间隔向其他节点发送通知，确保自己仍是Leader。有些情况下当 Follower 们收不到 Leader 的通知后，比如说 Leader 节点宕机或者失去了连接，其他节点会重复之前选举过程选举出新的 Leader。
 
 
-6、判断数据是否写入
+7、判断数据是否写入
 
 etcd 认为写入请求被 Leader 节点处理并分发给了多数节点后，就是一个成功的写入。那么多少节点如何判定呢，假设总结点数是 N，那么多数节点 Quorum=N/2+1。关于如何确定 etcd 集群应该有多少个节点的问题，上图的左侧的图表给出了集群中节点总数(Instances)对应的 Quorum 数量，用 Instances 减去 Quorom 就是集群中容错节点（允许出故障的节点）的数量。
 
