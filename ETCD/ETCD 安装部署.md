@@ -77,6 +77,7 @@ listen-client-urls: 'http://192.168.10.128:2379,http://127.0.0.1:2379'
 - 除了可以使用配置文件指定配置外，也可以直接通过命令行参数指定配置，常用的命令行参数如下(推荐使用配置文件)，命令行参数参考文档：https://etcd.io/docs/v3.5/op-guide/configuration/ ，配置文件参考文档：https://github.com/etcd-io/etcd/blob/main/etcd.conf.yml.sample
 
 | 参数 | 说明 |
+|------|-----|
 | --name | etcd节点名字如果在集群环境中，name必须是唯一的，建议用主机名称或者机器ID。 |
 | --data-dir | 数据存储目录 |
 | --initial-cluster | etcd启动的时候，通过这个配置找到其他ectd节点的地址列表，格式：`节点名字1=http://节点ip1:2380,节点名字1=http://节点ip1:2380,.....` |
