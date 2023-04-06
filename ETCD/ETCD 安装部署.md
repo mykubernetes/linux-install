@@ -74,17 +74,17 @@ listen-client-urls: 'http://192.168.10.128:2379,http://127.0.0.1:2379'
 [root@linux9 ~]# systemctl enable etcd 
 ```
 
-- 除了可以使用配置文件指定配置外，也可以直接通过命令行参数指定配置，常用的命令行参数如下(推荐使用配置文件)，命令行参数参考文档：https://etcd.io/docs/v3.5/op-guide/configuration/，配置文件参考文档：https://github.com/etcd-io/etcd/blob/main/etcd.conf.yml.sample
+- 除了可以使用配置文件指定配置外，也可以直接通过命令行参数指定配置，常用的命令行参数如下(推荐使用配置文件)，命令行参数参考文档：https://etcd.io/docs/v3.5/op-guide/configuration/ ，配置文件参考文档：https://github.com/etcd-io/etcd/blob/main/etcd.conf.yml.sample
 
 | 参数 | 说明 |
 | --name | etcd节点名字如果在集群环境中，name必须是唯一的，建议用主机名称或者机器ID。 |
 | --data-dir | 数据存储目录 |
-| --initial-cluster | etcd启动的时候，通过这个配置找到其他ectd节点的地址列表，格式：'节点名字1=http://节点ip1:2380,节点名字1=http://节点ip1:2380,.....' |
+| --initial-cluster | etcd启动的时候，通过这个配置找到其他ectd节点的地址列表，格式：`节点名字1=http://节点ip1:2380,节点名字1=http://节点ip1:2380,.....` |
 | --initial-cluster-state | 初始化的时候，集群的状态 "new" 或者 "existing"两种状态，new代表新建的集群，existing表示加入已经存在的集群。 |
 | --advertise-client-urls | 如果--listen-client-urls配置了，多个监听客户端请求的地址，这个参数可以给出，建议客户端使用什么地址访问etcd。 |
 | --initial-advertise-peer-urls | 服务端之间通讯使用的地址列表。 |
-| --listen-client-urls | 监听客户端请求的地址列表，格式：'http://localhost:2379', 多个用逗号分隔。 |
-| --listen-peer-urls | 服务端节点之间通讯的监听地址，格式：'http://localhost:2380' |
+| --listen-client-urls | 监听客户端请求的地址列表，格式：`http://localhost:2379`, 多个用逗号分隔。 |
+| --listen-peer-urls | 服务端节点之间通讯的监听地址，格式：`http://localhost:2380` |
 
 - 验证
 ```
@@ -106,7 +106,7 @@ Hello, etcd
 
 # docker容器部署
 
-官方文档参考地址：https://etcd.io/docs/v3.5/op-guide/container/，官方docker示例使用命令行参数启动，并不推荐。
+官方文档参考地址：https://etcd.io/docs/v3.5/op-guide/container/ ，官方docker示例使用命令行参数启动，并不推荐。
 ```
 # 创建数据目录与配置文件目录
 [root@linux9 ~]# mkdir -p /etc/etcd
@@ -532,7 +532,7 @@ hello world
 
 ## helm部署etcd集群
 
-使用helm可以快速部署一个etcd集群，集成了配置基于角色的访问控制和 TLS 加密，并且可以按需开启定时备份和监控指标采集。参考文档：https://artifacthub.io/packages/helm/bitnami/etcd，维护使用文档：https://docs.bitnami.com/kubernetes/infrastructure/etcd/get-started/install/
+使用helm可以快速部署一个etcd集群，集成了配置基于角色的访问控制和 TLS 加密，并且可以按需开启定时备份和监控指标采集。参考文档：https://artifacthub.io/packages/helm/bitnami/etcd ，维护使用文档：https://docs.bitnami.com/kubernetes/infrastructure/etcd/get-started/install/
 ```
 添加仓库，获取安装包
 [root@k8s-master k8s-test]# cd etcd/
