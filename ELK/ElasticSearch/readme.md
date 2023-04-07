@@ -33,7 +33,16 @@
 - es异步检索：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/async-search.html
 - enrich your data：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/ingest-enriching-data.html
 - es enrich processor：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/enrich-processor.html
-
+- search api：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/search-search.html#request-body-search-query
+- query dsl：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/query-dsl.html
+- es全文检索：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/full-text-queries.html
+- es精确查询：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/term-level-queries.html
+- es布尔查询：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/query-dsl-bool-query.html
+- es搜索结果排序：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/sort-search-results.html
+- es搜索结果分页：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/paginate-search-results.html
+- es搜索结果高亮： https://www.elastic.co/guide/en/elasticsearch/reference/7.13/highlighting.html
+- es搜索模板：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/search-template.html
+- boosting：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/query-dsl-boosting-query.html
 
 
 
