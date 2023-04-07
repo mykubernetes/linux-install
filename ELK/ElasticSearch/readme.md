@@ -5,9 +5,19 @@
 - es节点配置：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/modules-node.html
 - es jvm配置：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/advanced-configuration.html
 - csdn 倒排索引、分词详解https://blog.csdn.net/jiaojiao521765146514/article/details/83750548
-
-
-
+- es字段类型：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/mapping-types.html
+- es显式映射：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/explicit-mapping.html
+- es动态映射：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/dynamic.html
+- es字段复制：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/copy-to.html
+- es倒排索引记录选项：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/index-options.html
+- es空值处理：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/null-value.html
+- es内置分词器https://www.elastic.co/guide/en/elasticsearch/reference/7.13/analysis-tokenizers.html
+- es_Analyze API https://www.elastic.co/guide/en/elasticsearch/reference/7.13/indices-analyze.html
+- es自定义分词器https://www.elastic.co/guide/en/elasticsearch/reference/7.13/analysis-custom-analyzer.html
+- es子字段：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/multi-fields.html
+- es嵌套字段类型：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/nested.html
+- 铭毅天下Elasticsearch Nested类型深入详解：https://blog.csdn.net/laoyang360/article/details/82950393
+- 运行时：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/runtime.html
 
 
 
