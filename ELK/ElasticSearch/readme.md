@@ -18,6 +18,22 @@
 - es嵌套字段类型：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/nested.html
 - 铭毅天下Elasticsearch Nested类型深入详解：https://blog.csdn.net/laoyang360/article/details/82950393
 - 运行时：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/runtime.html
+- es index管理https://www.elastic.co/guide/en/elasticsearch/reference/7.13/indices.html
+- es index配置https://www.elastic.co/guide/en/elasticsearch/reference/7.13/indices-update-settings.html
+- es 文档操作文档：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/docs.html
+- es删除文档：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/docs-delete.html
+- es 索引别名 https://www.elastic.co/guide/en/elasticsearch/reference/7.13/indices-aliases.html
+- es索引模板文档：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/index-templates.html
+- es索引动态映射：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/dynamic-mapping.html#dynamic-mapping
+- reindex：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/docs-reindex.html
+- update by query：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/docs-update-by-query.html
+- task:https://www.elastic.co/guide/en/elasticsearch/reference/7.13/tasks.html
+- 管道:https://www.elastic.co/guide/en/elasticsearch/reference/7.13/ingest.html
+- 处理器https://www.elastic.co/guide/en/elasticsearch/reference/7.13/processors.html
+- es异步检索：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/async-search.html
+- enrich your data：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/ingest-enriching-data.html
+- es enrich processor：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/enrich-processor.html
+
 
 
 
