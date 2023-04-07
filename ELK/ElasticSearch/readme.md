@@ -70,6 +70,7 @@
 - es cat-shards API： https://www.elastic.co/guide/en/elasticsearch/reference/7.13/cat-shards.html
 - es cluster-reroute API： https://www.elastic.co/guide/en/elasticsearch/reference/7.13/cluster-reroute.html
 - es分片异常排查：https://www.elastic.co/guide/en/cloud/current/ec-analyze_shards_with-api.html
+- kibana使用文件上传数据https://www.elastic.co/guide/en/kibana/7.13/connect-to-elasticsearch.html
 
 下载：
 - 官方下载地址：https://www.elastic.co/cn/downloads/past-releases/elasticsearch-7-13-4
