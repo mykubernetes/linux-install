@@ -43,8 +43,33 @@
 - es搜索结果高亮： https://www.elastic.co/guide/en/elasticsearch/reference/7.13/highlighting.html
 - es搜索模板：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/search-template.html
 - boosting：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/query-dsl-boosting-query.html
-
-
+- es聚合：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/search-aggregations.html
+- es metric聚合查询：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/search-aggregations-metrics.html
+- es bucket聚合：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/search-aggregations-bucket.html
+- es pipeline：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/search-aggregations-pipeline.html
+- es安全配置：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/configuring-stack-security.html
+- es最小安全配置：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/security-minimal-setup.html
+- es基础安全配置：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/security-basic-setup.html
+- es高阶安全配置：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/security-basic-setup-https.html
+- es角色管理：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/security-api-put-role.html
+- es用户管理：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/security-api-put-user.html
+- es权限说明：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/security-privileges.html#_run_as_privilege
+- es使用指定用户请求：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/run-as-privilege.html
+- es跨集群搜索：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/modules-cross-cluster-search.html
+- es远程集群：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/modules-remote-clusters.html
+- es 索引生命周期管理：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/index-lifecycle-management.html
+- es ilm api设置策略：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/ilm-index-lifecycle.html
+- es备份集群https://www.elastic.co/guide/en/elasticsearch/reference/7.13/backup-cluster.html
+- es快照与恢复https://www.elastic.co/guide/en/elasticsearch/reference/7.13/snapshot-restore.html
+- es注册快照存储仓库https://www.elastic.co/guide/en/elasticsearch/reference/7.13/snapshots-register-repository.html
+- 基于ilm挂载快照https://www.elastic.co/guide/en/elasticsearch/reference/7.13/ilm-searchable-snapshot.html
+- 快照索引挂载到本地https://www.elastic.co/guide/en/elasticsearch/reference/7.13/searchable-snapshots-api-mount-snapshot.html
+- es跨集群复制https://www.elastic.co/guide/en/elasticsearch/reference/current/xpack-ccr.html
+- es查看分片异常原图：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/cluster-allocation-explain.html
+- es cat-indices API：https://www.elastic.co/guide/en/elasticsearch/reference/7.13/cat-indices.html
+- es cat-shards API： https://www.elastic.co/guide/en/elasticsearch/reference/7.13/cat-shards.html
+- es cluster-reroute API： https://www.elastic.co/guide/en/elasticsearch/reference/7.13/cluster-reroute.html
+- es分片异常排查：https://www.elastic.co/guide/en/cloud/current/ec-analyze_shards_with-api.html
 
 下载：
 - 官方下载地址：https://www.elastic.co/cn/downloads/past-releases/elasticsearch-7-13-4
