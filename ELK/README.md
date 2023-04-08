@@ -252,9 +252,9 @@ curl -XGET localhost:9200/_cluster/health?pretty=true
   "initializing_shards" : 0,                    #正在初始化的分片数
   "unassigned_shards" : 0,                      #未分配到具体节点上的分片数      重要
   "delayed_unassigned_shards" : 0,              #延时待分配到具体节点上的分片数
-  "number_of_pending_tasks" : 0,
-  "number_of_in_flight_fetch" : 0,
-  "task_max_waiting_in_queue_millis" : 0,
+  "number_of_pending_tasks" : 0,                #尚未执行的集群级别更改的数量
+  "number_of_in_flight_fetch" : 0,              #未完成的访存数量
+  "task_max_waiting_in_queue_millis" : 0,       #自最早的初始化任务等待执行以来的时间（以毫秒为单位）
   "active_shards_percent_as_number" : 100.0     #分片比例正常是100%，处在恢复阶段比例在增加直到100
 }
 
