@@ -241,9 +241,9 @@ curl -u es-user:es-password -H "Content-Type: application/json" -XPUT 'http://12
 ```
 curl -XGET localhost:9200/_cluster/health?pretty=true
 {
-  "cluster_name" : "jiankunking-log",
-  "status" : "green",
-  "timed_out" : false,
+  "cluster_name" : "jiankunking-log",           #集群的名称
+  "status" : "green",                           #集群的运行状况，基于其主要和副本分片的状态
+  "timed_out" : false,                          #如果false响应在timeout参数指定的时间段内返回（30s默认情况下）
   "number_of_nodes" : 3,                        #集群内的总节点数
   "number_of_data_nodes" : 3,                   #集群内的总数据节点数
   "active_primary_shards" : 2722,               #集群内所有索引的主分片总数
