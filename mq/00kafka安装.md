@@ -74,16 +74,20 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.151-b12, mixed mode)
 ```  
 
 2、修改配置文件
+
+2.1、进入配置文件目录
 ```
-# 1、进入配置文件目录
 # cd /usr/local/zookeeper/conf
 # ls
 configuration.xsl  log4j.properties  zoo_sample.cfg
-
-# 2、zookeeper提供了一个示例配置文件 zoo_sample.cfg 复制一份
+```
+2.2、zookeeper提供了一个示例配置文件 zoo_sample.cfg 复制一份
+```
 # cp zoo_sample.cfg zoo.cfg
+```
 
-# 3、编辑配置文件
+2.3、编辑配置文件
+```
 # vim zoo.cfg
 # The number of milliseconds of each tick
 tickTime=2000
@@ -131,10 +135,10 @@ clientPort=2181
 # Set to "0" to disable auto purge feature
 #autopurge.purgeInterval=1
 
+#集群信息（服务器编号，服务器地址，Leader-Follower 通信端口，选举端口）
 server.1=zk1.linuxops.org:2888:3888
 server.2=zk2.linuxops.org:2888:3888
 server.3=zk3.linuxops.org:2888:3888
-#以上配置zookeeper集群的服务地址，需要手动添加。
 #其中server.1为第1台服务器，zk1.linuxops.org为第一台服务器解析的域名
 #2888为该服务器于集群中Leader交换信息的端口，3888为选举时服务器通信端口。
 ```  
@@ -248,28 +252,121 @@ kafka-configs.sh              kafka-delete-records.sh      kafka-reassign-partit
 
 
 3、修改配置文件
-| 参数 | 说明 |
-|------|-----|
-| broker.id =0 | 全局唯一当IP改变时，broker.id没有变化，不会影响consumers的消息情况 |
-| listeners=PLAINTEXT://:9092 | 配置kafka监听地址 |
-| advertised.listeners=PLAINTEXT://ip:9092 | producer、consumer连接地址，如未设置使用 listeners |
-| num.network.threads=3 | broker处理消息的最大线程数，一般情况下数量为cpu核数 |
-| num.io.threads=8 | broker处理磁盘IO的线程数，数值为cpu核数2倍 |
-| socket.send.buffer.bytes=102400 | socket的发送缓冲区，socket的调优参数SO_SNDBUFF |
-| socket.receive.buffer.bytes=102400 | socket的接受缓冲区，socket的调优参数SO_RCVBUFF |
-| socket.request.max.bytes=104857600 | 向kafka请求消息或者向kafka发送消息的请请求的最大数，这个值不能超过java的堆栈大小 |
-| log.dirs=/tmp/kafka-logs | kafka数据的存放地址，多个地址的话用逗号分割,多个目录分布在不同磁盘上可以提高读写性能 /data/kafka-logs-1，/data/kafka-logs-2 |
-| num.partitions=1 | 每个topic的分区个数，在创建topic时没有指定使用 |
-| num.recovery.threads.per.data.dir=1 | 在启动时用于日志恢复的线程个数 |
-| offsets.topic.replication.factor=1 | 用于配置offset记录的topic的partition的副本个数 |
-| transaction.state.log.replication.factor=1 |  |
-| transaction.state.log.min.isr=1 |  |
-| log.retention.hours=168 | 默认消息的最大持久化时间，168小时，7天 |
-| log.segment.bytes=1073741824 | topic分区以一堆segment文件存储，控制每个segment的大小，会被topic创建时的指定参数覆盖 |
-| log.retention.check.interval.ms=300000 | 每隔300000毫秒去检查上面配置的log失效时间（log.retention.hours=168 ） |
-| zookeeper.connect=localhost:2181 | zookeeper集群的地址 |
-| zookeeper.connection.timeout.ms=6000 | ZooKeeper的连接超时时间 |
-| group.initial.rebalance.delay.ms=0 |  |	
+```
+############################# Server Basics #############################
+#broker 的 id,必须唯一
+broker.id=0
+
+############################# Socket Server Settings #############################
+#监听地址
+listeners=PLAINTEXT://192.168.1.6:9092
+
+#Broker 用于处理网络请求的线程数
+num.network.threads=6
+
+#Broker 用于处理 I/O 的线程数，推荐值 8 * 磁盘数
+num.io.threads=120
+
+#在网络线程停止读取新请求之前，可以排队等待 I/O 线程处理的最大请求个数
+queued.max.requests=1000
+
+#socket 发送缓冲区大小
+socket.send.buffer.bytes=102400
+
+#socket 接收缓冲区大小
+socket.receive.buffer.bytes=102400
+
+#socket 接收请求的最大值（防止 OOM）
+socket.request.max.bytes=104857600
+
+
+############################# Log Basics #############################
+
+#数据目录
+log.dirs=/data1,/data2,/data3,/data4,/data5,/data6,/data7,/data8,/data9,/data10,/data11,/data12,/data13,/data14,/data15
+
+#清理过期数据线程数
+num.recovery.threads.per.data.dir=3
+
+#单条消息最大 10 M
+message.max.bytes=10485760
+
+############################# Topic Settings #############################
+
+#不允许自动创建 Topic
+auto.create.topics.enable=false
+
+#不允许 Unclean Leader 选举。
+unclean.leader.election.enable=false
+
+#不允许定期进行 Leader 选举。
+auto.leader.rebalance.enable=false
+
+#默认分区数
+num.partitions=3
+
+#默认分区副本数
+default.replication.factor=3
+
+#当生产者将 acks 设置为 "all"（或"-1"）时，此配置指定必须确认写入的副本的最小数量，才能认为写入成功
+min.insync.replicas=2
+
+#允许删除主题
+delete.topic.enable=true
+
+############################# Log Flush Policy #############################
+
+#建议由操作系统使用默认设置执行后台刷新
+#日志落盘消息条数阈值
+#log.flush.interval.messages=10000
+#日志落盘时间间隔
+#log.flush.interval.ms=1000
+#检查是否达到flush条件间隔
+#log.flush.scheduler.interval.ms=200
+
+############################# Log Retention Policy #############################
+
+#日志留存时间 7 天
+log.retention.hours=168
+
+#最多存储 58TB 数据
+log.retention.bytes=63771674411008
+                    
+#日志文件中每个 segment 的大小为 1G
+log.segment.bytes=1073741824
+
+#检查 segment 文件大小的周期 5 分钟
+log.retention.check.interval.ms=300000
+
+#开启日志压缩
+log.cleaner.enable=true
+
+#日志压缩线程数
+log.cleaner.threads=8
+
+############################# Zookeeper #############################
+
+#Zookeeper 连接参数
+zookeeper.connect=192.168.1.6:2181,192.168.1.7:2181,192.168.1.8:2181
+
+#连接 Zookeeper 的超时时间
+zookeeper.connection.timeout.ms=6000
+
+
+############################# Group Coordinator Settings #############################
+
+#为了缩短多消费者首次平衡的时间，这段延时期间 10s 内允许更多的消费者加入组
+group.initial.rebalance.delay.ms=10000
+
+#心跳超时时间默认 10s，设置成 6s 主要是为了让 Coordinator 能够更快地定位已经挂掉的 Consumer
+session.timeout.ms = 6s。
+
+#心跳间隔时间，session.timeout.ms >= 3 * heartbeat.interval.ms。
+heartbeat.interval.ms=2s
+
+#最长消费时间 5 分钟
+max.poll.interval.ms=300000
+```
 
 ```
 # cd config/
@@ -284,12 +381,13 @@ num.io.threads=16                        #用来处理磁盘IO的现成数量,�
 socket.send.buffer.bytes=102400          #发送套接字的缓冲区大小
 socket.receive.buffer.bytes=102400       #接收套接字的缓冲区大小
 socket.request.max.bytes=104857600       #请求套接字的缓冲区大小
-log.dirs=/opt/module/kafka/logs          #kafka运行日志存放的路径
+log.dirs=/opt/module/kafka/logs          #kafka数据的存放地址，多个地址的话用逗号分割,多个目录分布在不同磁盘上可以提高读写性能 /data/kafka-logs-1，/data/kafka-logs-2
 log.cleaner.enable=true                  #日志清理是否打开
-num.partitions=1                         #topic在当前broker上的分区个数
+num.partitions=1                         #每个topic的分区个数，在创建topic时没有指定使用
 num.recovery.threads.per.data.dir=1      #用来恢复和清理data下数据的线程数量
-log.retention.hours=168                  #segment文件保留的最长时间，超时将被删除
+log.retention.hours=168                  #默认消息的最大持久化时间，168小时，7天
 log.roll.hours=168                       #滚动生成新的segment文件的最大时间
+log.retention.check.interval.ms=300000   #每隔300000毫秒去检查上面配置的log失效时间（log.retention.hours=168 ）
 log.segment.bytes=1073741824             #日志文件中每个segment的大小，默认为1G
 log.flush.interval.messages=10000        #partion buffer中，消息的条数达到阈值，将触发flush到磁盘
 log.flush.interval.ms=3000               #消息buffer的时间，达到阈值，将触发flush到磁盘
